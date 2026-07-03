@@ -86,7 +86,7 @@ export function getProductImageAltKey(product: Product): string | null {
   return imageAltKeyMap[img] || null;
 }
 
-const ACTIVE_LOCATIONS: ProductLocation[] = ["san-diego", "online"];
+const ACTIVE_LOCATIONS: InternalLocation[] = ["san-diego", "las-vegas", "fresno", "online"];
 
 const internalCatalog: InternalProduct[] = [
   // ─── ONLINE CERTIFICATION (UNIFIED: INDIVIDUAL + CREW) ───────────

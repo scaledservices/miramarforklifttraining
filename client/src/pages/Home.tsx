@@ -39,8 +39,14 @@ export default function Home() {
               {t("home.heroSubtitle")}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/request-quote">
+                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white text-base px-8 py-6" data-testid="button-hero-quote">
+                  <Building2 className="h-5 w-5 mr-2" />
+                  {t("home.getQuoteCta")}
+                </Button>
+              </Link>
               <Link href="/in-person-training">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white text-base px-8 py-6" data-testid="button-hero-in-person">
+                <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 text-base px-8 py-6" data-testid="button-hero-in-person">
                   <Wrench className="h-5 w-5 mr-2" />
                   {t("home.bookInPerson")}
                 </Button>
@@ -83,6 +89,32 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <Link href="/request-quote" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg block">
+                <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg h-full border-2 border-accent shadow-md ring-1 ring-accent/20" data-testid="card-b2b">
+                  <div className="absolute top-0 left-0 right-0 bg-accent text-accent-foreground text-xs font-semibold text-center py-1.5 flex items-center justify-center gap-1.5">
+                    <Star className="w-3 h-3 fill-current" />{t("common.mostPopular")}
+                  </div>
+                  <CardContent className="p-6 pt-10 flex flex-col h-full">
+                    <div className="w-14 h-14 rounded-xl bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center mb-5">
+                      <Building2 className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{t("home.b2bTitle")}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-5">{t("home.b2bDesc")}</p>
+                    <ul className="space-y-2 mb-6 flex-1">
+                      {[t("home.b2bF1"), t("home.b2bF2"), t("home.b2bF3")].map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-sm">
+                          <CheckCircle className="w-4 h-4 shrink-0 text-purple-600 dark:text-purple-400" />
+                          <span className="text-muted-foreground">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-accent text-accent-foreground px-4 py-2.5 text-sm font-medium transition-colors">
+                      {t("home.getQuoteCta")} <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </CardContent>
+                </Card>
+            </Link>
+
             <Link href="/in-person-training" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg block">
                 <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg h-full border-border hover:border-muted-foreground/30" data-testid="card-in-person">
                   <CardContent className="p-6 flex flex-col h-full">
@@ -107,11 +139,8 @@ export default function Home() {
             </Link>
 
             <Link href="/p/online-forklift-operator-training" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg block">
-                <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg h-full border-2 border-accent shadow-md ring-1 ring-accent/20" data-testid="card-online">
-                  <div className="absolute top-0 left-0 right-0 bg-accent text-accent-foreground text-xs font-semibold text-center py-1.5 flex items-center justify-center gap-1.5">
-                    <Star className="w-3 h-3 fill-current" />{t("common.mostPopular")}
-                  </div>
-                  <CardContent className="p-6 pt-10 flex flex-col h-full">
+                <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg h-full border-border hover:border-muted-foreground/30" data-testid="card-online">
+                  <CardContent className="p-6 flex flex-col h-full">
                     <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center mb-5">
                       <Monitor className="w-7 h-7 text-accent" />
                     </div>
@@ -125,35 +154,12 @@ export default function Home() {
                         </li>
                       ))}
                     </ul>
-                    <div className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-accent text-accent-foreground px-4 py-2.5 text-sm font-medium transition-colors">
+                    <div className="w-full inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2.5 text-sm font-medium hover:bg-accent/5 transition-colors">
                       {t("cta.getCertifiedNow")} <ArrowRight className="w-4 h-4" />
                     </div>
                     <div className="flex items-center justify-center gap-1.5 mt-3 text-xs text-muted-foreground">
                       <Zap className="w-3 h-3 text-accent" />
                       <span>{t("home.certIn2Hours")}</span>
-                    </div>
-                  </CardContent>
-                </Card>
-            </Link>
-
-            <Link href="/request-quote" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg block">
-                <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg h-full border-border hover:border-muted-foreground/30" data-testid="card-b2b">
-                  <CardContent className="p-6 flex flex-col h-full">
-                    <div className="w-14 h-14 rounded-xl bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center mb-5">
-                      <Building2 className="w-7 h-7 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">{t("home.b2bTitle")}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-5">{t("home.b2bDesc")}</p>
-                    <ul className="space-y-2 mb-6 flex-1">
-                      {[t("home.b2bF1"), t("home.b2bF2"), t("home.b2bF3")].map((f) => (
-                        <li key={f} className="flex items-center gap-2 text-sm">
-                          <CheckCircle className="w-4 h-4 shrink-0 text-purple-600 dark:text-purple-400" />
-                          <span className="text-muted-foreground">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="w-full inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2.5 text-sm font-medium hover:bg-accent/5 transition-colors">
-                      {t("home.getQuoteCta")} <ArrowRight className="w-4 h-4" />
                     </div>
                   </CardContent>
                 </Card>
@@ -198,14 +204,14 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-4">{t("home.readyToGetCertified")}</h2>
           <p className="text-blue-100 text-lg mb-8">{t("home.readyToGetCertifiedDesc")}</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/in-person-training">
+            <Link href="/request-quote">
               <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8">
-                {t("home.bookInPerson")}
+                {t("home.requestQuoteCta")}
               </Button>
             </Link>
-            <Link href="/contact">
+            <Link href="/in-person-training">
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 px-8">
-                {t("cta.contactUs")}
+                {t("home.bookInPerson")}
               </Button>
             </Link>
           </div>
