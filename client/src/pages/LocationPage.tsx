@@ -111,9 +111,11 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                 </div>
               </div>
 
-              {slug === "san-diego" && (
+              {loc.supportsInPerson && (
                 <div>
-                  <h2 className="text-2xl font-bold tracking-tight mb-4">{t("location.sd.pricingTitle")}</h2>
+                  <h2 className="text-2xl font-bold tracking-tight mb-4" data-testid="text-pricing-title">
+                    {t(`${i18nPrefix}.pricingTitle`, { defaultValue: t("location.pricingTitleDefault", { defaultValue: "Pricing" }) })}
+                  </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {Object.values(brand.pricing.inPerson).map((course) => (
                       <div key={course.name} className="flex items-center justify-between bg-card border rounded-lg px-4 py-3">
@@ -122,6 +124,9 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                       </div>
                     ))}
                   </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {t("location.pricingNote", { defaultValue: "Prices vary by equipment type and group size. Volume discounts available for 5+ trainees. Call for a custom quote." })}
+                  </p>
                 </div>
               )}
 
