@@ -78,8 +78,8 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
     phone: "(858) 901-0149",
     phoneTel: "+18589010149",
     hours: "Mon–Fri: 7:00 AM – 5:00 PM",
-    active: false,
-    supportsInPerson: false,
+    active: true,
+    supportsInPerson: true,
     supportsOnsite: true,
     equipmentTypes: [
       "Sit-down Counterbalance Forklift (LPG)",
@@ -92,7 +92,7 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
     heroImage: "/images/hero-forklift.jpg",
     seo: {
       title: "Forklift Training in Las Vegas",
-      description: "OSHA-aligned forklift certification in Las Vegas. On-site training at your facility.",
+      description: "OSHA-aligned forklift certification in Las Vegas. In-person at our facility or on-site at your location.",
     },
   },
   fresno: {
@@ -110,8 +110,8 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
     phone: "(858) 901-0149",
     phoneTel: "+18589010149",
     hours: "Mon–Fri: 7:00 AM – 5:00 PM",
-    active: false,
-    supportsInPerson: false,
+    active: true,
+    supportsInPerson: true,
     supportsOnsite: true,
     equipmentTypes: [
       "Sit-down Counterbalance Forklift (LPG)",

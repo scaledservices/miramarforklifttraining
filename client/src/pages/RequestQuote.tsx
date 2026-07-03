@@ -49,6 +49,7 @@ const formSchema = z.object({
   state: z.string().optional(),
   zip: z.string().optional(),
   traineeCount: z.coerce.number().int().min(1, "At least 1 participant").max(1000),
+  companySize: z.string().optional(),
   equipmentTypes: z.array(z.string()).min(1, "Please select at least one equipment type"),
   trainingType: z.string().min(1, "Please select a training type"),
   preferredDate1: z.string().optional(),
@@ -100,6 +101,7 @@ export default function RequestQuote() {
       state: "",
       zip: "",
       traineeCount: 1,
+      companySize: "",
       equipmentTypes: [],
       trainingType: "",
       preferredDate1: "",
@@ -128,6 +130,7 @@ export default function RequestQuote() {
         state: isFacility ? (loc?.address.state || "") : data.state,
         zip: isFacility ? (loc?.address.zip || "") : data.zip,
         traineeCount: data.traineeCount,
+        companySize: data.companySize || undefined,
         equipmentTypes: data.equipmentTypes,
         trainingType: data.trainingType,
         preferredDate1: data.preferredDate1 || undefined,
@@ -199,6 +202,32 @@ export default function RequestQuote() {
 
       <div className="max-w-5xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2">
+          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl p-5 mb-6">
+            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <ClipboardList className="h-5 w-5 text-primary" />
+              {t("requestQuote.startingPricesTitle", { defaultValue: "Starting Prices" })}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+                <div>
+                  <span className="font-medium text-foreground">{t("requestQuote.priceOnsiteLabel", { defaultValue: "Onsite / Company Training" })}</span>
+                  <span className="block text-muted-foreground">{t("requestQuote.priceOnsiteValue", { defaultValue: "From $200-280 per person depending on group size" })}</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+                <div>
+                  <span className="font-medium text-foreground">{t("requestQuote.priceHandsOnLabel", { defaultValue: "Hands-On at Our Location" })}</span>
+                  <span className="block text-muted-foreground">{t("requestQuote.priceHandsOnValue", { defaultValue: "From $200-300 per person depending on equipment" })}</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3">
+              {t("requestQuote.priceNote", { defaultValue: "Volume discounts available for 5+ trainees. Train-the-Trainer available for $750. Final pricing confirmed in your quote." })}
+            </p>
+          </div>
+
           <div className="bg-card border rounded-xl p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-6 text-foreground">{t("requestQuote.formTitle")}</h2>
             <Form {...form}>
@@ -355,6 +384,33 @@ export default function RequestQuote() {
                     </FormItem>
                   )} />
                 </div>
+
+                <FormField control={form.control} name="companySize" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("requestQuote.companySizeLabel", { defaultValue: "Company Size (optional)" })}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-company-size">
+                          <SelectValue placeholder={t("requestQuote.companySizePlaceholder", { defaultValue: "Select company size" })} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="1-4">{t("requestQuote.companySize1to4", { defaultValue: "1-4 employees" })}</SelectItem>
+                        <SelectItem value="5-9">{t("requestQuote.companySize5to9", { defaultValue: "5-9 employees" })}</SelectItem>
+                        <SelectItem value="10+">{t("requestQuote.companySize10plus", { defaultValue: "10+ employees" })}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                {form.watch("companySize") === "10+" && (
+                  <div className="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 text-sm">
+                    <p className="font-medium text-purple-800 dark:text-purple-400">
+                      {t("requestQuote.tttSuggestion", { defaultValue: "With 10+ employees, ask about our Train-the-Trainer program - certify your own in-house instructor for $750." })}
+                    </p>
+                  </div>
+                )}
 
                 <FormField control={form.control} name="equipmentTypes" render={() => (
                   <FormItem>
