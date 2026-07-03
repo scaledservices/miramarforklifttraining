@@ -5,10 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import { Phone, Mail, ShoppingCart, ArrowLeft } from "lucide-react";
 import { brand } from "@shared/config/brand";
+import { trackCheckoutContact } from "@/lib/analytics";
+import { useEffect } from "react";
 
 export default function Checkout() {
   const { t } = useTranslation();
   const { items, totalPrice, clearCart } = useCart();
+
+  useEffect(() => {
+    if (items.length > 0) trackCheckoutContact();
+  }, [items.length]);
 
   if (items.length === 0) {
     return (

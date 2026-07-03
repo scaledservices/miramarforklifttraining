@@ -7,6 +7,7 @@ import { industry } from "@shared/config/industry";
 import { getActiveLocations, getLocation, type TrainingLocation } from "@shared/config/locations";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { trackLeadSubmit } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -144,6 +145,7 @@ export default function RequestQuote() {
       return apiRequest("POST", "/api/onsite-requests", payload);
     },
     onSuccess: () => {
+      trackLeadSubmit(getLeadSourceFromUrl(), form.getValues("requestedLocationSlug"));
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
