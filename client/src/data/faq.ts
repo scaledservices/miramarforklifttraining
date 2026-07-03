@@ -34,7 +34,7 @@ export const faqItems: FAQItem[] = [
   },
   {
     question: "Where are your hands-on training locations?",
-    answer: "We currently offer hands-on forklift training at two locations: San Diego, California and Las Vegas, Nevada. Our training facilities are equipped with multiple types of powered industrial trucks for comprehensive practical training.",
+    answer: "We currently offer hands-on forklift training at three locations: San Diego, California; Las Vegas, Nevada; and Fresno, California. Our training facilities are equipped with multiple types of powered industrial trucks for comprehensive practical training.",
     category: "hands-on",
   },
   {
@@ -76,6 +76,38 @@ export const faqItems: FAQItem[] = [
     question: "What if I fail the assessment?",
     answer: "Our online training includes unlimited retakes of the final assessment at no additional charge. For hands-on training, our instructors work with you during the practical exercises to ensure you develop the skills needed to pass the evaluation. Additional practice time is provided if needed.",
     category: "general",
+  },
+
+  // ─── CONVERSATIONAL / AEO-STYLE FAQ (for voice search & AI overviews) ───
+  {
+    question: "How much does forklift certification cost?",
+    answer: "Online forklift certification costs $45 to $59 per person depending on group size. Hands-on training at our facility costs $200 to $300 per person depending on equipment type. Onsite training at your facility starts at $200 to $280 per person with volume discounts for 5 or more. Train the Trainer certification is $750.",
+    category: "general",
+  },
+  {
+    question: "How long does it take to get forklift certified?",
+    answer: "Online certification takes 1 to 2 hours to complete at your own pace. Hands-on training at our facility takes 3 to 4 hours for beginners or 1.5 to 2 hours for experienced operators. Same-day certification is available for all hands-on courses.",
+    category: "general",
+  },
+  {
+    question: "Is online forklift certification valid?",
+    answer: "Yes, online forklift certification covers the formal classroom instruction required by OSHA. However, OSHA also requires a hands-on practical evaluation. Many employers complete this evaluation in-house. If you need a full certification including hands-on evaluation, we offer that at our facilities in San Diego, Las Vegas, and Fresno, or we can come to your site.",
+    category: "certification",
+  },
+  {
+    question: "Do I need to renew my forklift certification?",
+    answer: "Yes, OSHA requires forklift operator evaluation every 3 years. You may also need recertification sooner if you switch to a different type of equipment, are involved in an accident or near-miss, or are observed operating unsafely. We offer fast renewal options including online, hands-on, and onsite training.",
+    category: "certification",
+  },
+  {
+    question: "Can you train forklift operators at my workplace?",
+    answer: "Yes, we offer onsite training where we come to your facility. This is often the best option for companies with 2 or more operators. You train on the equipment you actually use, and pricing starts at $200 to $280 per person with volume discounts for groups of 5 or more.",
+    category: "business",
+  },
+  {
+    question: "What is train the trainer for forklift certification?",
+    answer: "Train the Trainer is a program that certifies you to train and evaluate your own forklift operators in-house. It costs $750 and takes 2 to 4 hours. This is a good option for companies with 10 or more employees who need ongoing training, since you can certify new hires yourself instead of bringing in outside trainers each time.",
+    category: "business",
   },
 ];
 
