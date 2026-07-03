@@ -22,6 +22,7 @@ import Documentation from "@/pages/Documentation";
 import Contact from "@/pages/Contact";
 import Support from "@/pages/Support";
 import LocationPage from "@/pages/LocationPage";
+import RenewalPage from "@/pages/RenewalPage";
 import Blog from "@/pages/Blog";
 import BlogArticle from "@/pages/BlogArticle";
 import ProductDetail from "@/pages/ProductDetail";
@@ -145,6 +146,7 @@ function AppRoutes() {
       <Route path="/contact" component={Contact} />
       <Route path="/locations" component={LocationsHub} />
       <Route path="/locations/:slug">{(params: { slug: string }) => <LocationPage location={params.slug} />}</Route>
+      <Route path="/renewal" component={RenewalPage} />
       <Route path="/in-person-training" component={InPersonTraining} />
       <Route path="/request-onsite-training">{() => <Redirect to="/request-quote" />}</Route>
       <Route path="/request-quote" component={RequestQuote} />
