@@ -6,7 +6,6 @@ import { organizationSchema } from "@/components/seo/StructuredData";
 import { useCurrentLocale } from "@/hooks/useLocaleLocation";
 import { faqItems } from "@/data/faq";
 import FAQSection from "@/components/sections/FAQSection";
-import Testimonials from "@/components/sections/Testimonials";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -190,7 +189,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Testimonials />
+      {/* Testimonials hidden until real reviews are collected per senior review Section B.8 */}
 
       <FAQSection
         items={faqItems}
