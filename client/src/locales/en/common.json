@@ -233,7 +233,7 @@
     "needOnsiteTraining": "Need training at your facility instead?"
   },
   "home": {
-    "heroTitle": "San Diego Forklift Training & Certification",
+    "heroTitle": "OSHA-Aligned Forklift Training & Certification",
     "heroSubtitle": "OSHA-aligned in-person and online forklift certification at our Miramar facility or your job site. Same-day cards available.",
     "bookInPerson": "Book In-Person Training",
     "getOnlineCertified": "Get Certified Online",
@@ -1092,17 +1092,17 @@
     },
     "lv": {
       "seoTitle": "{{brand}} — Las Vegas Forklift Training & Certification",
-      "seoDesc": "{{body}}-aligned forklift training coming soon to Las Vegas, NV.",
+      "seoDesc": "{{body}}-aligned forklift training in Las Vegas. In-person at our facility or on-site at your location.",
       "heroTitle": "Forklift Training in Las Vegas",
-      "heroSubtitle": "{{body}}-aligned forklift certification coming soon to Las Vegas.",
+      "heroSubtitle": "{{body}}-aligned forklift certification in Las Vegas. In-person at our facility or on-site at your location.",
       "bookTraining": "Book Training",
       "requestQuote": "Request a Quote"
     },
     "fr": {
       "seoTitle": "{{brand}} — Fresno Forklift Training & Certification",
-      "seoDesc": "{{body}}-aligned forklift training coming soon to Fresno, CA.",
+      "seoDesc": "{{body}}-aligned forklift training in Fresno. In-person at our facility or on-site at your location.",
       "heroTitle": "Forklift Training in Fresno",
-      "heroSubtitle": "{{body}}-aligned forklift certification coming soon to Fresno.",
+      "heroSubtitle": "{{body}}-aligned forklift certification in Fresno. In-person at our facility or on-site at your location.",
       "bookTraining": "Book Training",
       "requestQuote": "Request a Quote"
     }
@@ -1763,7 +1763,7 @@
     "title": "Training Location",
     "subtitle": "In-person training at our San Diego facility or on-site at your location. {{body}}-aligned certification with hands-on evaluation.",
     "sanDiegoFacility": "San Diego Facility",
-    "facilityDesc": "Walk-in and scheduled training at our Miramar facility. Individual and group sessions available with same-day certification.",
+    "facilityDesc": "In-person and on-site forklift training. Individual and group sessions with same-day certification.",
     "viewTrainingOptions": "View Training Options",
     "onSiteTraining": "On-Site Training",
     "onSiteSubtitle": "We come to your facility",

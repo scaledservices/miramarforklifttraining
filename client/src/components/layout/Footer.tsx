@@ -36,7 +36,7 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 opacity-90">{t("footer.resources")}</h3>
             <ul className="space-y-2">
-              <li><Link href="/blog" className="text-sm opacity-75 transition-opacity" data-testid="footer-link-blog">{t("footer.blog")}</Link></li>
+              {/* Blog link hidden until blog content exists (senior review Section B.5) */}
               <li><Link href="/documentation" className="text-sm opacity-75 transition-opacity" data-testid="footer-link-docs">{t("footer.documentation")}</Link></li>
               <li><Link href="/business/faq" className="text-sm opacity-75 transition-opacity" data-testid="footer-link-faq">{t("footer.faq")}</Link></li>
               <li><Link href="/osha-compliance" className="text-sm opacity-75 transition-opacity" data-testid="footer-link-osha">{t("footer.oshaCompliance")}</Link></li>
@@ -58,8 +58,10 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 opacity-60 shrink-0 mt-0.5" />
-                <div className="text-sm opacity-75">
+                <div className="text-sm opacity-75 space-y-1">
                   <Link href="/locations/san-diego" data-testid="footer-link-sd">{t("footerLocations.sanDiego")}</Link>
+                  <div><Link href="/locations/las-vegas" data-testid="footer-link-lv">{t("footerLocations.lasVegas", { defaultValue: "Las Vegas, NV" })}</Link></div>
+                  <div><Link href="/locations/fresno" data-testid="footer-link-fresno">{t("footerLocations.fresno", { defaultValue: "Fresno, CA" })}</Link></div>
                 </div>
               </li>
             </ul>
