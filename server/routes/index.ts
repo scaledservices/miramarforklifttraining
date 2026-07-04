@@ -18,6 +18,7 @@ import { registerServiceRoutes } from "./services";
 import { registerAssistantRoutes } from "./assistant";
 import { registerTrainingEventRoutes } from "./training-events";
 import { registerQuoteRoutes } from "./quotes";
+import { registerAuthorizeNetRoutes } from "./authorizeNet";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -57,6 +58,7 @@ export async function registerRoutes(
   registerAssistantRoutes(app);
   registerTrainingEventRoutes(app);
   registerQuoteRoutes(app);
+  registerAuthorizeNetRoutes(app);
 
   return httpServer;
 }
