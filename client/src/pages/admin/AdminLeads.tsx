@@ -26,6 +26,7 @@ interface Lead {
   trainingType: string;
   equipmentTypes: string[];
   status: OnsiteStatus;
+  customerClassification: "new" | "existing" | "unverified";
   assignedRepId: number | null;
   repName: string | null;
   leadSource: string | null;
@@ -143,6 +144,18 @@ export default function AdminLeads() {
     },
     onError: (err: Error) => {
       toast({ title: "Failed to assign rep", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const classificationMutation = useMutation({
+    mutationFn: ({ id, customerClassification }: { id: number; customerClassification: string }) =>
+      apiRequest("PATCH", `/api/admin/onsite-requests/${id}`, { customerClassification }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/leads"] });
+      toast({ title: "Customer classification updated" });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Failed to update classification", description: err.message, variant: "destructive" });
     },
   });
 
@@ -302,6 +315,7 @@ export default function AdminLeads() {
                   <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("status")}>
                     Status <SortIcon field="status" />
                   </TableHead>
+                  <TableHead>Class</TableHead>
                   <TableHead>Rep</TableHead>
                   <TableHead>Next Action</TableHead>
                   <TableHead className="cursor-pointer select-none" onClick={() => toggleSort("activity")}>
@@ -366,6 +380,21 @@ export default function AdminLeads() {
                       </TableCell>
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <Select
+                          value={lead.customerClassification || "unverified"}
+                          onValueChange={(val) => classificationMutation.mutate({ id: lead.id, customerClassification: val })}
+                        >
+                          <SelectTrigger className="w-[120px] h-8 text-xs" data-testid={`select-lead-classification-${lead.id}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="unverified">Unverified</SelectItem>
+                            <SelectItem value="new">New</SelectItem>
+                            <SelectItem value="existing">Existing</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Select
                           value={lead.assignedRepId?.toString() || "none"}
                           onValueChange={(val) => {
                             if (val !== "none") repMutation.mutate({ id: lead.id, repId: parseInt(val) });
@@ -419,7 +448,7 @@ export default function AdminLeads() {
                 })}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-muted-foreground py-10">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground py-10">
                       {leads.length === 0 ? "No leads yet." : "No leads match your filters."}
                     </TableCell>
                   </TableRow>

@@ -86,6 +86,8 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import SeoPageRenderer from "@/pages/seo/SeoPageRenderer";
 import BookTraining from "@/pages/BookTraining";
 import LocationsHub from "@/pages/LocationsHub";
+import ServiceAreaPage from "@/pages/ServiceAreaPage";
+import ServiceAreasHub from "@/pages/ServiceAreasHub";
 import { CartProvider } from "@/contexts/CartContext";
 import DemoBanner from "@/components/DemoBanner";
 import SEOHead from "@/components/seo/SEOHead";
@@ -147,6 +149,8 @@ function AppRoutes() {
       <Route path="/contact" component={Contact} />
       <Route path="/locations" component={LocationsHub} />
       <Route path="/locations/:slug">{(params: { slug: string }) => <LocationPage location={params.slug} />}</Route>
+      <Route path="/service-areas" component={ServiceAreasHub} />
+      <Route path="/service-areas/:city">{(params: { city: string }) => <ServiceAreaPage city={params.city} />}</Route>
       <Route path="/renewal" component={RenewalPage} />
       <Route path="/faq" component={FAQPage} />
       <Route path="/in-person-training" component={InPersonTraining} />

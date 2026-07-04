@@ -226,7 +226,7 @@ export interface IStorage {
   createOnsiteTrainingRequest(data: InsertOnsiteTrainingRequest): Promise<OnsiteTrainingRequest>;
   listOnsiteTrainingRequests(status?: string): Promise<OnsiteTrainingRequest[]>;
   getOnsiteTrainingRequest(id: number): Promise<OnsiteTrainingRequest | undefined>;
-  updateOnsiteTrainingRequest(id: number, data: Partial<Pick<OnsiteTrainingRequest, "status" | "adminNotes" | "assignedRepId" | "leadSource" | "companyId" | "contactId" | "nextActionType" | "nextActionDate" | "lastActivityAt">>): Promise<OnsiteTrainingRequest | undefined>;
+  updateOnsiteTrainingRequest(id: number, data: Partial<Pick<OnsiteTrainingRequest, "status" | "adminNotes" | "assignedRepId" | "leadSource" | "companyId" | "contactId" | "nextActionType" | "nextActionDate" | "lastActivityAt" | "customerClassification">>): Promise<OnsiteTrainingRequest | undefined>;
 
   createLeadActivity(data: InsertLeadActivity): Promise<LeadActivity>;
   getLeadActivitiesByLead(leadId: number): Promise<LeadActivity[]>;
@@ -1545,7 +1545,7 @@ export class DatabaseStorage implements IStorage {
     return req;
   }
 
-  async updateOnsiteTrainingRequest(id: number, data: Partial<Pick<OnsiteTrainingRequest, "status" | "adminNotes" | "assignedRepId" | "leadSource" | "companyId" | "contactId" | "nextActionType" | "nextActionDate" | "lastActivityAt">>): Promise<OnsiteTrainingRequest | undefined> {
+  async updateOnsiteTrainingRequest(id: number, data: Partial<Pick<OnsiteTrainingRequest, "status" | "adminNotes" | "assignedRepId" | "leadSource" | "companyId" | "contactId" | "nextActionType" | "nextActionDate" | "lastActivityAt" | "customerClassification">>): Promise<OnsiteTrainingRequest | undefined> {
     const [req] = await db.update(onsiteTrainingRequests)
       .set({ ...data, updatedAt: new Date() })
       .where(eq(onsiteTrainingRequests.id, id))

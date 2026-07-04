@@ -562,6 +562,7 @@ export const onsiteTrainingRequests = pgTable("onsite_training_requests", {
   contactId: integer("contact_id").references(() => contacts.id),
   assignedRepId: integer("assigned_rep_id").references(() => users.id),
   leadSource: text("lead_source").default("unknown"),
+  customerClassification: text("customer_classification", { enum: ["new", "existing", "unverified"] }).notNull().default("unverified"),
   requestedLocationSlug: text("requested_location_slug"),
   requestedLocationType: text("requested_location_type"),
   nextActionType: text("next_action_type", { enum: ["call_back", "send_quote", "follow_up", "schedule_training", "send_info", "other"] }),

@@ -65,6 +65,13 @@ export default function Footer() {
                 </div>
               </li>
             </ul>
+
+            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 mt-6 opacity-90">Service Areas</h3>
+            <ul className="space-y-2">
+              <li><Link href="/service-areas/los-angeles" className="text-sm opacity-75" data-testid="footer-link-la">Onsite Training Los Angeles</Link></li>
+              <li><Link href="/service-areas/bakersfield" className="text-sm opacity-75" data-testid="footer-link-bakersfield">Onsite Training Bakersfield</Link></li>
+              <li><Link href="/service-areas/hayward" className="text-sm opacity-75" data-testid="footer-link-hayward">Onsite Training Hayward</Link></li>
+            </ul>
           </div>
         </div>
 

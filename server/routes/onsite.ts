@@ -406,6 +406,7 @@ app.get("/api/admin/reps", requireRole("admin", "super_admin"), async (_req: Req
 const onsiteRequestUpdateSchema = z.object({
   status: z.enum(ONSITE_STATUSES as unknown as [string, ...string[]]).optional(),
   adminNotes: z.string().optional(),
+  customerClassification: z.enum(["new", "existing", "unverified"]).optional(),
 });
 
 app.patch("/api/admin/onsite-requests/:id", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
@@ -416,7 +417,7 @@ app.patch("/api/admin/onsite-requests/:id", requireRole("admin", "super_admin"),
     if (!parsed.success) {
       return res.status(400).json({ error: "Invalid request body", details: parsed.error.issues });
     }
-    const { status, adminNotes } = parsed.data;
+    const { status, adminNotes, customerClassification } = parsed.data;
 
     if (status !== undefined) {
       const existing = await storage.getOnsiteTrainingRequest(id);
@@ -437,6 +438,7 @@ app.patch("/api/admin/onsite-requests/:id", requireRole("admin", "super_admin"),
     const updated = await storage.updateOnsiteTrainingRequest(id, {
       ...(status !== undefined ? { status: status as OnsiteStatus } : {}),
       ...(adminNotes !== undefined ? { adminNotes } : {}),
+      ...(customerClassification !== undefined ? { customerClassification } : {}),
     });
     if (!updated) return res.status(404).json({ error: "Request not found" });
 

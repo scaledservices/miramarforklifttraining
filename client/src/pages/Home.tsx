@@ -5,14 +5,17 @@ import SEOHead from "@/components/seo/SEOHead";
 import { organizationSchema } from "@/components/seo/StructuredData";
 import { useCurrentLocale } from "@/hooks/useLocaleLocation";
 import { faqItems } from "@/data/faq";
+import { getAllServiceAreaCities } from "@/data/serviceAreas";
 import FAQSection from "@/components/sections/FAQSection";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Shield, Award, Clock, MapPin, Monitor, Wrench, Users,
-  ArrowRight, CheckCircle, Building2, Star, Zap,
+  ArrowRight, CheckCircle, Building2, Star, Zap, Truck,
 } from "lucide-react";
+
+const serviceAreas = getAllServiceAreaCities();
 
 export default function Home() {
   const { t } = useTranslation();
@@ -190,6 +193,39 @@ export default function Home() {
       </section>
 
       {/* Testimonials hidden until real reviews are collected per senior review Section B.8 */}
+
+      {/* Service Areas */}
+      <section className="py-16 md:py-20 bg-card border-y border-border" data-testid="service-areas-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-accent text-sm font-semibold uppercase tracking-wider">Onsite Training</span>
+            <h2 className="text-3xl font-bold mt-2 mb-4 tracking-tight" data-testid="text-service-areas-title">Onsite Forklift Training Service Areas</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              We bring {industry.regulatory.body}-aligned forklift certification directly to your facility — no travel required for your team.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {serviceAreas.map((area) => (
+              <Link key={area.slug} href={`/service-areas/${area.slug}`} className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-lg block">
+                <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg h-full border-border hover:border-accent" data-testid={`card-service-area-${area.slug}`}>
+                  <CardContent className="p-6 flex flex-col h-full">
+                    <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center mb-5">
+                      <Truck className="w-7 h-7 text-accent" />
+                    </div>
+                    <h3 className="text-xl font-bold mb-2">{area.city}, {area.stateAbbrev}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">
+                      Onsite forklift training in {area.city} and surrounding areas. We come to your facility with same-day certification.
+                    </p>
+                    <div className="w-full inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2.5 text-sm font-medium hover:bg-accent/5 transition-colors">
+                      Learn More <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <FAQSection
         items={faqItems}
