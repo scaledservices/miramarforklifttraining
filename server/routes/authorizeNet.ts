@@ -7,6 +7,7 @@ import { isAdminRole } from "@shared/roles";
 import {
   isAuthorizeNetConfigured,
   getAuthorizeNetClientKey,
+  getAuthorizeNetApiLoginID,
   getAuthorizeNetEnvironment,
   createTransactionFromNonce,
   refundTransaction,
@@ -35,6 +36,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
         configured: true,
         provider: "authorize_net",
         clientKey: getAuthorizeNetClientKey(),
+        apiLoginID: getAuthorizeNetApiLoginID(),
         environment: getAuthorizeNetEnvironment(),
       });
     } catch (err) {

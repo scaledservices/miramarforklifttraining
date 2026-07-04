@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -7,6 +7,7 @@ import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
@@ -20,31 +21,44 @@ interface PaymentConfig {
   configured: boolean;
   provider: string;
   clientKey?: string;
+  apiLoginID?: string;
   environment?: string;
   demoMode?: boolean;
 }
 
-// Authorize.net Accept UI iframe integration
+// Authorize.net Accept.js (v1) integration — uses Accept.dispatchData to send
+// card data directly to Authorize.net and receive an opaque payment nonce.
+// Card data never touches our server (SAQ-A-EP scope).
 declare global {
   interface Window {
-    AcceptUI?: (config: AcceptUIConfig) => void;
+    Accept?: {
+      dispatchData: (secureData: AcceptSecureData, responseHandler: (response: AcceptDispatchResponse) => void) => void;
+    };
   }
 }
 
-interface AcceptUIConfig {
-  clientKey: string;
-  apiLoginID: string;
-  environment: string;
-  buttonLabel: string;
-  paymentOptions: string;
-  showBillingAddress: boolean;
-  responseHandler: (response: AcceptUIResponse) => void;
-}
-
-interface AcceptUIResponse {
+interface AcceptDispatchResponse {
+  messages: {
+    resultCode: string;
+    message: { code: string; text: string }[];
+  };
   opaqueData: {
     dataDescriptor: string;
     dataValue: string;
+  };
+}
+
+interface AcceptSecureData {
+  cardData: {
+    cardNumber: string;
+    month: string;
+    year: string;
+    cardCode: string;
+    zip?: string;
+  };
+  authData: {
+    apiLoginID: string;
+    clientKey: string;
   };
 }
 
@@ -58,19 +72,28 @@ export default function Checkout() {
   const [refundAccepted, setRefundAccepted] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [cardForm, setCardForm] = useState({
+    cardNumber: "",
+    month: "",
+    year: "",
+    cardCode: "",
+    zip: "",
+  });
 
-  // Load Accept.js script
+  // Load Accept.js script (v1 — provides Accept.dispatchData)
   const [acceptLoaded, setAcceptLoaded] = useState(false);
   useEffect(() => {
+    const existing = document.querySelector('script[src*="Accept.js"]');
+    if (existing) {
+      setAcceptLoaded(true);
+      return;
+    }
     const script = document.createElement("script");
     script.src = "https://js.authorize.net/v1/Accept.js";
     script.async = true;
     script.charset = "utf-8";
     script.onload = () => setAcceptLoaded(true);
     document.head.appendChild(script);
-    return () => {
-      document.head.removeChild(script);
-    };
   }, []);
 
   const { data: paymentConfig } = useQuery<PaymentConfig>({
@@ -120,7 +143,7 @@ export default function Checkout() {
     },
   });
 
-  function handleAcceptUIPayment() {
+  function handleCardPayment() {
     if (!refundAccepted) {
       toast({
         title: t("checkout.refundPolicyRequired", { defaultValue: "Please accept the refund policy" }),
@@ -129,32 +152,57 @@ export default function Checkout() {
       return;
     }
 
-    if (!paymentConfig?.clientKey || !acceptLoaded || !window.AcceptUI) {
+    if (!paymentConfig?.clientKey || !paymentConfig?.apiLoginID || !acceptLoaded || !window.Accept) {
       setPaymentError("Payment system is loading. Please try again in a moment.");
+      return;
+    }
+
+    // Basic validation
+    const cardNumber = cardForm.cardNumber.replace(/\s/g, "");
+    if (!cardNumber || cardNumber.length < 13) {
+      setPaymentError("Please enter a valid card number.");
+      return;
+    }
+    if (!cardForm.month || !cardForm.year) {
+      setPaymentError("Please enter the card expiration date.");
+      return;
+    }
+    if (!cardForm.cardCode || cardForm.cardCode.length < 3) {
+      setPaymentError("Please enter the card CVV code.");
       return;
     }
 
     setIsProcessing(true);
     setPaymentError(null);
 
-    const config: AcceptUIConfig = {
-      clientKey: paymentConfig.clientKey,
-      apiLoginID: process.env.AUTHORIZE_API_LOGIN_ID || "",
-      environment: paymentConfig.environment === "production" ? "PRODUCTION" : "SANDBOX",
-      buttonLabel: t("checkout.payAmount", { amount: totalWithSurcharge.toFixed(2), defaultValue: `Pay $${totalWithSurcharge.toFixed(2)}` }),
-      paymentOptions: "card",
-      showBillingAddress: true,
-      responseHandler: (response: AcceptUIResponse) => {
-        const nonce = response.opaqueData.dataValue;
-        chargeMutation.mutate({
-          paymentNonce: nonce,
-          isCardPayment: true,
-        });
+    const secureData: AcceptSecureData = {
+      cardData: {
+        cardNumber,
+        month: cardForm.month,
+        year: cardForm.year.length === 2 ? `20${cardForm.year}` : cardForm.year,
+        cardCode: cardForm.cardCode,
+        zip: cardForm.zip || undefined,
+      },
+      authData: {
+        apiLoginID: paymentConfig.apiLoginID,
+        clientKey: paymentConfig.clientKey,
       },
     };
 
     try {
-      window.AcceptUI(config);
+      window.Accept.dispatchData(secureData, (response: AcceptDispatchResponse) => {
+        if (response.messages.resultCode === "Ok") {
+          const nonce = response.opaqueData.dataValue;
+          chargeMutation.mutate({
+            paymentNonce: nonce,
+            isCardPayment: true,
+          });
+        } else {
+          const errMsg = response.messages.message?.[0]?.text || "Payment authorization failed.";
+          setPaymentError(errMsg);
+          setIsProcessing(false);
+        }
+      });
     } catch (err: any) {
       setPaymentError(err.message || "Payment initialization failed");
       setIsProcessing(false);
@@ -228,6 +276,84 @@ export default function Checkout() {
                         {t("checkout.securePaymentDesc", { defaultValue: "Your card information is processed securely through Authorize.net. We never see or store your card details." })}
                       </p>
                     </div>
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="cardNumber">{t("checkout.cardNumber", { defaultValue: "Card Number" })}</Label>
+                        <Input
+                          id="cardNumber"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="cc-number"
+                          placeholder="1234 5678 9012 3456"
+                          value={cardForm.cardNumber}
+                          onChange={(e) => setCardForm({ ...cardForm, cardNumber: e.target.value })}
+                          disabled={isProcessing}
+                          data-testid="input-card-number"
+                        />
+                      </div>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="cardMonth">{t("checkout.cardMonth", { defaultValue: "MM" })}</Label>
+                          <Input
+                            id="cardMonth"
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="cc-exp-month"
+                            placeholder="MM"
+                            maxLength={2}
+                            value={cardForm.month}
+                            onChange={(e) => setCardForm({ ...cardForm, month: e.target.value })}
+                            disabled={isProcessing}
+                            data-testid="input-card-month"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="cardYear">{t("checkout.cardYear", { defaultValue: "YY" })}</Label>
+                          <Input
+                            id="cardYear"
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="cc-exp-year"
+                            placeholder="YY"
+                            maxLength={2}
+                            value={cardForm.year}
+                            onChange={(e) => setCardForm({ ...cardForm, year: e.target.value })}
+                            disabled={isProcessing}
+                            data-testid="input-card-year"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="cardCode">{t("checkout.cardCode", { defaultValue: "CVV" })}</Label>
+                          <Input
+                            id="cardCode"
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="cc-csc"
+                            placeholder="123"
+                            maxLength={4}
+                            value={cardForm.cardCode}
+                            onChange={(e) => setCardForm({ ...cardForm, cardCode: e.target.value })}
+                            disabled={isProcessing}
+                            data-testid="input-card-code"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="cardZip">{t("checkout.cardZip", { defaultValue: "Billing ZIP" })}</Label>
+                        <Input
+                          id="cardZip"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="postal-code"
+                          placeholder="12345"
+                          maxLength={10}
+                          value={cardForm.zip}
+                          onChange={(e) => setCardForm({ ...cardForm, zip: e.target.value })}
+                          disabled={isProcessing}
+                          data-testid="input-card-zip"
+                        />
+                      </div>
+                    </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">{t("checkout.cardFeeNote", { defaultValue: "Includes 3% card processing fee" })}</span>
                       <span className="font-medium text-orange-600">+${surcharge.toFixed(2)}</span>
@@ -236,7 +362,7 @@ export default function Checkout() {
                       size="lg"
                       className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
                       disabled={!refundAccepted || isProcessing || !acceptLoaded}
-                      onClick={handleAcceptUIPayment}
+                      onClick={handleCardPayment}
                       data-testid="button-pay-card"
                     >
                       {isProcessing ? (

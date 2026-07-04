@@ -36,6 +36,10 @@ export function getAuthorizeNetClientKey(): string | undefined {
   return CLIENT_KEY;
 }
 
+export function getAuthorizeNetApiLoginID(): string | undefined {
+  return API_LOGIN_ID;
+}
+
 export function getAuthorizeNetEnvironment(): string {
   return ENVIRONMENT;
 }

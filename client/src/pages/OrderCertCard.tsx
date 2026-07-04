@@ -29,8 +29,43 @@ interface PaymentConfig {
   configured: boolean;
   provider: string;
   clientKey?: string;
+  apiLoginID?: string;
   environment?: string;
   demoMode?: boolean;
+}
+
+// Authorize.net Accept.js (v1) — dispatchData API
+declare global {
+  interface Window {
+    Accept?: {
+      dispatchData: (secureData: AcceptSecureData, responseHandler: (response: AcceptDispatchResponse) => void) => void;
+    };
+  }
+}
+
+interface AcceptDispatchResponse {
+  messages: {
+    resultCode: string;
+    message: { code: string; text: string }[];
+  };
+  opaqueData: {
+    dataDescriptor: string;
+    dataValue: string;
+  };
+}
+
+interface AcceptSecureData {
+  cardData: {
+    cardNumber: string;
+    month: string;
+    year: string;
+    cardCode: string;
+    zip?: string;
+  };
+  authData: {
+    apiLoginID: string;
+    clientKey: string;
+  };
 }
 
 export default function OrderCertCard() {
@@ -59,6 +94,13 @@ export default function OrderCertCard() {
   const [shippingMethod, setShippingMethod] = useState<"standard" | "expedited">("standard");
   const [isProcessing, setIsProcessing] = useState(false);
   const [acceptLoaded, setAcceptLoaded] = useState(false);
+  const [cardForm, setCardForm] = useState({
+    cardNumber: "",
+    month: "",
+    year: "",
+    cardCode: "",
+    zip: "",
+  });
 
   // Load Accept.js
   useEffect(() => {
@@ -147,20 +189,47 @@ export default function OrderCertCard() {
 
   const handleNext = () => {
     if (step === 3) {
-      // Payment step — use Accept UI if configured, demo mode otherwise
-      if (paymentConfig?.configured && paymentConfig.clientKey && acceptLoaded && window.AcceptUI) {
+      // Payment step — use Accept.js dispatchData if configured, demo mode otherwise
+      if (paymentConfig?.configured && paymentConfig.clientKey && paymentConfig.apiLoginID && acceptLoaded && window.Accept) {
+        // Basic validation
+        const cardNumber = cardForm.cardNumber.replace(/\s/g, "");
+        if (!cardNumber || cardNumber.length < 13) {
+          toast({ title: "Please enter a valid card number.", variant: "destructive" });
+          return;
+        }
+        if (!cardForm.month || !cardForm.year) {
+          toast({ title: "Please enter the card expiration date.", variant: "destructive" });
+          return;
+        }
+        if (!cardForm.cardCode || cardForm.cardCode.length < 3) {
+          toast({ title: "Please enter the card CVV code.", variant: "destructive" });
+          return;
+        }
+
         setIsProcessing(true);
-        window.AcceptUI({
-          clientKey: paymentConfig.clientKey,
-          apiLoginID: "",
-          environment: paymentConfig.environment === "production" ? "PRODUCTION" : "SANDBOX",
-          buttonLabel: t("orderCertCard.placeOrder", { defaultValue: `Pay $${total.toFixed(2)}` }),
-          paymentOptions: "card",
-          showBillingAddress: true,
-          responseHandler: (response: any) => {
+        const secureData: AcceptSecureData = {
+          cardData: {
+            cardNumber,
+            month: cardForm.month,
+            year: cardForm.year.length === 2 ? `20${cardForm.year}` : cardForm.year,
+            cardCode: cardForm.cardCode,
+            zip: cardForm.zip || undefined,
+          },
+          authData: {
+            apiLoginID: paymentConfig.apiLoginID,
+            clientKey: paymentConfig.clientKey,
+          },
+        };
+
+        window.Accept.dispatchData(secureData, (response: AcceptDispatchResponse) => {
+          if (response.messages.resultCode === "Ok") {
             const nonce = response.opaqueData.dataValue;
             orderMutation.mutate({ paymentNonce: nonce });
-          },
+          } else {
+            const errMsg = response.messages.message?.[0]?.text || "Payment authorization failed.";
+            toast({ title: errMsg, variant: "destructive" });
+            setIsProcessing(false);
+          }
         });
       } else if (paymentConfig?.demoMode) {
         setIsProcessing(true);
@@ -328,14 +397,90 @@ export default function OrderCertCard() {
           </CardHeader>
           <CardContent className="space-y-4">
             {paymentConfig?.configured ? (
-              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
-                <p className="font-medium text-blue-800 dark:text-blue-400 mb-1">
-                  {t("orderCertCard.securePayment", { defaultValue: "Secure Card Payment" })}
-                </p>
-                <p className="text-blue-700 dark:text-blue-500">
-                  {t("orderCertCard.securePaymentDesc", { defaultValue: "Your card is processed securely through Authorize.net. We never see or store your card details." })}
-                </p>
-              </div>
+              <>
+                <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
+                  <p className="font-medium text-blue-800 dark:text-blue-400 mb-1">
+                    {t("orderCertCard.securePayment", { defaultValue: "Secure Card Payment" })}
+                  </p>
+                  <p className="text-blue-700 dark:text-blue-500">
+                    {t("orderCertCard.securePaymentDesc", { defaultValue: "Your card is processed securely through Authorize.net. We never see or store your card details." })}
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="cardNumber">{t("orderCertCard.cardNumber", { defaultValue: "Card Number" })}</Label>
+                    <Input
+                      id="cardNumber"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="cc-number"
+                      placeholder="1234 5678 9012 3456"
+                      value={cardForm.cardNumber}
+                      onChange={(e) => setCardForm({ ...cardForm, cardNumber: e.target.value })}
+                      disabled={isProcessing}
+                      data-testid="input-card-number"
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="cardMonth">{t("orderCertCard.cardMonth", { defaultValue: "MM" })}</Label>
+                      <Input
+                        id="cardMonth"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="MM"
+                        maxLength={2}
+                        value={cardForm.month}
+                        onChange={(e) => setCardForm({ ...cardForm, month: e.target.value })}
+                        disabled={isProcessing}
+                        data-testid="input-card-month"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cardYear">{t("orderCertCard.cardYear", { defaultValue: "YY" })}</Label>
+                      <Input
+                        id="cardYear"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="YY"
+                        maxLength={2}
+                        value={cardForm.year}
+                        onChange={(e) => setCardForm({ ...cardForm, year: e.target.value })}
+                        disabled={isProcessing}
+                        data-testid="input-card-year"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cardCode">{t("orderCertCard.cardCode", { defaultValue: "CVV" })}</Label>
+                      <Input
+                        id="cardCode"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="123"
+                        maxLength={4}
+                        value={cardForm.cardCode}
+                        onChange={(e) => setCardForm({ ...cardForm, cardCode: e.target.value })}
+                        disabled={isProcessing}
+                        data-testid="input-card-code"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cardZip">{t("orderCertCard.cardZip", { defaultValue: "Billing ZIP" })}</Label>
+                    <Input
+                      id="cardZip"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="12345"
+                      maxLength={10}
+                      value={cardForm.zip}
+                      onChange={(e) => setCardForm({ ...cardForm, zip: e.target.value })}
+                      disabled={isProcessing}
+                      data-testid="input-card-zip"
+                    />
+                  </div>
+                </div>
+              </>
             ) : paymentConfig?.demoMode ? (
               <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-sm">
                 <p className="font-medium text-yellow-800 dark:text-yellow-400">
