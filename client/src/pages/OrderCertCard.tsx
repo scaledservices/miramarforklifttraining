@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,10 +18,20 @@ import {
   Award,
   AlertTriangle,
   Package,
+  Loader2,
+  Lock,
 } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+
+interface PaymentConfig {
+  configured: boolean;
+  provider: string;
+  clientKey?: string;
+  environment?: string;
+  demoMode?: boolean;
+}
 
 export default function OrderCertCard() {
   const { t } = useTranslation();
@@ -47,7 +57,27 @@ export default function OrderCertCard() {
     country: "US",
   });
   const [shippingMethod, setShippingMethod] = useState<"standard" | "expedited">("standard");
-  const [payment, setPayment] = useState({ cardNumber: "", exp: "", cvv: "" });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [acceptLoaded, setAcceptLoaded] = useState(false);
+
+  // Load Accept.js
+  useEffect(() => {
+    const existing = document.querySelector('script[src*="Accept.js"]');
+    if (existing) {
+      setAcceptLoaded(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://js.authorize.net/v1/Accept.js";
+    script.async = true;
+    script.charset = "utf-8";
+    script.onload = () => setAcceptLoaded(true);
+    document.head.appendChild(script);
+  }, []);
+
+  const { data: paymentConfig } = useQuery<PaymentConfig>({
+    queryKey: ["/api/payment/config"],
+  });
 
   const { data, isLoading, error } = useQuery<{ certification: any }>({
     queryKey: ["/api/certifications", certId],
@@ -56,21 +86,33 @@ export default function OrderCertCard() {
 
   const cert = data?.certification;
 
+  const cardPrice = 9.99;
+  const shippingCost = shippingMethod === "standard" ? 4.99 : 9.99;
+  const subtotal = cardPrice + shippingCost;
+  const surcharge = paymentConfig?.configured ? Number((subtotal * 0.03).toFixed(2)) : 0;
+  const total = Number((subtotal + surcharge).toFixed(2));
+
   const orderMutation = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/cert-cards", {
+    mutationFn: async (data: { paymentNonce?: string }) => {
+      const payload: Record<string, unknown> = {
         certificationId: certId,
         shippingAddress: shipping,
         shippingMethod,
-      });
+      };
+      if (data.paymentNonce) {
+        payload.paymentNonce = data.paymentNonce;
+      }
+      const res = await apiRequest("POST", "/api/cert-cards", payload);
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/certifications"] });
       setStep(4);
+      setIsProcessing(false);
     },
     onError: (err: Error) => {
       toast({ title: t("orderCertCard.orderFailed"), description: err.message, variant: "destructive" });
+      setIsProcessing(false);
     },
   });
 
@@ -96,23 +138,39 @@ export default function OrderCertCard() {
     );
   }
 
-  const cardPrice = 9.99;
-  const shippingCost = shippingMethod === "standard" ? 4.99 : 9.99;
-  const total = cardPrice + shippingCost;
-
   const canProceed = () => {
     if (step === 1) {
       return shipping.name && shipping.address && shipping.city && shipping.state && shipping.zip;
-    }
-    if (step === 3) {
-      return payment.cardNumber && payment.exp && payment.cvv;
     }
     return true;
   };
 
   const handleNext = () => {
     if (step === 3) {
-      orderMutation.mutate();
+      // Payment step — use Accept UI if configured, demo mode otherwise
+      if (paymentConfig?.configured && paymentConfig.clientKey && acceptLoaded && window.AcceptUI) {
+        setIsProcessing(true);
+        window.AcceptUI({
+          clientKey: paymentConfig.clientKey,
+          apiLoginID: "",
+          environment: paymentConfig.environment === "production" ? "PRODUCTION" : "SANDBOX",
+          buttonLabel: t("orderCertCard.placeOrder", { defaultValue: `Pay $${total.toFixed(2)}` }),
+          paymentOptions: "card",
+          showBillingAddress: true,
+          responseHandler: (response: any) => {
+            const nonce = response.opaqueData.dataValue;
+            orderMutation.mutate({ paymentNonce: nonce });
+          },
+        });
+      } else if (paymentConfig?.demoMode) {
+        setIsProcessing(true);
+        orderMutation.mutate({});
+      } else {
+        toast({
+          title: t("orderCertCard.paymentNotConfigured", { defaultValue: "Payment is not configured. Please call us to order." }),
+          variant: "destructive",
+        });
+      }
     } else {
       setStep((s) => s + 1);
     }
@@ -269,20 +327,28 @@ export default function OrderCertCard() {
             <CardTitle className="text-lg">{t("orderCertCard.paymentTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="cardNumber">{t("orderCertCard.cardNumber")}</Label>
-              <Input id="cardNumber" placeholder="4242 4242 4242 4242" value={payment.cardNumber} onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })} data-testid="input-card-number" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="exp">{t("orderCertCard.expiration")}</Label>
-                <Input id="exp" placeholder="MM/YY" value={payment.exp} onChange={(e) => setPayment({ ...payment, exp: e.target.value })} data-testid="input-card-exp" />
+            {paymentConfig?.configured ? (
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
+                <p className="font-medium text-blue-800 dark:text-blue-400 mb-1">
+                  {t("orderCertCard.securePayment", { defaultValue: "Secure Card Payment" })}
+                </p>
+                <p className="text-blue-700 dark:text-blue-500">
+                  {t("orderCertCard.securePaymentDesc", { defaultValue: "Your card is processed securely through Authorize.net. We never see or store your card details." })}
+                </p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="cvv">{t("orderCertCard.cvv")}</Label>
-                <Input id="cvv" placeholder="123" value={payment.cvv} onChange={(e) => setPayment({ ...payment, cvv: e.target.value })} data-testid="input-card-cvv" />
+            ) : paymentConfig?.demoMode ? (
+              <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 text-sm">
+                <p className="font-medium text-yellow-800 dark:text-yellow-400">
+                  {t("orderCertCard.demoMode", { defaultValue: "Demo Mode - No real charges" })}
+                </p>
               </div>
-            </div>
+            ) : (
+              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
+                <p className="text-muted-foreground">
+                  {t("orderCertCard.contactToOrder", { defaultValue: "Please call us to complete your card order." })}
+                </p>
+              </div>
+            )}
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between gap-2 text-sm">
                 <span>{t("orderCertCard.walletCard")}</span>
@@ -292,6 +358,12 @@ export default function OrderCertCard() {
                 <span>{t("orderCertCard.shipping")} ({shippingMethod === "standard" ? t("orderCertCard.standardShipping").toLowerCase() : t("orderCertCard.expeditedShipping").toLowerCase()})</span>
                 <span>${shippingCost.toFixed(2)}</span>
               </div>
+              {paymentConfig?.configured && surcharge > 0 && (
+                <div className="flex justify-between gap-2 text-sm">
+                  <span className="text-muted-foreground">{t("orderCertCard.cardFee", { defaultValue: "Card processing fee (3%)" })}</span>
+                  <span className="text-orange-600">${surcharge.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between gap-2 font-semibold border-t pt-2">
                 <span>{t("orderCertCard.total")}</span>
                 <span data-testid="text-total">${total.toFixed(2)}</span>
@@ -341,11 +413,25 @@ export default function OrderCertCard() {
           </Button>
           <Button
             onClick={handleNext}
-            disabled={!canProceed() || orderMutation.isPending}
+            disabled={!canProceed() || isProcessing || (step === 3 && !paymentConfig?.configured && !paymentConfig?.demoMode)}
             data-testid="button-next-step"
           >
-            {step === 3 ? (orderMutation.isPending ? t("orderCertCard.processing") : t("orderCertCard.placeOrder")) : t("orderCertCard.continue")}
-            {step < 3 && <ArrowRight className="h-4 w-4 ml-2" />}
+            {isProcessing ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                {t("orderCertCard.processing")}
+              </>
+            ) : step === 3 ? (
+              <>
+                <Lock className="h-4 w-4 mr-2" />
+                {t("orderCertCard.placeOrder", { defaultValue: `Pay $${total.toFixed(2)}` })}
+              </>
+            ) : (
+              <>
+                {t("orderCertCard.continue")}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </>
+            )}
           </Button>
         </div>
       )}
