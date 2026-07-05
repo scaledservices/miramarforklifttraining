@@ -24,6 +24,10 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Behind Railway's proxy, Express must trust X-Forwarded-Proto or
+  // express-session refuses to set Secure cookies (breaking all logins).
+  app.set("trust proxy", 1);
+
   const PgStore = connectPgSimple(session);
   app.use(session({
     store: new PgStore({
