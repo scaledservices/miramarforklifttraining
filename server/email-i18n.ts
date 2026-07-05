@@ -160,7 +160,7 @@ const strings: Record<string, EmailStrings> = {
       whatNext: "What happens next?",
       whatNextText: "Our team will reach out to you at {{email}} within 1–2 business days to confirm your training schedule, discuss any specific requirements, and provide a formal quote.",
       cta: "Have Questions? Contact Us",
-      urgentNote: "If you have any urgent questions, call us at (858) 401-0700.",
+      urgentNote: "If you have any urgent questions, call us at (858) 901-0149.",
     },
     instructorAppConfirmation: {
       subject: "Instructor Application Received - {{brandName}}",
@@ -340,7 +340,7 @@ const strings: Record<string, EmailStrings> = {
       whatNext: "¿Qué sigue?",
       whatNextText: "Nuestro equipo se comunicará contigo en {{email}} dentro de 1–2 días hábiles para confirmar tu horario de capacitación, discutir cualquier requisito específico y proporcionar una cotización formal.",
       cta: "¿Tienes Preguntas? Contáctanos",
-      urgentNote: "Si tienes alguna pregunta urgente, llámanos al (858) 401-0700.",
+      urgentNote: "Si tienes alguna pregunta urgente, llámanos al (858) 901-0149.",
     },
     instructorAppConfirmation: {
       subject: "Solicitud de Instructor Recibida - {{brandName}}",

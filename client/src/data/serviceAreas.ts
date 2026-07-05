@@ -1,3 +1,28 @@
+export interface ServiceAreaTranslations {
+  heroHeadline?: string;
+  heroSubtitle?: string;
+  seo?: {
+    title: string;
+    description: string;
+  };
+  intro?: string;
+  industriesServed?: string[];
+  whatsIncluded?: {
+    title: string;
+    description: string;
+  }[];
+  whyOnsite?: {
+    title: string;
+    description: string;
+  };
+  faqs?: {
+    question: string;
+    answer: string;
+  }[];
+  ctaTitle?: string;
+  ctaSubtitle?: string;
+}
+
 export interface ServiceAreaCity {
   slug: string;
   city: string;
@@ -27,6 +52,8 @@ export interface ServiceAreaCity {
   }[];
   ctaTitle: string;
   ctaSubtitle: string;
+  /** Spanish translations. English fields above remain canonical; missing fields fall back to English. */
+  es?: ServiceAreaTranslations;
 }
 
 export const SERVICE_AREA_CITIES: Record<string, ServiceAreaCity> = {
@@ -143,6 +170,98 @@ export const SERVICE_AREA_CITIES: Record<string, ServiceAreaCity> = {
     ctaTitle: "Ready to Schedule Onsite Forklift Training in Los Angeles?",
     ctaSubtitle:
       "Request a quote today and we'll put together a customized training plan for your LA-area facility, equipment, and schedule.",
+    es: {
+      heroHeadline: "Capacitación de Montacargas en Sitio en Los Angeles, CA",
+      heroSubtitle:
+        "Llevamos la certificación de montacargas alineada con OSHA directamente a su almacén, centro de distribución o sitio de trabajo en el área de Los Angeles — sin que su equipo tenga que viajar.",
+      seo: {
+        title: "Capacitación de Montacargas en Sitio Los Angeles, CA | Certificación Alineada con OSHA",
+        description:
+          "Capacitación de montacargas en sitio en Los Angeles, CA. Vamos a su instalación con certificación alineada con OSHA para montacargas de contrapeso, reach truck, order picker, plataforma de tijera y más. Tarjetas de certificación el mismo día.",
+      },
+      intro:
+        "Los Angeles es uno de los centros de logística y almacenamiento más grandes del país, con enormes redes de distribución que se extienden desde los puertos de LA y Long Beach hasta el Inland Empire. Ya sea que opere un centro de distribución en Vernon, una planta de manufactura en City of Industry o un sitio de construcción en el centro de la ciudad, nuestra capacitación de montacargas en sitio lleva la certificación alineada con OSHA directamente a su instalación. Sus operadores se capacitan en el equipo que usan todos los días, en el entorno donde realmente trabajan — lo que produce operadores mejores y con mayor cumplimiento que cualquier sesión genérica en un salón de clases.",
+      industriesServed: [
+        "Almacenamiento y Distribución (Vernon, City of Industry, Commerce)",
+        "Logística Portuaria e Intermodal (San Pedro, Wilmington, corredor de Long Beach)",
+        "Manufactura (Downtown LA, South Gate, Paramount)",
+        "Construcción y Materiales de Construcción",
+        "Comercio Minorista y Cumplimiento de Pedidos de E-commerce",
+        "Distribución de Alimentos y Bebidas",
+      ],
+      whatsIncluded: [
+        {
+          title: "Instrucción Formal en Aula",
+          description:
+            "Capacitación en aula requerida por OSHA que cubre los fundamentos del equipo, el manejo de cargas, los principios de estabilidad, el reconocimiento de peligros y la seguridad peatonal — impartida en su instalación de LA.",
+        },
+        {
+          title: "Evaluación Práctica",
+          description:
+            "Cada operador es evaluado operando los montacargas específicos que usa en el trabajo — contrapeso, reach truck, order picker, plataforma de tijera o cualquier equipo que utilice su operación.",
+        },
+        {
+          title: "Capacitación en Inspección Preoperacional",
+          description:
+            "Enseñamos y evaluamos los procedimientos correctos de inspección antes del turno en su equipo, para que su personal detecte problemas de mantenimiento antes de que se conviertan en incidentes de seguridad.",
+        },
+        {
+          title: "Tarjetas de Certificación el Mismo Día",
+          description:
+            "Los operadores que aprueban reciben sus tarjetas de certificación de montacargas el mismo día. Sin esperar a que llegue el papeleo por correo — su equipo queda en cumplimiento antes de que nos vayamos.",
+        },
+        {
+          title: "Documentación de Registros de Capacitación",
+          description:
+            "Le entregamos la documentación del empleador que necesita para el cumplimiento con OSHA: formularios de evaluación, listas de asistencia y registros de certificación adaptados a su equipo y a las condiciones de su sitio.",
+        },
+        {
+          title: "Instrucción Bilingüe (Inglés y Español)",
+          description:
+            "Los Angeles tiene una de las fuerzas laborales más diversas del país. Nuestros instructores imparten la capacitación en inglés y en español para que cada operador comprenda completamente el material.",
+        },
+      ],
+      whyOnsite: {
+        title: "Por Qué la Capacitación en Sitio Tiene Sentido para Operaciones en LA",
+        description:
+          "Tan solo el tráfico de LA le cuesta a la región miles de millones en productividad perdida. Enviar a su personal al otro lado del área metropolitana para capacitarse significa turnos perdidos, pago de horas extra y dolores de cabeza de programación. La capacitación en sitio elimina el traslado — sus operadores siguen siendo productivos, se capacitan en equipo conocido y se certifican en un solo día. Para empresas con horarios de distribución 24/7, podemos dividir la capacitación en varios turnos o programar sesiones de fin de semana para minimizar la interrupción operativa. Con los puertos de LA y Long Beach manejando el 40% del tráfico de contenedores de EE. UU., sus operadores de montacargas son infraestructura crítica. No los saque del piso — lleve la capacitación a ellos.",
+      },
+      faqs: [
+        {
+          question: "¿Cuánto cuesta la capacitación de montacargas en sitio en Los Angeles?",
+          answer:
+            "La capacitación de montacargas en sitio en Los Angeles comienza en $200 por persona para la certificación estándar de contrapeso. El precio varía según los tipos de equipo, el número de operadores y su ubicación específica dentro del área metropolitana de LA. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto según sus necesidades.",
+        },
+        {
+          question: "¿Cuánto dura la capacitación en sitio en nuestra instalación de LA?",
+          answer:
+            "Una sesión en sitio con un solo tipo de equipo normalmente toma de 3 a 4 horas para un grupo. Si necesita certificación en varios tipos de equipo (por ejemplo, contrapeso más reach truck), planifique de 5 a 6 horas. Podemos dividir la capacitación entre turnos para adaptarnos a las operaciones 24/7 comunes en el corredor logístico de LA.",
+        },
+        {
+          question: "¿Atienden toda el área metropolitana de Los Angeles?",
+          answer:
+            "Sí. Atendemos todo el Gran Los Angeles, incluyendo Vernon, City of Industry, Long Beach, Commerce, Torrance, Santa Fe Springs, el Valle de San Fernando y el Inland Empire. Si su instalación está en cualquier parte del área metropolitana de LA o de la región del Inland Empire, vamos a usted.",
+        },
+        {
+          question: "¿En qué tipos de equipo pueden capacitar en nuestra instalación?",
+          answer:
+            "Ofrecemos capacitación en sitio en montacargas de contrapeso (LPG), reach trucks, order pickers, transpaletas eléctricas (EPJ), plataformas de tijera y plataformas aéreas/de pluma. Debe tener el equipo disponible en su instalación para la parte de evaluación práctica de la capacitación.",
+        },
+        {
+          question: "¿La certificación es reconocida por OSHA en California?",
+          answer:
+            "Sí. Nuestra capacitación está alineada con la norma OSHA 29 CFR 1910.178, que es la norma federal aplicable en California. Aunque Cal/OSHA (el plan estatal) hace cumplir las normas federales de OSHA, nuestra certificación cumple con estos requisitos y es reconocida por empleadores en todo el estado.",
+        },
+        {
+          question: "¿Pueden capacitar a operadores que solo hablan español?",
+          answer:
+            "Por supuesto. Ofrecemos instrucción completamente bilingüe en inglés y español. Dada la diversidad de la fuerza laboral de LA, este es uno de nuestros servicios más solicitados. Cada operador recibe la misma calidad de capacitación sin importar el idioma.",
+        },
+      ],
+      ctaTitle: "¿Listo para Programar Capacitación de Montacargas en Sitio en Los Angeles?",
+      ctaSubtitle:
+        "Solicite una cotización hoy y prepararemos un plan de capacitación personalizado para su instalación, equipo y horario en el área de LA.",
+    },
   },
 
   "bakersfield": {
@@ -258,6 +377,98 @@ export const SERVICE_AREA_CITIES: Record<string, ServiceAreaCity> = {
     ctaTitle: "Ready to Schedule Onsite Forklift Training in Bakersfield?",
     ctaSubtitle:
       "Request a quote and we'll build a training plan tailored to your Kern County facility, equipment, and operational schedule.",
+    es: {
+      heroHeadline: "Capacitación de Montacargas en Sitio en Bakersfield, CA",
+      heroSubtitle:
+        "Llevamos la certificación de montacargas alineada con OSHA a su instalación en el área de Bakersfield — sirviendo a la agricultura, los servicios petroleros, el almacenamiento y la manufactura en todo el condado de Kern.",
+      seo: {
+        title: "Capacitación de Montacargas en Sitio Bakersfield, CA | Certificación Alineada con OSHA",
+        description:
+          "Capacitación de montacargas en sitio en Bakersfield, CA. Vamos a su instalación con certificación alineada con OSHA para montacargas de contrapeso, reach truck, order picker, plataforma de tijera y más. Servimos todo el condado de Kern.",
+      },
+      intro:
+        "Bakersfield y la región circundante del condado de Kern forman un centro crítico para la agricultura, la extracción de petróleo y gas, la logística y el procesamiento de alimentos. Desde instalaciones de almacenamiento en frío que manejan productos del Valle Central hasta patios de equipo que apoyan los campos petroleros, los operadores de montacargas aquí trabajan en entornos exigentes y especializados. Nuestra capacitación de montacargas en sitio va a su instalación — ya sea una empacadora en Shafter, un centro de distribución en el suroeste de Bakersfield o un patio industrial en Taft — para que sus operadores se capaciten y sean evaluados en el equipo y el terreno exactos que enfrentan todos los días. Eso no es solo mejor capacitación; es mejor cumplimiento.",
+      industriesServed: [
+        "Agricultura y Empaque de Productos Agrícolas (Shafter, Wasco, Delano)",
+        "Servicios de Campo de Petróleo y Gas (Taft, McKittrick, Buttonwillow)",
+        "Procesamiento de Alimentos y Almacenamiento en Frío",
+        "Almacenamiento y Distribución",
+        "Construcción y Materiales de Construcción",
+        "Energía Renovable (Manejo de Componentes Solares y Eólicos)",
+      ],
+      whatsIncluded: [
+        {
+          title: "Instrucción Formal en Aula",
+          description:
+            "Capacitación en aula requerida por OSHA en su instalación del área de Bakersfield, que cubre la operación del equipo, la estabilidad de cargas, la identificación de peligros y las prácticas de operación segura adaptadas a su industria — ya sea agricultura, campo petrolero o almacén.",
+        },
+        {
+          title: "Evaluación Práctica",
+          description:
+            "Evaluamos a cada operador en sus montacargas reales, en su entorno de trabajo real. Ya sea que su personal opere montacargas de contrapeso LPG en una empacadora o montacargas todo terreno en un patio de equipo, capacitarse en su propio equipo significa capacitación que cuenta.",
+        },
+        {
+          title: "Capacitación en Inspección Preoperacional",
+          description:
+            "Los entornos polvorientos, al aire libre y de alto uso comunes en el condado de Kern exigen inspecciones rigurosas antes del turno. Capacitamos a sus operadores para realizar revisiones exhaustivas del equipo que detectan problemas a tiempo y mantienen su operación en marcha.",
+        },
+        {
+          title: "Tarjetas de Certificación el Mismo Día",
+          description:
+            "Sus operadores se llevan sus tarjetas de certificación el mismo día que los capacitamos. Sin papeleo posterior ni demoras — su equipo queda en cumplimiento con OSHA antes de que salgamos de su instalación.",
+        },
+        {
+          title: "Registros de Capacitación y Documentación de Cumplimiento",
+          description:
+            "Usted recibe documentación completa que incluye formularios de evaluación de operadores, listas de capacitación y registros de certificación. Todo lo que necesita para demostrar cumplimiento durante una inspección de Cal/OSHA.",
+        },
+        {
+          title: "Instrucción Bilingüe (Inglés y Español)",
+          description:
+            "La fuerza laboral agrícola e industrial del condado de Kern es en gran parte bilingüe. Nuestros instructores imparten la capacitación en inglés y en español para que cada operador sea capacitado y evaluado por completo.",
+        },
+      ],
+      whyOnsite: {
+        title: "Por Qué la Capacitación en Sitio Es la Opción Correcta para Operaciones en Bakersfield",
+        description:
+          "Las instalaciones industriales de Bakersfield están distribuidas en un área geográfica amplia, desde los campos petroleros al oeste de la ciudad hasta las operaciones agrícolas al norte en Shafter y Delano. Llevar a todo su personal a un centro de capacitación lejano significa horas de trabajo perdidas y dolores de cabeza de programación — especialmente para operaciones con calendarios ajustados de cosecha o producción. La capacitación en sitio elimina el traslado y, más importante aún, nos permite capacitar a sus operadores en el equipo específico que manejan a diario. Un operador de montacargas en una empacadora de almacenamiento en frío enfrenta desafíos diferentes a los de uno que trabaja en un patio de equipo petrolero. La capacitación en sitio aborda directamente esas condiciones del mundo real. Para operaciones estacionales, podemos programar la capacitación alrededor de sus períodos pico para que nunca pierda tiempo crítico de producción.",
+      },
+      faqs: [
+        {
+          question: "¿Cuánto cuesta la capacitación de montacargas en sitio en Bakersfield?",
+          answer:
+            "La capacitación de montacargas en sitio en Bakersfield comienza en $200 por persona para la certificación estándar de contrapeso. El precio depende del número de operadores, los tipos de equipo y su ubicación específica dentro del condado de Kern. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto.",
+        },
+        {
+          question: "¿Atienden todo el condado de Kern o solo Bakersfield?",
+          answer:
+            "Atendemos todo el condado de Kern, incluyendo Shafter, Wasco, Delano, Taft, Tehachapi, Arvin, Lamont, Mojave, Ridgecrest y las comunidades circundantes. Si su instalación está en cualquier parte de la región del condado de Kern, vamos a usted.",
+        },
+        {
+          question: "¿Pueden capacitar a operadores en montacargas todo terreno?",
+          answer:
+            "Sí. Para operaciones petroleras y de construcción en el área de Bakersfield, ofrecemos capacitación y evaluación en montacargas todo terreno (Clase 7 de OSHA), además del equipo estándar de almacén como montacargas de contrapeso, reach trucks y plataformas de tijera. Debe tener el equipo disponible en su sitio para la evaluación práctica.",
+        },
+        {
+          question: "¿Cuánto dura la capacitación en sitio en nuestra instalación?",
+          answer:
+            "Una sesión con un solo tipo de equipo normalmente toma de 3 a 4 horas para un grupo. Si necesita certificación en varios tipos de equipo, planifique de 5 a 6 horas. Para operaciones agrícolas con personal estacional, podemos programar la capacitación en horas de menor actividad o entre turnos.",
+        },
+        {
+          question: "¿La certificación es válida para el cumplimiento con Cal/OSHA?",
+          answer:
+            "Sí. Nuestra capacitación está alineada con la norma OSHA 29 CFR 1910.178, que en California es aplicada por Cal/OSHA. La certificación que emitimos cumple con estos requisitos y es reconocida por empleadores y reguladores en toda California.",
+        },
+        {
+          question: "¿Pueden adaptar la capacitación para trabajadores agrícolas de temporada?",
+          answer:
+            "Por supuesto. Trabajamos con operaciones agrícolas en todo el Valle Central para programar la capacitación alrededor de las temporadas de cosecha y empaque. También ofrecemos instrucción bilingüe (inglés/español), lo cual es especialmente importante para la fuerza laboral estacional del Valle Central.",
+        },
+      ],
+      ctaTitle: "¿Listo para Programar Capacitación de Montacargas en Sitio en Bakersfield?",
+      ctaSubtitle:
+        "Solicite una cotización y crearemos un plan de capacitación adaptado a su instalación, equipo y calendario operativo en el condado de Kern.",
+    },
   },
 
   "hayward": {
@@ -373,15 +584,126 @@ export const SERVICE_AREA_CITIES: Record<string, ServiceAreaCity> = {
     ctaTitle: "Ready to Schedule Onsite Forklift Training in Hayward?",
     ctaSubtitle:
       "Request a quote and we'll customize a training plan for your Bay Area facility, equipment types, and shift schedule.",
+    es: {
+      heroHeadline: "Capacitación de Montacargas en Sitio en Hayward, CA",
+      heroSubtitle:
+        "Llevamos la certificación de montacargas alineada con OSHA a su instalación en Hayward o el Área de la Bahía — sirviendo el corredor logístico del East Bay desde Fremont hasta Oakland.",
+      seo: {
+        title: "Capacitación de Montacargas en Sitio Hayward, CA | Certificación Alineada con OSHA",
+        description:
+          "Capacitación de montacargas en sitio en Hayward, CA. Vamos a su instalación con certificación alineada con OSHA para montacargas de contrapeso, reach truck, order picker, plataforma de tijera y más. Servimos toda el Área de la Bahía.",
+      },
+      intro:
+        "Hayward se encuentra en el corazón geográfico del corredor industrial del East Bay, con acceso directo a la I-880, la I-580 y el Puerto de Oakland. Es una ubicación privilegiada para centros de distribución, manufactura y operaciones logísticas que sirven a toda el Área de la Bahía de San Francisco. Nuestra capacitación de montacargas en sitio va a su instalación del área de Hayward — ya sea que opere un almacén cerca de la zona industrial del Hayward Executive Airport, una planta de manufactura en Fremont o un centro de distribución en Newark — para que sus operadores se certifiquen en el equipo que realmente usan, en las condiciones que realmente enfrentan. Para las empresas del Área de la Bahía, donde cada hora de inactividad es costosa, la capacitación en sitio mantiene su operación funcionando mientras su equipo se pone en cumplimiento.",
+      industriesServed: [
+        "Almacenamiento y Distribución (Hayward, Fremont, Newark, Union City)",
+        "Logística y Transporte del Puerto de Oakland",
+        "Manufactura y Ensamblaje de Electrónicos",
+        "Construcción y Materiales de Construcción",
+        "Procesamiento de Alimentos y Bebidas",
+        "Cumplimiento de Pedidos de E-commerce (corredor de Silicon Valley)",
+      ],
+      whatsIncluded: [
+        {
+          title: "Instrucción Formal en Aula",
+          description:
+            "Capacitación en aula requerida por OSHA en su instalación del Área de la Bahía, que cubre los fundamentos de la operación de montacargas, los principios de manejo de cargas, el reconocimiento de peligros y la seguridad peatonal — todo impartido en el contexto de su operación específica.",
+        },
+        {
+          title: "Evaluación Práctica",
+          description:
+            "Evaluamos a cada operador en los montacargas que usa en su instalación — ya sea un reach truck en un almacén de pasillos angostos, un montacargas de contrapeso en un muelle de carga o una plataforma de tijera para trabajos de mantenimiento. Capacitarse en su propio equipo es capacitación que se transfiere directamente al trabajo.",
+        },
+        {
+          title: "Capacitación en Inspección Preoperacional",
+          description:
+            "Las instalaciones del Área de la Bahía suelen manejar operaciones de alto volumen donde el equipo está en uso constante. Capacitamos a sus operadores en procedimientos rigurosos de inspección antes del turno que mantienen el equipo seguro sin detener las operaciones.",
+        },
+        {
+          title: "Tarjetas de Certificación el Mismo Día",
+          description:
+            "Los operadores que aprueban la evaluación reciben sus tarjetas de certificación el mismo día. En el acelerado entorno logístico del Área de la Bahía, el cumplimiento el mismo día significa cero retrasos operativos.",
+        },
+        {
+          title: "Documentación Completa de Cumplimiento",
+          description:
+            "Usted recibe registros completos de capacitación que incluyen formularios de evaluación, listas de operadores y documentación de certificación — todo lo necesario para el cumplimiento con OSHA y las inspecciones de Cal/OSHA.",
+        },
+        {
+          title: "Instrucción Bilingüe (Inglés y Español)",
+          description:
+            "La diversa fuerza laboral de logística y manufactura del Área de la Bahía incluye muchos operadores de habla hispana. Nuestros instructores bilingües se aseguran de que cada operador reciba una capacitación integral en su idioma preferido.",
+        },
+      ],
+      whyOnsite: {
+        title: "Por Qué las Empresas del Área de la Bahía Eligen la Capacitación de Montacargas en Sitio",
+        description:
+          "El tráfico del Área de la Bahía es legendario — y no en el buen sentido. Enviar a un grupo de operadores desde Hayward o Fremont a un centro de capacitación al otro lado de la región significa horas de tiempo perdido, gastos de estacionamiento y caos de programación. La capacitación en sitio elimina el traslado por completo. Más importante aún, nos permite capacitar a sus operadores en el equipo y las condiciones específicas del sitio donde trabajan. Una operación de reach trucks en pasillos angostos en un centro de distribución de Hayward requiere una capacitación diferente a la de un montacargas de contrapeso cargando camiones en un muelle de San Leandro. La capacitación en sitio aborda esas diferencias reales. Para operaciones con múltiples turnos — comunes en el corredor logístico 24/7 del Área de la Bahía — podemos dividir las sesiones de capacitación entre turnos o programar fechas de fin de semana para minimizar la interrupción.",
+      },
+      faqs: [
+        {
+          question: "¿Cuánto cuesta la capacitación de montacargas en sitio en Hayward?",
+          answer:
+            "La capacitación de montacargas en sitio en Hayward comienza en $200 por persona para la certificación estándar de contrapeso. El precio varía según los tipos de equipo, el número de operadores y su ubicación específica dentro del Área de la Bahía. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto.",
+        },
+        {
+          question: "¿Atienden toda el Área de la Bahía o solo Hayward?",
+          answer:
+            "Atendemos toda el Área de la Bahía, incluyendo Hayward, Fremont, Newark, Union City, San Leandro, Oakland, San Jose, Milpitas, Dublin, Pleasanton, Livermore, Richmond y las comunidades circundantes. Si su instalación está en cualquier parte del Área de la Bahía, vamos a usted.",
+        },
+        {
+          question: "¿Pueden capacitar a operadores en varios turnos?",
+          answer:
+            "Sí. Muchas operaciones logísticas del Área de la Bahía funcionan 24/7. Podemos dividir las sesiones de capacitación entre varios turnos o programar sesiones de fin de semana para asegurar que todos sus operadores se certifiquen sin interrumpir las operaciones. Indíquenos su horario de turnos cuando solicite una cotización.",
+        },
+        {
+          question: "¿En qué tipos de equipo pueden capacitar en nuestra instalación?",
+          answer:
+            "Ofrecemos capacitación en sitio en montacargas de contrapeso (LPG), reach trucks, order pickers, transpaletas eléctricas (EPJ), plataformas de tijera y plataformas aéreas/de pluma. El equipo debe estar disponible en su instalación para la parte de evaluación práctica de la capacitación.",
+        },
+        {
+          question: "¿La certificación es válida para el cumplimiento con Cal/OSHA?",
+          answer:
+            "Sí. Nuestra capacitación está alineada con la norma OSHA 29 CFR 1910.178, que en California es aplicada por Cal/OSHA. La certificación cumple con todos los requisitos federales y estatales y es reconocida por empleadores en toda California.",
+        },
+        {
+          question: "¿Cuánto dura la capacitación en sitio en nuestra instalación?",
+          answer:
+            "Una sesión con un solo tipo de equipo normalmente toma de 3 a 4 horas para un grupo. La certificación en varios tipos de equipo (por ejemplo, contrapeso más reach truck) toma de 5 a 6 horas. Podemos programar entre turnos si es necesario para adaptarnos a su calendario operativo.",
+        },
+      ],
+      ctaTitle: "¿Listo para Programar Capacitación de Montacargas en Sitio en Hayward?",
+      ctaSubtitle:
+        "Solicite una cotización y personalizaremos un plan de capacitación para su instalación, tipos de equipo y horario de turnos en el Área de la Bahía.",
+    },
   },
 };
 
-export function getServiceAreaCity(slug: string): ServiceAreaCity | undefined {
-  return SERVICE_AREA_CITIES[slug];
+function localizeServiceArea(area: ServiceAreaCity, locale: string): ServiceAreaCity {
+  if (locale !== "es" || !area.es) return area;
+  const es = area.es;
+  return {
+    ...area,
+    heroHeadline: es.heroHeadline ?? area.heroHeadline,
+    heroSubtitle: es.heroSubtitle ?? area.heroSubtitle,
+    seo: es.seo ?? area.seo,
+    intro: es.intro ?? area.intro,
+    industriesServed: es.industriesServed ?? area.industriesServed,
+    whatsIncluded: es.whatsIncluded ?? area.whatsIncluded,
+    whyOnsite: es.whyOnsite ?? area.whyOnsite,
+    faqs: es.faqs ?? area.faqs,
+    ctaTitle: es.ctaTitle ?? area.ctaTitle,
+    ctaSubtitle: es.ctaSubtitle ?? area.ctaSubtitle,
+  };
 }
 
-export function getAllServiceAreaCities(): ServiceAreaCity[] {
-  return Object.values(SERVICE_AREA_CITIES);
+export function getServiceAreaCity(slug: string, locale: string = "en"): ServiceAreaCity | undefined {
+  const area = SERVICE_AREA_CITIES[slug];
+  return area ? localizeServiceArea(area, locale) : undefined;
+}
+
+export function getAllServiceAreaCities(locale: string = "en"): ServiceAreaCity[] {
+  return Object.values(SERVICE_AREA_CITIES).map((area) => localizeServiceArea(area, locale));
 }
 
 export const SERVICE_AREA_SLUGS = Object.keys(SERVICE_AREA_CITIES);

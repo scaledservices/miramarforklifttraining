@@ -47,7 +47,9 @@ const onsiteRequestLimiter = rateLimit({ name: "onsite_request", windowMs: 60_00
 const onsiteRequestCreateSchema = insertOnsiteTrainingRequestSchema.extend({
   contactName: z.string().min(2, "Contact name required"),
   email: z.string().email("Valid email required"),
-  phone: z.string().min(7, "Valid phone required"),
+  // Phone is optional on the slimmed quote form; empty string is the safe
+  // default coalesced in before validation (DB column is NOT NULL).
+  phone: z.union([z.literal(""), z.string().min(7, "Valid phone required")]),
   trainingAddress: z.string().min(5, "Training address required"),
   city: z.string().min(2, "City required"),
   state: z.string().min(2, "State required"),
@@ -62,7 +64,14 @@ const onsiteRequestCreateSchema = insertOnsiteTrainingRequestSchema.extend({
 
 app.post("/api/onsite-requests", onsiteRequestLimiter, async (req: Request, res: Response) => {
   try {
-    const result = onsiteRequestCreateSchema.safeParse(req.body);
+    // Phone and training type are optional on the client form, but the DB
+    // columns are NOT NULL — coalesce to safe defaults before validation.
+    const body = {
+      ...(req.body ?? {}),
+      phone: typeof req.body?.phone === "string" && req.body.phone.trim() !== "" ? req.body.phone : "",
+      trainingType: req.body?.trainingType || "Initial Certification",
+    };
+    const result = onsiteRequestCreateSchema.safeParse(body);
     if (!result.success) {
       return res.status(400).json({ error: "Invalid form data", details: result.error.issues });
     }

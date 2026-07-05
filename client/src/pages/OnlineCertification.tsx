@@ -78,7 +78,7 @@ export default function OnlineCertification() {
       <section className="py-16 md:py-20 bg-background" data-testid="online-benefits">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="text-accent text-sm font-semibold uppercase tracking-wider">{t("onlineCert.whyChooseOnline")}</span>
+            <span className="text-brand-orange text-sm font-semibold uppercase tracking-wider">{t("onlineCert.whyChooseOnline")}</span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-2 mb-4 tracking-tight">
               {t("onlineCert.fastestPath")}
             </h2>

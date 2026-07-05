@@ -268,7 +268,7 @@ export default function AdminTrainingEvents() {
               key={tab.key}
               className={`px-3 py-2 text-sm rounded-t-md transition-colors ${
                 activeQueue === tab.key
-                  ? "bg-primary text-primary-foreground font-medium"
+                  ? "bg-brand-dark text-white font-medium"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
               onClick={() => setActiveQueue(tab.key)}

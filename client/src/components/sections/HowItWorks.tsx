@@ -31,7 +31,7 @@ export default function HowItWorks() {
     <section className="py-16 md:py-20 bg-background" data-testid="how-it-works">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <span className="text-accent text-sm font-semibold uppercase tracking-wider">{t("howItWorks.sectionLabel")}</span>
+          <span className="text-brand-orange text-sm font-semibold uppercase tracking-wider">{t("howItWorks.sectionLabel")}</span>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-2 mb-4 tracking-tight">
             {t("howItWorks.title")}
           </h2>
@@ -53,9 +53,9 @@ export default function HowItWorks() {
                 </div>
               )}
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <item.icon className="w-7 h-7 text-primary" />
+                <item.icon className="w-7 h-7 text-brand-dark" />
               </div>
-              <span className="text-xs font-bold text-accent uppercase tracking-wider mb-2">{t("howItWorks.stepLabel", { number: item.step })}</span>
+              <span className="text-xs font-bold text-brand-dark uppercase tracking-wider mb-2">{t("howItWorks.stepLabel", { number: item.step })}</span>
               <h3 className="text-lg font-bold mb-2">{item.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
             </div>

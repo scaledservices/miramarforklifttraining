@@ -157,7 +157,7 @@ export default function AcceptInvite() {
             <div className="flex rounded-lg border overflow-hidden">
               <button
                 type="button"
-                className={`flex-1 py-2 text-sm font-medium transition-colors ${authMode === "register" ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${authMode === "register" ? "bg-brand-dark text-white" : "hover:bg-muted"}`}
                 onClick={() => setAuthMode("register")}
                 data-testid="tab-register"
               >
@@ -165,7 +165,7 @@ export default function AcceptInvite() {
               </button>
               <button
                 type="button"
-                className={`flex-1 py-2 text-sm font-medium transition-colors ${authMode === "login" ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${authMode === "login" ? "bg-brand-dark text-white" : "hover:bg-muted"}`}
                 onClick={() => setAuthMode("login")}
                 data-testid="tab-login"
               >

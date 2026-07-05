@@ -92,7 +92,7 @@ export async function generateInvoicePdf(orderId: number): Promise<string> {
 
     doc.moveDown(2);
     const infoY = 120;
-    doc.fontSize(10).fillColor("#333333");
+    doc.fontSize(10).fillColor(theme.colors.text.dark);
     doc.text(`Invoice Number: ${invoiceNumber}`, 50, infoY);
     doc.text(`Order Number: ${order.orderNumber}`, 50, infoY + 15);
     doc.text(`Date: ${new Date(order.createdAt!).toLocaleDateString("en-US")}`, 50, infoY + 30);
@@ -105,7 +105,7 @@ export async function generateInvoicePdf(orderId: number): Promise<string> {
 
     const tableTop = infoY + 80;
     doc.rect(50, tableTop, 512, 25).fill(theme.pdf.tableHeaderBg);
-    doc.fontSize(10).fillColor("#ffffff");
+    doc.fontSize(10).fillColor(theme.pdf.tableHeaderText);
     doc.text("Item", 60, tableTop + 7, { width: 250 });
     doc.text("Qty", 320, tableTop + 7, { width: 50, align: "center" });
     doc.text("Unit Price", 380, tableTop + 7, { width: 80, align: "right" });
@@ -113,15 +113,15 @@ export async function generateInvoicePdf(orderId: number): Promise<string> {
 
     let rowY = tableTop + 30;
     let subtotal = 0;
-    doc.fillColor("#333333");
+    doc.fillColor(theme.colors.text.dark);
 
     for (const item of items) {
       const lineTotal = Number(item.unitPrice) * item.quantity;
       subtotal += lineTotal;
 
       if (rowY % 2 === 0) {
-        doc.rect(50, rowY - 5, 512, 20).fill("#f7f7f7");
-        doc.fillColor("#333333");
+        doc.rect(50, rowY - 5, 512, 20).fill(theme.colors.background.row);
+        doc.fillColor(theme.colors.text.dark);
       }
 
       doc.text(item.courseTitle, 60, rowY, { width: 250 });
@@ -131,18 +131,18 @@ export async function generateInvoicePdf(orderId: number): Promise<string> {
       rowY += 22;
     }
 
-    doc.moveTo(50, rowY + 5).lineTo(562, rowY + 5).lineWidth(0.5).strokeColor("#cccccc").stroke();
+    doc.moveTo(50, rowY + 5).lineTo(562, rowY + 5).lineWidth(0.5).strokeColor(theme.colors.border.light).stroke();
 
     const summaryY = rowY + 15;
-    doc.fontSize(10).fillColor("#666666");
+    doc.fontSize(10).fillColor(theme.colors.text.medium);
     doc.text("Subtotal:", 380, summaryY, { width: 80, align: "right" });
-    doc.fillColor("#333333").text(`$${subtotal.toFixed(2)}`, 470, summaryY, { width: 80, align: "right" });
+    doc.fillColor(theme.colors.text.dark).text(`$${subtotal.toFixed(2)}`, 470, summaryY, { width: 80, align: "right" });
 
-    doc.fillColor("#666666").text("Shipping:", 380, summaryY + 18, { width: 80, align: "right" });
-    doc.fillColor("#333333").text("$0.00", 470, summaryY + 18, { width: 80, align: "right" });
+    doc.fillColor(theme.colors.text.medium).text("Shipping:", 380, summaryY + 18, { width: 80, align: "right" });
+    doc.fillColor(theme.colors.text.dark).text("$0.00", 470, summaryY + 18, { width: 80, align: "right" });
 
-    doc.fillColor("#666666").text("Tax:", 380, summaryY + 36, { width: 80, align: "right" });
-    doc.fillColor("#333333").text("$0.00", 470, summaryY + 36, { width: 80, align: "right" });
+    doc.fillColor(theme.colors.text.medium).text("Tax:", 380, summaryY + 36, { width: 80, align: "right" });
+    doc.fillColor(theme.colors.text.dark).text("$0.00", 470, summaryY + 36, { width: 80, align: "right" });
 
     doc.moveTo(380, summaryY + 54).lineTo(562, summaryY + 54).lineWidth(1).strokeColor(theme.pdf.totalLineColor).stroke();
 

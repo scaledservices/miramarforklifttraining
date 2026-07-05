@@ -10,6 +10,8 @@ import { brand } from "@shared/config/brand";
 import { industry } from "@shared/config/industry";
 import SEOHead from "@/components/seo/SEOHead";
 import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
+import CardPaymentSection from "@/components/checkout/CardPaymentSection";
+import { computeBookingPrice } from "@shared/config/bookingPricing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -154,6 +156,7 @@ export default function BookTraining() {
 
   const [submitted, setSubmitted] = useState(false);
   const [bookingNumber, setBookingNumber] = useState("");
+  const [depositInfo, setDepositInfo] = useState<{ deposit: number; depositSurcharge: number; depositCharged: number; balanceDue: number; volumeDiscount: number; total: number } | null>(null);
 
   const handsOnProducts = useMemo(
     () => catalog.filter((p) => p.category === "hands-on"),
@@ -272,6 +275,8 @@ export default function BookTraining() {
     contactEmail: string;
     specialRequests?: string;
     productPrice: number;
+    productSlugs: string[];
+    paymentNonce?: string;
   }
 
   const bookingMutation = useMutation({
@@ -279,6 +284,7 @@ export default function BookTraining() {
     onSuccess: async (res) => {
       const data = await res.json();
       setBookingNumber(data.bookingNumber || "");
+      setDepositInfo(data.pricing || null);
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
@@ -302,10 +308,12 @@ export default function BookTraining() {
     return parts.join(" | ") || "custom-training";
   }
 
-  function handleSubmit() {
+  function handleSubmit(paymentNonce?: string | null) {
     if (!isAuthenticated || !serviceArea || !selectedDate || !selectedSlot) return;
     const productPrice = productsSubtotal;
     bookingMutation.mutate({
+      paymentNonce: paymentNonce || undefined,
+      productSlugs: selectedProducts.map((p) => p.slug),
       serviceAreaId: serviceArea.id,
       productSlug: buildProductSlug(),
       sessionDate: selectedDate,
@@ -343,6 +351,10 @@ export default function BookTraining() {
     0
   );
   const totalEstimate = productsSubtotal * participantCount;
+  // Authoritative pricing (volume discount + deposit) from the shared module the
+  // server also charges from — null when only custom equipment is selected.
+  const bookingPricing = computeBookingPrice(selectedProducts.map((pr) => pr.slug), participantCount);
+  const depositWithSurcharge = bookingPricing ? Number((bookingPricing.deposit * 1.03).toFixed(2)) : 0;
   const dayNames = useMemo(() => getDayNames(i18n.language || "en"), [i18n.language]);
 
   if (submitted) {
@@ -354,7 +366,7 @@ export default function BookTraining() {
         />
         <div className="max-w-lg w-full text-center space-y-6">
           <div className="flex justify-center">
-            <CheckCircle className="h-20 w-20 text-green-500" />
+            <CheckCircle className="h-20 w-20 text-brand-green" />
           </div>
           <h1 className="text-3xl font-bold text-foreground" data-testid="text-booking-success">
             {t("bookTraining.successTitle")}
@@ -366,6 +378,18 @@ export default function BookTraining() {
             <div className="bg-muted rounded-lg p-4">
               <p className="text-sm text-muted-foreground">{t("bookTraining.bookingNumberLabel")}</p>
               <p className="text-xl font-bold font-mono text-foreground" data-testid="text-booking-number">{bookingNumber}</p>
+            </div>
+          )}
+          {depositInfo && depositInfo.depositCharged > 0 && (
+            <div className="bg-primary/10 border border-primary/40 rounded-lg p-4 text-left text-sm space-y-1" data-testid="deposit-receipt">
+              <div className="flex justify-between font-semibold text-foreground">
+                <span>{t("booking.depositReceived")}</span>
+                <span>${depositInfo.depositCharged.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-muted-foreground">
+                <span>{t("booking.balanceOnCompletion")}</span>
+                <span>${depositInfo.balanceDue.toFixed(2)}</span>
+              </div>
             </div>
           )}
           <div className="bg-muted rounded-lg p-5 text-left space-y-2">
@@ -397,12 +421,12 @@ export default function BookTraining() {
         canonical="/book-training"
       />
 
-      <div className="bg-primary text-primary-foreground py-12 px-4">
+      <div className="bg-brand-dark text-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl font-bold mb-3" data-testid="text-page-title">
             {t("bookTraining.pageTitle")}
           </h1>
-          <p className="text-blue-100 text-lg max-w-2xl mx-auto">
+          <p className="text-white/80 text-lg max-w-2xl mx-auto">
             {t("bookTraining.pageSubtitle")}
           </p>
         </div>
@@ -441,7 +465,7 @@ export default function BookTraining() {
               <div className="space-y-6" data-testid="step-1-content">
                 <div className="bg-card border rounded-xl p-6">
                   <h2 className="text-xl font-semibold mb-1 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-primary" />
+                    <MapPin className="w-5 h-5 text-brand-dark" />
                     {t("bookTraining.checkAvailability")}
                   </h2>
                   <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.enterZipDesc")}</p>
@@ -494,7 +518,7 @@ export default function BookTraining() {
                 {serviceArea && (
                   <div className="bg-card border rounded-xl p-6">
                     <h2 className="text-xl font-semibold mb-1 flex items-center gap-2">
-                      <ClipboardList className="w-5 h-5 text-primary" />
+                      <ClipboardList className="w-5 h-5 text-brand-dark" />
                       {t("bookTraining.selectTraining")}
                     </h2>
                     <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.selectTrainingDesc")}</p>
@@ -571,14 +595,14 @@ export default function BookTraining() {
               <div className="space-y-6" data-testid="step-2-content">
                 <div className="bg-card border rounded-xl p-6">
                   <h2 className="text-xl font-semibold mb-1 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-primary" />
+                    <Calendar className="w-5 h-5 text-brand-dark" />
                     {t("bookTraining.chooseDateTime")}
                   </h2>
                   <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.chooseDateTimeDesc")}</p>
 
                   {slotsLoading ? (
                     <div className="flex items-center justify-center py-12">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                      <Loader2 className="w-6 h-6 animate-spin text-brand-dark" />
                     </div>
                   ) : (
                     <div>
@@ -656,7 +680,7 @@ export default function BookTraining() {
                 {selectedDate && slotsForDate.length > 0 && (
                   <div className="bg-card border rounded-xl p-6">
                     <h3 className="font-semibold mb-3 flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-primary" />
+                      <Clock className="w-5 h-5 text-brand-dark" />
                       {t("bookTraining.selectTimeSlot")} — {formatDate(selectedDate, i18n.language || "en")}
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -698,7 +722,7 @@ export default function BookTraining() {
             {step === 3 && (
               <div className="bg-card border rounded-xl p-6 space-y-5" data-testid="step-3-content">
                 <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <Users className="w-5 h-5 text-primary" />
+                  <Users className="w-5 h-5 text-brand-dark" />
                   {t("bookTraining.yourDetails")}
                 </h2>
 
@@ -826,7 +850,7 @@ export default function BookTraining() {
               <div className="space-y-6" data-testid="step-4-content">
                 <div className="bg-card border rounded-xl p-6">
                   <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-primary" />
+                    <Shield className="w-5 h-5 text-brand-dark" />
                     {t("bookTraining.reviewTitle")}
                   </h2>
 
@@ -881,12 +905,45 @@ export default function BookTraining() {
                   <CheckoutInlineAuth />
                 )}
 
-                {isAuthenticated && (
+                {isAuthenticated && bookingPricing && (
+                  <div className="space-y-3">
+                    <div className="bg-primary/10 border border-primary/40 rounded-xl p-4 text-sm space-y-1.5" data-testid="deposit-summary">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">{t("booking.trainingTotal")}</span>
+                        <span className="font-medium">${bookingPricing.total.toFixed(2)}</span>
+                      </div>
+                      {bookingPricing.volumeDiscount > 0 && (
+                        <div className="flex justify-between text-brand-green">
+                          <span>{t("booking.volumeDiscountApplied")}</span>
+                          <span>-${bookingPricing.volumeDiscount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-semibold text-foreground">
+                        <span>{t("booking.depositDueToday")}</span>
+                        <span>${depositWithSurcharge.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>{t("booking.balanceOnCompletion")}</span>
+                        <span>${bookingPricing.balance.toFixed(2)}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground pt-1">{t("booking.depositNote")}</p>
+                    </div>
+                    <CardPaymentSection
+                      chargeAmount={depositWithSurcharge}
+                      pending={bookingMutation.isPending}
+                      onPay={(nonce) => handleSubmit(nonce)}
+                      ctaLabel={t("booking.payDepositCta", { amount: depositWithSurcharge.toFixed(2) })}
+                      fallbackCtaLabel={t("bookTraining.confirmBooking")}
+                    />
+                  </div>
+                )}
+
+                {isAuthenticated && !bookingPricing && (
                   <div className="space-y-3">
                     <Button
-                      onClick={handleSubmit}
+                      onClick={() => handleSubmit(null)}
                       disabled={bookingMutation.isPending}
-                      className="w-full bg-accent hover:bg-accent/90 text-white h-12 text-base"
+                      className="w-full bg-accent text-accent-foreground border-accent-border h-12 text-base"
                       data-testid="button-submit-booking"
                     >
                       {bookingMutation.isPending ? (
@@ -1000,6 +1057,19 @@ export default function BookTraining() {
                         <span className="font-bold text-lg text-foreground">${totalEstimate.toFixed(2)}</span>
                       </div>
                     )}
+                    {bookingPricing && bookingPricing.volumeDiscount > 0 && (
+                      <div className="flex justify-between mt-1 text-sm text-brand-green">
+                        <span>{t("booking.volumeDiscountApplied")}</span>
+                        <span>-${bookingPricing.volumeDiscount.toFixed(2)}</span>
+                      </div>
+                    )}
+                    {bookingPricing && (
+                      <div className="flex justify-between mt-1 text-sm">
+                        <span className="text-muted-foreground">{t("booking.depositDueToday")}</span>
+                        <span className="font-semibold">${depositWithSurcharge.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-2">{t("booking.priceAnchor")}</p>
                     {selectedEquipment.length > 0 && (
                       <p className="text-xs text-muted-foreground mt-2 italic">
                         {t("bookTraining.equipmentPricingNote")}
@@ -1023,9 +1093,9 @@ export default function BookTraining() {
               </div>
             </div>
 
-            <div className="bg-primary text-primary-foreground rounded-xl p-6">
+            <div className="bg-brand-dark text-white rounded-xl p-6">
               <h3 className="font-semibold text-lg mb-3">{t("bookTraining.whyBookWithUs")}</h3>
-              <ul className="space-y-2 text-blue-100 text-sm">
+              <ul className="space-y-2 text-white/80 text-sm">
                 <li className="flex gap-2">
                   <Building2 className="h-5 w-5 shrink-0 text-accent" />
                   <span>{t("bookTraining.benefit1")}</span>
@@ -1049,14 +1119,14 @@ export default function BookTraining() {
               <h3 className="font-semibold text-foreground">{t("bookTraining.needHelp")}</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Phone className="h-4 w-4 text-primary" />
-                  <a href={`tel:${brand.support.phoneTel}`} className="hover:text-primary" data-testid="link-support-phone">
+                  <Phone className="h-4 w-4 text-brand-dark" />
+                  <a href={`tel:${brand.support.phoneTel}`} className="hover:text-brand-dark" data-testid="link-support-phone">
                     {brand.support.phone}
                   </a>
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <Mail className="h-4 w-4 text-primary" />
-                  <a href={`mailto:${brand.support.infoEmail}`} className="hover:text-primary" data-testid="link-support-email">
+                  <Mail className="h-4 w-4 text-brand-dark" />
+                  <a href={`mailto:${brand.support.infoEmail}`} className="hover:text-brand-dark" data-testid="link-support-email">
                     {brand.support.infoEmail}
                   </a>
                 </div>

@@ -30,7 +30,12 @@
     "mainNavigation": "Navegación principal",
     "inPersonTraining": "Capacitación Presencial",
     "sanDiego": "San Diego, CA",
-    "getQuote": "Solicitar Cotización"
+    "getQuote": "Solicitar Cotización",
+    "renewal": "Renovar Certificación",
+    "lasVegas": "Las Vegas",
+    "fresno": "Fresno",
+    "callUs": "Llámenos",
+    "bookTraining": "Reservar"
   },
   "cta": {
     "getCertified": "Certifícate",
@@ -192,7 +197,10 @@
     "terms": "Términos",
     "privacy": "Privacidad",
     "refundPolicy": "Política de Reembolso",
-    "contactUs": "Contáctenos"
+    "contactUs": "Contáctenos",
+    "renewal": "Renovar Certificación",
+    "requestQuote": "Solicitar Cotización",
+    "locations": "Ubicaciones"
   },
   "badges": {
     "oshaAligned": "Alineado con OSHA",
@@ -233,19 +241,19 @@
     "needOnsiteTraining": "¿Necesitas capacitación en tu instalación?"
   },
   "home": {
-    "heroTitle": "Capacitación y Certificación de Montacargas en San Diego",
-    "heroSubtitle": "Certificación de montacargas presencial y en línea alineada con OSHA en nuestras instalaciones de Miramar o en su lugar de trabajo. Tarjetas el mismo día.",
+    "heroTitle": "Capacitación y Certificación de Montacargas Alineada con OSHA",
+    "heroSubtitle": "Capacitación en sus instalaciones, o cursos prácticos en nuestros centros de San Diego, Las Vegas y Fresno. Instructores bilingües con experiencia. Tarjetas de certificación el mismo día.",
     "bookInPerson": "Reservar Capacitación Presencial",
     "getOnlineCertified": "Certifícate en Línea",
     "trust1": "Certificación el Mismo Día",
     "trust2": "Capacitación Alineada con OSHA",
     "trust3": "10+ Años de Experiencia",
-    "trust4": "San Diego, CA",
+    "trust4": "3 Ubicaciones: San Diego, Las Vegas y Fresno",
     "getStartedLabel": "Comenzar",
-    "buyerTracksTitle": "Elige Tu Camino de Certificación",
-    "buyerTracksSubtitle": "Individual, en línea o equipo — tenemos la opción correcta para ti.",
-    "inPersonTitle": "Capacitación Presencial",
-    "inPersonDesc": "Certificación práctica de montacargas en nuestras instalaciones de Miramar. Sin cita previa, tarjeta el mismo día.",
+    "buyerTracksTitle": "Encuentre la Capacitación Adecuada para Usted",
+    "buyerTracksSubtitle": "Tres formas de certificarse — elija la que le convenga.",
+    "inPersonTitle": "¿Se Certifica Usted Mismo?",
+    "inPersonDesc": "Capacitación práctica con equipo real en nuestras instalaciones de San Diego, Las Vegas o Fresno. Salga con su tarjeta el mismo día.",
     "inPersonF1": "Capacitación con equipo real",
     "inPersonF2": "Tarjeta de certificación el mismo día",
     "inPersonF3": "Desde $200/persona",
@@ -256,10 +264,10 @@
     "onlineF2": "Certificado imprimible",
     "onlineF3": "Completa en ~2 horas",
     "certIn2Hours": "Certifícate en tan solo 2 horas",
-    "b2bTitle": "Capacitación para Equipos y En-Sitio",
-    "b2bDesc": "Capacitación personalizada en su instalación o la nuestra. Precios por volumen, instructores bilingües, documentación de cumplimiento.",
-    "b2bF1": "En su ubicación",
-    "b2bF2": "Descuentos por volumen disponibles",
+    "b2bTitle": "¿Capacitación para Su Equipo?",
+    "b2bDesc": "Llevamos la capacitación a sus instalaciones — o recibimos a su equipo en las nuestras. Precios por volumen, instructores bilingües y documentación de cumplimiento completa.",
+    "b2bF1": "El instructor viaja a su sitio",
+    "b2bF2": "Descuentos por volumen para 5+ personas",
     "b2bF3": "Documentos de cumplimiento incluidos",
     "getQuoteCta": "Solicitar Cotización",
     "b2bSectionTitle": "Capacite a Todo Su Equipo",
@@ -269,9 +277,27 @@
     "commonQuestions": "Preguntas Frecuentes",
     "commonQuestionsDesc": "Obtén respuestas rápidas sobre nuestros programas de certificación.",
     "readyToGetCertified": "¿Listo para Certificarte?",
-    "readyToGetCertifiedDesc": "Reserve capacitación presencial en nuestras instalaciones de San Diego o comience su certificación en línea hoy.",
+    "readyToGetCertifiedDesc": "Solicite una cotización para capacitación en sus instalaciones, o reserve capacitación práctica en San Diego, Las Vegas o Fresno.",
     "individualAlt": "Operador individual completando certificación de montacargas en línea",
-    "businessAlt": "Equipo empresarial planificando programa de capacitación de montacargas"
+    "businessAlt": "Equipo empresarial planificando programa de capacitación de montacargas",
+    "heroEyebrow": "San Diego · Las Vegas · Fresno",
+    "heroRenewLink": "¿Solo necesita renovar? Renueve su certificación en línea",
+    "renewTitle": "¿Solo Necesita Renovar?",
+    "renewDesc": "Renueve su certificación de montacargas en línea en aproximadamente 2 horas, o programe un repaso y evaluación presencial.",
+    "renewF1": "Opción 100% en línea disponible",
+    "renewF2": "Listo en aproximadamente 2 horas",
+    "renewF3": "Certificado el mismo día",
+    "renewCta": "Renovar Mi Certificación",
+    "statYears": "Años de Experiencia",
+    "statLocations": "Centros de Capacitación",
+    "statSameDay": "Certificación el Mismo Día",
+    "statBilingual": "Inglés y Español",
+    "serviceAreasLabel": "Capacitación en Sitio",
+    "serviceAreasTitle": "Áreas de Servicio de Capacitación en Sitio",
+    "serviceAreasDesc": "Llevamos la certificación de montacargas alineada con {{body}} directamente a sus instalaciones — sin viajes para su equipo.",
+    "serviceAreaCardDesc": "Capacitación de montacargas en sitio en {{city}} y áreas cercanas. Vamos a sus instalaciones con certificación el mismo día.",
+    "bookTrainingCta": "Reservar Capacitación",
+    "largeGroupLink": "¿10+ personas o requisitos especiales? Solicite una cotización personalizada"
   },
   "onlineCert": {
     "title": "Certificación de Operador de Montacargas en Línea",
@@ -715,7 +741,12 @@
     "validBadge": "Certificado Válido",
     "invalidBadge": "Certificado Inválido",
     "verificationProvidedBy": "Esta verificación es proporcionada por {{domain}}",
-    "complianceNote": "Programa de certificación conforme a {{body}} {{standard}}"
+    "complianceNote": "Programa de certificación conforme a {{body}} {{standard}}",
+    "lookupTitle": "Verificar una Certificación",
+    "lookupDesc": "Ingrese el número de certificado impreso en el certificado o en la tarjeta para confirmar que es válido y vigente.",
+    "lookupPlaceholder": "ej. MFT-2026-000123",
+    "lookupButton": "Verificar",
+    "lookupHint": "El número de certificado aparece debajo del nombre del titular en el certificado y la tarjeta."
   },
   "certification": {
     "notFoundTitle": "Certificación No Encontrada",
@@ -1136,19 +1167,37 @@
     "ctaTitle": "¿Listo para Reservar Su Capacitación?",
     "ctaSubtitle": "Solicite una cotización o llámenos para programar su capacitación de certificación de montacargas.",
     "course": {
-      "standard": { "name": "Certificación Estándar de Montacargas", "duration": "4-6 horas" },
-      "reachForklift": { "name": "Montacargas de Alcance + Montacargas", "duration": "6-8 horas" },
-      "orderPickerForklift": { "name": "Recogedor de Pedidos + Montacargas", "duration": "6-8 horas" },
-      "forkliftScissorEpj": { "name": "Montacargas + Plataforma de Tijera + EPJ", "duration": "Día completo" },
-      "fullMultiEquipment": { "name": "Multi-Equipo Completo", "duration": "Día completo" },
-      "scissorAerial": { "name": "Plataforma de Tijera + Plataforma Aérea", "duration": "4-6 horas" }
+      "standard": {
+        "name": "Certificación Estándar de Montacargas",
+        "duration": "4-6 horas"
+      },
+      "reachForklift": {
+        "name": "Montacargas de Alcance + Montacargas",
+        "duration": "6-8 horas"
+      },
+      "orderPickerForklift": {
+        "name": "Recogedor de Pedidos + Montacargas",
+        "duration": "6-8 horas"
+      },
+      "forkliftScissorEpj": {
+        "name": "Montacargas + Plataforma de Tijera + EPJ",
+        "duration": "Día completo"
+      },
+      "fullMultiEquipment": {
+        "name": "Multi-Equipo Completo",
+        "duration": "Día completo"
+      },
+      "scissorAerial": {
+        "name": "Plataforma de Tijera + Plataforma Aérea",
+        "duration": "4-6 horas"
+      }
     }
   },
   "requestQuote": {
     "seoTitle": "Solicitar Cotización — {{brand}}",
     "seoDesc": "Obtenga una cotización personalizada para capacitación de montacargas de {{brand}}. Presencial en nuestras instalaciones de Miramar o en su ubicación.",
-    "pageTitle": "Solicitar una Cotización de Capacitación",
-    "pageSubtitle": "Cuéntenos sobre sus necesidades de capacitación y le responderemos dentro de un día hábil con una cotización personalizada.",
+    "pageTitle": "Cotización para Grupos Grandes y Capacitación Personalizada",
+    "pageSubtitle": "¿Capacitación para 10 o más personas, varias sedes o equipo especial? Cuéntenos lo que necesita y le enviaremos una cotización personalizada dentro de un día hábil.",
     "formTitle": "Detalles de Capacitación",
     "firstName": "Nombre",
     "lastName": "Apellido",
@@ -1203,7 +1252,12 @@
       "electricPalletJack": "Transpaleta Eléctrica (EPJ)",
       "scissorLift": "Plataforma de Tijera",
       "aerialBoomLift": "Plataforma Aérea/Brazo"
-    }
+    },
+    "selfServeTitle": "¿Reservando para 1 a 9 personas?",
+    "selfServeDesc": "No necesita cotización: reserve y pague en línea en minutos.",
+    "selfServeCta": "Reservar en Línea",
+    "phoneOptional": "Teléfono (opcional)",
+    "preferredDateOptional": "Fecha preferida (opcional)"
   },
   "seoPage": {
     "startCertification": "Iniciar Certificación — $59.99",
@@ -1759,9 +1813,9 @@
     "viewBusinessProducts": "Ver Productos para Empresas"
   },
   "locationsHubPage": {
-    "badgeLabel": "San Diego, CA",
-    "title": "Ubicación de Capacitación",
-    "subtitle": "Capacitación presencial en nuestras instalaciones de San Diego o en su ubicación. Certificación alineada con {{body}} con evaluación práctica.",
+    "badgeLabel": "3 Centros de Capacitación",
+    "title": "Centros de Capacitación",
+    "subtitle": "Capacitación presencial en nuestras instalaciones de San Diego, Las Vegas y Fresno — o en su ubicación. Certificación alineada con {{body}} con evaluación práctica.",
     "sanDiegoFacility": "Instalaciones de San Diego",
     "facilityDesc": "Capacitación sin cita previa y programada en nuestras instalaciones de Miramar. Sesiones individuales y grupales disponibles con certificación el mismo día.",
     "viewTrainingOptions": "Ver Opciones de Capacitación",
@@ -2066,5 +2120,73 @@
     "ordersLinked": "pedidos vinculados",
     "certsLinked": "certificaciones vinculadas",
     "skippedAmbiguous": "omitidos (ambiguos)"
+  },
+  "serviceAreas": {
+    "notFoundTitle": "Área de Servicio No Encontrada",
+    "backToHome": "Volver al Inicio",
+    "breadcrumbHome": "Inicio",
+    "breadcrumbHub": "Áreas de Servicio",
+    "schemaDescription": "Capacitación de montacargas en sitio en {{city}}, {{state}}. Certificación alineada con {{body}} en su instalación.",
+    "requestQuote": "Solicitar Cotización",
+    "introHeading": "Capacitación de Montacargas en Sitio en {{city}} — Vamos a Usted",
+    "industriesHeading": "Industrias que Atendemos en {{city}}",
+    "sidebarCaption": "Capacitación en Sitio — {{city}}, {{state}}",
+    "serviceAreaLabel": "Área de Servicio",
+    "phoneLabel": "Teléfono",
+    "schedulingLabel": "Horario",
+    "schedulingHours": "Lun–Vie: 7:00 AM – 5:00 PM",
+    "schedulingFlexible": "Turnos flexibles y fines de semana disponibles",
+    "languagesLabel": "Idiomas",
+    "languagesList": "Inglés y Español",
+    "checkOshaAligned": "Certificación alineada con {{body}}",
+    "checkSameDay": "Tarjetas de certificación el mismo día",
+    "checkYourEquipment": "Capacitación en su propio equipo",
+    "checkVolumeDiscounts": "Descuentos por volumen (5+ operadores)",
+    "callButton": "Llamar al {{phone}}",
+    "includedTag": "Qué Incluye",
+    "includedHeading": "Certificación de Montacargas en Sitio — {{city}}",
+    "includedSubtitle": "Todo lo que sus operadores necesitan para cumplir con los requisitos de {{body}}, entregado en su instalación.",
+    "areasNearHeading": "Áreas que Atendemos Cerca de {{city}}",
+    "areasNearSubtitle": "Ofrecemos capacitación de montacargas en sitio en toda la región de {{region}} y las comunidades circundantes.",
+    "faqHeading": "Capacitación de Montacargas en Sitio en {{city}} — Preguntas Frecuentes",
+    "faqSubtitle": "Preguntas comunes sobre la certificación en sitio en su instalación.",
+    "otherAreasHeading": "Otras Áreas de Servicio",
+    "otherAreasSubtitle": "También ofrecemos capacitación de montacargas en sitio en estas ubicaciones:",
+    "viewFacilities": "Ver Centros de Capacitación",
+    "hubSeoTitle": "Áreas de Servicio de Capacitación de Montacargas en Sitio | {{brand}}",
+    "hubSeoDescription": "Ofrecemos capacitación de montacargas en sitio en su instalación en toda California. Certificación alineada con {{body}} en su ubicación — sin necesidad de que su equipo viaje.",
+    "hubBadge": "Capacitación en Sitio",
+    "hubTitle": "Áreas de Servicio de Capacitación de Montacargas en Sitio",
+    "hubSubtitle": "Llevamos la certificación de montacargas alineada con {{body}} directamente a su instalación. No envíe a su equipo al otro lado del estado — permítanos ir a usted con certificación el mismo día.",
+    "learnMore": "Más información",
+    "hubNoCity": "¿No ve su ciudad en la lista? Viajamos por toda California para capacitación en sitio.",
+    "hubQuoteCta": "Solicitar Cotización para Su Ubicación",
+    "bookCta": "Reservar Capacitación"
+  },
+  "mobileBar": {
+    "call": "Llamar Ahora",
+    "quote": "Cotización",
+    "book": "Reservar"
+  },
+  "checkoutTrust": {
+    "secure": "Pago cifrado y seguro procesado por Authorize.net",
+    "sameDay": "Certificado emitido el mismo día al completar el curso"
+  },
+  "booking": {
+    "trainingTotal": "Total de la capacitación",
+    "volumeDiscountApplied": "Descuento por volumen (5+ personas)",
+    "depositDueToday": "Depósito a pagar hoy (50%)",
+    "balanceOnCompletion": "Saldo después de la capacitación",
+    "depositNote": "Su fecha queda reservada al pagar el depósito. El saldo restante se cobra después de completar la capacitación.",
+    "payDepositCta": "Pagar Depósito de ${{amount}} y Reservar",
+    "depositReceived": "Depósito recibido",
+    "policyRequired": "Acepte la política de cancelación para continuar.",
+    "paymentLoading": "El sistema de pago está cargando. Intente de nuevo en un momento.",
+    "paymentTitle": "Pago",
+    "policyAccept": "Acepto la",
+    "policyLink": "política de cancelación y reembolso",
+    "freeReschedule": "reprogramación gratuita hasta 24 horas antes de su sesión.",
+    "processing": "Procesando...",
+    "priceAnchor": "La certificación práctica cuesta $350+ por persona en otros lugares."
   }
 }

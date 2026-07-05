@@ -258,7 +258,7 @@ export default function CoursePlayer() {
                       disabled={!accessible}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left text-sm transition-colors ${
                         isActive
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-brand-dark text-white"
                           : accessible
                             ? "hover:bg-muted"
                             : "opacity-50 cursor-not-allowed"
@@ -284,7 +284,7 @@ export default function CoursePlayer() {
               disabled={!accessible}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left text-sm transition-colors ${
                 isActive
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-brand-dark text-white"
                   : accessible
                     ? "hover:bg-muted"
                     : "opacity-50 cursor-not-allowed"

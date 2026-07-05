@@ -119,7 +119,7 @@ export default function RequestOnsiteTraining() {
             </ul>
           </div>
           <p className="text-sm text-muted-foreground">
-            {t("onsiteTraining.questionsCall")} <a href={`tel:${brand.support.phoneTel}`} className="text-primary font-medium">{brand.support.phone}</a>
+            {t("onsiteTraining.questionsCall")} <a href={`tel:${brand.support.phoneTel}`} className="text-brand-dark font-medium">{brand.support.phone}</a>
           </p>
         </div>
       </div>
@@ -134,10 +134,10 @@ export default function RequestOnsiteTraining() {
         canonical="/request-onsite-training"
       />
 
-      <div className="bg-primary text-primary-foreground py-16 px-4">
+      <div className="bg-brand-dark text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl font-bold mb-4" data-testid="text-page-title">{t("onsiteTraining.pageTitle")}</h1>
-          <p className="text-blue-100 text-lg max-w-2xl mx-auto">
+          <p className="text-white/80 text-lg max-w-2xl mx-auto">
             {t("onsiteTraining.pageSubtitle")}
           </p>
           <p className="text-blue-200 text-sm mt-3 italic">
@@ -402,7 +402,7 @@ export default function RequestOnsiteTraining() {
                 <Button
                   type="submit"
                   size="lg"
-                  className="w-full bg-accent hover:bg-accent/90 text-white"
+                  className="w-full bg-accent text-accent-foreground border-accent-border"
                   disabled={mutation.isPending}
                   data-testid="button-submit-request"
                 >
@@ -418,9 +418,9 @@ export default function RequestOnsiteTraining() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-primary text-primary-foreground rounded-xl p-6">
+          <div className="bg-brand-dark text-white rounded-xl p-6">
             <h3 className="font-semibold text-lg mb-4">{t("onsiteTraining.whyChooseOnsite")}</h3>
-            <ul className="space-y-3 text-blue-100 text-sm">
+            <ul className="space-y-3 text-white/80 text-sm">
               <li className="flex gap-2">
                 <Building2 className="h-5 w-5 shrink-0 text-accent" />
                 <span dangerouslySetInnerHTML={{ __html: t("onsiteTraining.benefitFacility") }} />
@@ -467,15 +467,15 @@ export default function RequestOnsiteTraining() {
             <h3 className="font-semibold text-foreground">{t("onsiteTraining.contactDirectly")}</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="h-4 w-4 text-primary" />
-                <a href={`tel:${brand.support.phoneTel}`} className="hover:text-primary" data-testid="link-phone">{brand.support.phone}</a>
+                <Phone className="h-4 w-4 text-brand-dark" />
+                <a href={`tel:${brand.support.phoneTel}`} className="hover:text-brand-dark" data-testid="link-phone">{brand.support.phone}</a>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-4 w-4 text-primary" />
-                <a href={`mailto:${brand.support.infoEmail}`} className="hover:text-primary" data-testid="link-email">{brand.support.infoEmail}</a>
+                <Mail className="h-4 w-4 text-brand-dark" />
+                <a href={`mailto:${brand.support.infoEmail}`} className="hover:text-brand-dark" data-testid="link-email">{brand.support.infoEmail}</a>
               </div>
               <div className="flex items-start gap-2 text-muted-foreground">
-                <MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <MapPin className="h-4 w-4 text-brand-dark mt-0.5 shrink-0" />
                 <span>{t("onsiteTraining.servingAreas")}</span>
               </div>
             </div>

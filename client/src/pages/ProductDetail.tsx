@@ -134,8 +134,8 @@ export default function ProductDetail() {
       />
       <section className="relative overflow-hidden py-10 md:py-14">
         <div className="absolute inset-0">
-          <OptimizedImage src={categoryImage} alt={categoryImageAlt} className="w-full h-full object-cover" loading="eager" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(210,85%,15%)]/95 via-[hsl(210,85%,18%)]/85 to-[hsl(210,85%,20%)]/70" />
+          <OptimizedImage src={categoryImage} alt={categoryImageAlt} className="w-full h-full object-cover" loading="eager" fetchpriority="high" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(10,22%,15%)]/95 via-[hsl(10,22%,18%)]/85 to-[hsl(10,22%,21%)]/70" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/training-programs" className="inline-flex items-center gap-1 text-sm text-white/70 mb-4" data-testid="link-back">

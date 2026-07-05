@@ -8,6 +8,7 @@ import { getLocation } from "@shared/config/locations";
 import { localBusinessSchema } from "@/components/seo/StructuredData";
 import { MapPin, Phone, Clock, Globe, CheckCircle, Award, Users, Shield, Construction } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import OptimizedImage from "@/components/ui/optimized-image";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 
@@ -104,7 +105,7 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                 <div className="grid grid-cols-2 gap-3">
                   {loc.equipmentTypes.map((eq) => (
                     <div key={eq} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-accent shrink-0" />
+                      <CheckCircle className="h-4 w-4 text-brand-green shrink-0" />
                       <span>{eq}</span>
                     </div>
                   ))}
@@ -120,7 +121,7 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                     {Object.values(brand.pricing.inPerson).map((course) => (
                       <div key={course.name} className="flex items-center justify-between bg-card border rounded-lg px-4 py-3">
                         <span className="text-sm font-medium">{course.name}</span>
-                        <span className="text-sm font-bold text-accent">${course.price}</span>
+                        <span className="text-sm font-bold text-brand-orange">${course.price}</span>
                       </div>
                     ))}
                   </div>
@@ -142,7 +143,7 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                     { icon: Clock, title: t(`${i18nPrefix}.why4Title`, { defaultValue: "Same-Day Certification" }), desc: t(`${i18nPrefix}.why4Desc`, { defaultValue: "Walk out with your certification card the same day" }) },
                   ].map((item) => (
                     <div key={item.title} className="flex items-start gap-3">
-                      <item.icon className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                      <item.icon className="h-5 w-5 text-brand-dark shrink-0 mt-0.5" />
                       <div>
                         <p className="font-medium text-sm">{item.title}</p>
                         <p className="text-xs text-muted-foreground">{item.desc}</p>
@@ -157,38 +158,38 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
               <Card className="border-border sticky top-20" data-testid="location-info-card">
                 <CardContent className="p-0">
                   <div className="relative h-40 rounded-t-lg overflow-hidden">
-                    <div className="w-full h-full bg-gradient-to-br from-blue-900 to-blue-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <OptimizedImage src={loc.heroImage} alt={loc.displayName} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/85 via-brand-dark/20 to-transparent" />
                     <div className="absolute bottom-3 left-4">
                       <h3 className="font-bold text-lg text-white drop-shadow-md">{brand.name}</h3>
-                      <p className="text-sm text-blue-100">{loc.displayName}</p>
+                      <p className="text-sm text-white/80">{loc.displayName}</p>
                     </div>
                   </div>
                 </CardContent>
                 <CardContent className="p-6 space-y-5">
                   <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    <MapPin className="w-5 h-5 text-brand-dark shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">{t("location.addressLabel")}</p>
                       <p className="text-sm text-muted-foreground">{loc.address.full}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Phone className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    <Phone className="w-5 h-5 text-brand-dark shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">{t("location.phoneLabel")}</p>
-                      <a href={`tel:${loc.phoneTel}`} className="text-sm text-accent hover:underline" data-testid="link-phone">{loc.phone}</a>
+                      <a href={`tel:${loc.phoneTel}`} className="text-sm text-brand-orange font-medium hover:underline" data-testid="link-phone">{loc.phone}</a>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    <Clock className="w-5 h-5 text-brand-dark shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">{t("location.hoursLabel")}</p>
                       <p className="text-sm text-muted-foreground">{loc.hours}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Globe className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    <Globe className="w-5 h-5 text-brand-dark shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">{t("location.languagesLabel")}</p>
                       <p className="text-sm text-muted-foreground">{t("location.languagesList")}</p>
@@ -196,15 +197,15 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                   </div>
                   <div className="space-y-2 pt-2">
                     <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-accent" />
+                      <CheckCircle className="w-4 h-4 text-brand-green" />
                       <span>{t("location.sameDayCert")}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-accent" />
+                      <CheckCircle className="w-4 h-4 text-brand-green" />
                       <span>{t("location.oshaAligned", { body: industry.regulatory.body })}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-accent" />
+                      <CheckCircle className="w-4 h-4 text-brand-green" />
                       <span>{t("location.tenYearsExp")}</span>
                     </div>
                   </div>

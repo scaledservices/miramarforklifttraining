@@ -19,8 +19,7 @@ const STATIC_MARKETING_PAGES = [
   "/contact",
   "/support",
   "/locations",
-  "/request-onsite-training",
-  "/blog",
+  "/request-quote",
   "/osha-compliance",
   "/locations/southern-california",
   "/locations/central-california",
@@ -28,6 +27,13 @@ const STATIC_MARKETING_PAGES = [
   "/locations/san-diego",
   "/locations/las-vegas",
   "/locations/fresno",
+  "/service-areas",
+  "/service-areas/los-angeles",
+  "/service-areas/bakersfield",
+  "/service-areas/hayward",
+  "/renewal",
+  "/faq",
+  "/verify",
 ];
 
 const EN_TO_ES_STATIC_SLUGS: Record<string, string> = {
@@ -44,8 +50,6 @@ const EN_TO_ES_STATIC_SLUGS: Record<string, string> = {
   "/contact": "/contacto",
   "/support": "/soporte",
   "/locations": "/ubicaciones",
-  "/request-onsite-training": "/solicitar-capacitacion-presencial",
-  "/blog": "/blog",
   "/osha-compliance": "/cumplimiento-osha",
   "/locations/southern-california": "/ubicaciones/sur-de-california",
   "/locations/central-california": "/ubicaciones/centro-de-california",
@@ -53,6 +57,15 @@ const EN_TO_ES_STATIC_SLUGS: Record<string, string> = {
   "/locations/san-diego": "/ubicaciones/san-diego",
   "/locations/las-vegas": "/ubicaciones/las-vegas",
   "/locations/fresno": "/ubicaciones/fresno",
+  // Routes below keep the same slug in Spanish (see client/src/lib/locale.ts),
+  // except /verify which is localized to /verificar.
+  "/service-areas": "/service-areas",
+  "/service-areas/los-angeles": "/service-areas/los-angeles",
+  "/service-areas/bakersfield": "/service-areas/bakersfield",
+  "/service-areas/hayward": "/service-areas/hayward",
+  "/renewal": "/renewal",
+  "/faq": "/faq",
+  "/verify": "/verificar",
 };
 
 const ES_TO_EN_SEO_SLUGS: Record<string, string> = {

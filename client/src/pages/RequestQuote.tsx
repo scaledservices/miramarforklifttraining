@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, Building2, Users, MapPin, Phone, Mail, Calendar, ClipboardList, Clock } from "lucide-react";
+import { CheckCircle, Building2, Users, MapPin, Phone, Mail, Calendar, CalendarDays, ClipboardList, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/seo/SEOHead";
 
@@ -42,7 +43,7 @@ const formSchema = z.object({
   lastName: z.string().min(2, "Last name is required"),
   companyName: z.string().optional(),
   email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(7, "Please enter a valid phone number"),
+  phone: z.string().optional(),
   requestedLocationSlug: z.string().min(1, "Please select a location"),
   trainingLocation: z.enum(["facility", "onsite"]),
   trainingAddress: z.string().optional(),
@@ -50,12 +51,9 @@ const formSchema = z.object({
   state: z.string().optional(),
   zip: z.string().optional(),
   traineeCount: z.coerce.number().int().min(1, "At least 1 participant").max(1000),
-  companySize: z.string().optional(),
   equipmentTypes: z.array(z.string()).min(1, "Please select at least one equipment type"),
-  trainingType: z.string().min(1, "Please select a training type"),
+  trainingType: z.string().optional(),
   preferredDate1: z.string().optional(),
-  preferredDate2: z.string().optional(),
-  preferredDate3: z.string().optional(),
   notes: z.string().optional(),
 }).refine((data) => {
   if (data.trainingLocation === "onsite") {
@@ -102,12 +100,9 @@ export default function RequestQuote() {
       state: "",
       zip: "",
       traineeCount: 1,
-      companySize: "",
       equipmentTypes: [],
-      trainingType: "",
+      trainingType: "Initial Certification",
       preferredDate1: "",
-      preferredDate2: "",
-      preferredDate3: "",
       notes: "",
     },
   });
@@ -125,18 +120,15 @@ export default function RequestQuote() {
         contactName: `${data.firstName} ${data.lastName}`,
         companyName: data.companyName || undefined,
         email: data.email,
-        phone: data.phone,
+        phone: data.phone || undefined,
         trainingAddress: isFacility ? (loc?.address.street || "") : data.trainingAddress,
         city: isFacility ? (loc?.address.city || "") : data.city,
         state: isFacility ? (loc?.address.state || "") : data.state,
         zip: isFacility ? (loc?.address.zip || "") : data.zip,
         traineeCount: data.traineeCount,
-        companySize: data.companySize || undefined,
         equipmentTypes: data.equipmentTypes,
-        trainingType: data.trainingType,
+        trainingType: data.trainingType || undefined,
         preferredDate1: data.preferredDate1 || undefined,
-        preferredDate2: data.preferredDate2 || undefined,
-        preferredDate3: data.preferredDate3 || undefined,
         notes: data.notes || undefined,
         leadSource: getLeadSourceFromUrl(),
         requestedLocationSlug: data.requestedLocationSlug,
@@ -164,7 +156,7 @@ export default function RequestQuote() {
         />
         <div className="max-w-lg w-full text-center space-y-6">
           <div className="flex justify-center">
-            <CheckCircle className="h-20 w-20 text-green-500" />
+            <CheckCircle className="h-20 w-20 text-brand-green" />
           </div>
           <h1 className="text-3xl font-bold text-foreground" data-testid="text-success-title">{t("requestQuote.successTitle")}</h1>
           <p className="text-muted-foreground text-lg">{t("requestQuote.successMessage")}</p>
@@ -178,7 +170,7 @@ export default function RequestQuote() {
           </div>
           <p className="text-sm text-muted-foreground">
             {t("requestQuote.questionsCall")}{" "}
-            <a href={`tel:${brand.support.phoneTel}`} className="text-primary font-medium" data-testid="link-phone-confirmation">
+            <a href={`tel:${brand.support.phoneTel}`} className="text-brand-dark font-medium" data-testid="link-phone-confirmation">
               {brand.support.phone}
             </a>
           </p>
@@ -195,30 +187,43 @@ export default function RequestQuote() {
         canonical="/request-quote"
       />
 
-      <div className="bg-primary text-primary-foreground py-16 px-4">
+      <div className="bg-gradient-to-br from-brand-dark to-[hsl(10,22%,15%)] text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl font-bold mb-4" data-testid="text-page-title">{t("requestQuote.pageTitle")}</h1>
-          <p className="text-blue-100 text-lg max-w-2xl mx-auto">{t("requestQuote.pageSubtitle")}</p>
+          <p className="text-white/80 text-lg max-w-2xl mx-auto">{t("requestQuote.pageSubtitle")}</p>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2">
-          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl p-5 mb-6">
+          <div className="bg-accent/10 border-2 border-accent rounded-xl p-5 mb-6" data-testid="self-serve-callout">
+            <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-brand-orange" />
+              {t("requestQuote.selfServeTitle")}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-3">{t("requestQuote.selfServeDesc")}</p>
+            <Link href="/book-training">
+              <Button className="bg-accent text-accent-foreground border-accent-border" data-testid="button-self-serve-book">
+                {t("requestQuote.selfServeCta")}
+              </Button>
+            </Link>
+          </div>
+
+          <div className="bg-primary/10 border border-primary/40 rounded-xl p-5 mb-6">
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <ClipboardList className="h-5 w-5 text-primary" />
+              <ClipboardList className="h-5 w-5 text-brand-orange" />
               {t("requestQuote.startingPricesTitle", { defaultValue: "Starting Prices" })}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+                <CheckCircle className="w-4 h-4 shrink-0 text-brand-green mt-0.5" />
                 <div>
                   <span className="font-medium text-foreground">{t("requestQuote.priceOnsiteLabel", { defaultValue: "Onsite / Company Training" })}</span>
                   <span className="block text-muted-foreground">{t("requestQuote.priceOnsiteValue", { defaultValue: "From $200-280 per person depending on group size" })}</span>
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+                <CheckCircle className="w-4 h-4 shrink-0 text-brand-green mt-0.5" />
                 <div>
                   <span className="font-medium text-foreground">{t("requestQuote.priceHandsOnLabel", { defaultValue: "Hands-On at Our Location" })}</span>
                   <span className="block text-muted-foreground">{t("requestQuote.priceHandsOnValue", { defaultValue: "From $200-300 per person depending on equipment" })}</span>
@@ -269,7 +274,7 @@ export default function RequestQuote() {
                   )} />
                   <FormField control={form.control} name="phone" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("requestQuote.phone")}</FormLabel>
+                      <FormLabel>{t("requestQuote.phoneOptional")}</FormLabel>
                       <FormControl><Input type="tel" placeholder="(555) 555-5555" {...field} data-testid="input-phone" /></FormControl>
                       <FormMessage />
                     </FormItem>
@@ -387,33 +392,6 @@ export default function RequestQuote() {
                   )} />
                 </div>
 
-                <FormField control={form.control} name="companySize" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("requestQuote.companySizeLabel", { defaultValue: "Company Size (optional)" })}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-company-size">
-                          <SelectValue placeholder={t("requestQuote.companySizePlaceholder", { defaultValue: "Select company size" })} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="1-4">{t("requestQuote.companySize1to4", { defaultValue: "1-4 employees" })}</SelectItem>
-                        <SelectItem value="5-9">{t("requestQuote.companySize5to9", { defaultValue: "5-9 employees" })}</SelectItem>
-                        <SelectItem value="10+">{t("requestQuote.companySize10plus", { defaultValue: "10+ employees" })}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                {form.watch("companySize") === "10+" && (
-                  <div className="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4 text-sm">
-                    <p className="font-medium text-purple-800 dark:text-purple-400">
-                      {t("requestQuote.tttSuggestion", { defaultValue: "With 10+ employees, ask about our Train-the-Trainer program - certify your own in-house instructor for $750." })}
-                    </p>
-                  </div>
-                )}
-
                 <FormField control={form.control} name="equipmentTypes" render={() => (
                   <FormItem>
                     <FormLabel>{t("requestQuote.equipmentTypes")}</FormLabel>
@@ -440,21 +418,13 @@ export default function RequestQuote() {
                   </FormItem>
                 )} />
 
-                <div>
-                  <p className="text-sm font-medium text-foreground mb-3">{t("requestQuote.preferredDates")}</p>
-                  <p className="text-xs text-muted-foreground mb-3">{t("requestQuote.preferredDatesNote")}</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {(["preferredDate1", "preferredDate2", "preferredDate3"] as const).map((name, i) => (
-                      <FormField key={name} control={form.control} name={name} render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-xs text-muted-foreground">{t("requestQuote.dateLabel", { num: i + 1 })}</FormLabel>
-                          <FormControl><Input type="date" {...field} data-testid={`input-preferred-date-${i + 1}`} /></FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                    ))}
-                  </div>
-                </div>
+                <FormField control={form.control} name="preferredDate1" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t("requestQuote.preferredDateOptional")}</FormLabel>
+                    <FormControl><Input type="date" {...field} data-testid="input-preferred-date-1" /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
 
                 <FormField control={form.control} name="notes" render={({ field }) => (
                   <FormItem>
@@ -472,7 +442,7 @@ export default function RequestQuote() {
                   </div>
                 )}
 
-                <Button type="submit" size="lg" className="w-full bg-accent hover:bg-accent/90 text-white" disabled={mutation.isPending} data-testid="button-submit-request">
+                <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground border-accent-border" disabled={mutation.isPending} data-testid="button-submit-request">
                   {mutation.isPending ? t("requestQuote.submitting") : t("requestQuote.submitRequest")}
                 </Button>
 
@@ -483,9 +453,9 @@ export default function RequestQuote() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-primary text-primary-foreground rounded-xl p-6">
+          <div className="bg-brand-dark text-white rounded-xl p-6">
             <h3 className="font-semibold text-lg mb-4">{t("requestQuote.whyMiramar")}</h3>
-            <ul className="space-y-3 text-blue-100 text-sm">
+            <ul className="space-y-3 text-white/80 text-sm">
               <li className="flex gap-2">
                 <Building2 className="h-5 w-5 shrink-0 text-accent" />
                 <span>{t("requestQuote.benefit1")}</span>
@@ -509,19 +479,19 @@ export default function RequestQuote() {
             <h3 className="font-semibold text-foreground">{t("requestQuote.contactDirectly")}</h3>
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="h-4 w-4 text-primary" />
-                <a href={`tel:${brand.support.phoneTel}`} className="hover:text-primary" data-testid="link-phone">{brand.support.phone}</a>
+                <Phone className="h-4 w-4 text-brand-dark" />
+                <a href={`tel:${brand.support.phoneTel}`} className="hover:text-brand-dark" data-testid="link-phone">{brand.support.phone}</a>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-4 w-4 text-primary" />
-                <a href={`mailto:${brand.support.infoEmail}`} className="hover:text-primary" data-testid="link-email">{brand.support.infoEmail}</a>
+                <Mail className="h-4 w-4 text-brand-dark" />
+                <a href={`mailto:${brand.support.infoEmail}`} className="hover:text-brand-dark" data-testid="link-email">{brand.support.infoEmail}</a>
               </div>
               <div className="flex items-start gap-2 text-muted-foreground">
-                <MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                <MapPin className="h-4 w-4 text-brand-dark mt-0.5 shrink-0" />
                 <span>{brand.address.full}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="h-4 w-4 text-primary" />
+                <Clock className="h-4 w-4 text-brand-dark" />
                 <span>{t("requestQuote.responseTime")}</span>
               </div>
             </div>

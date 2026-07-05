@@ -6,6 +6,9 @@ import { documentCatalog, generateDocumentPdf, getDocumentDef } from "../documen
 import { sendBookingConfirmation, sendBookingCancellation, sendBookingConfirmedEmail, sendBookingCompletedEmail, sendBookingAdminNotificationToAll, sendBookingCancellationAdminAlert } from "../email";
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, requireRole } from "./middleware";
+import { db } from "../db";
+import { computeBookingPrice } from "@shared/config/bookingPricing";
+import { createTransactionFromNonce, isAuthorizeNetConfigured, calculateCardSurcharge } from "../authorizeNetClient";
 import { isAdminRole } from "@shared/roles";
 
 export function registerServiceRoutes(app: Express) {
@@ -186,29 +189,89 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
       return res.status(400).json({ error: `Only ${remaining} spots remaining for this time slot` });
     }
 
-    const price = Number(productPrice) || 0;
-    const totalPrice = (price * participantCount).toFixed(2);
+    // Price is computed server-side from the shared pricing map — the client's
+    // productPrice is display-only and never trusted for the charge.
+    const productSlugs: string[] = Array.isArray(req.body.productSlugs) ? req.body.productSlugs : [];
+    const pricing = computeBookingPrice(productSlugs, Number(participantCount));
 
-    const booking = await storage.createBooking({
-      userId: user.id,
-      serviceAreaId,
-      productSlug,
-      sessionDate,
-      startTime,
-      endTime,
-      participantCount,
-      customerAddress,
-      customerCity,
-      customerState,
-      customerZip,
-      contactName,
-      contactPhone,
-      contactEmail,
-      specialRequests: specialRequests || null,
-      totalPrice,
-      status: "pending",
-      orderId: null,
-    });
+    // Custom/equipment-only selections have no published price: fall back to the
+    // legacy request flow (pending booking, price confirmed by the office, no charge).
+    const totalPrice = pricing
+      ? pricing.total.toFixed(2)
+      : ((Number(productPrice) || 0) * Number(participantCount)).toFixed(2);
+
+    // Deposit-at-booking: when Authorize.net is configured and the selection has
+    // published pricing, a 50% deposit (plus card surcharge) is charged up front;
+    // balance is due on completion.
+    let orderId: number | null = null;
+    let depositCharged = 0;
+    let depositSurcharge = 0;
+
+    if (pricing && isAuthorizeNetConfigured()) {
+      const { paymentNonce } = req.body;
+      if (!paymentNonce) {
+        return res.status(400).json({ error: "Payment details are required to book" });
+      }
+
+      depositSurcharge = calculateCardSurcharge(pricing.deposit);
+      const chargeAmount = Number((pricing.deposit + depositSurcharge).toFixed(2));
+
+      const order = await storage.createOrder({
+        userId: user.id,
+        total: totalPrice,
+        status: "pending",
+        refundPolicyAccepted: true,
+      });
+
+      const result = await createTransactionFromNonce(paymentNonce, chargeAmount, order.id, order.orderNumber, true);
+      if (!result.success) {
+        return res.status(400).json({ error: result.errorMessage || "Payment was declined" });
+      }
+
+      const { payments: paymentsTable } = await import("@shared/schema");
+      await db.insert(paymentsTable).values({
+        orderId: order.id,
+        provider: "authorize_net",
+        providerTransactionId: result.transactionId,
+        amount: String(chargeAmount),
+        status: "approved",
+      });
+
+      orderId = order.id;
+      depositCharged = chargeAmount;
+    }
+
+    let booking;
+    try {
+      booking = await storage.createBooking({
+        userId: user.id,
+        serviceAreaId,
+        productSlug,
+        sessionDate,
+        startTime,
+        endTime,
+        participantCount,
+        customerAddress,
+        customerCity,
+        customerState,
+        customerZip,
+        contactName,
+        contactPhone,
+        contactEmail,
+        specialRequests: specialRequests || null,
+        totalPrice,
+        status: "pending",
+        orderId,
+      });
+    } catch (bookingErr) {
+      // The deposit has already been captured — surface enough detail for the
+      // office to reconcile manually rather than silently orphaning the charge.
+      console.error(`[Bookings] CRITICAL: deposit captured (order ${orderId}) but booking creation failed`, bookingErr);
+      return res.status(500).json({
+        error: "Your deposit was received but the booking could not be finalized. Please call us and reference your receipt — we will complete your booking manually.",
+        orderId,
+      });
+    }
 
     await storage.createAuditLog({
       actorUserId: user.id,
@@ -254,7 +317,19 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
       console.error("[Booking] Email error (non-fatal):", emailErr);
     }
 
-    return res.status(201).json(booking);
+    return res.status(201).json({
+      ...booking,
+      pricing: pricing === null ? null : {
+        perPerson: pricing.perPerson,
+        subtotal: pricing.subtotal,
+        volumeDiscount: pricing.volumeDiscount,
+        total: pricing.total,
+        deposit: pricing.deposit,
+        depositSurcharge,
+        depositCharged,
+        balanceDue: pricing.balance,
+      },
+    });
   } catch (error) {
     console.error("[Bookings] Create error:", error);
     return res.status(500).json({ error: "Failed to create booking" });

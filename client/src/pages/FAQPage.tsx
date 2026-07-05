@@ -61,12 +61,12 @@ export default function FAQPage() {
         jsonLd={[classicSchema, conversationalSchema]}
       />
 
-      <section className="bg-gradient-to-br from-primary via-primary to-primary/90 text-primary-foreground py-16 px-4">
+      <section className="bg-gradient-to-br from-brand-dark via-brand-dark to-[hsl(10,22%,15%)] text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-4xl font-bold mb-4" data-testid="text-faq-title">
             {t("faqPage.title", { defaultValue: "Frequently Asked Questions" })}
           </h1>
-          <p className="text-blue-100 text-lg mb-8">
+          <p className="text-white/80 text-lg mb-8">
             {t("faqPage.subtitle", { defaultValue: `Everything you need to know about forklift certification, training options, pricing, and ${industry.regulatory.body} requirements.` })}
           </p>
           <div className="relative max-w-xl mx-auto">
@@ -76,7 +76,7 @@ export default function FAQPage() {
               placeholder={t("faqPage.searchPlaceholder", { defaultValue: "Search questions..." })}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-lg bg-white text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-accent"
+              className="w-full pl-11 pr-4 py-3 rounded-lg bg-background text-foreground border border-border focus:outline-none focus:ring-2 focus:ring-accent"
               data-testid="input-faq-search"
             />
           </div>
@@ -132,15 +132,15 @@ export default function FAQPage() {
         </div>
       </section>
 
-      <section className="py-12 bg-primary text-primary-foreground">
+      <section className="py-12 bg-brand-dark text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-3">{t("faqPage.stillHaveQuestions", { defaultValue: "Still Have Questions?" })}</h2>
-          <p className="text-blue-100 mb-6">
+          <p className="text-white/80 mb-6">
             {t("faqPage.stillHaveQuestionsDesc", { defaultValue: "We are here to help. Call us and we will answer any questions you have about training, certification, or pricing." })}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href={`tel:${brand.support.phoneTel}`}>
-              <Button size="lg" className="bg-accent hover:bg-accent/90 text-white px-8">
+              <Button size="lg" className="bg-accent text-accent-foreground border-accent-border px-8">
                 <Phone className="w-4 h-4 mr-2" />
                 {brand.support.phone}
               </Button>

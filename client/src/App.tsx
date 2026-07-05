@@ -8,6 +8,7 @@ import { industry } from "@shared/config/industry";
 import ThemeInjector from "@/components/ThemeInjector";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import MobileCtaBar from "@/components/layout/MobileCtaBar";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import OnlineCertification from "@/pages/OnlineCertification";
@@ -34,8 +35,6 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ResetPassword from "@/pages/ResetPassword";
 import AcceptInvite from "@/pages/AcceptInvite";
-import Dashboard from "@/pages/Dashboard";
-import CoursePlayer from "@/pages/CoursePlayer";
 import Certification from "@/pages/Certification";
 import CertificateVerify from "@/pages/CertificateVerify";
 import OrderCertCard from "@/pages/OrderCertCard";
@@ -43,41 +42,6 @@ import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
 import RefundPolicy from "@/pages/RefundPolicy";
 import OshaCompliance from "@/pages/OshaCompliance";
-import GroupDashboard from "@/pages/group/GroupDashboard";
-import GroupMembers from "@/pages/group/GroupMembers";
-import GroupSeats from "@/pages/group/GroupSeats";
-import GroupProgress from "@/pages/group/GroupProgress";
-import GroupCertifications from "@/pages/group/GroupCertifications";
-import AdminDashboard from "@/pages/admin/AdminDashboard";
-import AdminUsers from "@/pages/admin/AdminUsers";
-import AdminCourses from "@/pages/admin/AdminCourses";
-import AdminCourseEditor from "@/pages/admin/AdminCourseEditor";
-import AdminOrders from "@/pages/admin/AdminOrders";
-import AdminEnrollments from "@/pages/admin/AdminEnrollments";
-import AdminCertificates from "@/pages/admin/AdminCertificates";
-import AdminCardOrders from "@/pages/admin/AdminCardOrders";
-import AdminAuditLog from "@/pages/admin/AdminAuditLog";
-import AdminEmailOutbox from "@/pages/admin/AdminEmailOutbox";
-import AdminSeoPages from "@/pages/admin/AdminSeoPages";
-import AdminSeoHealth from "@/pages/admin/AdminSeoHealth";
-import AdminBookings from "@/pages/admin/AdminBookings";
-import AdminSessions from "@/pages/admin/AdminSessions";
-import AdminOnsiteRequests from "@/pages/admin/AdminOnsiteRequests";
-import AdminOnsiteRequestDetail from "@/pages/admin/AdminOnsiteRequestDetail";
-import AdminLeads from "@/pages/admin/AdminLeads";
-import AdminCompanies from "@/pages/admin/AdminCompanies";
-import AdminCompanyDetail from "@/pages/admin/AdminCompanyDetail";
-import AdminTrainingEvents from "@/pages/admin/AdminTrainingEvents";
-import AdminTrainingEventCreate from "@/pages/admin/AdminTrainingEventCreate";
-import AdminTrainingEventDetail from "@/pages/admin/AdminTrainingEventDetail";
-import AdminReports from "@/pages/admin/AdminReports";
-import AdminQuotes from "@/pages/admin/AdminQuotes";
-import AdminQuoteCreate from "@/pages/admin/AdminQuoteCreate";
-import AdminQuoteDetail from "@/pages/admin/AdminQuoteDetail";
-import AdminInstructorApplications from "@/pages/admin/AdminInstructorApplications";
-import AdminInstructorApplicationDetail from "@/pages/admin/AdminInstructorApplicationDetail";
-import AdminInstructors from "@/pages/admin/AdminInstructors";
-import AdminInstructorDetail from "@/pages/admin/AdminInstructorDetail";
 import RequestOnsiteTraining from "@/pages/RequestOnsiteTraining";
 import RequestQuote from "@/pages/RequestQuote";
 import InPersonTraining from "@/pages/InPersonTraining";
@@ -91,12 +55,52 @@ import ServiceAreasHub from "@/pages/ServiceAreasHub";
 import { CartProvider } from "@/contexts/CartContext";
 import DemoBanner from "@/components/DemoBanner";
 import SEOHead from "@/components/seo/SEOHead";
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import LanguageBanner from "@/components/LanguageBanner";
 import { useLocaleLocation } from "@/hooks/useLocaleLocation";
 import { DEFAULT_LOCALE, getStoredLocale } from "@/lib/locale";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+
+// Route-level code splitting: admin, group, and LMS pages load on demand.
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const CoursePlayer = lazy(() => import("@/pages/CoursePlayer"));
+const GroupDashboard = lazy(() => import("@/pages/group/GroupDashboard"));
+const GroupMembers = lazy(() => import("@/pages/group/GroupMembers"));
+const GroupSeats = lazy(() => import("@/pages/group/GroupSeats"));
+const GroupProgress = lazy(() => import("@/pages/group/GroupProgress"));
+const GroupCertifications = lazy(() => import("@/pages/group/GroupCertifications"));
+const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
+const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers"));
+const AdminCourses = lazy(() => import("@/pages/admin/AdminCourses"));
+const AdminCourseEditor = lazy(() => import("@/pages/admin/AdminCourseEditor"));
+const AdminOrders = lazy(() => import("@/pages/admin/AdminOrders"));
+const AdminEnrollments = lazy(() => import("@/pages/admin/AdminEnrollments"));
+const AdminCertificates = lazy(() => import("@/pages/admin/AdminCertificates"));
+const AdminCardOrders = lazy(() => import("@/pages/admin/AdminCardOrders"));
+const AdminAuditLog = lazy(() => import("@/pages/admin/AdminAuditLog"));
+const AdminEmailOutbox = lazy(() => import("@/pages/admin/AdminEmailOutbox"));
+const AdminSeoPages = lazy(() => import("@/pages/admin/AdminSeoPages"));
+const AdminSeoHealth = lazy(() => import("@/pages/admin/AdminSeoHealth"));
+const AdminBookings = lazy(() => import("@/pages/admin/AdminBookings"));
+const AdminSessions = lazy(() => import("@/pages/admin/AdminSessions"));
+const AdminOnsiteRequests = lazy(() => import("@/pages/admin/AdminOnsiteRequests"));
+const AdminOnsiteRequestDetail = lazy(() => import("@/pages/admin/AdminOnsiteRequestDetail"));
+const AdminLeads = lazy(() => import("@/pages/admin/AdminLeads"));
+const AdminCompanies = lazy(() => import("@/pages/admin/AdminCompanies"));
+const AdminCompanyDetail = lazy(() => import("@/pages/admin/AdminCompanyDetail"));
+const AdminTrainingEvents = lazy(() => import("@/pages/admin/AdminTrainingEvents"));
+const AdminTrainingEventCreate = lazy(() => import("@/pages/admin/AdminTrainingEventCreate"));
+const AdminTrainingEventDetail = lazy(() => import("@/pages/admin/AdminTrainingEventDetail"));
+const AdminReports = lazy(() => import("@/pages/admin/AdminReports"));
+const AdminQuotes = lazy(() => import("@/pages/admin/AdminQuotes"));
+const AdminQuoteCreate = lazy(() => import("@/pages/admin/AdminQuoteCreate"));
+const AdminQuoteDetail = lazy(() => import("@/pages/admin/AdminQuoteDetail"));
+const AdminInstructorApplications = lazy(() => import("@/pages/admin/AdminInstructorApplications"));
+const AdminInstructorApplicationDetail = lazy(() => import("@/pages/admin/AdminInstructorApplicationDetail"));
+const AdminInstructors = lazy(() => import("@/pages/admin/AdminInstructors"));
+const AdminInstructorDetail = lazy(() => import("@/pages/admin/AdminInstructorDetail"));
 
 function HydrationReveal() {
   useEffect(() => {
@@ -132,8 +136,17 @@ function LocaleRedirect() {
   return null;
 }
 
+function RouteFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center" data-testid="loading-spinner">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+}
+
 function AppRoutes() {
   return (
+    <Suspense fallback={<RouteFallback />}>
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/online-forklift-certification" component={OnlineCertification} />
@@ -172,6 +185,7 @@ function AppRoutes() {
       <Route path="/dashboard">{() => <ProtectedRoute><Dashboard /></ProtectedRoute>}</Route>
       <Route path="/course/:enrollmentId">{() => <ProtectedRoute><CoursePlayer /></ProtectedRoute>}</Route>
       <Route path="/certifications/:id">{() => <ProtectedRoute><Certification /></ProtectedRoute>}</Route>
+      <Route path="/verify" component={CertificateVerify} />
       <Route path="/verify/:certificateNumber" component={CertificateVerify} />
       <Route path="/order-cert-card/:certificationId">{() => <ProtectedRoute><OrderCertCard /></ProtectedRoute>}</Route>
       <Route path="/terms" component={Terms} />
@@ -217,6 +231,7 @@ function AppRoutes() {
       <Route path="/:slug*" component={SeoPageRenderer} />
       <Route component={NotFound} />
     </Switch>
+    </Suspense>
   );
 }
 
@@ -235,7 +250,7 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background pb-14 lg:pb-0">
       <SEOHead
         title={`${brand.name} | ${industry.regulatory.body}-Aligned Forklift Training & Certification`}
         description={`Get your forklift certification in San Diego — in-person at our facility or on-site at your location. ${industry.regulatory.body}-aligned programs with same-day certification.`}
@@ -248,6 +263,7 @@ function AppContent() {
         <AppRoutes />
       </main>
       <Footer />
+      <MobileCtaBar />
     </div>
   );
 }

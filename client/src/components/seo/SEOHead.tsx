@@ -2,6 +2,7 @@ import { Helmet } from "react-helmet-async";
 import { brand } from "@shared/config/brand";
 import { useCurrentLocale } from "@/hooks/useLocaleLocation";
 import { getAlternateLocalePath } from "@/lib/locale";
+import { SITE_URL } from "./siteUrl";
 
 interface SEOHeadProps {
   title: string;
@@ -15,7 +16,7 @@ interface SEOHeadProps {
 
 const DEFAULT_OG_IMAGE = brand.og.defaultImage;
 const SITE_NAME = brand.name;
-const BASE_URL = `https://${brand.domain}`;
+const BASE_URL = SITE_URL;
 
 export default function SEOHead({
   title,

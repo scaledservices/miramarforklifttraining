@@ -12,6 +12,7 @@ import {
   Globe,
   Activity,
   CalendarDays,
+  CalendarClock,
   Clock,
   ClipboardList,
   UserCheck,
@@ -58,6 +59,7 @@ const onsiteItems = [
   { title: "Training Requests", url: "/admin/onsite-requests", icon: ClipboardList },
   { title: "Training Events", url: "/admin/training-events", icon: CalendarDays },
   { title: "Bookings", url: "/admin/bookings", icon: Clock },
+  { title: "Availability Rules", url: "/admin/sessions", icon: CalendarClock },
   { title: "Instructor Apps", url: "/admin/instructor-applications", icon: UserCheck },
   { title: "Instructors", url: "/admin/instructors", icon: UserCog },
 ];

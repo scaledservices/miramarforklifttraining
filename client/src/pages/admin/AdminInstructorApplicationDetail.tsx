@@ -106,7 +106,7 @@ function RatingSelector({ value, onChange, label }: { value: number | null; onCh
             onClick={() => onChange(n)}
             className={`h-8 w-8 rounded-md border text-sm font-medium transition-colors ${
               value !== null && n <= value
-                ? "bg-primary text-primary-foreground border-primary"
+                ? "bg-brand-dark text-white border-primary"
                 : "bg-background hover:bg-muted border-border text-foreground"
             }`}
             data-testid={`rating-${label.toLowerCase().replace(/\s+/g, "-")}-${n}`}

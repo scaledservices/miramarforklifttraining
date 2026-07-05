@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import SEOHead from "@/components/seo/SEOHead";
 import { brand } from "@shared/config/brand";
@@ -40,11 +43,52 @@ export default function CertificateVerify() {
     />
   );
 
+  const [, setLocation] = useLocation();
+  const [lookupInput, setLookupInput] = useState("");
+
   const { data, isLoading, error } = useQuery<VerifyResponse>({
     queryKey: ["/api/verify", certNumber],
     enabled: !!certNumber,
     queryFn: getQueryFn({ on401: "returnNull" }),
   });
+
+  if (!certNumber) {
+    return (
+      <>{seoHead}<div className="max-w-xl mx-auto px-4 py-16 space-y-8" data-testid="page-verify-lookup">
+        <div className="text-center space-y-4">
+          <div className="h-24 w-24 rounded-full bg-primary/15 flex items-center justify-center mx-auto">
+            <ShieldCheck className="h-12 w-12 text-brand-dark" />
+          </div>
+          <h1 className="text-3xl font-bold">{t("certVerify.lookupTitle")}</h1>
+          <p className="text-muted-foreground max-w-md mx-auto">{t("certVerify.lookupDesc")}</p>
+        </div>
+        <Card>
+          <CardContent className="py-6">
+            <form
+              className="flex flex-col sm:flex-row gap-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const num = lookupInput.trim();
+                if (num) setLocation(`/verify/${encodeURIComponent(num)}`);
+              }}
+            >
+              <Input
+                value={lookupInput}
+                onChange={(e) => setLookupInput(e.target.value)}
+                placeholder={t("certVerify.lookupPlaceholder")}
+                className="flex-1 font-mono"
+                data-testid="input-cert-number"
+              />
+              <Button type="submit" className="bg-accent text-accent-foreground border-accent-border" disabled={!lookupInput.trim()} data-testid="button-verify-lookup">
+                {t("certVerify.lookupButton")}
+              </Button>
+            </form>
+            <p className="text-xs text-muted-foreground mt-3">{t("certVerify.lookupHint")}</p>
+          </CardContent>
+        </Card>
+      </div></>
+    );
+  }
 
   if (isLoading) {
     return (

@@ -103,7 +103,7 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
     doc.fontSize(32).fillColor(theme.pdf.titleColor).text(labels.certificateOfCompletion, 0, 90, { align: "center" });
     doc.moveDown(1);
 
-    doc.fontSize(14).fillColor("#666666").text(labels.certifyThat, 0, 140, { align: "center" });
+    doc.fontSize(14).fillColor(theme.colors.text.medium).text(labels.certifyThat, 0, 140, { align: "center" });
     doc.moveDown(0.5);
 
     doc.fontSize(28).fillColor(theme.pdf.titleColor).text(user.name, 0, 170, { align: "center" });
@@ -111,7 +111,7 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
 
     doc.moveTo(200, 210).lineTo(592, 210).lineWidth(1).strokeColor(theme.pdf.borderAccent).stroke();
 
-    doc.fontSize(14).fillColor("#666666").text(labels.completedCourse, 0, 225, { align: "center" });
+    doc.fontSize(14).fillColor(theme.colors.text.medium).text(labels.completedCourse, 0, 225, { align: "center" });
     doc.moveDown(0.5);
 
     doc.fontSize(22).fillColor(theme.pdf.titleColor).text(course.title, 0, 255, { align: "center" });
@@ -131,20 +131,20 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
     const rightCol = 460;
     const infoY = 350;
 
-    doc.fontSize(11).fillColor("#999999").text(labels.dateIssued, leftCol, infoY, { width: 200 });
-    doc.fontSize(13).fillColor("#333333").text(issuedDate, leftCol, infoY + 16, { width: 200 });
+    doc.fontSize(11).fillColor(theme.colors.text.light).text(labels.dateIssued, leftCol, infoY, { width: 200 });
+    doc.fontSize(13).fillColor(theme.colors.text.dark).text(issuedDate, leftCol, infoY + 16, { width: 200 });
 
-    doc.fontSize(11).fillColor("#999999").text(labels.expirationDate, rightCol, infoY, { width: 200 });
-    doc.fontSize(13).fillColor("#333333").text(expiresDate, rightCol, infoY + 16, { width: 200 });
+    doc.fontSize(11).fillColor(theme.colors.text.light).text(labels.expirationDate, rightCol, infoY, { width: 200 });
+    doc.fontSize(13).fillColor(theme.colors.text.dark).text(expiresDate, rightCol, infoY + 16, { width: 200 });
 
-    doc.fontSize(11).fillColor("#999999").text(labels.certificateNumber, leftCol, infoY + 50, { width: 200 });
-    doc.fontSize(13).fillColor("#333333").text(cert.certificateNumber, leftCol, infoY + 66, { width: 200 });
+    doc.fontSize(11).fillColor(theme.colors.text.light).text(labels.certificateNumber, leftCol, infoY + 50, { width: 200 });
+    doc.fontSize(13).fillColor(theme.colors.text.dark).text(cert.certificateNumber, leftCol, infoY + 66, { width: 200 });
 
     doc.image(qrBuffer, rightCol + 30, infoY + 40, { width: 90, height: 90 });
 
-    doc.fontSize(9).fillColor("#999999").text(labels.scanToVerify, rightCol + 40, infoY + 135, { width: 80, align: "center" });
+    doc.fontSize(9).fillColor(theme.colors.text.light).text(labels.scanToVerify, rightCol + 40, infoY + 135, { width: 80, align: "center" });
 
-    doc.fontSize(9).fillColor("#aaaaaa").text(
+    doc.fontSize(9).fillColor(theme.colors.text.extraFaint).text(
       `${labels.verifyAt} ${verifyUrl}`,
       0, pageHeight - 55,
       { align: "center", width: pageWidth }

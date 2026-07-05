@@ -1,4 +1,8 @@
 import type { Express, Request, Response } from "express";
+import { and, eq, ne } from "drizzle-orm";
+import { db } from "../db";
+import { enrollments as enrollmentsTable } from "@shared/schema";
+import { brand } from "@shared/config/brand";
 import { storage } from "../storage";
 import { isInviteExpired } from "../auth";
 import { sendGroupInvite, sendTrainingReminder, sendSeatAssignedNotification } from "../email";

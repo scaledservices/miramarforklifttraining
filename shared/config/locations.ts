@@ -89,7 +89,7 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
       "Scissor Lift",
       "Aerial/Boom Lift",
     ],
-    heroImage: "/images/hero-forklift.jpg",
+    heroImage: "/images/las-vegas.jpg",
     seo: {
       title: "Forklift Training in Las Vegas",
       description: "OSHA-aligned forklift certification in Las Vegas. In-person at our facility or on-site at your location.",
@@ -121,7 +121,7 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
       "Scissor Lift",
       "Aerial/Boom Lift",
     ],
-    heroImage: "/images/hero-forklift.jpg",
+    heroImage: "/images/fresno-city.jpg",
     seo: {
       title: "Forklift Training in Fresno",
       description: "OSHA-aligned forklift certification in Fresno. In-person at our facility or on-site at your location.",

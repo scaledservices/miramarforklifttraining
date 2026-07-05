@@ -14,7 +14,7 @@ const LOCALE_LABELS: Record<Locale, string> = {
   es: "Español",
 };
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ className = "" }: { className?: string }) {
   const currentLocale = useCurrentLocale();
 
   function switchTo(locale: Locale) {
@@ -29,7 +29,7 @@ export default function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" data-testid="button-language-switcher">
+        <Button variant="ghost" size="sm" className={className} data-testid="button-language-switcher">
           <Globe className="w-4 h-4 mr-1.5" />
           <span className="hidden sm:inline">{LOCALE_LABELS[currentLocale]}</span>
         </Button>

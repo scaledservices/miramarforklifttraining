@@ -66,7 +66,7 @@ export default function BlogArticle() {
         canonical={`/blog/${article.slug}`}
         ogType="article"
       />
-      <section className="bg-gradient-to-br from-primary to-[hsl(210,85%,22%)] py-12 md:py-16">
+      <section className="bg-gradient-to-br from-brand-dark to-[hsl(10,22%,16%)] py-12 md:py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/blog" className="inline-flex items-center gap-1 text-sm text-white/70 mb-4" data-testid="link-back-blog">
             <ArrowLeft className="w-3.5 h-3.5" />

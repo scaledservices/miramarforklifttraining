@@ -88,7 +88,21 @@ async function updateOutboxDelivery(outboxId: number, update: { providerStatus?:
 
 const FROM_EMAIL = brand.emails.from;
 
+// Dev/test safety valve: when EMAIL_OVERRIDE is set (e.g. peter+miramar@scaled.services),
+// ALL outgoing mail is rerouted to that address instead of real recipients, with the
+// original recipient preserved in the subject line. Leave unset in production.
+const EMAIL_OVERRIDE = process.env.EMAIL_OVERRIDE?.trim();
+
 async function sendEmail(options: EmailOptions): Promise<boolean> {
+  if (EMAIL_OVERRIDE) {
+    options = {
+      ...options,
+      to: EMAIL_OVERRIDE,
+      subject: `[TEST → ${options.to}] ${options.subject}`,
+      payload: { ...options.payload, emailOverride: true, originalRecipient: options.to },
+    };
+    console.log(`[EMAIL] EMAIL_OVERRIDE active — rerouting to ${EMAIL_OVERRIDE}`);
+  }
   console.log(`[EMAIL] To: ${options.to} | Subject: ${options.subject}`);
   const outboxId = await writeToOutbox(options);
   await logEmailSend(options);
@@ -140,7 +154,8 @@ async function sendEmail(options: EmailOptions): Promise<boolean> {
 }
 
 function getLogoUrl(): string {
-  return `${getSiteUrl()}${brand.logo.full}`;
+  // Email header is a dark band — use the dark-background logo variant.
+  return `${getSiteUrl()}${brand.logo.fullDark}`;
 }
 
 function getBrandHeader(): string {
@@ -191,7 +206,7 @@ function localePath(locale: string, path: string): string {
 }
 
 function wrap(locale: string, body: string): string {
-  return `<!DOCTYPE html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;background-color:#f7fafc;"><div style="font-family: ${theme.email.bodyFont}; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">${getBrandHeader()}<div style="padding: 32px 30px;">${body}</div>${getBrandFooter(locale)}</div></body></html>`;
+  return `<!DOCTYPE html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head><body style="margin:0;padding:0;background-color:${theme.colors.background.light};"><div style="font-family: ${theme.email.bodyFont}; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">${getBrandHeader()}<div style="padding: 32px 30px;">${body}</div>${getBrandFooter(locale)}</div></body></html>`;
 }
 
 export async function sendWelcomeEmail(params: {
@@ -210,7 +225,7 @@ export async function sendWelcomeEmail(params: {
     template: "welcome",
     payload: { userName: params.userName },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading").replace("{{userName}}", params.userName)}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading").replace("{{userName}}", params.userName)}</h2>
       <p>${_("body").replace("{{brandName}}", brand.name).replace("{{regulatory}}", industry.regulatory.body)}</p>
       <p><strong>${_("whatNext")}</strong></p>
       <ul style="color: #4a5568; line-height: 1.8;">
@@ -219,7 +234,7 @@ export async function sendWelcomeEmail(params: {
         <li>${_("trackProgress")}</li>
       </ul>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/online-forklift-certification")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/online-forklift-certification")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
     `),
@@ -248,14 +263,14 @@ export async function sendOrderReceipt(params: {
     template: "order_receipt",
     payload: { orderNumber: params.orderNumber, items: params.items, total: params.total },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("body").replace("{{orderNumber}}", params.orderNumber)}</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <thead><tr style="background: #f7f7f7;"><th style="padding: 8px; text-align: left;">${_("thItem")}</th><th style="padding: 8px; text-align: center;">${_("thQty")}</th><th style="padding: 8px; text-align: right;">${_("thPrice")}</th></tr></thead>
         <tbody>${itemRows}</tbody>
       </table>
-      <p style="font-size: 18px; font-weight: bold; color: ${theme.colors.primary.hex}; text-align: right;">${_("total").replace("{{total}}", params.total.toFixed(2))}</p>
-      <p>${_("cta").replace("{{accentHex}}", theme.colors.accent.hex).replace("{{dashboardUrl}}", `${baseUrl}${localePath(loc, "/dashboard")}`)}</p>
+      <p style="font-size: 18px; font-weight: bold; color: ${theme.email.headingColor}; text-align: right;">${_("total").replace("{{total}}", params.total.toFixed(2))}</p>
+      <p>${_("cta").replace("{{accentHex}}", theme.email.linkColor).replace("{{dashboardUrl}}", `${baseUrl}${localePath(loc, "/dashboard")}`)}</p>
     `),
     actorUserId: params.actorUserId,
   });
@@ -280,10 +295,10 @@ export async function sendGroupInvite(params: {
     template: "group_invite",
     payload: { inviterName: params.inviterName, groupName: params.groupName, inviteToken: params.inviteToken, inviteUrl },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("body").replace("{{inviterName}}", params.inviterName).replace("{{groupName}}", params.groupName)}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${inviteUrl}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${inviteUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: #999; font-size: 12px;">${_("footer")}</p>
     `),
@@ -312,16 +327,16 @@ export async function sendCertificationEmail(params: {
     template: "certification",
     payload: { userName: params.userName, courseName: params.courseName, certificateNumber: params.certificateNumber, certificationId: params.certificationId, certUrl, verifyUrl },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading").replace("{{userName}}", params.userName)}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading").replace("{{userName}}", params.userName)}</h2>
       <p>${_("body").replace("{{courseName}}", params.courseName)}</p>
       <p><strong>${_("certNumber")}</strong> ${params.certificateNumber}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${certUrl}" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${certUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
-      <p>${_("shareVerify")} <a href="${verifyUrl}" style="color: ${theme.colors.accent.hex};">${verifyUrl}</a></p>
+      <p>${_("shareVerify")} <a href="${verifyUrl}" style="color: ${theme.email.linkColor};">${verifyUrl}</a></p>
       <p style="color: #999; font-size: 12px;">${_("pdfNote")}</p>
       <div style="background: ${theme.colors.background.light}; border-left: 4px solid ${theme.colors.primary.hex}; padding: 12px 16px; margin: 20px 0; border-radius: 4px;">
-        <p style="margin: 0; color: #4a5568; font-size: 13px;">${_("instructorCta")} <a href="${baseUrl}${localePath(loc, "/become-an-instructor")}" style="color: ${theme.colors.accent.hex}; text-decoration: none;">${_("learnMore")}</a></p>
+        <p style="margin: 0; color: #4a5568; font-size: 13px;">${_("instructorCta")} <a href="${baseUrl}${localePath(loc, "/become-an-instructor")}" style="color: ${theme.email.linkColor}; text-decoration: none;">${_("learnMore")}</a></p>
       </div>
     `),
     actorUserId: params.actorUserId,
@@ -346,7 +361,7 @@ export async function sendCardOrderReceipt(params: {
     template: "card_order_receipt",
     payload: { certNumber: params.certNumber, shippingMethod: params.shippingMethod, shippingCost: params.shippingCost, totalAmount: params.totalAmount },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("body")}</p>
       <p><strong>${_("certificate")}</strong> ${params.certNumber}</p>
       <p><strong>${_("shipping")}</strong> ${params.shippingMethod} ($${params.shippingCost.toFixed(2)})</p>
@@ -373,7 +388,7 @@ export async function sendShippingNotification(params: {
     template: "shipping_notification",
     payload: { trackingNumber: params.trackingNumber, carrier: params.carrier },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("body")}</p>
       <p><strong>${_("carrier")}</strong> ${params.carrier}</p>
       <p><strong>${_("trackingNumber")}</strong> ${params.trackingNumber}</p>
@@ -399,10 +414,10 @@ export async function sendPasswordResetEmail(params: {
     template: "password_reset",
     payload: { token: params.token, resetUrl },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("body")}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${resetUrl}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${resetUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: #999; font-size: 12px;">${_("footer")}</p>
     `),
@@ -429,13 +444,13 @@ export async function sendTrainingReminder(params: {
     template: "training_reminder",
     payload: { memberName: params.memberName, courseName: params.courseName, progressPct: params.progressPct, groupName: params.groupName },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("greeting").replace("{{memberName}}", params.memberName)}</p>
       <p>${_("body").replace("{{groupName}}", params.groupName)}</p>
       <p><strong>${_("course")}</strong> ${params.courseName}</p>
       <p><strong>${_("progress")}</strong> ${_("progressValue").replace("{{pct}}", String(params.progressPct))}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: #999; font-size: 12px;">${_("footer").replace("{{regulatory}}", industry.regulatory.body)}</p>
     `),
@@ -476,7 +491,7 @@ export async function sendBookingConfirmation(params: {
       totalPrice: params.totalPrice,
     },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("body")}</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("bookingNumber")}</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
@@ -485,14 +500,14 @@ export async function sendBookingConfirmation(params: {
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("time")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("location")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.onsiteAddress}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("participants")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.participantCount}</td></tr>
-        <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_("totalPrice")}</td><td style="padding: 8px; font-weight: bold; font-size: 18px; color: ${theme.colors.primary.hex};">$${params.totalPrice.toFixed(2)}</td></tr>
+        <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_("totalPrice")}</td><td style="padding: 8px; font-weight: bold; font-size: 18px; color: ${theme.email.headingColor};">$${params.totalPrice.toFixed(2)}</td></tr>
       </table>
       <div style="background: ${theme.colors.background.light}; border-radius: 6px; padding: 16px; margin: 20px 0;">
-        <p style="margin: 0 0 8px; font-weight: bold; color: ${theme.colors.primary.hex};">${_("cancellationPolicy")}</p>
+        <p style="margin: 0 0 8px; font-weight: bold; color: ${theme.email.headingColor};">${_("cancellationPolicy")}</p>
         <p style="margin: 0; color: #4a5568; font-size: 13px;">${_("cancellationText").replace("{{supportEmail}}", brand.support.email)}</p>
       </div>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
     `),
@@ -546,13 +561,13 @@ export async function sendBookingAdminNotification(params: {
       specialRequests: params.specialRequests,
     },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">New Training Booking</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New Training Booking</h2>
       <p>A new on-site training session has been booked. Review the details below:</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Booking Number</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer Name</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactName}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactPhone}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.contactEmail}" style="color: ${theme.colors.accent.hex};">${params.contactEmail}</a></td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.contactEmail}" style="color: ${theme.email.linkColor};">${params.contactEmail}</a></td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Time</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
@@ -561,7 +576,7 @@ export async function sendBookingAdminNotification(params: {
         ${specialRequestsRow}
       </table>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}/admin/bookings" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Manage Bookings</a>
+        <a href="${baseUrl}/admin/bookings" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Manage Bookings</a>
       </div>
     `),
     actorUserId: params.actorUserId,
@@ -594,7 +609,7 @@ export async function sendBookingCancellation(params: {
       endTime: params.endTime,
     },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("body")}</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${emailT(loc, "bookingConfirmation", "bookingNumber")}</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
@@ -604,7 +619,7 @@ export async function sendBookingCancellation(params: {
       </table>
       <p>${_("refundNote")}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/book-training")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/book-training")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
     `),
@@ -680,7 +695,7 @@ export async function sendBookingConfirmedEmail(params: {
     template: "booking_confirmed_by_admin",
     payload: params,
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("body")}</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_bc("bookingNumber")}</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
@@ -689,16 +704,16 @@ export async function sendBookingConfirmedEmail(params: {
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_bc("time")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
         <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_bc("location")}</td><td style="padding: 8px;">${params.onsiteAddress}</td></tr>
       </table>
-      <div style="background: #f0fff4; border-left: 4px solid #38a169; padding: 16px; margin: 20px 0; border-radius: 4px;">
-        <p style="margin: 0; font-weight: bold; color: #276749;">${_("whatToPrepare")}</p>
-        <ul style="margin: 8px 0 0; color: #2f855a; font-size: 13px;">
+      <div style="background: ${theme.email.successBg}; border-left: 4px solid ${theme.email.successBorder}; padding: 16px; margin: 20px 0; border-radius: 4px;">
+        <p style="margin: 0; font-weight: bold; color: ${theme.email.successText};">${_("whatToPrepare")}</p>
+        <ul style="margin: 8px 0 0; color: ${theme.colors.text.dark}; font-size: 13px;">
           <li>${_("prepareArea").replace("{{participantCount}}", String(params.participantCount))}</li>
           <li>${_("prepareParticipants")}</li>
           <li>${_("prepareAttire")}</li>
         </ul>
       </div>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
     `),
     actorUserId: params.actorUserId,
@@ -725,21 +740,21 @@ export async function sendBookingCompletedEmail(params: {
     template: "booking_completed",
     payload: params,
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("greeting").replace("{{contactName}}", params.contactName)}</p>
       <p>${_("body").replace("{{brandName}}", brand.name).replace("{{sessionDate}}", params.sessionDate).replace("{{trainingType}}", params.trainingType).replace("{{participantCount}}", String(params.participantCount))}</p>
-      <div style="background: #f0fff4; border-left: 4px solid #38a169; padding: 16px; margin: 20px 0; border-radius: 4px;">
-        <p style="margin: 0; font-weight: bold; color: #276749;">${_("nextSteps")}</p>
-        <ul style="margin: 8px 0 0; color: #2f855a; font-size: 13px;">
+      <div style="background: ${theme.email.successBg}; border-left: 4px solid ${theme.email.successBorder}; padding: 16px; margin: 20px 0; border-radius: 4px;">
+        <p style="margin: 0; font-weight: bold; color: ${theme.email.successText};">${_("nextSteps")}</p>
+        <ul style="margin: 8px 0 0; color: ${theme.colors.text.dark}; font-size: 13px;">
           <li>${_("certsDashboard")}</li>
           <li>${_("walletCards")}</li>
           <li>${_("verifyLinks")}</li>
         </ul>
       </div>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
-      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("bookAnother")} <a href="${baseUrl}${localePath(loc, "/book-training")}" style="color: ${theme.colors.accent.hex};">${_("scheduleHere")}</a>.</p>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("bookAnother")} <a href="${baseUrl}${localePath(loc, "/book-training")}" style="color: ${theme.email.linkColor};">${_("scheduleHere")}</a>.</p>
     `),
     actorUserId: params.actorUserId,
   });
@@ -761,11 +776,11 @@ export async function sendRefundNotification(params: {
     template: "refund_notification",
     payload: params,
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("body")}</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("orderNumber")}</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.orderNumber}</td></tr>
-        <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_("refundAmount")}</td><td style="padding: 8px; font-weight: bold; font-size: 18px; color: #38a169;">$${params.refundAmount.toFixed(2)}</td></tr>
+        <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_("refundAmount")}</td><td style="padding: 8px; font-weight: bold; font-size: 18px; color: ${theme.colors.green.hex};">$${params.refundAmount.toFixed(2)}</td></tr>
       </table>
       <p>${_("note")}</p>
     `),
@@ -789,11 +804,11 @@ export async function sendCertificateRevokedNotification(params: {
     template: "certificate_revoked",
     payload: params,
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("body").replace("{{courseName}}", params.courseName).replace("{{certificateNumber}}", params.certificateNumber)}</p>
       <p>${_("note")}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="mailto:${brand.support.email}" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="mailto:${brand.support.email}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
     `),
     actorUserId: params.actorUserId,
@@ -818,12 +833,12 @@ export async function sendSeatAssignedNotification(params: {
     template: "seat_assigned",
     payload: params,
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("greeting").replace("{{memberName}}", params.memberName)}</p>
       <p>${_("body").replace("{{courseName}}", params.courseName).replace("{{groupName}}", params.groupName)}</p>
       <p>${_("startNow")}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer").replace("{{regulatory}}", industry.regulatory.body)}</p>
     `),
@@ -849,16 +864,16 @@ export async function sendContactFormAdminAlert(params: {
       template: "contact_form_admin",
       payload: params,
       html: wrap(loc, `
-        <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">New Contact Form Submission</h2>
+        <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New Contact Form Submission</h2>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Name</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.name}</td></tr>
-          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.email}" style="color: ${theme.colors.accent.hex};">${params.email}</a></td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.email}" style="color: ${theme.email.linkColor};">${params.email}</a></td></tr>
           ${params.phone ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.phone}</td></tr>` : ""}
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
           <tr><td style="padding: 8px; color: ${theme.colors.text.muted}; vertical-align: top;">Message</td><td style="padding: 8px;">${params.message}</td></tr>
         </table>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="mailto:${params.email}?subject=Re: Your ${brand.name} Inquiry" style="background: ${theme.email.headerBg}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Reply to ${params.name}</a>
+          <a href="mailto:${params.email}?subject=Re: Your ${brand.name} Inquiry" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Reply to ${params.name}</a>
         </div>
       `),
     });
@@ -887,18 +902,18 @@ export async function sendNewOrderAdminAlert(params: {
       template: "order_admin_alert",
       payload: params,
       html: wrap(loc, `
-        <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">New Order Received</h2>
+        <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New Order Received</h2>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Order Number</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.orderNumber}</td></tr>
-          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.customerName} (<a href="mailto:${params.customerEmail}" style="color: ${theme.colors.accent.hex};">${params.customerEmail}</a>)</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.customerName} (<a href="mailto:${params.customerEmail}" style="color: ${theme.email.linkColor};">${params.customerEmail}</a>)</td></tr>
         </table>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <thead><tr style="background: #f7f7f7;"><th style="padding: 8px; text-align: left;">Item</th><th style="padding: 8px; text-align: center;">Qty</th><th style="padding: 8px; text-align: right;">Price</th></tr></thead>
           <tbody>${itemRows}</tbody>
         </table>
-        <p style="font-size: 18px; font-weight: bold; color: ${theme.colors.primary.hex}; text-align: right;">Total: $${params.total.toFixed(2)}</p>
+        <p style="font-size: 18px; font-weight: bold; color: ${theme.email.headingColor}; text-align: right;">Total: $${params.total.toFixed(2)}</p>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${baseUrl}/admin/orders" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Manage Orders</a>
+          <a href="${baseUrl}/admin/orders" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Manage Orders</a>
         </div>
       `),
     });
@@ -937,13 +952,13 @@ export async function sendBookingAdminNotificationToAll(params: {
       template: "booking_admin_notification",
       payload: params,
       html: wrap(loc, `
-        <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">New Training Booking</h2>
+        <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New Training Booking</h2>
         <p>A new on-site training session has been booked. Review the details below:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Booking Number</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer Name</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactName}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactPhone}</td></tr>
-          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.contactEmail}" style="color: ${theme.colors.accent.hex};">${params.contactEmail}</a></td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.contactEmail}" style="color: ${theme.email.linkColor};">${params.contactEmail}</a></td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Time</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
@@ -952,7 +967,7 @@ export async function sendBookingAdminNotificationToAll(params: {
           ${specialRequestsRow}
         </table>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${baseUrl}/admin/bookings" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Manage Bookings</a>
+          <a href="${baseUrl}/admin/bookings" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Manage Bookings</a>
         </div>
       `),
       actorUserId: params.actorUserId,
@@ -982,7 +997,7 @@ export async function sendBookingCancellationAdminAlert(params: {
       template: "booking_cancellation_admin",
       payload: params,
       html: wrap(loc, `
-        <h2 style="color: #c53030; margin-top: 0;">Booking Cancelled</h2>
+        <h2 style="color: #c53030; font-family: ${theme.email.headingFont}; margin-top: 0;">Booking Cancelled</h2>
         <p>A training booking has been cancelled:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Booking Number</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
@@ -993,7 +1008,7 @@ export async function sendBookingCancellationAdminAlert(params: {
           <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">Cancelled By</td><td style="padding: 8px;">${params.cancelledBy}</td></tr>
         </table>
         <div style="text-align: center; margin: 30px 0;">
-          <a href="${baseUrl}/admin/bookings" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Bookings</a>
+          <a href="${baseUrl}/admin/bookings" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Bookings</a>
         </div>
       `),
       actorUserId: params.actorUserId,
@@ -1036,10 +1051,10 @@ export async function sendOnsiteRequestCustomerConfirmation(params: {
       state: params.state,
     },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("greeting").replace("{{contactName}}", params.contactName)}</p>
       <p>${_("body")}</p>
-      <h3 style="color: ${theme.colors.primary.hex}; margin-top: 24px;">${_("summary")}</h3>
+      <h3 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 24px;">${_("summary")}</h3>
       <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
         ${params.companyName ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("company")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.companyName}</td></tr>` : ""}
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
@@ -1047,12 +1062,12 @@ export async function sendOnsiteRequestCustomerConfirmation(params: {
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainingLocation")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.city}, ${params.state}</td></tr>
         ${dateRows}
       </table>
-      <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; margin: 24px 0; border-radius: 0 6px 6px 0;">
-        <p style="margin: 0; color: #15803d; font-weight: 500;">${_("whatNext")}</p>
-        <p style="margin: 8px 0 0; color: #166534; font-size: 14px;">${_("whatNextText").replace("{{email}}", params.to)}</p>
+      <div style="background: ${theme.email.successBg}; border-left: 4px solid ${theme.email.successBorder}; padding: 16px; margin: 24px 0; border-radius: 0 6px 6px 0;">
+        <p style="margin: 0; color: ${theme.email.successText}; font-weight: 500;">${_("whatNext")}</p>
+        <p style="margin: 8px 0 0; color: ${theme.colors.text.dark}; font-size: 14px;">${_("whatNextText").replace("{{email}}", params.to)}</p>
       </div>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/contact")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/contact")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("urgentNote")}</p>
     `),
@@ -1107,14 +1122,14 @@ export async function sendOnsiteRequestAdminAlert(params: {
       notes: params.notes,
     },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">New On-Site Training Request</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New On-Site Training Request</h2>
       <p>A new on-site training request has been submitted. Review and follow up with the customer:</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Request #</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">#${params.requestId}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Contact</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactName}</td></tr>
         ${params.companyName ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Company</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.companyName}</td></tr>` : ""}
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.email}" style="color: ${theme.colors.accent.hex};">${params.email}</a></td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="tel:${params.phone}" style="color: ${theme.colors.accent.hex};">${params.phone}</a></td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.email}" style="color: ${theme.email.linkColor};">${params.email}</a></td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="tel:${params.phone}" style="color: ${theme.email.linkColor};">${params.phone}</a></td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Address</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingAddress}, ${params.city}, ${params.state} ${params.zip}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Trainees</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.traineeCount}</td></tr>
@@ -1123,7 +1138,7 @@ export async function sendOnsiteRequestAdminAlert(params: {
         ${params.notes ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted}; vertical-align: top;">Notes</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.notes}</td></tr>` : ""}
       </table>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}/admin/onsite-requests/${params.requestId}" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Request in Admin</a>
+        <a href="${baseUrl}/admin/onsite-requests/${params.requestId}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Request in Admin</a>
       </div>
     `),
   });
@@ -1144,7 +1159,7 @@ export async function sendInstructorApplicationConfirmation(params: {
     template: "instructor_application_confirmation",
     payload: { applicantName: params.applicantName },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("greeting").replace("{{applicantName}}", params.applicantName)}</p>
       <p>${_("body").replace("{{brandName}}", brand.name)}</p>
       <div style="background: ${theme.colors.background.light}; border-left: 4px solid ${theme.colors.accent.hex}; padding: 16px; margin: 20px 0; border-radius: 4px;">
@@ -1155,7 +1170,7 @@ export async function sendInstructorApplicationConfirmation(params: {
           <li>${_("decisionTimeline")}</li>
         </ul>
       </div>
-      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")} <a href="mailto:${brand.support.email}" style="color: ${theme.colors.accent.hex};">${brand.support.email}</a>.</p>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")} <a href="mailto:${brand.support.email}" style="color: ${theme.email.linkColor};">${brand.support.email}</a>.</p>
     `),
     actorUserId: params.actorUserId,
   });
@@ -1187,16 +1202,16 @@ export async function sendInstructorApplicationAdminAlert(params: {
       applicationId: params.applicationId,
     },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">New Instructor Application</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New Instructor Application</h2>
       <p>A certified graduate has applied to join the instructor network.</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Applicant</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.applicantName}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.applicantEmail}" style="color: ${theme.colors.accent.hex};">${params.applicantEmail}</a></td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.applicantEmail}" style="color: ${theme.email.linkColor};">${params.applicantEmail}</a></td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Location</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.city}, ${params.state}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Experience</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.yearsExperience} years</td></tr>
       </table>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}/admin/instructor-applications/${params.applicationId}" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Review Application</a>
+        <a href="${baseUrl}/admin/instructor-applications/${params.applicationId}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Review Application</a>
       </div>
     `),
     actorUserId: params.actorUserId,
@@ -1226,7 +1241,7 @@ export async function sendInstructorAssignmentNotification(params: {
     template: "instructor_assignment",
     payload: { requestId: params.requestId, instructorName: params.instructorName },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">New Training Assignment</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New Training Assignment</h2>
       <p>Hi ${params.instructorName},</p>
       <p>You've been proposed for an on-site training assignment. Here are the details:</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
@@ -1237,7 +1252,7 @@ export async function sendInstructorAssignmentNotification(params: {
       </table>
       <p>An admin will follow up with more details. Please log in to your dashboard for full information.</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Dashboard</a>
+        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Dashboard</a>
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">If you have questions or need to decline, please contact us at ${brand.support.email}.</p>
     `),
@@ -1261,7 +1276,7 @@ export async function sendAssignmentAdminAlert(params: {
   const recipients = await getAdminEmailsFallback();
 
   const html = wrap(loc, `
-    <h2 style="color: ${theme.colors.primary.hex}; margin-top: 0;">Instructor Assignment Update</h2>
+    <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">Instructor Assignment Update</h2>
     <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
       <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted}; width: 140px;">Action</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">${params.action}</td></tr>
       <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Instructor</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">${params.instructorName}</td></tr>
@@ -1269,7 +1284,7 @@ export async function sendAssignmentAdminAlert(params: {
       ${params.previousStatus && params.newStatus ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Status Change</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.previousStatus} → ${params.newStatus}</td></tr>` : ""}
     </table>
     <div style="text-align: center; margin: 30px 0;">
-      <a href="${baseUrl}/admin/onsite-requests/${params.requestId}" style="background: ${theme.colors.primary.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Request</a>
+      <a href="${baseUrl}/admin/onsite-requests/${params.requestId}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">View Request</a>
     </div>
   `);
 
@@ -1313,10 +1328,10 @@ export async function sendAbandonedCheckoutReminder(params: {
     template: "abandoned_checkout",
     payload: { orderNumber: params.orderNumber },
     html: wrap(loc, `
-      <h2 style="color: ${theme.colors.primary.hex};">${_("heading")}</h2>
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("body").replace("{{orderNumber}}", params.orderNumber)}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.colors.accent.hex}; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: #999; font-size: 12px;">${_("footer").replace("{{regulatory}}", industry.regulatory.body)}</p>
     `),

@@ -245,7 +245,7 @@ export default function BecomeAnInstructor() {
         noindex={true}
       />
 
-      <section className="bg-primary text-primary-foreground py-16 md:py-24">
+      <section className="bg-brand-dark text-white py-16 md:py-24">
         <div className="max-w-5xl mx-auto px-4 text-center space-y-6">
           <Badge variant="secondary" className="text-sm" data-testid="badge-certified-only">
             <ShieldCheck className="h-3.5 w-3.5 mr-1" />
@@ -254,7 +254,7 @@ export default function BecomeAnInstructor() {
           <h1 className="text-3xl md:text-5xl font-bold" data-testid="text-hero-title">
             {t("instructor.heroTitle", { brand: brand.name })}
           </h1>
-          <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
             {t("instructor.heroDesc")}
           </p>
           <a href="#apply" className="inline-block">
@@ -329,7 +329,7 @@ export default function BecomeAnInstructor() {
               { step: 4, title: t("instructor.step4Title"), desc: t("instructor.step4Desc") },
             ].map((s) => (
               <div key={s.step} className="flex gap-4 items-start" data-testid={`step-${s.step}`}>
-                <div className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0 font-bold">
+                <div className="h-10 w-10 rounded-full bg-brand-dark text-white flex items-center justify-center shrink-0 font-bold">
                   {s.step}
                 </div>
                 <div>

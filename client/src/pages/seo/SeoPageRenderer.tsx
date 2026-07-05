@@ -266,10 +266,10 @@ function RelatedArticles({ links, isPillar }: { links: Array<{ label: string; hr
 function NextStepCta() {
   const { t } = useTranslation();
   return (
-    <div className="bg-primary text-primary-foreground py-12" data-testid="next-step-cta">
+    <div className="bg-brand-dark text-white py-12" data-testid="next-step-cta">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <h2 className="text-2xl font-bold mb-3">{t("seoPage.readyToGetCertified")}</h2>
-        <p className="text-primary-foreground/80 mb-6 max-w-2xl mx-auto">
+        <p className="text-white/80 mb-6 max-w-2xl mx-auto">
           {t("seoPage.readyToGetCertifiedDesc", { body: industry.regulatory.body })}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -283,7 +283,7 @@ function NextStepCta() {
           </a>
           <a
             href="/forklift-certification-cost"
-            className="inline-flex items-center justify-center gap-2 border border-primary-foreground/30 text-primary-foreground px-8 py-3 rounded-lg font-semibold hover:bg-primary-foreground/10 transition-colors"
+            className="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-foreground/10 transition-colors"
             data-testid="cta-cost"
           >
             {t("seoPage.learnAboutPricing")}

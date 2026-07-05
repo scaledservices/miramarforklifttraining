@@ -14,8 +14,8 @@ export default function ProgramCards() {
       description: t("programCards.onlineDesc"),
       href: "/online-training",
       cta: t("cta.startOnlineTraining"),
-      color: "text-blue-600 dark:text-blue-400",
-      bgColor: "bg-blue-50 dark:bg-blue-950/30",
+      color: "text-brand-dark",
+      bgColor: "bg-primary/15",
     },
     {
       icon: Wrench,
@@ -23,8 +23,8 @@ export default function ProgramCards() {
       description: t("programCards.handsOnDesc"),
       href: "/hands-on-training",
       cta: t("cta.viewHandsOnTraining"),
-      color: "text-emerald-600 dark:text-emerald-400",
-      bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+      color: "text-brand-dark",
+      bgColor: "bg-primary/15",
     },
     {
       icon: GraduationCap,
@@ -32,8 +32,8 @@ export default function ProgramCards() {
       description: t("programCards.trainerDesc"),
       href: "/train-the-trainer",
       cta: t("cta.learnMore"),
-      color: "text-purple-600 dark:text-purple-400",
-      bgColor: "bg-purple-50 dark:bg-purple-950/30",
+      color: "text-brand-dark",
+      bgColor: "bg-primary/15",
     },
     {
       icon: Building2,
@@ -41,8 +41,8 @@ export default function ProgramCards() {
       description: t("trainingPrograms.businessProductsDesc"),
       href: "/business",
       cta: t("nav.forBusiness"),
-      color: "text-amber-600 dark:text-amber-400",
-      bgColor: "bg-amber-50 dark:bg-amber-950/30",
+      color: "text-brand-dark",
+      bgColor: "bg-primary/15",
     },
   ];
 
@@ -50,7 +50,7 @@ export default function ProgramCards() {
     <section className="py-16 md:py-20 bg-card" data-testid="program-cards">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <span className="text-accent text-sm font-semibold uppercase tracking-wider">{t("programCards.sectionLabel")}</span>
+          <span className="text-brand-orange text-sm font-semibold uppercase tracking-wider">{t("programCards.sectionLabel")}</span>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-2 mb-4 tracking-tight">
             {t("programCards.title")}
           </h2>

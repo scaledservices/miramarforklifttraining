@@ -1,6 +1,5 @@
 import Hero from "@/components/sections/Hero";
 import CTABand from "@/components/sections/CTABand";
-import Testimonials from "@/components/sections/Testimonials";
 import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/seo/SEOHead";
 import { Link, useLocation } from "wouter";
@@ -393,7 +392,7 @@ export default function Business() {
         </div>
       </section>
 
-      <Testimonials />
+      {/* Testimonials hidden until real reviews are collected per senior review Section B.8 */}
 
       <CTABand
         title={t("businessPage.ctaTitle")}

@@ -34,13 +34,13 @@ export default function Hero({ title, subtitle, primaryCta, secondaryCta, badges
       <section className="relative overflow-hidden" data-testid="hero-home">
         {image && (
           <div className="absolute inset-0">
-            <OptimizedImage src={image} alt={imageAlt || ""} className="w-full h-full object-cover" loading="eager" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(210,85%,15%)]/95 via-[hsl(210,85%,18%)]/85 to-[hsl(210,85%,20%)]/70" />
+            <OptimizedImage src={image} alt={imageAlt || ""} className="w-full h-full object-cover" loading="eager" fetchpriority="high" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(10,22%,15%)]/95 via-[hsl(10,22%,18%)]/85 to-[hsl(10,22%,21%)]/70" />
           </div>
         )}
         {!image && (
           <>
-            <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-[hsl(210,85%,20%)]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-dark via-brand-dark to-[hsl(10,22%,17%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.08),transparent_60%)]" />
           </>
         )}
@@ -111,12 +111,12 @@ export default function Hero({ title, subtitle, primaryCta, secondaryCta, badges
     <section className="relative overflow-hidden py-16 md:py-20" data-testid="hero-page">
       {image ? (
         <div className="absolute inset-0">
-          <OptimizedImage src={image} alt={imageAlt || ""} className="w-full h-full object-cover" loading="eager" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(210,85%,15%)]/95 via-[hsl(210,85%,18%)]/85 to-[hsl(210,85%,20%)]/65" />
+          <OptimizedImage src={image} alt={imageAlt || ""} className="w-full h-full object-cover" loading="eager" fetchpriority="high" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(10,22%,15%)]/95 via-[hsl(10,22%,18%)]/85 to-[hsl(10,22%,21%)]/65" />
         </div>
       ) : (
         <>
-          <div className="absolute inset-0 bg-gradient-to-br from-primary to-[hsl(210,85%,22%)]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-brand-dark to-[hsl(10,22%,16%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.05),transparent_50%)]" />
         </>
       )}

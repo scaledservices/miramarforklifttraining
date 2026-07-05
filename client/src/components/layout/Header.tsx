@@ -24,10 +24,13 @@ import {
   Package,
   CircleHelp,
   ClipboardList,
+  RefreshCw,
+  Phone,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/contexts/CartContext";
 import Logo from "@/components/ui/Logo";
+import { brand } from "@shared/config/brand";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 function DesktopNav() {
@@ -81,10 +84,13 @@ function DesktopNav() {
     { label: t("nav.inPersonTraining"), href: "/in-person-training", icon: Wrench },
     { label: t("nav.onlineTraining"), href: "/online-training", icon: Monitor },
     { label: t("nav.trainTheTrainer"), href: "/train-the-trainer", icon: GraduationCap },
+    { label: t("nav.renewal"), href: "/renewal", icon: RefreshCw },
   ];
 
   const trainingLocations = [
     { label: t("nav.sanDiego"), href: "/locations/san-diego" },
+    { label: t("nav.lasVegas"), href: "/locations/las-vegas" },
+    { label: t("nav.fresno"), href: "/locations/fresno" },
   ];
 
   const businessLinks = [
@@ -132,7 +138,7 @@ function DesktopNav() {
       >
         <button
           className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-            isTrainingActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            isTrainingActive ? "text-white" : "text-white/70 hover:text-white"
           }`}
           aria-expanded={openDropdown === "training"}
           aria-haspopup="true"
@@ -227,7 +233,7 @@ function DesktopNav() {
       >
         <button
           className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-            isBusinessActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            isBusinessActive ? "text-white" : "text-white/70 hover:text-white"
           }`}
           aria-expanded={openDropdown === "business"}
           aria-haspopup="true"
@@ -271,7 +277,7 @@ function DesktopNav() {
       >
         <button
           className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-            isResourcesActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+            isResourcesActive ? "text-white" : "text-white/70 hover:text-white"
           }`}
           aria-expanded={openDropdown === "resources"}
           aria-haspopup="true"
@@ -352,9 +358,9 @@ function MobileNavActions({ onClose }: { onClose: () => void }) {
           {t("nav.login")}
         </Button>
       </Link>
-      <Link href="/p/online-forklift-operator-training" onClick={onClose}>
+      <Link href="/book-training" onClick={onClose}>
         <Button className="w-full bg-accent text-accent-foreground border-accent-border" data-testid="mobile-button-cta">
-          {t("cta.getCertified")}
+          {t("nav.bookTraining")}
         </Button>
       </Link>
     </div>
@@ -390,11 +396,14 @@ function MobileNav() {
     { label: t("nav.inPersonTraining"), href: "/in-person-training" },
     { label: t("nav.onlineTraining"), href: "/online-training" },
     { label: t("nav.trainTheTrainer"), href: "/train-the-trainer" },
+    { label: t("nav.renewal"), href: "/renewal" },
     { label: t("nav.viewAllPrograms"), href: "/training-programs" },
   ];
 
   const trainingLocations = [
     { label: t("nav.sanDiego"), href: "/locations/san-diego" },
+    { label: t("nav.lasVegas"), href: "/locations/las-vegas" },
+    { label: t("nav.fresno"), href: "/locations/fresno" },
   ];
 
   const businessLinks = [
@@ -414,7 +423,7 @@ function MobileNav() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button size="icon" variant="ghost" className="lg:hidden" data-testid="button-mobile-menu">
+        <Button size="icon" variant="ghost" className="lg:hidden text-white hover:text-white" data-testid="button-mobile-menu">
           <Menu className="w-5 h-5" />
         </Button>
       </SheetTrigger>
@@ -559,7 +568,7 @@ function HeaderActions() {
     return (
       <>
         <Link href="/cart" className="relative hidden sm:flex">
-          <Button variant="ghost" size="sm" data-testid="button-cart">
+          <Button variant="ghost" size="sm" className="text-white hover:text-white" data-testid="button-cart">
             <ShoppingCart className="w-4 h-4" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center" data-testid="text-cart-count">{cartCount}</span>
@@ -567,20 +576,20 @@ function HeaderActions() {
           </Button>
         </Link>
         <Link href={dashboardLink} className="hidden lg:flex">
-          <Button variant="ghost" size="sm" data-testid="button-dashboard">
+          <Button variant="ghost" size="sm" className="text-white hover:text-white" data-testid="button-dashboard">
             <DashIcon className="w-4 h-4 mr-1.5" />
             {dashboardLabel}
           </Button>
         </Link>
         {user.role === "group_admin" && (
           <Link href="/dashboard" className="hidden lg:flex">
-            <Button variant="ghost" size="sm" data-testid="button-personal-dashboard">
+            <Button variant="ghost" size="sm" className="text-white hover:text-white" data-testid="button-personal-dashboard">
               <LayoutDashboard className="w-4 h-4 mr-1.5" />
               {t("nav.dashboard")}
             </Button>
           </Link>
         )}
-        <Button variant="ghost" size="sm" className="hidden lg:flex" onClick={() => { logout(); setLocation("/"); }} data-testid="button-logout">
+        <Button variant="ghost" size="sm" className="hidden lg:flex text-white hover:text-white" onClick={() => { logout(); setLocation("/"); }} data-testid="button-logout">
           <LogOut className="w-4 h-4 mr-1.5" />
           {t("nav.logout")}
         </Button>
@@ -590,8 +599,25 @@ function HeaderActions() {
 
   return (
     <>
+      <a
+        href={`tel:${brand.support.phoneTel}`}
+        className="hidden xl:flex items-center gap-1.5 text-sm font-semibold text-white/90 hover:text-accent transition-colors mr-1"
+        aria-label={t("nav.callUs")}
+        data-testid="link-header-phone"
+      >
+        <Phone className="w-4 h-4 text-accent" />
+        {brand.support.phone}
+      </a>
+      <a
+        href={`tel:${brand.support.phoneTel}`}
+        className="flex xl:hidden items-center justify-center w-9 h-9 rounded-md text-accent"
+        aria-label={t("nav.callUs")}
+        data-testid="link-header-phone-mobile"
+      >
+        <Phone className="w-5 h-5" />
+      </a>
       <Link href="/cart" className="relative flex">
-        <Button variant="ghost" size="sm" data-testid="button-cart">
+        <Button variant="ghost" size="sm" className="text-white hover:text-white" data-testid="button-cart">
           <ShoppingCart className="w-4 h-4" />
           {cartCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center" data-testid="text-cart-count">{cartCount}</span>
@@ -599,14 +625,14 @@ function HeaderActions() {
         </Button>
       </Link>
       <Link href="/login" className="hidden lg:flex">
-        <Button variant="ghost" size="sm" data-testid="button-login">
+        <Button variant="ghost" size="sm" className="text-white hover:text-white" data-testid="button-login">
           <LogIn className="w-4 h-4 mr-1.5" />
           {t("nav.login")}
         </Button>
       </Link>
-      <Link href="/p/online-forklift-operator-training" className="hidden sm:block">
+      <Link href="/book-training" className="hidden sm:block">
         <Button size="sm" className="bg-accent text-accent-foreground border-accent-border" data-testid="button-header-cta">
-          {t("cta.getCertified")}
+          {t("nav.bookTraining")}
         </Button>
       </Link>
     </>
@@ -626,21 +652,21 @@ export default function Header() {
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-200 ${
         scrolled
-          ? "bg-background/95 backdrop-blur-md border-b border-border"
-          : "bg-background border-b border-transparent"
+          ? "bg-[#232323]/95 backdrop-blur-md border-b border-white/10"
+          : "bg-[#232323] border-b border-transparent"
       }`}
       data-testid="header"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4 h-16">
           <Link href="/" className="flex items-center shrink-0" data-testid="link-logo">
-            <Logo variant="navbar" />
+            <Logo variant="navbar" theme="dark" />
           </Link>
 
           <DesktopNav />
 
           <div className="flex items-center gap-2">
-            <LanguageSwitcher />
+            <LanguageSwitcher className="text-white/80 hover:text-white" />
             <HeaderActions />
             <MobileNav />
           </div>

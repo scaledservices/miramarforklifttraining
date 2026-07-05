@@ -275,10 +275,6 @@ function injectSeoIntoTemplate(
     <meta name="twitter:title" content="${escapeHtml(fullTitle)}" />
     <meta name="twitter:description" content="${escapeHtml(opts.metaDescription)}" />
     <meta name="twitter:image" content="${opts.ogImage}" />
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#1a3a5c" />
     ${opts.jsonLdItems.map(item => `<script type="application/ld+json">${JSON.stringify(item)}</script>`).join("\n    ")}`;
 
   let html = template;

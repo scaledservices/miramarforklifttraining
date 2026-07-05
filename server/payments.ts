@@ -2,6 +2,7 @@ import { db } from "./db";
 import { payments, orders, webhookEvents, certifications, enrollments, auditLogs } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 import { getUncachableStripeClient, isStripeConfigured } from "./stripeClient";
+import { refundTransaction as refundAuthorizeNetTransaction } from "./authorizeNetClient";
 
 export interface PaymentResult {
   success: boolean;
@@ -138,6 +139,47 @@ export async function refundTransaction(
 
   const payment = existingPayment[0];
   const isDemo = payment.provider === "demo_sandbox";
+
+  // Authorize.net payments must refund through Authorize.net — checked before the
+  // demo fallback so a real card payment can never be "refunded" with a mock entry.
+  if (payment.provider === "authorize_net") {
+    const anetResult = await refundAuthorizeNetTransaction(transactionId, amount, orderId);
+    if (!anetResult.success) {
+      return { success: false, errorMessage: anetResult.errorMessage || "Authorize.net refund failed" };
+    }
+
+    await db.insert(payments).values({
+      orderId,
+      provider: "authorize_net",
+      providerTransactionId: anetResult.transactionId || `REFUND-${transactionId}`,
+      status: "refunded",
+      amount: String(amount),
+      rawResponse: anetResult.rawResponse ?? { refund: true },
+    });
+
+    await db.update(orders).set({ status: "refunded", updatedAt: new Date() }).where(eq(orders.id, orderId));
+
+    const orderCerts = await db.select().from(certifications)
+      .innerJoin(enrollments, eq(certifications.enrollmentId, enrollments.id))
+      .where(eq(enrollments.orderId, orderId));
+
+    for (const { certifications: cert } of orderCerts) {
+      await db.update(certifications).set({
+        status: "revoked",
+        updatedAt: new Date(),
+      }).where(eq(certifications.id, cert.id));
+
+      await db.insert(auditLogs).values({
+        actorUserId: null,
+        action: "certification_revoked_on_refund",
+        entity: "certification",
+        entityId: cert.id,
+        metadata: { orderId, transactionId },
+      });
+    }
+
+    return { success: true, transactionId: anetResult.transactionId, rawResponse: anetResult.rawResponse };
+  }
 
   if (isDemo || !isStripeConfigured()) {
     const mockRefundId = `REFUND-${Date.now()}`;

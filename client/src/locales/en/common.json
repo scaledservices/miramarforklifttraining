@@ -30,7 +30,12 @@
     "mainNavigation": "Main navigation",
     "inPersonTraining": "In-Person Training",
     "sanDiego": "San Diego, CA",
-    "getQuote": "Get a Quote"
+    "getQuote": "Get a Quote",
+    "renewal": "Renew Certification",
+    "lasVegas": "Las Vegas",
+    "fresno": "Fresno",
+    "callUs": "Call us",
+    "bookTraining": "Book Training"
   },
   "cta": {
     "getCertified": "Get Certified",
@@ -192,7 +197,10 @@
     "terms": "Terms",
     "privacy": "Privacy",
     "refundPolicy": "Refund Policy",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "renewal": "Renew Certification",
+    "requestQuote": "Request a Quote",
+    "locations": "Locations"
   },
   "badges": {
     "oshaAligned": "OSHA-Aligned",
@@ -234,18 +242,18 @@
   },
   "home": {
     "heroTitle": "OSHA-Aligned Forklift Training & Certification",
-    "heroSubtitle": "OSHA-aligned in-person and online forklift certification at our Miramar facility or your job site. Same-day cards available.",
+    "heroSubtitle": "Onsite training at your facility, or hands-on courses at our San Diego, Las Vegas, and Fresno training centers. Experienced bilingual instructors. Same-day certification cards.",
     "bookInPerson": "Book In-Person Training",
     "getOnlineCertified": "Get Certified Online",
     "trust1": "Same-Day Certification",
     "trust2": "OSHA-Aligned Training",
     "trust3": "10+ Years Experience",
-    "trust4": "San Diego, CA",
+    "trust4": "3 Locations: San Diego, Las Vegas & Fresno",
     "getStartedLabel": "Get Started",
-    "buyerTracksTitle": "Choose Your Certification Path",
-    "buyerTracksSubtitle": "Individual, online, or team — we have the right option for you.",
-    "inPersonTitle": "In-Person Training",
-    "inPersonDesc": "Hands-on forklift certification at our Miramar training facility. Walk-ins welcome, same-day card.",
+    "buyerTracksTitle": "Find the Right Training for You",
+    "buyerTracksSubtitle": "Three ways to get certified — pick the one that fits.",
+    "inPersonTitle": "Getting Certified Yourself?",
+    "inPersonDesc": "Hands-on training on real equipment at our San Diego, Las Vegas, or Fresno facilities. Walk out with your card the same day.",
     "inPersonF1": "Real equipment training",
     "inPersonF2": "Same-day certification card",
     "inPersonF3": "Starting at $200/person",
@@ -256,10 +264,10 @@
     "onlineF2": "Printable certificate",
     "onlineF3": "Complete in ~2 hours",
     "certIn2Hours": "Get certified in as little as 2 hours",
-    "b2bTitle": "Team & On-Site Training",
-    "b2bDesc": "Custom training at your facility or ours. Volume pricing, bilingual instructors, compliance documentation.",
-    "b2bF1": "On-site at your location",
-    "b2bF2": "Volume discounts available",
+    "b2bTitle": "Training for Your Crew?",
+    "b2bDesc": "We bring the training to your facility — or host your team at ours. Volume pricing, bilingual instructors, and full compliance documentation.",
+    "b2bF1": "Trainer travels to your site",
+    "b2bF2": "Volume discounts for 5+ trainees",
     "b2bF3": "Compliance docs included",
     "getQuoteCta": "Request a Quote",
     "b2bSectionTitle": "Train Your Entire Crew",
@@ -269,9 +277,27 @@
     "commonQuestions": "Common Questions",
     "commonQuestionsDesc": "Get quick answers about our certification programs.",
     "readyToGetCertified": "Ready to Get Certified?",
-    "readyToGetCertifiedDesc": "Book in-person training at our San Diego facility or start your online certification today.",
+    "readyToGetCertifiedDesc": "Get a quote for onsite training at your facility, or book hands-on training in San Diego, Las Vegas, or Fresno.",
     "individualAlt": "Individual operator completing online forklift certification",
-    "businessAlt": "Business team planning forklift training program"
+    "businessAlt": "Business team planning forklift training program",
+    "heroEyebrow": "San Diego · Las Vegas · Fresno",
+    "heroRenewLink": "Just need to renew? Renew your certification online",
+    "renewTitle": "Just Need to Renew?",
+    "renewDesc": "Renew your forklift certification online in about 2 hours, or schedule an in-person refresher and evaluation.",
+    "renewF1": "100% online option available",
+    "renewF2": "Done in about 2 hours",
+    "renewF3": "Same-day certificate",
+    "renewCta": "Renew My Certification",
+    "statYears": "Years of Experience",
+    "statLocations": "Training Locations",
+    "statSameDay": "Same-Day Certification",
+    "statBilingual": "English & Spanish",
+    "serviceAreasLabel": "Onsite Training",
+    "serviceAreasTitle": "Onsite Forklift Training Service Areas",
+    "serviceAreasDesc": "We bring {{body}}-aligned forklift certification directly to your facility — no travel required for your team.",
+    "serviceAreaCardDesc": "Onsite forklift training in {{city}} and surrounding areas. We come to your facility with same-day certification.",
+    "bookTrainingCta": "Book Training Now",
+    "largeGroupLink": "10+ trainees or special requirements? Request a custom quote"
   },
   "onlineCert": {
     "title": "Online Forklift Operator Certification",
@@ -715,7 +741,12 @@
     "validBadge": "Valid Certificate",
     "invalidBadge": "Invalid Certificate",
     "verificationProvidedBy": "This verification is provided by {{domain}}",
-    "complianceNote": "{{body}} {{standard}} compliant certification program"
+    "complianceNote": "{{body}} {{standard}} compliant certification program",
+    "lookupTitle": "Verify a Certification",
+    "lookupDesc": "Enter the certificate number printed on the certificate or wallet card to confirm it is valid and current.",
+    "lookupPlaceholder": "e.g. MFT-2026-000123",
+    "lookupButton": "Verify",
+    "lookupHint": "The certificate number appears below the holder's name on the certificate and card."
   },
   "certification": {
     "notFoundTitle": "Certification Not Found",
@@ -1136,19 +1167,37 @@
     "ctaTitle": "Ready to Book Your Training?",
     "ctaSubtitle": "Request a quote or call us to schedule your forklift certification training.",
     "course": {
-      "standard": { "name": "Standard Forklift Certification", "duration": "4-6 hours" },
-      "reachForklift": { "name": "Reach Truck + Forklift", "duration": "6-8 hours" },
-      "orderPickerForklift": { "name": "Order Picker + Forklift", "duration": "6-8 hours" },
-      "forkliftScissorEpj": { "name": "Forklift + Scissor Lift + EPJ", "duration": "Full day" },
-      "fullMultiEquipment": { "name": "Full Multi-Equipment", "duration": "Full day" },
-      "scissorAerial": { "name": "Scissor Lift + Aerial/Boom Lift", "duration": "4-6 hours" }
+      "standard": {
+        "name": "Standard Forklift Certification",
+        "duration": "4-6 hours"
+      },
+      "reachForklift": {
+        "name": "Reach Truck + Forklift",
+        "duration": "6-8 hours"
+      },
+      "orderPickerForklift": {
+        "name": "Order Picker + Forklift",
+        "duration": "6-8 hours"
+      },
+      "forkliftScissorEpj": {
+        "name": "Forklift + Scissor Lift + EPJ",
+        "duration": "Full day"
+      },
+      "fullMultiEquipment": {
+        "name": "Full Multi-Equipment",
+        "duration": "Full day"
+      },
+      "scissorAerial": {
+        "name": "Scissor Lift + Aerial/Boom Lift",
+        "duration": "4-6 hours"
+      }
     }
   },
   "requestQuote": {
     "seoTitle": "Request a Quote — {{brand}}",
     "seoDesc": "Get a custom quote for forklift training from {{brand}}. In-person at our Miramar facility or on-site at your location.",
-    "pageTitle": "Request a Training Quote",
-    "pageSubtitle": "Tell us about your training needs and we'll get back to you within one business day with a custom quote.",
+    "pageTitle": "Custom & Large-Group Training Quote",
+    "pageSubtitle": "Booking for 10+ trainees, multiple sites, or special equipment? Tell us what you need and we'll send a custom quote within one business day.",
     "formTitle": "Training Details",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -1203,7 +1252,12 @@
       "electricPalletJack": "Electric Pallet Jack (EPJ)",
       "scissorLift": "Scissor Lift",
       "aerialBoomLift": "Aerial/Boom Lift"
-    }
+    },
+    "selfServeTitle": "Booking for 1-9 people?",
+    "selfServeDesc": "Skip the quote — book and pay online in minutes.",
+    "selfServeCta": "Book Online Now",
+    "phoneOptional": "Phone (optional)",
+    "preferredDateOptional": "Preferred date (optional)"
   },
   "seoPage": {
     "startCertification": "Start Certification — $59.99",
@@ -1759,9 +1813,9 @@
     "viewBusinessProducts": "View Business Products"
   },
   "locationsHubPage": {
-    "badgeLabel": "San Diego, CA",
-    "title": "Training Location",
-    "subtitle": "In-person training at our San Diego facility or on-site at your location. {{body}}-aligned certification with hands-on evaluation.",
+    "badgeLabel": "3 Training Locations",
+    "title": "Training Locations",
+    "subtitle": "In-person training at our San Diego, Las Vegas, and Fresno facilities — or onsite at your location. {{body}}-aligned certification with hands-on evaluation.",
     "sanDiegoFacility": "San Diego Facility",
     "facilityDesc": "In-person and on-site forklift training. Individual and group sessions with same-day certification.",
     "viewTrainingOptions": "View Training Options",
@@ -2066,5 +2120,73 @@
     "ordersLinked": "orders linked",
     "certsLinked": "certs linked",
     "skippedAmbiguous": "skipped (ambiguous)"
+  },
+  "serviceAreas": {
+    "notFoundTitle": "Service Area Not Found",
+    "backToHome": "Back to Home",
+    "breadcrumbHome": "Home",
+    "breadcrumbHub": "Service Areas",
+    "schemaDescription": "Onsite forklift training in {{city}}, {{state}}. {{body}}-aligned certification at your facility.",
+    "requestQuote": "Request a Quote",
+    "introHeading": "Onsite Forklift Training in {{city}} — We Come to You",
+    "industriesHeading": "Industries We Serve in {{city}}",
+    "sidebarCaption": "Onsite Training — {{city}}, {{state}}",
+    "serviceAreaLabel": "Service Area",
+    "phoneLabel": "Phone",
+    "schedulingLabel": "Scheduling",
+    "schedulingHours": "Mon–Fri: 7:00 AM – 5:00 PM",
+    "schedulingFlexible": "Flexible shifts & weekends available",
+    "languagesLabel": "Languages",
+    "languagesList": "English & Spanish",
+    "checkOshaAligned": "{{body}}-aligned certification",
+    "checkSameDay": "Same-day certification cards",
+    "checkYourEquipment": "Train on your equipment",
+    "checkVolumeDiscounts": "Volume discounts (5+ operators)",
+    "callButton": "Call {{phone}}",
+    "includedTag": "What's Included",
+    "includedHeading": "Onsite Forklift Certification — {{city}}",
+    "includedSubtitle": "Everything your operators need to meet {{body}} requirements, delivered at your facility.",
+    "areasNearHeading": "Areas We Serve Near {{city}}",
+    "areasNearSubtitle": "We provide onsite forklift training throughout {{region}} and surrounding communities.",
+    "faqHeading": "Onsite Forklift Training {{city}} — FAQs",
+    "faqSubtitle": "Common questions about onsite certification at your facility.",
+    "otherAreasHeading": "Other Service Areas",
+    "otherAreasSubtitle": "We also provide onsite forklift training in these locations:",
+    "viewFacilities": "View Training Facilities",
+    "hubSeoTitle": "Onsite Forklift Training Service Areas | {{brand}}",
+    "hubSeoDescription": "We provide onsite forklift training at your facility across California. {{body}}-aligned certification at your location — no travel required for your team.",
+    "hubBadge": "Onsite Training",
+    "hubTitle": "Onsite Forklift Training Service Areas",
+    "hubSubtitle": "We bring {{body}}-aligned forklift certification directly to your facility. Don't send your team across the state — let us come to you with same-day certification.",
+    "learnMore": "Learn more",
+    "hubNoCity": "Don't see your city listed? We travel throughout California for onsite training.",
+    "hubQuoteCta": "Request a Quote for Your Location",
+    "bookCta": "Book Training Now"
+  },
+  "mobileBar": {
+    "call": "Call Now",
+    "quote": "Get a Quote",
+    "book": "Book Now"
+  },
+  "checkoutTrust": {
+    "secure": "Secure encrypted payment processed by Authorize.net",
+    "sameDay": "Certificate issued same day upon course completion"
+  },
+  "booking": {
+    "trainingTotal": "Training total",
+    "volumeDiscountApplied": "Volume discount (5+ trainees)",
+    "depositDueToday": "Deposit due today (50%)",
+    "balanceOnCompletion": "Balance due after training",
+    "depositNote": "Your date is reserved once the deposit is paid. The remaining balance is collected after your training is completed.",
+    "payDepositCta": "Pay ${{amount}} Deposit & Book",
+    "depositReceived": "Deposit received",
+    "policyRequired": "Please accept the cancellation policy to continue.",
+    "paymentLoading": "Payment system is loading. Please try again in a moment.",
+    "paymentTitle": "Payment",
+    "policyAccept": "I accept the",
+    "policyLink": "cancellation & refund policy",
+    "freeReschedule": "free reschedule up to 24 hours before your session.",
+    "processing": "Processing...",
+    "priceAnchor": "Hands-on certification runs $350+ per person elsewhere."
   }
 }

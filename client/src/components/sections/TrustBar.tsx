@@ -17,8 +17,8 @@ export default function TrustBar() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
           {trustItems.map((item, index) => (
             <div key={index} className="flex flex-col items-center text-center gap-2">
-              <item.icon className="w-6 h-6 text-accent" />
-              <span className="text-xs font-medium text-muted-foreground">{item.label}</span>
+              <span className="w-9 h-9 rounded-lg bg-brand-dark flex items-center justify-center"><item.icon className="w-[18px] h-[18px] text-accent" /></span>
+              <span className="text-sm font-semibold text-foreground">{item.label}</span>
             </div>
           ))}
         </div>

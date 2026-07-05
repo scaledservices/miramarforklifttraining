@@ -243,15 +243,15 @@ export default function Checkout() {
         <ArrowLeft className="w-3.5 h-3.5" />
         {t("checkout.backToCart")}
       </Link>
-      <h1 className="text-2xl font-bold mb-8" data-testid="text-checkout-title">{t("checkout.title")}</h1>
+      <h1 className="text-3xl font-bold mb-8" data-testid="text-checkout-title">{t("checkout.title")}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           {needsAuth && <CheckoutInlineAuth />}
 
           {paymentError && (
-            <Card className="border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-800">
-              <CardContent className="p-4 flex items-center gap-2 text-red-700 dark:text-red-400">
+            <Card className="border-destructive/40 bg-destructive/10">
+              <CardContent className="p-4 flex items-center gap-2 text-destructive">
                 <AlertCircle className="w-5 h-5 shrink-0" />
                 <span className="text-sm">{paymentError}</span>
               </CardContent>
@@ -268,11 +268,11 @@ export default function Checkout() {
 
                 {isConfigured ? (
                   <div className="space-y-4">
-                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
-                      <p className="font-medium text-blue-800 dark:text-blue-400 mb-1">
+                    <div className="bg-primary/10 border border-primary/40 rounded-lg p-4 text-sm">
+                      <p className="font-medium text-foreground mb-1">
                         {t("checkout.securePayment", { defaultValue: "Secure Card Payment" })}
                       </p>
-                      <p className="text-blue-700 dark:text-blue-500">
+                      <p className="text-muted-foreground">
                         {t("checkout.securePaymentDesc", { defaultValue: "Your card information is processed securely through Authorize.net. We never see or store your card details." })}
                       </p>
                     </div>
@@ -356,7 +356,7 @@ export default function Checkout() {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">{t("checkout.cardFeeNote", { defaultValue: "Includes 3% card processing fee" })}</span>
-                      <span className="font-medium text-orange-600">+${surcharge.toFixed(2)}</span>
+                      <span className="font-medium text-muted-foreground">+${surcharge.toFixed(2)}</span>
                     </div>
                     <Button
                       size="lg"
@@ -377,9 +377,15 @@ export default function Checkout() {
                         </>
                       )}
                     </Button>
-                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                      <Lock className="w-3 h-3" />
-                      <span>{t("checkout.secureCheckout", { defaultValue: "Secure checkout via Authorize.net" })}</span>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                        <Lock className="w-3 h-3 text-brand-green" />
+                        <span>{t("checkoutTrust.secure")}</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                        <CreditCard className="w-3 h-3 text-brand-green" />
+                        <span>{t("checkoutTrust.sameDay")}</span>
+                      </div>
                     </div>
                   </div>
                 ) : isDemoMode ? (
@@ -409,7 +415,7 @@ export default function Checkout() {
                   </div>
                 ) : (
                   <div className="space-y-4 text-center py-4">
-                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                    <div className="bg-primary/10 border border-primary/40 rounded-lg p-4">
                       <p className="font-medium text-foreground mb-1">
                         {t("checkout.contactToEnrollTitle", { defaultValue: "Enroll by Phone or Email" })}
                       </p>
@@ -418,7 +424,7 @@ export default function Checkout() {
                       </p>
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                         <a href={`tel:${brand.support.phoneTel}`}>
-                          <Button size="sm" className="bg-accent hover:bg-accent/90 text-white">
+                          <Button size="sm" className="bg-accent text-accent-foreground border-accent-border">
                             <Phone className="w-4 h-4 mr-2" />
                             {brand.support.phone}
                           </Button>
@@ -481,7 +487,7 @@ export default function Checkout() {
                 {isConfigured && surcharge > 0 && (
                   <div className="flex justify-between gap-2">
                     <span className="text-muted-foreground">{t("checkout.cardFee", { defaultValue: "Card processing fee (3%)" })}</span>
-                    <span className="font-medium text-orange-600">${surcharge.toFixed(2)}</span>
+                    <span className="font-medium text-muted-foreground">${surcharge.toFixed(2)}</span>
                   </div>
                 )}
               </div>
