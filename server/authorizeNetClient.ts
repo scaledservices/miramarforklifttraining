@@ -81,7 +81,8 @@ export async function createTransactionFromNonce(
     amount: amount.toFixed(2),
     payment: {
       opaqueData: {
-        dataDescriptor: isCardPayment ? "COMMON.APP.INLINE.PAYMENT" : "COMMON.APP.INLINE.PAYMENT",
+        // Accept.js dispatchData nonces always carry this descriptor.
+        dataDescriptor: "COMMON.ACCEPT.INAPP.PAYMENT",
         dataValue: paymentNonce,
       },
     },
@@ -120,7 +121,7 @@ export async function createTransactionFromNonce(
     const responseCode = txResponse?.responseCode;
     const transId = txResponse?.transId;
 
-    if (responseCode === "1" || responseCode === 4) {
+    if (responseCode === "1" || responseCode === "4") {
       // responseCode 4 = held for review (fraud suspect) — treat as success for now
       return {
         success: true,
@@ -131,7 +132,7 @@ export async function createTransactionFromNonce(
 
     // Handle decline or error
     const message = txResponse?.errors?.[0]?.errorText
-      || data?.messages?.[0]?.description
+      || data?.messages?.message?.[0]?.text
       || `Transaction failed with response code ${responseCode}`;
 
     return {
