@@ -87,7 +87,8 @@ export async function createTransactionFromNonce(
       },
     },
     order: {
-      orderId: orderNumber,
+      // Authorize.net's order element accepts invoiceNumber (max 20 chars), not orderId.
+      invoiceNumber: orderNumber.slice(0, 20),
     },
     customer: {
       type: "individual",
@@ -181,7 +182,7 @@ export async function refundTransaction(
         },
         refTransId: originalTransactionId,
         order: {
-          orderId: String(orderId),
+          invoiceNumber: String(orderId).slice(0, 20),
         },
       },
     },
