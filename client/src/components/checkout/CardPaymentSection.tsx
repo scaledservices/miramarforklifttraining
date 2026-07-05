@@ -27,6 +27,7 @@ interface PaymentConfig {
   demoMode: boolean;
   apiLoginID?: string;
   clientKey?: string;
+  environment?: string;
 }
 
 interface CardPaymentSectionProps {
@@ -47,25 +48,30 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
   const [tokenizing, setTokenizing] = useState(false);
   const [cardForm, setCardForm] = useState({ cardNumber: "", month: "", year: "", cardCode: "", zip: "" });
 
+  const { data: paymentConfig } = useQuery<PaymentConfig>({
+    queryKey: ["/api/payment/config"],
+  });
+  const isConfigured = paymentConfig?.configured ?? false;
+
+  // Sandbox credentials only work with the sandbox Accept.js host — load the
+  // script once the environment is known.
   const [acceptLoaded, setAcceptLoaded] = useState(false);
   useEffect(() => {
-    const existing = document.querySelector('script[src*="Accept.js"]');
+    if (!paymentConfig?.configured) return;
+    const host = paymentConfig.environment === "sandbox" ? "https://jstest.authorize.net" : "https://js.authorize.net";
+    const src = `${host}/v1/Accept.js`;
+    const existing = document.querySelector(`script[src="${src}"]`);
     if (existing) {
       setAcceptLoaded(true);
       return;
     }
     const script = document.createElement("script");
-    script.src = "https://js.authorize.net/v1/Accept.js";
+    script.src = src;
     script.async = true;
     script.charset = "utf-8";
     script.onload = () => setAcceptLoaded(true);
     document.head.appendChild(script);
-  }, []);
-
-  const { data: paymentConfig } = useQuery<PaymentConfig>({
-    queryKey: ["/api/payment/config"],
-  });
-  const isConfigured = paymentConfig?.configured ?? false;
+  }, [paymentConfig?.configured, paymentConfig?.environment]);
 
   function handlePay() {
     setError(null);
