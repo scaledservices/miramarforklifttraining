@@ -105,34 +105,45 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
     }
 
     setTokenizing(true);
-    try {
-      window.Accept!.dispatchData(
-        {
-          cardData: {
-            cardNumber,
-            month: cardForm.month,
-            year: cardForm.year.length === 2 ? `20${cardForm.year}` : cardForm.year,
-            cardCode: cardForm.cardCode,
-            zip: cardForm.zip || undefined,
-          },
-          authData: {
-            apiLoginID: paymentConfig.apiLoginID,
-            clientKey: paymentConfig.clientKey,
-          },
-        },
-        (response: AcceptDispatchResponse) => {
-          setTokenizing(false);
+
+    const secureData = {
+      cardData: {
+        cardNumber,
+        month: cardForm.month,
+        year: cardForm.year.length === 2 ? `20${cardForm.year}` : cardForm.year,
+        cardCode: cardForm.cardCode,
+        zip: cardForm.zip || undefined,
+      },
+      authData: {
+        apiLoginID: paymentConfig.apiLoginID,
+        clientKey: paymentConfig.clientKey,
+      },
+    };
+
+    // Accept.js occasionally reports "not loaded correctly" (E_WC_14) when its
+    // internal frame isn't ready yet — retry once after a short delay.
+    const attempt = (retriesLeft: number) => {
+      try {
+        window.Accept!.dispatchData(secureData, (response: AcceptDispatchResponse) => {
           if (response.messages.resultCode === "Ok") {
+            setTokenizing(false);
             onPay(response.opaqueData.dataValue);
-          } else {
-            setError(response.messages.message?.[0]?.text || t("checkout.paymentFailed", { defaultValue: "Payment authorization failed." }));
+            return;
           }
-        }
-      );
-    } catch (err: any) {
-      setTokenizing(false);
-      setError(err.message || t("checkout.paymentFailed", { defaultValue: "Payment initialization failed" }));
-    }
+          const msg = response.messages.message?.[0]?.text || "";
+          if (retriesLeft > 0 && /not loaded/i.test(msg)) {
+            setTimeout(() => attempt(retriesLeft - 1), 1500);
+            return;
+          }
+          setTokenizing(false);
+          setError(msg || t("checkout.paymentFailed", { defaultValue: "Payment authorization failed." }));
+        });
+      } catch (err: any) {
+        setTokenizing(false);
+        setError(err.message || t("checkout.paymentFailed", { defaultValue: "Payment initialization failed" }));
+      }
+    };
+    attempt(2);
   }
 
   const busy = pending || tokenizing;
