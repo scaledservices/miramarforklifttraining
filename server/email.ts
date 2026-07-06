@@ -1444,3 +1444,70 @@ export async function sendBalanceReminderEmail(params: {
     `),
   });
 }
+
+export async function sendRecertReminderEmail(params: {
+  to: string;
+  certHolderName: string;
+  certificateNumber: string;
+  courseName: string;
+  expiresAt: Date; // expiry date from certifications.expires_at
+  certId: number;
+  reminderDay: number; // days before expiry (90 / 60 / 30)
+  locale?: string;
+}) {
+  const baseUrl = getSiteUrl();
+  const loc = params.locale || "en";
+  const es = loc === "es";
+  const _ = (key: string) => emailT(loc, "recertReminder", key);
+  // Renewal page is the primary rebook destination for expiring certs.
+  const renewUrl = `${baseUrl}${es ? "/es" : "/en"}/renewal`;
+  const expiryDateDisplay = (() => {
+    try {
+      return new Date(params.expiresAt).toLocaleDateString(es ? "es-US" : "en-US", {
+        year: "numeric", month: "long", day: "numeric",
+      });
+    } catch {
+      return params.expiresAt.toISOString().split("T")[0];
+    }
+  })();
+
+  return sendEmail({
+    to: params.to,
+    subject: _("subject").replace("{{days}}", String(params.reminderDay)),
+    // The template key + payload below are the dedupe source of truth for the
+    // recert-reminders job (server/jobs/recert-reminders.ts): it checks the
+    // email_outbox table for a row with this template, certId and
+    // reminderDay before sending. Do not remove these payload fields.
+    template: "recert_reminder",
+    payload: {
+      certId: params.certId,
+      certificateNumber: params.certificateNumber,
+      reminderDay: params.reminderDay,
+      expiresAt: params.expiresAt.toISOString(),
+    },
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
+      <p>${_("greeting").replace("{{certHolderName}}", params.certHolderName)}</p>
+      <p>${_("body").replace("{{brandName}}", brand.name).replace("{{regulatory}}", industry.regulatory.body)}</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 0 0 24px;">
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("certificateNumber")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${params.certificateNumber}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("courseName")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${params.courseName}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("expiryDate")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${expiryDateDisplay}</strong></td>
+        </tr>
+      </table>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${renewUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+      </div>
+      <p>${_("renewNote")}</p>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer").replace("{{phone}}", brand.support.phone)}</p>
+    `),
+  });
+}
