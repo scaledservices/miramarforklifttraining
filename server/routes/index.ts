@@ -22,7 +22,9 @@ import { registerAuthorizeNetRoutes } from "./authorizeNet";
 import { registerTodayRoutes } from "./today";
 import { registerMoneyRoutes } from "./money";
 import { registerDiscountRoutes } from "./discounts";
+import { registerReferralRoutes } from "./referrals";
 import { registerGeoRoutes } from "./geo";
+import { registerAuditBinderRoutes } from "./audit-binder";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -70,7 +72,9 @@ export async function registerRoutes(
   registerTodayRoutes(app);
   registerMoneyRoutes(app);
   registerDiscountRoutes(app);
+  registerReferralRoutes(app);
   registerGeoRoutes(app);
+  registerAuditBinderRoutes(app);
 
   return httpServer;
 }

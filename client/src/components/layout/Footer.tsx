@@ -44,6 +44,7 @@ export default function Footer() {
               <li><Link href="/osha-compliance" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-osha">{t("footer.oshaCompliance")}</Link></li>
               <li><Link href="/verify" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-verification">{t("footer.verifyCertification")}</Link></li>
               <li><Link href="/osha-forklift-training" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-osha-training">{t("footer.oshaTrainingGuide")}</Link></li>
+              <li><Link href="/referral" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-referral">{t("footer.referralProgram")}</Link></li>
             </ul>
           </div>
 

@@ -64,6 +64,7 @@ import LanguageBanner from "@/components/LanguageBanner";
 import { useLocaleLocation } from "@/hooks/useLocaleLocation";
 import { DEFAULT_LOCALE, getStoredLocale } from "@/lib/locale";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ReferralProgram from "@/pages/ReferralProgram";
 
 // Route-level code splitting: admin, group, and LMS pages load on demand.
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -106,6 +107,7 @@ const AdminInstructorApplications = lazy(() => import("@/pages/admin/AdminInstru
 const AdminInstructorApplicationDetail = lazy(() => import("@/pages/admin/AdminInstructorApplicationDetail"));
 const AdminInstructors = lazy(() => import("@/pages/admin/AdminInstructors"));
 const AdminInstructorDetail = lazy(() => import("@/pages/admin/AdminInstructorDetail"));
+const AuditBinder = lazy(() => import("@/pages/AuditBinder"));
 
 function HydrationReveal() {
   useEffect(() => {
@@ -189,6 +191,7 @@ function AppRoutes() {
       <Route path="/accept-invite" component={AcceptInvite} />
       <Route path="/become-an-instructor">{() => <ProtectedRoute><BecomeAnInstructor /></ProtectedRoute>}</Route>
       <Route path="/dashboard">{() => <ProtectedRoute><Dashboard /></ProtectedRoute>}</Route>
+      <Route path="/referral">{() => <ProtectedRoute><ReferralProgram /></ProtectedRoute>}</Route>
       <Route path="/course/:enrollmentId">{() => <ProtectedRoute><CoursePlayer /></ProtectedRoute>}</Route>
       <Route path="/certifications/:id">{() => <ProtectedRoute><Certification /></ProtectedRoute>}</Route>
       <Route path="/pay-balance/:bookingId" component={PayBalance} />

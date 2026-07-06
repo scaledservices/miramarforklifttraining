@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Clock, PlayCircle, Award, GraduationCap } from "lucide-react";
+import { BookOpen, Clock, PlayCircle, Award, GraduationCap, Gift } from "lucide-react";
 import { Redirect } from "wouter";
 
 interface EnrollmentWithCourse {
@@ -63,6 +63,20 @@ export default function Dashboard() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Referral banner */}
+        <Link href="/referral" className="mb-6 block">
+          <div className="flex items-center gap-4 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-4 transition-colors hover:bg-primary/10">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 shrink-0">
+              <Gift className="h-6 w-6 text-primary" />
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-foreground">{t("referral.dashboardCtaTitle")}</p>
+              <p className="text-sm text-muted-foreground">{t("referral.dashboardCtaDesc")}</p>
+            </div>
+            <span className="text-sm font-medium text-primary shrink-0 hidden sm:block">{t("referral.dashboardCtaLink")} &rarr;</span>
+          </div>
+        </Link>
+
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (

@@ -872,6 +872,44 @@ export type InsertDiscountRedemption = z.infer<typeof insertDiscountRedemptionSc
 export type DiscountCode = typeof discountCodes.$inferSelect;
 export type DiscountRedemption = typeof discountRedemptions.$inferSelect;
 
+// ---------------------------------------------------------------------------
+// Referral program — built on top of the discount code infrastructure.
+// Each referral code is linked 1:1 to a discount code so the existing
+// validateDiscountCode / recordDiscountRedemption helpers work unchanged.
+// ---------------------------------------------------------------------------
+
+export const referralCodes = pgTable("referral_codes", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  code: text("code").notNull().unique(),
+  discountCodeId: integer("discount_code_id").notNull().references(() => discountCodes.id),
+  referredBy: integer("referred_by").references(() => referralCodes.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("referral_codes_user_id_idx").on(table.userId),
+]);
+
+export const referralRedemptions = pgTable("referral_redemptions", {
+  id: serial("id").primaryKey(),
+  referralCodeId: integer("referral_code_id").notNull().references(() => referralCodes.id),
+  referredUserId: integer("referred_user_id").references(() => users.id),
+  orderId: integer("order_id").references(() => orders.id),
+  bookingId: integer("booking_id").references(() => bookings.id),
+  discountCodeId: integer("discount_code_id").references(() => discountCodes.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("referral_redemptions_referral_code_id_idx").on(table.referralCodeId),
+  index("referral_redemptions_referred_user_id_idx").on(table.referredUserId),
+]);
+
+export const insertReferralCodeSchema = createInsertSchema(referralCodes).omit({ id: true, createdAt: true });
+export const insertReferralRedemptionSchema = createInsertSchema(referralRedemptions).omit({ id: true, createdAt: true });
+
+export type InsertReferralCode = z.infer<typeof insertReferralCodeSchema>;
+export type InsertReferralRedemption = z.infer<typeof insertReferralRedemptionSchema>;
+export type ReferralCode = typeof referralCodes.$inferSelect;
+export type ReferralRedemption = typeof referralRedemptions.$inferSelect;
+
 export const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
