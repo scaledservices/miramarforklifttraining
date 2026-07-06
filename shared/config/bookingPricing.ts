@@ -23,6 +23,48 @@ export const BOOKING_PRODUCT_PRICES: Record<string, number> = {
   "standard-forklift-certification-fresno": 280,
 };
 
+// ── Booking add-on upsell catalog ─────────────────────────────────
+// Keyed by BASE product slug. Each entry lists compatible add-on products
+// offered as an opt-in upsell during the self-serve booking flow. Add-on
+// slugs MUST exist in BOOKING_PRODUCT_PRICES above — the per-person price is
+// always looked up there, never duplicated here. Fresno intentionally has no
+// entry: it only offers standard forklift certification.
+export interface BookingAddon {
+  slug: string;
+  name: string;
+}
+
+export const BOOKING_ADDONS: Record<string, BookingAddon[]> = {
+  "standard-forklift-certification-san-diego": [
+    {
+      slug: "scissor-aerial-boom-lift-certification-san-diego",
+      name: "Standard Scissor & Aerial/Boom Lift Certification",
+    },
+  ],
+  "standard-forklift-certification-las-vegas": [
+    {
+      slug: "scissor-aerial-boom-lift-certification-las-vegas",
+      name: "Standard Scissor & Aerial/Boom Lift Certification",
+    },
+  ],
+};
+
+// Add-ons compatible with the given selected base slugs, deduped. Add-ons the
+// customer already selected are still returned so the UI can render them in a
+// checked state (toggling off removes them).
+export function getAddonsForProducts(selectedSlugs: string[]): BookingAddon[] {
+  const seen = new Set<string>();
+  const out: BookingAddon[] = [];
+  for (const slug of selectedSlugs) {
+    for (const addon of BOOKING_ADDONS[slug] ?? []) {
+      if (seen.has(addon.slug)) continue;
+      seen.add(addon.slug);
+      out.push(addon);
+    }
+  }
+  return out;
+}
+
 // Automated volume discount advertised sitewide ("volume discounts for 5+").
 export const VOLUME_DISCOUNT_MIN_PARTICIPANTS = 5;
 export const VOLUME_DISCOUNT_RATE = 0.10;

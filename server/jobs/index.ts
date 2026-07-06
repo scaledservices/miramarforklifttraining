@@ -1,6 +1,7 @@
 import { JOB_SCHEDULER_INTERVAL_MS } from "../constants";
 import { runAbandonedCheckoutJob } from "./abandoned-checkout";
 import { runWebhookRetryJob } from "./webhook-retry";
+import { runBalanceRemindersJob } from "./balance-reminders";
 import { db } from "../db";
 import { sql } from "drizzle-orm";
 import crypto from "crypto";
@@ -38,6 +39,7 @@ async function runWithLock(jobName: string, fn: () => Promise<void>): Promise<vo
 async function runAllJobs() {
   await runWithLock("abandoned_checkout", runAbandonedCheckoutJob);
   await runWithLock("webhook_retry", runWebhookRetryJob);
+  await runWithLock("balance_reminders", runBalanceRemindersJob);
 }
 
 export function startJobScheduler() {

@@ -2,8 +2,9 @@ import type { Express, Request, Response } from "express";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
-import { platformSettings } from "@shared/schema";
+import { platformSettings, orders as ordersTable, type DiscountCode } from "@shared/schema";
 import { isAdminRole } from "@shared/roles";
+import { validateDiscountCode, computeDiscountAmount, recordDiscountRedemption } from "./discounts";
 import {
   isAuthorizeNetConfigured,
   getAuthorizeNetClientKey,
@@ -56,7 +57,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
    */
   app.post("/api/authorize-net/charge", requireAuth, payLimiter, async (req: Request, res: Response) => {
     try {
-      const { items, refundPolicyAccepted, isTeamPurchase, locale, paymentNonce, isCardPayment } = req.body;
+      const { items, refundPolicyAccepted, isTeamPurchase, locale, paymentNonce, isCardPayment, discountCode } = req.body;
       const userId = req.session.userId!;
 
       if (!items || !Array.isArray(items) || items.length === 0) {
@@ -67,6 +68,16 @@ export function registerAuthorizeNetRoutes(app: Express) {
         return res.status(400).json({ error: "You must accept the refund policy" });
       }
 
+      // Re-validate any discount code server-side (never trust the client).
+      let discount: DiscountCode | null = null;
+      if (discountCode) {
+        const validation = await validateDiscountCode(String(discountCode));
+        if (!validation.valid) {
+          return res.status(400).json({ error: `Discount code ${String(discountCode).toUpperCase()} is not valid: ${validation.reason}` });
+        }
+        discount = validation.code;
+      }
+
       // Demo mode fallback (dev/staging only)
       if (!isAuthorizeNetConfigured()) {
         if (process.env.DEMO_MODE === "true" && process.env.NODE_ENV !== "production") {
@@ -74,19 +85,27 @@ export function registerAuthorizeNetRoutes(app: Express) {
           const orderRes = await buildOrder(items, req.session.userId!, isTeamPurchase, locale);
           const order = orderRes.order;
 
+          // Apply discount (server-computed) to the demo order
+          const demoDiscount = await applyDiscountToOrder(discount, order.id, orderRes.total);
+          const demoTotal = demoDiscount.discountedTotal;
+
           // Record a demo payment
           const { payments: paymentsTable } = await import("@shared/schema");
           await db.insert(paymentsTable).values({
             orderId: order.id,
             provider: "authorize_net",
             providerTransactionId: `demo-${Date.now()}`,
-            amount: String(orderRes.total),
+            amount: String(demoTotal),
             status: "approved",
           });
 
           await storage.updateOrderStatus(order.id, "paid");
 
-          await postPaymentProcessing(order.id, req.session.userId!, `demo-${Date.now()}`, orderRes.total, isTeamPurchase);
+          if (discount && demoDiscount.discountAmount > 0) {
+            await recordDiscountRedemption({ codeId: discount.id, orderId: order.id, amountDiscounted: demoDiscount.discountAmount });
+          }
+
+          await postPaymentProcessing(order.id, req.session.userId!, `demo-${Date.now()}`, demoTotal, isTeamPurchase);
 
           return res.json({
             success: true,
@@ -109,7 +128,10 @@ export function registerAuthorizeNetRoutes(app: Express) {
       // Build the order
       const orderRes = await buildOrder(items, req.session.userId!, isTeamPurchase, locale);
       const order = orderRes.order;
-      let total = orderRes.total;
+
+      // Apply discount (server-computed) before surcharge
+      const discountResult = await applyDiscountToOrder(discount, order.id, orderRes.total);
+      let total = discountResult.discountedTotal;
 
       // Add 3% card surcharge if card payment
       let surcharge = 0;
@@ -147,6 +169,11 @@ export function registerAuthorizeNetRoutes(app: Express) {
 
       await storage.updateOrderStatus(order.id, "paid");
 
+      // Record the discount redemption now that the charge succeeded
+      if (discount && discountResult.discountAmount > 0) {
+        await recordDiscountRedemption({ codeId: discount.id, orderId: order.id, amountDiscounted: discountResult.discountAmount });
+      }
+
       // Post-payment processing (earnings split, emails, audit log)
       await postPaymentProcessing(order.id, req.session.userId!, result.transactionId!, total, isTeamPurchase);
 
@@ -156,6 +183,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
         orderNumber: order.orderNumber,
         transactionId: result.transactionId,
         surcharge: surcharge > 0 ? surcharge : undefined,
+        discountAmount: discountResult.discountAmount > 0 ? discountResult.discountAmount : undefined,
       });
     } catch (error: any) {
       console.error("[AuthorizeNet] Charge error:", error);
@@ -229,6 +257,26 @@ export function registerAuthorizeNetRoutes(app: Express) {
       return res.status(500).json({ error: "Internal server error" });
     }
   });
+}
+
+/**
+ * Apply a validated discount code to a freshly built order: computes the
+ * server-side discount amount (fixed discounts never take the total below $0,
+ * percent is capped at 100), and updates the stored order total so receipts
+ * and reporting reflect what was actually charged.
+ */
+async function applyDiscountToOrder(
+  discount: DiscountCode | null,
+  orderId: number,
+  subtotal: number
+): Promise<{ discountedTotal: number; discountAmount: number }> {
+  if (!discount) return { discountedTotal: subtotal, discountAmount: 0 };
+  const discountAmount = computeDiscountAmount(discount, subtotal);
+  const discountedTotal = Number(Math.max(0, subtotal - discountAmount).toFixed(2));
+  if (discountAmount > 0) {
+    await db.update(ordersTable).set({ total: String(discountedTotal) }).where(eq(ordersTable.id, orderId));
+  }
+  return { discountedTotal, discountAmount };
 }
 
 /**

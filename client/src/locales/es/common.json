@@ -746,7 +746,24 @@
     "lookupDesc": "Ingrese el número de certificado impreso en el certificado o en la tarjeta para confirmar que es válido y vigente.",
     "lookupPlaceholder": "ej. MFT-2026-000123",
     "lookupButton": "Verificar",
-    "lookupHint": "El número de certificado aparece debajo del nombre del titular en el certificado y la tarjeta."
+    "lookupHint": "El número de certificado aparece debajo del nombre del titular en el certificado y la tarjeta.",
+    "recert": {
+      "expiresSoonTitle": "Esta certificación vence el {{date}}",
+      "expiredTitle": "Esta certificación venció el {{date}}",
+      "desc": "OSHA requiere que los operadores de montacargas sean reevaluados cada 3 años. Reserva una clase de recertificación ahora para mantenerte en cumplimiento — certificación el mismo día disponible.",
+      "bookCta": "Reservar Recertificación",
+      "contactCta": "Contáctanos",
+      "reminderTitle": "Recibe un recordatorio / permítenos llamarte",
+      "reminderName": "Nombre (opcional)",
+      "reminderPhone": "Teléfono",
+      "reminderEmail": "Correo electrónico",
+      "reminderHint": "Ingresa un número de teléfono o correo electrónico y te contactaremos sobre la recertificación.",
+      "reminderContactRequired": "Por favor ingresa un número de teléfono o correo electrónico para poder contactarte.",
+      "reminderSubmit": "Solicitar Seguimiento",
+      "reminderSubmitting": "Enviando...",
+      "reminderSuccess": "¡Gracias! Recibimos tu solicitud y te contactaremos sobre la recertificación.",
+      "reminderError": "Algo salió mal. Por favor intenta de nuevo o llámanos al (858) 901-0149."
+    }
   },
   "certification": {
     "notFoundTitle": "Certificación No Encontrada",
@@ -1700,6 +1717,10 @@
     "selectTrainingDesc": "Seleccione uno o más programas de capacitación y/o tipos de equipo para los que necesita certificación.",
     "perPerson": "por persona",
     "orSelectEquipment": "O seleccione tipos de equipo para una cotización personalizada",
+    "addonsTitle": "Ahorre tiempo: agregue otra certificación",
+    "addonsDesc": "Certifique a su equipo en más maquinaria durante la misma visita. Los complementos se cobran por persona y se incluyen en su depósito.",
+    "addonAdd": "Agregar a la reserva",
+    "addonAdded": "Agregado a su reserva",
     "chooseDateTime": "Elegir Fecha y Hora",
     "chooseDateTimeDesc": "Seleccione una fecha y horario disponible para su sesión de capacitación.",
     "available": "Disponible",

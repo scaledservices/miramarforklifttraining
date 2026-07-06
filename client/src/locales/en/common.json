@@ -746,7 +746,24 @@
     "lookupDesc": "Enter the certificate number printed on the certificate or wallet card to confirm it is valid and current.",
     "lookupPlaceholder": "e.g. MFT-2026-000123",
     "lookupButton": "Verify",
-    "lookupHint": "The certificate number appears below the holder's name on the certificate and card."
+    "lookupHint": "The certificate number appears below the holder's name on the certificate and card.",
+    "recert": {
+      "expiresSoonTitle": "This certification expires on {{date}}",
+      "expiredTitle": "This certification expired on {{date}}",
+      "desc": "OSHA requires forklift operators to be re-evaluated every 3 years. Book a recertification class now to stay compliant — same-day certification available.",
+      "bookCta": "Book Recertification",
+      "contactCta": "Contact Us",
+      "reminderTitle": "Get a reminder / have us call you",
+      "reminderName": "Name (optional)",
+      "reminderPhone": "Phone",
+      "reminderEmail": "Email",
+      "reminderHint": "Enter a phone number or email and we will follow up about recertification.",
+      "reminderContactRequired": "Please enter a phone number or email so we can reach you.",
+      "reminderSubmit": "Request a Follow-Up",
+      "reminderSubmitting": "Sending...",
+      "reminderSuccess": "Thanks! We received your request and will reach out about recertification.",
+      "reminderError": "Something went wrong. Please try again or call us at (858) 901-0149."
+    }
   },
   "certification": {
     "notFoundTitle": "Certification Not Found",
@@ -1700,6 +1717,10 @@
     "selectTrainingDesc": "Select one or more training programs and/or equipment types you need certification for.",
     "perPerson": "per person",
     "orSelectEquipment": "Or select equipment types for a custom quote",
+    "addonsTitle": "Save time: add another certification",
+    "addonsDesc": "Certify your crew on more equipment during the same visit. Add-ons are priced per person and included in your deposit.",
+    "addonAdd": "Add to booking",
+    "addonAdded": "Added to your booking",
     "chooseDateTime": "Choose Date & Time",
     "chooseDateTimeDesc": "Select an available date and time slot for your training session.",
     "available": "Available",

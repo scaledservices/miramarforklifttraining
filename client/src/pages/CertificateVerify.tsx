@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, useLocation } from "wouter";
+import { useParams, useLocation, Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
   AlertTriangle,
   BookOpen,
 } from "lucide-react";
-import { getQueryFn } from "@/lib/queryClient";
+import { getQueryFn, apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
 
 interface VerifyResponse {
@@ -28,6 +28,136 @@ interface VerifyResponse {
   issuedAt: string;
   expiresAt: string | null;
   status: string;
+}
+
+function RecertCallout({
+  certificateNumber,
+  expiresAt,
+  isExpired,
+}: {
+  certificateNumber: string;
+  expiresAt: Date;
+  isExpired: boolean;
+}) {
+  const { t, i18n } = useTranslation();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
+
+  const expiryDate = expiresAt.toLocaleDateString(i18n.language === "es" ? "es-US" : "en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError(null);
+    if (!phone.trim() && !email.trim()) {
+      setFormError(t("certVerify.recert.reminderContactRequired"));
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await apiRequest("POST", "/api/certs/recert-interest", {
+        name: name.trim() || undefined,
+        phone: phone.trim() || undefined,
+        email: email.trim() || undefined,
+        certificateNumber,
+      });
+      setSubmitted(true);
+    } catch {
+      setFormError(t("certVerify.recert.reminderError"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Card
+      className="border-2 border-[#FFC326] bg-[#FFC326]/10 overflow-hidden"
+      data-testid="card-recert-callout"
+    >
+      <div className="h-1.5 bg-[#FFC326]" />
+      <CardContent className="py-6 space-y-5">
+        <div className="flex items-start gap-3">
+          <div className="h-10 w-10 shrink-0 rounded-full bg-[#FFC326] flex items-center justify-center">
+            <AlertTriangle className="h-5 w-5 text-black" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold" data-testid="text-recert-title">
+              {isExpired
+                ? t("certVerify.recert.expiredTitle", { date: expiryDate })
+                : t("certVerify.recert.expiresSoonTitle", { date: expiryDate })}
+            </h2>
+            <p className="text-sm text-muted-foreground">{t("certVerify.recert.desc")}</p>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
+            asChild
+            className="flex-1 bg-[#FFC326] text-black font-semibold border-[#FFC326] hover:bg-[#FFC326]/90"
+            data-testid="button-recert-book"
+          >
+            <Link href="/book-training">{t("certVerify.recert.bookCta")}</Link>
+          </Button>
+          <Button asChild variant="outline" className="flex-1" data-testid="button-recert-contact">
+            <Link href="/contact">{t("certVerify.recert.contactCta")}</Link>
+          </Button>
+        </div>
+
+        <div className="border-t border-[#FFC326]/40 pt-4">
+          {submitted ? (
+            <p className="text-sm font-medium text-green-700 dark:text-green-400" data-testid="text-recert-success">
+              {t("certVerify.recert.reminderSuccess")}
+            </p>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-3" data-testid="form-recert-interest">
+              <p className="text-sm font-semibold">{t("certVerify.recert.reminderTitle")}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t("certVerify.recert.reminderName")}
+                  autoComplete="name"
+                  data-testid="input-recert-name"
+                />
+                <Input
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  type="tel"
+                  placeholder={t("certVerify.recert.reminderPhone")}
+                  autoComplete="tel"
+                  data-testid="input-recert-phone"
+                />
+                <Input
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  type="email"
+                  placeholder={t("certVerify.recert.reminderEmail")}
+                  autoComplete="email"
+                  data-testid="input-recert-email"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">{t("certVerify.recert.reminderHint")}</p>
+              {formError && (
+                <p className="text-sm text-red-600 dark:text-red-400" data-testid="text-recert-error">
+                  {formError}
+                </p>
+              )}
+              <Button type="submit" variant="outline" size="sm" disabled={submitting} data-testid="button-recert-submit">
+                {submitting ? t("certVerify.recert.reminderSubmitting") : t("certVerify.recert.reminderSubmit")}
+              </Button>
+            </form>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function CertificateVerify() {
@@ -116,6 +246,13 @@ export default function CertificateVerify() {
 
   const isValid = data.valid;
   const isRevoked = data.status === "revoked";
+
+  const expiresAtDate = data.expiresAt ? new Date(data.expiresAt) : null;
+  const daysToExpiry = expiresAtDate
+    ? Math.ceil((expiresAtDate.getTime() - Date.now()) / 86_400_000)
+    : null;
+  const showRecertCallout = !isRevoked && daysToExpiry !== null && daysToExpiry <= 90;
+  const isExpired = daysToExpiry !== null && daysToExpiry < 0;
 
   return (
     <>{seoHead}<div className="max-w-xl mx-auto px-4 py-16 space-y-8" data-testid="page-verify">
@@ -209,6 +346,14 @@ export default function CertificateVerify() {
           </div>
         </CardContent>
       </Card>
+
+      {showRecertCallout && expiresAtDate && (
+        <RecertCallout
+          certificateNumber={data.certificateNumber}
+          expiresAt={expiresAtDate}
+          isExpired={isExpired}
+        />
+      )}
 
       <div className="text-center text-xs text-muted-foreground space-y-1">
         <p>{t("certVerify.verificationProvidedBy", { domain: brand.domain })}</p>

@@ -29,7 +29,9 @@ import {
   CalendarClock,
   UserX,
   Loader2,
+  QrCode,
 } from "lucide-react";
+import PayLinkQRDialog from "@/components/admin/PayLinkQRDialog";
 import type { Booking, ServiceArea } from "@shared/schema";
 
 const statusColors: Record<string, string> = {
@@ -74,6 +76,7 @@ export default function AdminBookings() {
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [rescheduleForm, setRescheduleForm] = useState({ sessionDate: "", startTime: "", endTime: "" });
   const [completePromptOpen, setCompletePromptOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
   const { toast } = useToast();
 
   const { data: bookings, isLoading } = useQuery<Booking[]>({
@@ -505,14 +508,18 @@ export default function AdminBookings() {
                         </span>
                       </div>
                       {finance.balanceDue > 0.01 && (
-                        <div className="flex gap-2 pt-2">
-                          <Button size="sm" className="flex-1 bg-accent text-accent-foreground border-accent-border" onClick={() => { setRecordForm((f) => ({ ...f, amount: finance.balanceDue.toFixed(2) })); setRecordOpen(true); }} data-testid="button-record-balance">
+                        <div className="grid grid-cols-2 gap-2 pt-2">
+                          <Button size="sm" className="bg-accent text-accent-foreground border-accent-border" onClick={() => { setRecordForm((f) => ({ ...f, amount: finance.balanceDue.toFixed(2) })); setRecordOpen(true); }} data-testid="button-record-balance">
                             <DollarSign className="h-4 w-4 mr-1" />
                             Record Payment
                           </Button>
-                          <Button size="sm" variant="outline" className="flex-1" onClick={() => sendLinkMutation.mutate()} disabled={sendLinkMutation.isPending} data-testid="button-send-pay-link">
+                          <Button size="sm" variant="outline" onClick={() => sendLinkMutation.mutate()} disabled={sendLinkMutation.isPending} data-testid="button-send-pay-link">
                             {sendLinkMutation.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Send className="h-4 w-4 mr-1" />}
                             Email Pay Link
+                          </Button>
+                          <Button size="sm" variant="outline" className="col-span-2" onClick={() => setQrOpen(true)} data-testid="button-show-qr">
+                            <QrCode className="h-4 w-4 mr-1" />
+                            Show QR for Customer to Scan and Pay
                           </Button>
                         </div>
                       )}
@@ -751,6 +758,10 @@ export default function AdminBookings() {
                   <DollarSign className="h-4 w-4 mr-1" />
                   Record payment now
                 </Button>
+                <Button variant="outline" onClick={() => { setCompletePromptOpen(false); setQrOpen(true); }} data-testid="button-show-qr-first">
+                  <QrCode className="h-4 w-4 mr-1" />
+                  Show QR so they can pay now
+                </Button>
                 <Button variant="outline" onClick={() => sendLinkMutation.mutate()} disabled={sendLinkMutation.isPending} data-testid="button-email-link-first">
                   <Send className="h-4 w-4 mr-1" />
                   Email customer a pay link
@@ -767,6 +778,17 @@ export default function AdminBookings() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Pay-balance QR code (customer scans on their own phone) */}
+        {selectedBooking && finance && (
+          <PayLinkQRDialog
+            open={qrOpen}
+            onOpenChange={setQrOpen}
+            bookingId={selectedBooking.id}
+            customerName={selectedBooking.contactName}
+            amountDue={finance.balanceDue}
+          />
+        )}
       </div>
     </AdminLayout>
   );

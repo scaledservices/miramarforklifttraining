@@ -835,6 +835,43 @@ export const insertQuoteSchema = createInsertSchema(quotes).omit({ id: true, sta
 export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 export type Quote = typeof quotes.$inferSelect;
 
+export const discountCodes = pgTable("discount_codes", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  description: text("description"),
+  discountType: text("discount_type", { enum: ["percent", "fixed"] }).notNull(),
+  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  active: boolean("active").notNull().default(true),
+  maxRedemptions: integer("max_redemptions"),
+  startsAt: timestamp("starts_at"),
+  endsAt: timestamp("ends_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  check("discount_codes_amount_check", sql`${table.amount} >= 0`),
+]);
+
+export const discountRedemptions = pgTable("discount_redemptions", {
+  id: serial("id").primaryKey(),
+  codeId: integer("code_id").notNull().references(() => discountCodes.id),
+  orderId: integer("order_id").references(() => orders.id),
+  bookingId: integer("booking_id").references(() => bookings.id),
+  amountDiscounted: numeric("amount_discounted", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("discount_redemptions_code_id_idx").on(table.codeId),
+  index("discount_redemptions_order_id_idx").on(table.orderId),
+  index("discount_redemptions_booking_id_idx").on(table.bookingId),
+]);
+
+export const insertDiscountCodeSchema = createInsertSchema(discountCodes).omit({ id: true, createdAt: true });
+export const insertDiscountRedemptionSchema = createInsertSchema(discountRedemptions).omit({ id: true, createdAt: true });
+
+export type InsertDiscountCode = z.infer<typeof insertDiscountCodeSchema>;
+export type InsertDiscountRedemption = z.infer<typeof insertDiscountRedemptionSchema>;
+
+export type DiscountCode = typeof discountCodes.$inferSelect;
+export type DiscountRedemption = typeof discountRedemptions.$inferSelect;
+
 export const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),

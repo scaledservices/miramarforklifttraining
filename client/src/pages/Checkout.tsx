@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ShoppingCart, ArrowLeft, AlertCircle, Loader2, CreditCard, Lock, Phone, Mail } from "lucide-react";
+import { ShoppingCart, ArrowLeft, AlertCircle, Loader2, CreditCard, Lock, Phone, Mail, Tag, X } from "lucide-react";
 import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
 import { useTranslation } from "react-i18next";
 import { brand } from "@shared/config/brand";
@@ -24,6 +24,20 @@ interface PaymentConfig {
   apiLoginID?: string;
   environment?: string;
   demoMode?: boolean;
+}
+
+interface AppliedDiscount {
+  code: string;
+  discountType: "percent" | "fixed";
+  amount: number;
+}
+
+interface DiscountValidateResponse {
+  valid: boolean;
+  code?: string;
+  discountType?: "percent" | "fixed";
+  amount?: number;
+  reason?: string;
 }
 
 // Authorize.net Accept.js (v1) integration — uses Accept.dispatchData to send
@@ -79,6 +93,9 @@ export default function Checkout() {
     cardCode: "",
     zip: "",
   });
+  const [discountInput, setDiscountInput] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
+  const [discountError, setDiscountError] = useState<string | null>(null);
 
   const { data: paymentConfig } = useQuery<PaymentConfig>({
     queryKey: ["/api/payment/config"],
@@ -107,9 +124,72 @@ export default function Checkout() {
   const isConfigured = paymentConfig?.configured ?? false;
   const isDemoMode = paymentConfig?.demoMode ?? false;
 
-  // Calculate 3% card surcharge
-  const surcharge = isConfigured ? Number((totalPrice * 0.03).toFixed(2)) : 0;
-  const totalWithSurcharge = Number((totalPrice + surcharge).toFixed(2));
+  // Discount code validation (server is the source of truth; this only
+  // previews the reduced total — the server re-validates and re-computes
+  // before charging).
+  const validateDiscountMutation = useMutation({
+    mutationFn: async (code: string) => {
+      const res = await apiRequest("POST", "/api/discount-codes/validate", { code });
+      return res.json() as Promise<DiscountValidateResponse>;
+    },
+    onSuccess: (data, submittedCode) => {
+      if (data.valid && data.discountType && typeof data.amount === "number") {
+        setAppliedDiscount({
+          code: data.code || submittedCode.trim().toUpperCase(),
+          discountType: data.discountType,
+          amount: data.amount,
+        });
+        setDiscountError(null);
+      } else {
+        setAppliedDiscount(null);
+        setDiscountError(data.reason || t("checkout.discountInvalid", { defaultValue: "This code is not valid." }));
+      }
+    },
+    onError: () => {
+      setDiscountError(t("checkout.discountCheckFailed", { defaultValue: "Could not check the code. Please try again." }));
+    },
+  });
+
+  function handleApplyDiscount(code?: string) {
+    const value = (code ?? discountInput).trim();
+    if (!value) return;
+    setDiscountError(null);
+    validateDiscountMutation.mutate(value);
+  }
+
+  function handleRemoveDiscount() {
+    setAppliedDiscount(null);
+    setDiscountInput("");
+    setDiscountError(null);
+  }
+
+  // Support ?code=CODE links (e.g. from Alberto's flyers/QR codes)
+  useEffect(() => {
+    const codeParam = new URLSearchParams(window.location.search).get("code");
+    if (codeParam) {
+      setDiscountInput(codeParam.toUpperCase());
+      handleApplyDiscount(codeParam);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Discounted subtotal: percent capped at 100, fixed never below $0
+  // (mirrors server-side math in server/routes/discounts.ts)
+  const discountAmount = appliedDiscount
+    ? Number(
+        Math.min(
+          appliedDiscount.discountType === "percent"
+            ? totalPrice * (Math.min(Math.max(appliedDiscount.amount, 0), 100) / 100)
+            : Math.max(appliedDiscount.amount, 0),
+          totalPrice
+        ).toFixed(2)
+      )
+    : 0;
+  const discountedSubtotal = Number(Math.max(0, totalPrice - discountAmount).toFixed(2));
+
+  // Calculate 3% card surcharge (on the discounted subtotal)
+  const surcharge = isConfigured ? Number((discountedSubtotal * 0.03).toFixed(2)) : 0;
+  const totalWithSurcharge = Number((discountedSubtotal + surcharge).toFixed(2));
 
   useEffect(() => {
     if (items.length > 0) trackCheckoutContact();
@@ -124,6 +204,9 @@ export default function Checkout() {
         locale: i18n.language?.startsWith("es") ? "es" : "en",
         isCardPayment: data.isCardPayment,
       };
+      if (appliedDiscount) {
+        payload.discountCode = appliedDiscount.code;
+      }
       if (data.paymentNonce) {
         payload.paymentNonce = data.paymentNonce;
       }
@@ -413,7 +496,7 @@ export default function Checkout() {
                           {t("checkout.processing")}
                         </>
                       ) : (
-                        t("checkout.payAmountDemo", { amount: totalPrice.toFixed(2), defaultValue: `Pay $${totalPrice.toFixed(2)} (Demo)` })
+                        t("checkout.payAmountDemo", { amount: discountedSubtotal.toFixed(2), defaultValue: `Pay $${discountedSubtotal.toFixed(2)} (Demo)` })
                       )}
                     </Button>
                   </div>
@@ -483,11 +566,81 @@ export default function Checkout() {
                 ))}
               </div>
               <Separator className="my-4" />
+
+              {/* Discount code */}
+              <div className="space-y-2 mb-4">
+                {appliedDiscount ? (
+                  <div className="flex items-center justify-between gap-2 bg-brand-green/10 border border-brand-green/30 rounded-md px-3 py-2">
+                    <div className="flex items-center gap-2 text-sm min-w-0">
+                      <Tag className="w-4 h-4 shrink-0 text-brand-green" />
+                      <span className="font-mono font-medium truncate" data-testid="text-applied-discount">{appliedDiscount.code}</span>
+                      <span className="text-muted-foreground shrink-0">
+                        {appliedDiscount.discountType === "percent"
+                          ? `-${appliedDiscount.amount}%`
+                          : `-$${appliedDiscount.amount.toFixed(2)}`}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveDiscount}
+                      className="text-muted-foreground hover:text-foreground shrink-0"
+                      aria-label={t("checkout.removeDiscount", { defaultValue: "Remove discount code" })}
+                      data-testid="button-remove-discount"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder={t("checkout.discountPlaceholder", { defaultValue: "Discount code" })}
+                      value={discountInput}
+                      onChange={(e) => {
+                        setDiscountInput(e.target.value.toUpperCase());
+                        setDiscountError(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleApplyDiscount();
+                        }
+                      }}
+                      className="font-mono uppercase"
+                      disabled={isProcessing || validateDiscountMutation.isPending}
+                      data-testid="input-discount-code"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="shrink-0"
+                      onClick={() => handleApplyDiscount()}
+                      disabled={!discountInput.trim() || isProcessing || validateDiscountMutation.isPending}
+                      data-testid="button-apply-discount"
+                    >
+                      {validateDiscountMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        t("checkout.applyDiscount", { defaultValue: "Apply" })
+                      )}
+                    </Button>
+                  </div>
+                )}
+                {discountError && (
+                  <p className="text-xs text-destructive" data-testid="text-discount-error">{discountError}</p>
+                )}
+              </div>
+
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between gap-2">
                   <span className="text-muted-foreground">{t("checkout.subtotal", { defaultValue: "Subtotal" })}</span>
                   <span className="font-medium">${totalPrice.toFixed(2)}</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between gap-2">
+                    <span className="text-brand-green">{t("checkout.discount", { defaultValue: "Discount" })} ({appliedDiscount?.code})</span>
+                    <span className="font-medium text-brand-green" data-testid="text-discount-amount">-${discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 {isConfigured && surcharge > 0 && (
                   <div className="flex justify-between gap-2">
                     <span className="text-muted-foreground">{t("checkout.cardFee", { defaultValue: "Card processing fee (3%)" })}</span>
@@ -498,7 +651,7 @@ export default function Checkout() {
               <Separator className="my-4" />
               <div className="flex justify-between gap-2 font-bold text-lg">
                 <span>{t("checkout.total")}</span>
-                <span data-testid="text-checkout-total">${(isConfigured ? totalWithSurcharge : totalPrice).toFixed(2)}</span>
+                <span data-testid="text-checkout-total">${(isConfigured ? totalWithSurcharge : discountedSubtotal).toFixed(2)}</span>
               </div>
             </CardContent>
           </Card>

@@ -22,6 +22,7 @@ import {
   FileText,
   Sun,
   DollarSign,
+  Tag,
 } from "lucide-react";
 import {
   Sidebar,
@@ -46,6 +47,7 @@ const operateItems: NavItem[] = [
   { title: "Leads", url: "/admin/leads", icon: Target },
   { title: "Customers", url: "/admin/users", icon: Users },
   { title: "Money", url: "/admin/money", icon: DollarSign },
+  { title: "Discounts", url: "/admin/discounts", icon: Tag },
   { title: "Certificates", url: "/admin/certificates", icon: Award },
 ];
 

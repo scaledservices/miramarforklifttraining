@@ -180,6 +180,18 @@ const strings: Record<string, EmailStrings> = {
       cta: "Complete Your Order",
       footer: "Get certified today and stay {{regulatory}} compliant.",
     },
+    balanceReminder: {
+      subject: "Payment Reminder - Booking {{bookingNumber}}",
+      heading: "Friendly Payment Reminder",
+      greeting: "Hi {{contactName}},",
+      body: "Thank you for booking your training with {{brandName}}. Your deposit is in, and there is still a balance due on your booking.",
+      amountDue: "Amount Due",
+      bookingNumber: "Booking Number",
+      sessionDate: "Session Date",
+      cta: "Pay Balance Online",
+      payNote: "You can pay your balance online in just a minute using the button above.",
+      footer: "Questions? Call us at {{phone}} and we will be happy to help.",
+    },
   },
   es: {
     welcome: {
@@ -359,6 +371,18 @@ const strings: Record<string, EmailStrings> = {
       body: "Iniciaste un pedido ({{orderNumber}}) pero aún no has completado el pago.",
       cta: "Completar Tu Pedido",
       footer: "Certifícate hoy y mantente en cumplimiento con {{regulatory}}.",
+    },
+    balanceReminder: {
+      subject: "Recordatorio de Pago - Reserva {{bookingNumber}}",
+      heading: "Recordatorio Amistoso de Pago",
+      greeting: "Hola {{contactName}},",
+      body: "Gracias por reservar tu capacitación con {{brandName}}. Tu depósito está recibido y todavía queda un saldo pendiente en tu reserva.",
+      amountDue: "Monto Pendiente",
+      bookingNumber: "Número de Reserva",
+      sessionDate: "Fecha de la Sesión",
+      cta: "Pagar Saldo en Línea",
+      payNote: "Puedes pagar tu saldo en línea en solo un minuto usando el botón de arriba.",
+      footer: "¿Preguntas? Llámanos al {{phone}} y con gusto te ayudaremos.",
     },
   },
 };

@@ -21,6 +21,7 @@ import { registerQuoteRoutes } from "./quotes";
 import { registerAuthorizeNetRoutes } from "./authorizeNet";
 import { registerTodayRoutes } from "./today";
 import { registerMoneyRoutes } from "./money";
+import { registerDiscountRoutes } from "./discounts";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -67,6 +68,7 @@ export async function registerRoutes(
   registerAuthorizeNetRoutes(app);
   registerTodayRoutes(app);
   registerMoneyRoutes(app);
+  registerDiscountRoutes(app);
 
   return httpServer;
 }

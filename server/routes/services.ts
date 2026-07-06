@@ -7,7 +7,8 @@ import { sendBookingConfirmation, sendBookingCancellation, sendBookingConfirmedE
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, requireRole } from "./middleware";
 import { db } from "../db";
-import { computeBookingPrice } from "@shared/config/bookingPricing";
+import { computeBookingPrice, BOOKING_DEPOSIT_RATE } from "@shared/config/bookingPricing";
+import { validateDiscountCode, computeDiscountAmount, recordDiscountRedemption } from "./discounts";
 import { createTransactionFromNonce, isAuthorizeNetConfigured, calculateCardSurcharge } from "../authorizeNetClient";
 import { isAdminRole } from "@shared/roles";
 
@@ -191,8 +192,36 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
 
     // Price is computed server-side from the shared pricing map — the client's
     // productPrice is display-only and never trusted for the charge.
+    // productSlugs may contain the base course plus opt-in add-ons (see
+    // BOOKING_ADDONS in shared/config/bookingPricing.ts); computeBookingPrice
+    // sums every slug per person. The full selection is also persisted in
+    // bookings.productSlug as the joined display string sent by the client.
     const productSlugs: string[] = Array.isArray(req.body.productSlugs) ? req.body.productSlugs : [];
-    const pricing = computeBookingPrice(productSlugs, Number(participantCount));
+    let pricing = computeBookingPrice(productSlugs, Number(participantCount));
+
+    // Optional promo code: validated and priced server-side (never trust the
+    // client's discounted numbers), mirroring the online-checkout integration
+    // in routes/authorizeNet.ts. Discount applies to the total before the
+    // 50% deposit split; redemption is recorded only after the booking exists.
+    let appliedDiscount: { codeId: number; amount: number } | null = null;
+    if (pricing && typeof req.body.discountCode === "string" && req.body.discountCode.trim()) {
+      const validation = await validateDiscountCode(req.body.discountCode);
+      if (!validation.valid || !validation.code) {
+        return res.status(400).json({ error: validation.reason || "Invalid discount code" });
+      }
+      const discountAmount = computeDiscountAmount(validation.code, pricing.total);
+      if (discountAmount > 0) {
+        const discountedTotal = Number((pricing.total - discountAmount).toFixed(2));
+        const deposit = Number((discountedTotal * BOOKING_DEPOSIT_RATE).toFixed(2));
+        pricing = {
+          ...pricing,
+          total: discountedTotal,
+          deposit,
+          balance: Number((discountedTotal - deposit).toFixed(2)),
+        };
+        appliedDiscount = { codeId: validation.code.id, amount: discountAmount };
+      }
+    }
 
     // Custom/equipment-only selections have no published price: fall back to the
     // legacy request flow (pending booking, price confirmed by the office, no charge).
@@ -274,12 +303,26 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
       });
     }
 
+    if (appliedDiscount) {
+      try {
+        await recordDiscountRedemption({
+          codeId: appliedDiscount.codeId,
+          bookingId: booking.id,
+          orderId: orderId ?? undefined,
+          amountDiscounted: appliedDiscount.amount,
+        });
+      } catch (redemptionErr) {
+        // Stats-only record — never fail a paid booking over it.
+        console.error("[Bookings] Failed to record discount redemption:", redemptionErr);
+      }
+    }
+
     await storage.createAuditLog({
       actorUserId: user.id,
       action: "booking_created",
       entity: "booking",
       entityId: String(booking.id),
-      metadata: { bookingNumber: booking.bookingNumber, serviceAreaId, sessionDate, startTime, participantCount },
+      metadata: { bookingNumber: booking.bookingNumber, serviceAreaId, sessionDate, startTime, participantCount, ...(appliedDiscount ? { discountCodeId: appliedDiscount.codeId, discountAmount: appliedDiscount.amount } : {}) },
     });
 
     try {

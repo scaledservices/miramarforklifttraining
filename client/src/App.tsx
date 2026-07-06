@@ -75,6 +75,7 @@ const GroupCertifications = lazy(() => import("@/pages/group/GroupCertifications
 const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
 const AdminToday = lazy(() => import("@/pages/admin/AdminToday"));
 const AdminMoney = lazy(() => import("@/pages/admin/AdminMoney"));
+const AdminDiscounts = lazy(() => import("@/pages/admin/AdminDiscounts"));
 const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers"));
 const AdminCourses = lazy(() => import("@/pages/admin/AdminCourses"));
 const AdminCourseEditor = lazy(() => import("@/pages/admin/AdminCourseEditor"));
@@ -205,6 +206,7 @@ function AppRoutes() {
       <Route path="/admin/today">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminToday /></ProtectedRoute>}</Route>
       <Route path="/admin/overview">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminDashboard /></ProtectedRoute>}</Route>
       <Route path="/admin/money">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminMoney /></ProtectedRoute>}</Route>
+      <Route path="/admin/discounts">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminDiscounts /></ProtectedRoute>}</Route>
       <Route path="/admin/users">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminUsers /></ProtectedRoute>}</Route>
       <Route path="/admin/courses">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminCourses /></ProtectedRoute>}</Route>
       <Route path="/admin/courses/new">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminCourseEditor /></ProtectedRoute>}</Route>

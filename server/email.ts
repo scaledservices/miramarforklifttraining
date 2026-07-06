@@ -1377,3 +1377,70 @@ export async function sendBalanceDueEmail(params: {
     actorUserId: params.actorUserId,
   });
 }
+
+export async function sendBalanceReminderEmail(params: {
+  to: string;
+  contactName: string;
+  bookingNumber: string;
+  bookingId: number;
+  balanceDue: number;
+  sessionDate: string; // "YYYY-MM-DD" from the bookings.session_date date column
+  reminderDay: number; // days after booking creation (3 / 7 / 14)
+  locale?: string;
+}) {
+  const baseUrl = getSiteUrl();
+  const loc = params.locale || "en";
+  const es = loc === "es";
+  const _ = (key: string) => emailT(loc, "balanceReminder", key);
+  // Same customer pay-balance URL that sendBalanceDueEmail builds for the
+  // admin "send balance link" action in server/routes/services.ts.
+  const payUrl = `${baseUrl}${es ? "/es" : "/en"}/pay-balance/${params.bookingId}`;
+  const sessionDateDisplay = (() => {
+    try {
+      return new Date(`${params.sessionDate}T00:00:00`).toLocaleDateString(es ? "es-US" : "en-US", {
+        year: "numeric", month: "long", day: "numeric",
+      });
+    } catch {
+      return params.sessionDate;
+    }
+  })();
+
+  return sendEmail({
+    to: params.to,
+    subject: _("subject").replace("{{bookingNumber}}", params.bookingNumber),
+    // The template key + payload below are the dedupe source of truth for the
+    // balance-reminders job (server/jobs/balance-reminders.ts): it checks the
+    // email_outbox table for a row with this template, bookingId and
+    // reminderDay before sending. Do not remove these payload fields.
+    template: "balance_reminder",
+    payload: {
+      bookingId: params.bookingId,
+      bookingNumber: params.bookingNumber,
+      reminderDay: params.reminderDay,
+      balanceDue: params.balanceDue,
+      sessionDate: params.sessionDate,
+    },
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
+      <p>${_("greeting").replace("{{contactName}}", params.contactName)}</p>
+      <p>${_("body").replace("{{brandName}}", brand.name)}</p>
+      <p style="font-size: 26px; font-weight: bold; color: ${theme.email.headingColor}; text-align: center; margin: 24px 0 8px;">$${params.balanceDue.toFixed(2)}</p>
+      <p style="text-align: center; color: ${theme.colors.text.muted}; font-size: 13px; margin: 0 0 24px;">${_("amountDue")}</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 0 0 24px;">
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("bookingNumber")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${params.bookingNumber}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("sessionDate")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${sessionDateDisplay}</strong></td>
+        </tr>
+      </table>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${payUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+      </div>
+      <p>${_("payNote")}</p>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer").replace("{{phone}}", brand.support.phone)}</p>
+    `),
+  });
+}

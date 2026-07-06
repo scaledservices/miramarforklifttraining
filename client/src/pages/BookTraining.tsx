@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -10,8 +10,9 @@ import { brand } from "@shared/config/brand";
 import { industry } from "@shared/config/industry";
 import SEOHead from "@/components/seo/SEOHead";
 import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
+import AddonUpsell from "@/components/booking/AddonUpsell";
 import CardPaymentSection from "@/components/checkout/CardPaymentSection";
-import { computeBookingPrice } from "@shared/config/bookingPricing";
+import { computeBookingPrice, BOOKING_DEPOSIT_RATE } from "@shared/config/bookingPricing";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -142,6 +143,42 @@ export default function BookTraining() {
   const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{ startTime: string; endTime: string } | null>(null);
+
+  // Promo code — prefilled from ?code= share links (flyers/QR). Display math
+  // here mirrors computeDiscountAmount in server/routes/discounts.ts; the
+  // authoritative discounted charge is always recomputed server-side.
+  const [discountInput, setDiscountInput] = useState(() => new URLSearchParams(window.location.search).get("code")?.toUpperCase() ?? "");
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; discountType: "percent" | "fixed"; amount: number } | null>(null);
+  const [discountError, setDiscountError] = useState<string | null>(null);
+  const [discountValidating, setDiscountValidating] = useState(false);
+
+  const applyDiscountCode = useCallback(async (raw: string) => {
+    const code = raw.trim();
+    if (!code) return;
+    setDiscountValidating(true);
+    setDiscountError(null);
+    try {
+      const res = await apiRequest("POST", "/api/discount-codes/validate", { code });
+      const data = await res.json();
+      if (data.valid) {
+        setAppliedDiscount({ code: data.code, discountType: data.discountType, amount: Number(data.amount) });
+      } else {
+        setAppliedDiscount(null);
+        setDiscountError(data.reason || null);
+      }
+    } catch {
+      setAppliedDiscount(null);
+      setDiscountError("invalid");
+    } finally {
+      setDiscountValidating(false);
+    }
+  }, []);
+
+  // Auto-apply a code arriving via share link.
+  useEffect(() => {
+    if (discountInput) void applyDiscountCode(discountInput);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
@@ -277,6 +314,7 @@ export default function BookTraining() {
     productPrice: number;
     productSlugs: string[];
     paymentNonce?: string;
+    discountCode?: string;
   }
 
   const bookingMutation = useMutation({
@@ -297,6 +335,11 @@ export default function BookTraining() {
     },
   });
 
+  // Joined display value persisted in bookings.productSlug — includes the
+  // base course AND any add-on upsells (e.g. "standard-forklift-... +
+  // scissor-aerial-boom-lift-..."), so operations always see the full
+  // selection on the booking record and in notification emails. The
+  // authoritative charge is computed server-side from the productSlugs array.
   function buildProductSlug(): string {
     const parts: string[] = [];
     if (selectedProducts.length > 0) {
@@ -313,6 +356,7 @@ export default function BookTraining() {
     const productPrice = productsSubtotal;
     bookingMutation.mutate({
       paymentNonce: paymentNonce || undefined,
+      discountCode: appliedDiscount?.code,
       productSlugs: selectedProducts.map((p) => p.slug),
       serviceAreaId: serviceArea.id,
       productSlug: buildProductSlug(),
@@ -354,7 +398,21 @@ export default function BookTraining() {
   // Authoritative pricing (volume discount + deposit) from the shared module the
   // server also charges from — null when only custom equipment is selected.
   const bookingPricing = computeBookingPrice(selectedProducts.map((pr) => pr.slug), participantCount);
-  const depositWithSurcharge = bookingPricing ? Number((bookingPricing.deposit * 1.03).toFixed(2)) : 0;
+  // Promo discount preview — same clamping rules as the server (percent capped
+  // at 100, fixed never below $0); deposit is 50% of the discounted total.
+  const discountAmount = bookingPricing && appliedDiscount
+    ? appliedDiscount.discountType === "percent"
+      ? Number((bookingPricing.total * (Math.min(Math.max(appliedDiscount.amount, 0), 100) / 100)).toFixed(2))
+      : Math.min(appliedDiscount.amount, bookingPricing.total)
+    : 0;
+  const effectivePricing = bookingPricing && discountAmount > 0
+    ? (() => {
+        const total = Number((bookingPricing.total - discountAmount).toFixed(2));
+        const deposit = Number((total * BOOKING_DEPOSIT_RATE).toFixed(2));
+        return { ...bookingPricing, total, deposit, balance: Number((total - deposit).toFixed(2)) };
+      })()
+    : bookingPricing;
+  const depositWithSurcharge = effectivePricing ? Number((effectivePricing.deposit * 1.03).toFixed(2)) : 0;
   const dayNames = useMemo(() => getDayNames(i18n.language || "en"), [i18n.language]);
 
   if (submitted) {
@@ -567,6 +625,8 @@ export default function BookTraining() {
                         );
                       })}
                     </div>
+
+                    <AddonUpsell selectedProducts={selectedProducts} onToggle={toggleProduct} />
 
                     <div className="mt-6 pt-6 border-t">
                       <h3 className="font-medium text-foreground mb-3">{t("bookTraining.orSelectEquipment")}</h3>
@@ -929,15 +989,49 @@ export default function BookTraining() {
                           <span>-${bookingPricing.volumeDiscount.toFixed(2)}</span>
                         </div>
                       )}
+                      {appliedDiscount && discountAmount > 0 && (
+                        <div className="flex justify-between text-brand-green" data-testid="row-promo-discount">
+                          <span>{t("bookTraining.promoDiscount", { code: appliedDiscount.code })}</span>
+                          <span>-${discountAmount.toFixed(2)}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between font-semibold text-foreground">
                         <span>{t("booking.depositDueToday")}</span>
                         <span>${depositWithSurcharge.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between text-muted-foreground">
                         <span>{t("booking.balanceOnCompletion")}</span>
-                        <span>${bookingPricing.balance.toFixed(2)}</span>
+                        <span>${(effectivePricing ?? bookingPricing).balance.toFixed(2)}</span>
                       </div>
                       <p className="text-xs text-muted-foreground pt-1">{t("booking.depositNote")}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex gap-2" data-testid="row-promo-input">
+                        <Input
+                          value={discountInput}
+                          onChange={(e) => {
+                            setDiscountInput(e.target.value.toUpperCase());
+                            setDiscountError(null);
+                          }}
+                          placeholder={t("bookTraining.promoPlaceholder")}
+                          className="h-9"
+                          data-testid="input-promo-code"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-9 shrink-0"
+                          disabled={discountValidating || !discountInput.trim()}
+                          onClick={() => applyDiscountCode(discountInput)}
+                          data-testid="button-apply-promo"
+                        >
+                          {appliedDiscount && discountAmount > 0 ? t("bookTraining.promoApplied") : t("bookTraining.promoApply")}
+                        </Button>
+                      </div>
+                      {discountError && (
+                        <p className="text-xs text-destructive" data-testid="text-promo-error">{t("bookTraining.promoInvalid")}</p>
+                      )}
                     </div>
                     <CardPaymentSection
                       chargeAmount={depositWithSurcharge}
