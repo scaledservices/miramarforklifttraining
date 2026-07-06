@@ -102,24 +102,28 @@ export default function OrderCertCard() {
     zip: "",
   });
 
-  // Load Accept.js
+  const { data: paymentConfig } = useQuery<PaymentConfig>({
+    queryKey: ["/api/payment/config"],
+  });
+
+  // Load Accept.js (v1) from the host matching the configured environment —
+  // sandbox credentials only tokenize against jstest.authorize.net.
   useEffect(() => {
-    const existing = document.querySelector('script[src*="Accept.js"]');
+    if (!paymentConfig?.configured) return;
+    const host = paymentConfig.environment === "sandbox" ? "https://jstest.authorize.net" : "https://js.authorize.net";
+    const src = `${host}/v1/Accept.js`;
+    const existing = document.querySelector(`script[src="${src}"]`);
     if (existing) {
       setAcceptLoaded(true);
       return;
     }
     const script = document.createElement("script");
-    script.src = "https://js.authorize.net/v1/Accept.js";
+    script.src = src;
     script.async = true;
     script.charset = "utf-8";
     script.onload = () => setAcceptLoaded(true);
     document.head.appendChild(script);
-  }, []);
-
-  const { data: paymentConfig } = useQuery<PaymentConfig>({
-    queryKey: ["/api/payment/config"],
-  });
+  }, [paymentConfig?.configured, paymentConfig?.environment]);
 
   const { data, isLoading, error } = useQuery<{ certification: any }>({
     queryKey: ["/api/certifications", certId],
