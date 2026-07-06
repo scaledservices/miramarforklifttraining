@@ -85,7 +85,7 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
       return;
     }
 
-    if (!paymentConfig?.clientKey || !paymentConfig?.apiLoginID || !acceptLoaded || !window.Accept) {
+    if (!paymentConfig?.clientKey || !paymentConfig?.apiLoginID) {
       setError(t("booking.paymentLoading", { defaultValue: "Payment system is loading. Please try again in a moment." }));
       return;
     }
@@ -105,6 +105,16 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
     }
 
     setTokenizing(true);
+
+    // Accept.js loads asynchronously after the config query resolves — wait for
+    // it (up to ~6s) instead of bouncing the user with a "loading" error.
+    const waitForAccept = async (): Promise<boolean> => {
+      for (let i = 0; i < 12; i++) {
+        if (window.Accept) return true;
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      return false;
+    };
 
     const secureData = {
       cardData: {
@@ -143,7 +153,14 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
         setError(err.message || t("checkout.paymentFailed", { defaultValue: "Payment initialization failed" }));
       }
     };
-    attempt(2);
+    waitForAccept().then((ready) => {
+      if (!ready) {
+        setTokenizing(false);
+        setError(t("booking.paymentLoading", { defaultValue: "Payment system is loading. Please try again in a moment." }));
+        return;
+      }
+      attempt(2);
+    });
   }
 
   const busy = pending || tokenizing;

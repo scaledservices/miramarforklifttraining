@@ -235,6 +235,7 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         providerTransactionId: result.transactionId,
         amount: String(chargeAmount),
         status: "approved",
+        rawResponse: { surcharge: depositSurcharge, principal: pricing.deposit },
       });
 
       orderId = order.id;
@@ -489,9 +490,14 @@ async function getBookingFinance(bookingId: number) {
   let payments: any[] = [];
   if (booking.orderId) {
     payments = await storage.getPaymentsByOrder(booking.orderId);
+    // Card surcharges are processing fees, not payment toward the training
+    // price — count only the principal against the booking total.
     paid = payments
       .filter((p: any) => p.status === "approved")
-      .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+      .reduce((sum: number, p: any) => {
+        const surcharge = Number((p.rawResponse as any)?.surcharge) || 0;
+        return sum + Number(p.amount) - surcharge;
+      }, 0);
     // Refunds reduce the paid total
     paid -= payments
       .filter((p: any) => p.status === "refunded")
@@ -641,6 +647,7 @@ app.post("/api/bookings/:id/pay-balance", requireAuth, async (req: Request, res:
       providerTransactionId: result.transactionId,
       amount: String(chargeAmount),
       status: "approved",
+      rawResponse: { surcharge, principal: fin.balanceDue },
     });
     await storage.updateOrderStatus(fin.booking.orderId, "paid");
 
