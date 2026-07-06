@@ -56,6 +56,8 @@ import ServiceAreaPage from "@/pages/ServiceAreaPage";
 import ServiceAreasHub from "@/pages/ServiceAreasHub";
 import SpanishLanding from "@/pages/SpanishLanding";
 import SpanishServiceArea from "@/pages/SpanishServiceArea";
+import IndustryLanding from "@/pages/IndustryLanding";
+import IndustriesHub from "@/pages/IndustriesHub";
 import { CartProvider } from "@/contexts/CartContext";
 import DemoBanner from "@/components/DemoBanner";
 import SEOHead from "@/components/seo/SEOHead";
@@ -181,6 +183,8 @@ function AppRoutes() {
       <Route path="/certificacion-montacargas-san-diego">{() => <SpanishServiceArea city="san-diego" />}</Route>
       <Route path="/certificacion-montacargas-las-vegas">{() => <SpanishServiceArea city="las-vegas" />}</Route>
       <Route path="/certificacion-montacargas-fresno">{() => <SpanishServiceArea city="fresno" />}</Route>
+      <Route path="/industries" component={IndustriesHub} />
+      <Route path="/industries/:slug">{(params: { slug: string }) => <IndustryLanding slug={params.slug} />}</Route>
       <Route path="/renewal" component={RenewalPage} />
       <Route path="/faq" component={FAQPage} />
       <Route path="/in-person-training" component={InPersonTraining} />

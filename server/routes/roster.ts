@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { eq, and, inArray } from "drizzle-orm";
+import multer from "multer";
 import { db } from "../db";
 import {
   employeeRoster,
@@ -9,6 +10,185 @@ import {
 import { storage } from "../storage";
 import { requireAuth } from "./middleware";
 import { hasAnyRole } from "@shared/roles";
+
+/* ── File upload parser ─────────────────────────────────────── */
+
+/**
+ * Parse a single delimiter-separated line, respecting quoted fields.
+ * Handles CSV (comma) and TSV (tab) formats.
+ */
+function parseDelimitedLine(line: string, delimiter: string): string[] {
+  const fields: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (i + 1 < line.length && line[i + 1] === '"') {
+          // Escaped quote inside quoted field
+          current += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        current += ch;
+      }
+    } else {
+      if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === delimiter) {
+        fields.push(current.trim());
+        current = "";
+      } else {
+        current += ch;
+      }
+    }
+  }
+  fields.push(current.trim());
+  return fields;
+}
+
+/** Detect whether the delimiter is comma, tab, or semicolon */
+function detectDelimiter(sample: string): string {
+  const tabCount = (sample.match(/\t/g) || []).length;
+  const semicolonCount = (sample.match(/;/g) || []).length;
+  const commaCount = (sample.match(/,/g) || []).length;
+  if (tabCount >= semicolonCount && tabCount >= commaCount && tabCount > 0)
+    return "\t";
+  if (semicolonCount > commaCount && semicolonCount > 0) return ";";
+  return ",";
+}
+
+/** Header aliases → field key */
+const HEADER_ALIASES: Record<string, keyof ParsedEmployee> = {
+  name: "name",
+  employee: "name",
+  employeename: "name",
+  full_name: "name",
+  fullname: "name",
+  worker: "name",
+  operator: "name",
+  email: "email",
+  emailaddress: "email",
+  e_mail: "email",
+  mail: "email",
+  phone: "phone",
+  telephone: "phone",
+  tel: "phone",
+  mobile: "phone",
+  cellphone: "phone",
+  role: "roleTitle",
+  roletitle: "roleTitle",
+  title: "roleTitle",
+  jobtitle: "roleTitle",
+  position: "roleTitle",
+  job: "roleTitle",
+};
+
+interface ParsedEmployee {
+  name?: string;
+  email?: string;
+  phone?: string;
+  roleTitle?: string;
+}
+
+/**
+ * Smart file parser: detects delimiter, header row, and maps columns
+ * by header name. Falls back to positional (name, email, phone, roleTitle)
+ * if no recognizable headers are found.
+ */
+function parseFileContent(content: string): {
+  employees: ParsedEmployee[];
+  headers: string[] | null;
+  columnMapping: Record<string, string> | null;
+} {
+  const lines = content
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+  if (lines.length === 0) return { employees: [], headers: null, columnMapping: null };
+
+  const delimiter = detectDelimiter(lines[0]);
+  const firstRow = parseDelimitedLine(lines[0], delimiter);
+
+  // Check if first row looks like headers (contains known header names)
+  const headerMatchCount = firstRow.filter((h) => {
+    const normalized = h.toLowerCase().replace(/[\s_-]+/g, "");
+    return normalized in HEADER_ALIASES;
+  }).length;
+
+  const isHeaderRow = headerMatchCount >= 2;
+
+  if (isHeaderRow) {
+    const headers = firstRow;
+    const columnMapping: Record<string, string> = {};
+    const fieldIndices: Record<string, number> = {};
+    headers.forEach((header, idx) => {
+      const normalized = header.toLowerCase().replace(/[\s_-]+/g, "");
+      const field = HEADER_ALIASES[normalized];
+      if (field && !(field in fieldIndices)) {
+        fieldIndices[field] = idx;
+        columnMapping[header] = field;
+      }
+    });
+    // Parse data rows
+    const employees: ParsedEmployee[] = [];
+    for (let i = 1; i < lines.length; i++) {
+      const parts = parseDelimitedLine(lines[i], delimiter);
+      const emp: ParsedEmployee = {};
+      for (const [field, idx] of Object.entries(fieldIndices)) {
+        const val = parts[idx];
+        if (val) (emp as any)[field] = val;
+      }
+      if (emp.name) employees.push(emp);
+    }
+    return { employees, headers, columnMapping };
+  } else {
+    // No headers — use positional: name, email, phone, roleTitle
+    const employees: ParsedEmployee[] = [];
+    for (const line of lines) {
+      const parts = parseDelimitedLine(line, delimiter);
+      if (parts.length > 0 && parts[0]) {
+        employees.push({
+          name: parts[0],
+          email: parts[1] || undefined,
+          phone: parts[2] || undefined,
+          roleTitle: parts[3] || undefined,
+        });
+      }
+    }
+    return { employees, headers: null, columnMapping: null };
+  }
+}
+
+// Multer config for file uploads (in-memory, no disk writes)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  fileFilter: (_req, file, cb) => {
+    const allowed = [
+      "text/csv",
+      "application/csv",
+      "text/tab-separated-values",
+      "text/plain",
+      "application/vnd.ms-excel",
+      "application/octet-stream",
+    ];
+    // Also allow by file extension
+    const ext = (file.originalname || "").toLowerCase();
+    const allowedExt = [".csv", ".tsv", ".txt"];
+    if (
+      allowed.includes(file.mimetype) ||
+      allowedExt.some((e) => ext.endsWith(e))
+    ) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only CSV, TSV, or TXT files are allowed"));
+    }
+  },
+});
 
 /**
  * Resolve the companyId for the current user.
@@ -143,6 +323,25 @@ export function registerRosterRoutes(app: Express) {
     } catch (error) {
       console.error("[Roster] POST /api/roster error:", error);
       return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // POST /api/roster/upload-file — file upload with smart parsing (CSV/TSV)
+  app.post("/api/roster/upload-file", requireAuth, upload.single("file"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUser(req.session.userId!);
+      if (!currentUser) return res.status(401).json({ error: "Authentication required" });
+      if (!hasAnyRole(currentUser.role, ["group_admin", "admin", "super_admin"])) {
+        return res.status(403).json({ error: "Insufficient permissions" });
+      }
+      if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+      const content = req.file.buffer.toString("utf-8");
+      const parsed = parseFileContent(content);
+      return res.json({ employees: parsed.employees, headers: parsed.headers, columnMapping: parsed.columnMapping });
+    } catch (error) {
+      console.error("[Roster] Upload file error:", error);
+      return res.status(500).json({ error: "Failed to parse file" });
     }
   });
 

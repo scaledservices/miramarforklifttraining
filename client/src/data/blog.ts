@@ -204,6 +204,204 @@ Our Complete Equipment Certification Bundle lets you get certified on multiple e
     metaTitle: "Types of Forklifts & Required Certifications | Complete Guide",
     metaDescription: `Learn about the 7 ${industry.regulatory.body} forklift classes and which certifications you need. Complete guide to powered industrial truck types and training requirements.`,
   },
+  {
+    slug: "osha-forklift-recertification-guide",
+    title: "OSHA Forklift Recertification: When and How to Renew",
+    excerpt: `Forklift certifications expire every 3 years. Learn when you need to recertify, what triggers early recertification, and whether online or in-person renewal is right for you.`,
+    content: `Your forklift certification is not valid forever. Under ${industry.regulatory.body} standard ${industry.regulatory.standard}, operators must be re-evalated at least every ${industry.regulatory.certificationValidity}. Here is everything you need to know about recertification.
+
+## The 3-Year Rule
+
+${industry.regulatory.body} requires forklift operator evaluations at least every ${industry.regulatory.certificationValidity}. This is not optional. If your certification is older than ${industry.regulatory.certificationValidity}, you are no longer in compliance and need to recertify as soon as possible.
+
+Employers are responsible for tracking certification dates and ensuring timely renewal. Letting a certification lapse puts both the operator and the employer at risk of ${industry.regulatory.body} fines.
+
+## When Recertification Is Required Sooner
+
+The 3-year rule is a minimum. Recertification may be required earlier in these situations:
+
+**1. Accident or Near-Miss** — If an operator is involved in a forklift accident or a near-miss incident, refresher training is required before the operator can return to the equipment.
+
+**2. Unsafe Operation Observed** — If a supervisor observes an operator working unsafely, the operator must receive refresher training and be re-evaluated before continuing to operate.
+
+**3. New Equipment Type** — If an operator is assigned to a different type of forklift than they were originally trained on, they must receive training specific to that equipment before operating it.
+
+**4. Workplace Changes** — If workplace conditions change significantly (new layouts, different load types, new pedestrian traffic patterns), refresher training may be needed to address the new hazards.
+
+## Online vs In-Person Recertification
+
+Recertification follows the same structure as initial certification: formal instruction plus practical evaluation.
+
+**Online Recertification** covers the formal instruction portion. It is fast ($59.99, 1-2 hours) and can be completed from any device. This is ideal for experienced operators who just need the classroom refresher.
+
+**In-Person Recertification** includes both formal instruction and practical evaluation. This takes about 2 hours at one of our facilities (San Diego, Las Vegas, or Fresno) and costs $200 per person. This is required if your employer does not have a qualified person to conduct the practical evaluation in-house.
+
+## How to Start Your Recertification
+
+1. Check your current certification date. If it has been ${industry.regulatory.certificationValidity} or more since your last evaluation, you need to renew now.
+2. Choose your format: online (formal instruction only) or in-person (full recertification including practical evaluation).
+3. Complete the training and receive your updated certificate.
+
+${brand.name} offers both online and in-person recertification. The online course costs $59.99 and can be completed in 1-2 hours. The in-person option is available at our San Diego, Las Vegas, and Fresno facilities.`,
+    category: "Certification",
+    publishDate: "2025-04-15",
+    readTime: "5 min read",
+    metaTitle: `${industry.regulatory.body} Forklift Recertification Guide 2025 | When & How to Renew`,
+    metaDescription: `Forklift certifications expire every 3 years. Learn when ${industry.regulatory.body} recertification is required, what triggers early renewal, and how to recertify online or in-person.`,
+  },
+  {
+    slug: "online-vs-in-person-forklift-training",
+    title: "Online vs In-Person Forklift Training: Which Is Right for You?",
+    excerpt: "Both online and in-person forklift training have their place. Compare cost, time, convenience, and compliance to decide which format fits your situation.",
+    content: `Choosing between online and in-person forklift training depends on your experience level, employer requirements, budget, and schedule. Neither format is universally better — each has its place.
+
+## Quick Comparison
+
+**Online Training**
+- Cost: $59.99
+- Time: 1-2 hours, self-paced
+- Location: Anywhere with internet
+- Covers: Formal instruction (OSHA-required classroom portion)
+- Does not include: Hands-on practical evaluation
+
+**In-Person Training**
+- Cost: $200+ per person
+- Time: Full day (6-8 hours)
+- Location: Our facility (San Diego, Las Vegas, Fresno) or your site
+- Covers: Formal instruction plus practical evaluation
+- Includes: Full ${industry.regulatory.body} compliance
+
+## When Online Training Makes Sense
+
+Online training is a great fit when:
+
+- **You are an experienced operator** who needs the formal instruction refresher
+- **Your employer can conduct the practical evaluation** in-house using a qualified person
+- **You need to certify quickly** and cannot wait for a scheduled class
+- **Budget is a concern** — at $59.99, online is a fraction of the in-person cost
+- **You are not local** to San Diego, Las Vegas, or Fresno
+
+## When In-Person Training Makes Sense
+
+In-person training is the right choice when:
+
+- **You are a new operator** with little or no forklift experience
+- **Your employer requires full certification** including practical evaluation from a professional trainer
+- **You want everything done in one day** with no separate evaluation step
+- **You learn better hands-on** with an instructor present
+
+## The Hybrid Approach
+
+Many employers use a hybrid model: operators complete the online formal instruction ($59.99), then the employer conducts the practical evaluation in-house using a qualified supervisor. This gives full ${industry.regulatory.body} compliance at a lower cost and is perfectly acceptable under the standard.
+
+## Cost Analysis
+
+For a single operator:
+- Online only: $59.99
+- In-person: $200
+- Online + employer evaluation: $59.99
+
+For a team of 10 operators:
+- All online: $599.90 (plus employer's evaluation time)
+- All in-person at facility: $2,000+
+- Onsite training at your location: contact us for volume pricing
+
+## Compliance Note
+
+Both formats satisfy ${industry.regulatory.body} requirements when properly completed. The key is that ${industry.regulatory.body} requires both formal instruction AND practical evaluation. Online training covers formal instruction. The practical evaluation can be done by your employer or at our facility.
+
+## Which Should You Choose?
+
+If you are experienced, your employer can evaluate you, and you want the fastest most affordable option: choose online.
+
+If you are new to forklifts or want full professional certification including practical evaluation: choose in-person.
+
+Not sure? Call us at ${brand.support.phone} and we will help you decide.`,
+    category: "Training",
+    publishDate: "2025-05-01",
+    readTime: "6 min read",
+    metaTitle: "Online vs In-Person Forklift Training: Which Is Right for You?",
+    metaDescription: "Compare online vs in-person forklift training. Cost, time, convenience, and compliance explained. Find out which format is right for your situation.",
+  },
+  {
+    slug: "forklift-certification-cost-2026",
+    title: "What Does Forklift Certification Cost in 2026?",
+    excerpt: "Forklift certification costs range from $59.99 to $500+. Learn what drives the price, what to watch for with hidden fees, and how to get the best value for your certification.",
+    content: `Forklift certification costs vary widely depending on the format, provider, and equipment type. Here is a transparent breakdown of what you can expect to pay in 2026.
+
+## Online Forklift Certification
+
+Online certification covers the formal instruction portion of ${industry.regulatory.body} requirements.
+
+- **Typical cost**: $59.99 (at ${brand.name})
+- **What is included**: Full online course, printable certificate, wallet card, employer verification, unlimited retakes
+- **Time to complete**: 1-2 hours
+- **Best for**: Experienced operators or those whose employer can do the practical evaluation
+
+Watch for providers charging extra for the certificate, wallet card, or retakes. At ${brand.name}, everything is included in the $59.99 price with no hidden fees.
+
+## In-Person Forklift Certification
+
+In-person training includes both formal instruction and practical evaluation at a training facility.
+
+- **Typical cost**: $200 to $500 per person (depending on equipment type and location)
+- **What is included**: Classroom instruction, hands-on training on real equipment, practical evaluation, certification card
+- **Time to complete**: 1 day (6-8 hours for single equipment, 2-3 days for multiple equipment)
+- **Best for**: New operators or those who want full certification including practical evaluation
+
+## Onsite Training at Your Facility
+
+Onsite training brings the instructor to your workplace.
+
+- **Typical cost**: $200 to $280 per person, with volume discounts for groups of 5+
+- **What is included**: Classroom instruction, hands-on evaluation on your own equipment
+- **Time to complete**: 4-8 hours depending on group size and experience
+- **Best for**: Companies with 2+ operators, especially if you want training on your specific equipment
+
+## Train the Trainer
+
+If you have 10+ operators and want to certify them in-house, a Train the Trainer program is the most cost-effective long-term option.
+
+- **Typical cost**: $750
+- **What is included**: Full-day program that qualifies your employee to train and evaluate operators
+- **Time to complete**: 8 hours
+- **Best for**: Companies with ongoing hiring needs and 10+ operators
+
+## Hidden Fees to Watch For
+
+When comparing providers, ask about these common hidden fees:
+
+- **Certificate fees**: Some providers charge $10-$25 extra for the certificate
+- **Wallet card fees**: Some charge $5-$15 for the wallet card
+- **Retake fees**: Some charge for each assessment retake
+- **Expedited processing**: Some charge for faster certificate delivery
+- **Verification fees**: Some charge employers to verify certifications
+
+At ${brand.name}, the price you see is the price you pay. Our online certification is $59.99 with everything included — no hidden fees, no upsells.
+
+## Cost by Scenario
+
+**Single operator, experienced**: $59.99 (online) + employer evaluation
+**Single operator, new**: $200 (in-person at our facility)
+**Team of 5, same location**: $200-$280 per person (onsite) with volume discounts
+**Team of 10+, ongoing hiring**: $750 (Train the Trainer) + ongoing internal training costs
+
+## Getting the Best Value
+
+The cheapest option is not always the best value. Consider:
+
+1. **What is included** — Does the price cover the certificate, card, and retakes?
+2. **Compliance** — Does the training meet ${industry.regulatory.body} standard ${industry.regulatory.standard}?
+3. **Employer acceptance** — Will your employer accept the certification?
+4. **Support** — Can you get help if you have questions during the course?
+
+Our online certification at $59.99 includes everything with no hidden fees. For full in-person certification, our training starts at $200. Call ${brand.support.phone} to discuss your specific needs.`,
+    category: "Pricing",
+    publishDate: "2025-05-15",
+    readTime: "6 min read",
+    metaTitle: "Forklift Certification Cost in 2026: Complete Price Guide",
+    metaDescription: "How much does forklift certification cost in 2026? Complete price guide for online, in-person, onsite, and Train the Trainer programs. Learn about hidden fees to avoid.",
+  },
 ];
 
 export function getBlogBySlug(slug: string): BlogArticle | undefined {

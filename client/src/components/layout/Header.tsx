@@ -101,7 +101,7 @@ function DesktopNav() {
   ];
 
   const resourceLinks = [
-    // Blog link hidden until blog content exists (senior review Section B.5)
+    { label: t("nav.blog"), href: "/blog", icon: BookOpen },
     { label: t("nav.faq"), href: "/faq", icon: HelpCircle },
     { label: t("nav.support"), href: "/support", icon: HelpCircle },
     { label: t("nav.contact"), href: "/contact", icon: Mail },
@@ -414,7 +414,7 @@ function MobileNav() {
   ];
 
   const resourceLinks = [
-    // Blog link hidden until blog content exists
+    { label: t("nav.blog"), href: "/blog" },
     { label: t("nav.faq"), href: "/faq" },
     { label: t("nav.support"), href: "/support" },
     { label: t("nav.contact"), href: "/contact" },

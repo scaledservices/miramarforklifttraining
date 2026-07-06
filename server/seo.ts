@@ -34,6 +34,22 @@ const STATIC_MARKETING_PAGES = [
   "/renewal",
   "/faq",
   "/verify",
+  "/industries",
+  "/industries/warehousing",
+  "/industries/logistics",
+  "/industries/construction",
+  "/industries/manufacturing",
+  "/industries/retail",
+  "/industries/food-beverage",
+  "/industries/lumber-building-materials",
+  "/industries/shipping-ports",
+  "/blog/osha-forklift-certification-requirements",
+  "/blog/how-long-does-forklift-certification-take",
+  "/blog/forklift-training-for-businesses",
+  "/blog/types-of-forklifts-and-certifications",
+  "/blog/osha-forklift-recertification-guide",
+  "/blog/online-vs-in-person-forklift-training",
+  "/blog/forklift-certification-cost-2026",
 ];
 
 const EN_TO_ES_STATIC_SLUGS: Record<string, string> = {
@@ -66,6 +82,15 @@ const EN_TO_ES_STATIC_SLUGS: Record<string, string> = {
   "/renewal": "/renewal",
   "/faq": "/faq",
   "/verify": "/verificar",
+  "/industries": "/industrias",
+  "/industries/warehousing": "/industrias/warehousing",
+  "/industries/logistics": "/industrias/logistics",
+  "/industries/construction": "/industrias/construction",
+  "/industries/manufacturing": "/industrias/manufacturing",
+  "/industries/retail": "/industrias/retail",
+  "/industries/food-beverage": "/industrias/food-beverage",
+  "/industries/lumber-building-materials": "/industrias/lumber-building-materials",
+  "/industries/shipping-ports": "/industrias/shipping-ports",
 };
 
 const ES_TO_EN_SEO_SLUGS: Record<string, string> = {

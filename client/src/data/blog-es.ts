@@ -33,4 +33,22 @@ export const blogEs: Record<string, BlogTranslation> = {
     category: "Educación",
     readTime: "7 min de lectura",
   },
+  "osha-forklift-recertification-guide": {
+    title: `Recertificación de Montacargas ${industry.regulatory.body}: Cuándo y Cómo Renovar`,
+    excerpt: `Las certificaciones de montacargas expiran cada 3 años. Conozca cuándo necesita recertificarse, qué provoca una recertificación temprana y si la renovación en línea o presencial es la adecuada para usted.`,
+    category: "Certificación",
+    readTime: "5 min de lectura",
+  },
+  "online-vs-in-person-forklift-training": {
+    title: "Capacitación de Montacargas en Línea vs Presencial: ¿Cuál es la Adecuada para Usted?",
+    excerpt: "Tanto la capacitación en línea como la presencial de montacargas tienen su lugar. Compare costo, tiempo, conveniencia y cumplimiento para decidir qué formato se ajusta a su situación.",
+    category: "Capacitación",
+    readTime: "6 min de lectura",
+  },
+  "forklift-certification-cost-2026": {
+    title: "¿Cuánto Cuesta la Certificación de Montacargas en 2026?",
+    excerpt: "Los costos de certificación de montacargas varían desde $59.99 hasta más de $500. Conozca qué determina el precio, qué tener en cuenta con los cargos ocultos y cómo obtener el mejor valor para su certificación.",
+    category: "Precios",
+    readTime: "6 min de lectura",
+  },
 };
