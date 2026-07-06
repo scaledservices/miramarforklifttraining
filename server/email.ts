@@ -5,6 +5,7 @@ import { brand } from "@shared/config/brand";
 import { theme } from "@shared/config/theme";
 import { industry } from "@shared/config/industry";
 import { t as emailT } from "./email-i18n";
+import QRCode from "qrcode";
 
 function getSiteUrl(): string {
   if (process.env.SITE_URL) return process.env.SITE_URL;
@@ -1508,6 +1509,170 @@ export async function sendRecertReminderEmail(params: {
       </div>
       <p>${_("renewNote")}</p>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer").replace("{{phone}}", brand.support.phone)}</p>
+    `),
+  });
+}
+
+export async function sendReviewRequestEmail(params: {
+  to: string;
+  contactName: string;
+  bookingNumber: string;
+  bookingId: number;
+  sessionDate: string; // "YYYY-MM-DD" from the bookings.session_date date column
+  locale?: string;
+}) {
+  const baseUrl = getSiteUrl();
+  const loc = params.locale || "en";
+  const es = loc === "es";
+  const _ = (key: string) => emailT(loc, "reviewRequest", key);
+
+  // Review URL from env var; fall back to /contact page if not set.
+  const reviewUrl = process.env.GOOGLE_REVIEW_URL || `${baseUrl}${es ? "/es" : "/en"}${es ? "/contacto" : "/contact"}`;
+
+  // Generate QR code as a data URL — large enough to scan from a phone screen.
+  // width=300 produces a ~300x300 PNG; margin=2 keeps a quiet zone without
+  // excessive whitespace.
+  const qrDataUrl = await QRCode.toDataURL(reviewUrl, {
+    width: 300,
+    margin: 2,
+    errorCorrectionLevel: "M",
+    color: {
+      dark: "#4f3b3b", // brand brown
+      light: "#ffffff",
+    },
+  });
+
+  const sessionDateDisplay = (() => {
+    try {
+      return new Date(`${params.sessionDate}T00:00:00`).toLocaleDateString(es ? "es-US" : "en-US", {
+        year: "numeric", month: "long", day: "numeric",
+      });
+    } catch {
+      return params.sessionDate;
+    }
+  })();
+
+  return sendEmail({
+    to: params.to,
+    subject: _("subject").replace("{{brandName}}", brand.name),
+    // The template key + payload below are the dedupe source of truth for the
+    // review-requests job (server/jobs/review-requests.ts): it checks the
+    // email_outbox table for a row with this template and bookingId before
+    // sending. Do not remove these payload fields.
+    template: "review_request",
+    payload: {
+      bookingId: params.bookingId,
+      bookingNumber: params.bookingNumber,
+      sessionDate: params.sessionDate,
+    },
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
+      <p>${_("greeting").replace("{{contactName}}", params.contactName)}</p>
+      <p>${_("body").replace("{{brandName}}", brand.name).replace("{{sessionDate}}", sessionDateDisplay)}</p>
+      <p>${_("scanCta")}</p>
+      <div style="text-align: center; margin: 24px 0;">
+        <img src="${qrDataUrl}" alt="Google Review QR Code" style="width: 220px; height: 220px; border: 1px solid #eee; border-radius: 8px; padding: 8px;" />
+      </div>
+      <p style="text-align: center; color: ${theme.colors.text.muted}; font-size: 13px; margin: 0 0 16px;">${_("orClick")}</p>
+      <div style="text-align: center; margin: 16px 0 24px;">
+        <a href="${reviewUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+      </div>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
+    `),
+  });
+}
+
+export async function sendRouteFillAlertEmail(params: {
+  to: string;
+  bookingNumber: string;
+  bookingId: number;
+  sessionDate: string; // "YYYY-MM-DD"
+  startTime: string;
+  areaName: string;
+  openSeats: number;
+  bookedSeats: number;
+  maxParticipants: number;
+  locale?: string;
+}) {
+  const baseUrl = getSiteUrl();
+  const loc = params.locale || "en";
+  const es = loc === "es";
+  const _ = (key: string) => emailT(loc, "routeFillAlert", key);
+  const adminBookingsUrl = `${baseUrl}${es ? "/es" : "/en"}/admin/bookings`;
+  const sessionDateDisplay = (() => {
+    try {
+      return new Date(`${params.sessionDate}T00:00:00`).toLocaleDateString(es ? "es-US" : "en-US", {
+        weekday: "long", year: "numeric", month: "long", day: "numeric",
+      });
+    } catch {
+      return params.sessionDate;
+    }
+  })();
+  const sessionDateShort = (() => {
+    try {
+      return new Date(`${params.sessionDate}T00:00:00`).toLocaleDateString(es ? "es-US" : "en-US", {
+        month: "long", day: "numeric",
+      });
+    } catch {
+      return params.sessionDate;
+    }
+  })();
+
+  return sendEmail({
+    to: params.to,
+    subject: _("subject")
+      .replace("{{openSeats}}", String(params.openSeats))
+      .replace("{{areaName}}", params.areaName)
+      .replace("{{sessionDate}}", sessionDateShort),
+    // The template key + payload below are the dedupe source of truth for the
+    // route-fill-alerts job (server/jobs/route-fill-alerts.ts): it checks the
+    // email_outbox table for a row with this template, bookingId and
+    // sessionDate created today before sending. Do not remove these payload fields.
+    template: "route_fill_alert",
+    payload: {
+      bookingId: params.bookingId,
+      bookingNumber: params.bookingNumber,
+      sessionDate: params.sessionDate,
+      areaName: params.areaName,
+      openSeats: params.openSeats,
+    },
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
+      <p>${_("greeting")}</p>
+      <p style="font-size: 18px; font-weight: bold; color: ${theme.email.headingColor};">${_("body")
+        .replace("{{openSeats}}", String(params.openSeats))
+        .replace("{{areaName}}", params.areaName)
+        .replace("{{sessionDateLong}}", sessionDateDisplay)}</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 0 0 24px;">
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("bookingNumber")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${params.bookingNumber}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("location")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${params.areaName}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("sessionDate")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${sessionDateDisplay}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("startTime")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${params.startTime}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("openSeats")}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong style="color: ${theme.colors.green.hex};">${params.openSeats}</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("seatsCapacity").replace("{{booked}}", String(params.bookedSeats)).replace("{{max}}", String(params.maxParticipants))}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;"><strong>${params.bookedSeats} / ${params.maxParticipants}</strong></td>
+        </tr>
+      </table>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${adminBookingsUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+      </div>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
     `),
   });
 }

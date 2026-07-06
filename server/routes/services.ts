@@ -206,8 +206,11 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
     let appliedDiscount: { codeId: number; amount: number } | null = null;
     if (pricing && typeof req.body.discountCode === "string" && req.body.discountCode.trim()) {
       const validation = await validateDiscountCode(req.body.discountCode);
-      if (!validation.valid || !validation.code) {
+      if (!validation.valid) {
         return res.status(400).json({ error: validation.reason || "Invalid discount code" });
+      }
+      if (!validation.code) {
+        return res.status(400).json({ error: "Invalid discount code" });
       }
       const discountAmount = computeDiscountAmount(validation.code, pricing.total);
       if (discountAmount > 0) {

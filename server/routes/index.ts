@@ -22,6 +22,7 @@ import { registerAuthorizeNetRoutes } from "./authorizeNet";
 import { registerTodayRoutes } from "./today";
 import { registerMoneyRoutes } from "./money";
 import { registerDiscountRoutes } from "./discounts";
+import { registerGeoRoutes } from "./geo";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -69,6 +70,7 @@ export async function registerRoutes(
   registerTodayRoutes(app);
   registerMoneyRoutes(app);
   registerDiscountRoutes(app);
+  registerGeoRoutes(app);
 
   return httpServer;
 }

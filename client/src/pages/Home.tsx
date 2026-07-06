@@ -4,9 +4,11 @@ import { industry } from "@shared/config/industry";
 import SEOHead from "@/components/seo/SEOHead";
 import { organizationSchema } from "@/components/seo/StructuredData";
 import { useCurrentLocale } from "@/hooks/useLocaleLocation";
+import { useRegion } from "@/hooks/useRegion";
 import { faqItems } from "@/data/faq";
 import { getAllServiceAreaCities } from "@/data/serviceAreas";
 import FAQSection from "@/components/sections/FAQSection";
+import OnlineFirstHero from "@/components/sections/OnlineFirstHero";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,7 +21,9 @@ import {
 export default function Home() {
   const { t } = useTranslation();
   const locale = useCurrentLocale();
+  const { region } = useRegion();
   const serviceAreas = getAllServiceAreaCities(locale);
+  const showOnlineFirst = !region.isServiceArea;
 
   return (
     <>
@@ -30,49 +34,53 @@ export default function Home() {
         jsonLd={[organizationSchema(locale)]}
       />
 
-      <section className="relative overflow-hidden" data-testid="hero-home">
-        <div className="absolute inset-0">
-          <OptimizedImage
-            src="/images/hero-forklift.jpg"
-            alt={t("home.heroTitle")}
-            className="w-full h-full object-cover"
-            loading="eager"
-            fetchpriority="high"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(10,22%,14%)]/95 via-[hsl(10,22%,18%)]/85 to-[hsl(10,22%,23%)]/55" />
-        </div>
+      {showOnlineFirst ? (
+        <OnlineFirstHero />
+      ) : (
+        <section className="relative overflow-hidden" data-testid="hero-home">
+          <div className="absolute inset-0">
+            <OptimizedImage
+              src="/images/hero-forklift.jpg"
+              alt={t("home.heroTitle")}
+              className="w-full h-full object-cover"
+              loading="eager"
+              fetchpriority="high"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[hsl(10,22%,14%)]/95 via-[hsl(10,22%,18%)]/85 to-[hsl(10,22%,23%)]/55" />
+          </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 lg:py-32">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-6 text-xs font-semibold uppercase tracking-wider bg-white/10 text-white/90 rounded-full backdrop-blur-sm border border-white/10">
-              <MapPin className="w-3 h-3 text-accent" />
-              {t("home.heroEyebrow")}
-            </span>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 lg:py-32">
+            <div className="max-w-3xl">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-6 text-xs font-semibold uppercase tracking-wider bg-white/10 text-white/90 rounded-full backdrop-blur-sm border border-white/10">
+                <MapPin className="w-3 h-3 text-accent" />
+                {t("home.heroEyebrow")}
+              </span>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6 drop-shadow-md" data-testid="text-hero-title">
-              {t("home.heroTitle")}
-            </h1>
-            <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-8 max-w-2xl drop-shadow-sm">
-              {t("home.heroSubtitle")}
-            </p>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6 drop-shadow-md" data-testid="text-hero-title">
+                {t("home.heroTitle")}
+              </h1>
+              <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-8 max-w-2xl drop-shadow-sm">
+                {t("home.heroSubtitle")}
+              </p>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/get-certified">
-                <Button size="lg" className="w-full sm:w-auto bg-accent text-accent-foreground border-accent-border text-base px-8 py-6" data-testid="button-hero-get-certified">
-                  <Shield className="h-5 w-5 mr-2" />
-                  {t("cta.getCertified")}
-                </Button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/get-certified">
+                  <Button size="lg" className="w-full sm:w-auto bg-accent text-accent-foreground border-accent-border text-base px-8 py-6" data-testid="button-hero-get-certified">
+                    <Shield className="h-5 w-5 mr-2" />
+                    {t("cta.getCertified")}
+                  </Button>
+                </Link>
+              </div>
+
+              <Link href="/renewal" className="inline-flex items-center gap-1.5 mt-6 text-sm text-white/80 hover:text-white underline underline-offset-4 decoration-white/40" data-testid="link-hero-renew">
+                <RefreshCw className="w-3.5 h-3.5 text-accent" />
+                {t("home.heroRenewLink")}
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
-
-            <Link href="/renewal" className="inline-flex items-center gap-1.5 mt-6 text-sm text-white/80 hover:text-white underline underline-offset-4 decoration-white/40" data-testid="link-hero-renew">
-              <RefreshCw className="w-3.5 h-3.5 text-accent" />
-              {t("home.heroRenewLink")}
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="py-6 bg-card border-y border-border" data-testid="trust-bar">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

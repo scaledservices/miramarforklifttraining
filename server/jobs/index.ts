@@ -4,6 +4,8 @@ import { runWebhookRetryJob } from "./webhook-retry";
 import { runBalanceRemindersJob } from "./balance-reminders";
 import { runRecertRemindersJob } from "./recert-reminders";
 import { runSmsRemindersJob } from "./sms-reminders";
+import { runReviewRequestsJob } from "./review-requests";
+import { runRouteFillAlertsJob } from "./route-fill-alerts";
 import { db } from "../db";
 import { sql } from "drizzle-orm";
 import crypto from "crypto";
@@ -44,6 +46,8 @@ async function runAllJobs() {
   await runWithLock("balance_reminders", runBalanceRemindersJob);
   await runWithLock("recert_reminders", runRecertRemindersJob);
   await runWithLock("sms_reminders", runSmsRemindersJob);
+  await runWithLock("review_requests", runReviewRequestsJob);
+  await runWithLock("route_fill_alerts", runRouteFillAlertsJob);
 }
 
 export function startJobScheduler() {
