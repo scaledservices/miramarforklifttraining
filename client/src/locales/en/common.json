@@ -213,6 +213,8 @@
   },
   "guidedSelector": {
     "sectionLabel": "Get Started",
+    "pageTitle": "Get Certified | {{brand}}",
+    "pageDescription": "Answer two quick questions and we'll guide you to the right forklift certification program — online, hands-on, or onsite team training.",
     "title": "What Do You Need?",
     "subtitle": "Choose your path to certification — we'll guide you to the right program.",
     "locationTitle": "Where Do You Need Training?",
@@ -1713,6 +1715,8 @@
     "areaNotAvailable": "Not currently available in your area",
     "areaNotAvailableDesc": "We currently serve Southern California, Central California, and Southern Nevada.",
     "requestCustom": "Request custom arrangements",
+    "getCertifiedOnline": "Get Certified Online",
+    "requestCustomQuote": "Request a Custom Quote",
     "selectTraining": "Select Training Program",
     "selectTrainingDesc": "Select one or more training programs and/or equipment types you need certification for.",
     "perPerson": "per person",

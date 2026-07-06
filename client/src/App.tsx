@@ -50,6 +50,7 @@ import BecomeAnInstructor from "@/pages/BecomeAnInstructor";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import SeoPageRenderer from "@/pages/seo/SeoPageRenderer";
 import BookTraining from "@/pages/BookTraining";
+import GetCertified from "@/pages/GetCertified";
 import LocationsHub from "@/pages/LocationsHub";
 import ServiceAreaPage from "@/pages/ServiceAreaPage";
 import ServiceAreasHub from "@/pages/ServiceAreasHub";
@@ -153,6 +154,7 @@ function AppRoutes() {
     <Suspense fallback={<RouteFallback />}>
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/get-certified" component={GetCertified} />
       <Route path="/online-forklift-certification" component={OnlineCertification} />
       <Route path="/training-programs" component={TrainingPrograms} />
       <Route path="/online-training" component={OnlineTraining} />

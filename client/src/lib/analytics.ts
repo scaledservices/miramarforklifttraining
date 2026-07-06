@@ -16,7 +16,7 @@
  *   onsiteTrainingRequests.leadSource column.
  */
 
-type EventName = "page_view" | "cta_click" | "checkout_start" | "lead_submit" | "checkout_contact";
+type EventName = "page_view" | "cta_click" | "checkout_start" | "lead_submit" | "checkout_contact" | "booking_started" | "booking_step_reached" | "booking_completed" | "quote_started" | "quote_submitted";
 
 type EventProperties = Record<string, string | number | boolean | undefined>;
 

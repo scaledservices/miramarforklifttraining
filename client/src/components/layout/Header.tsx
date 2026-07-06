@@ -358,9 +358,9 @@ function MobileNavActions({ onClose }: { onClose: () => void }) {
           {t("nav.login")}
         </Button>
       </Link>
-      <Link href="/book-training" onClick={onClose}>
+      <Link href="/get-certified" onClick={onClose}>
         <Button className="w-full bg-accent text-accent-foreground border-accent-border" data-testid="mobile-button-cta">
-          {t("nav.bookTraining")}
+          {t("cta.getCertified")}
         </Button>
       </Link>
     </div>
@@ -630,9 +630,9 @@ function HeaderActions() {
           {t("nav.login")}
         </Button>
       </Link>
-      <Link href="/book-training" className="hidden sm:block">
+      <Link href="/get-certified" className="hidden sm:block">
         <Button size="sm" className="bg-accent text-accent-foreground border-accent-border" data-testid="button-header-cta">
-          {t("nav.bookTraining")}
+          {t("cta.getCertified")}
         </Button>
       </Link>
     </>

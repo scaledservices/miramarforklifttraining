@@ -57,16 +57,10 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/book-training">
-                <Button size="lg" className="w-full sm:w-auto bg-accent text-accent-foreground border-accent-border text-base px-8 py-6" data-testid="button-hero-quote">
-                  <Building2 className="h-5 w-5 mr-2" />
-                  {t("home.bookTrainingCta")}
-                </Button>
-              </Link>
-              <Link href="/in-person-training">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/30 text-white bg-white/10 backdrop-blur-sm text-base px-8 py-6" data-testid="button-hero-in-person">
-                  <Wrench className="h-5 w-5 mr-2" />
-                  {t("home.bookInPerson")}
+              <Link href="/get-certified">
+                <Button size="lg" className="w-full sm:w-auto bg-accent text-accent-foreground border-accent-border text-base px-8 py-6" data-testid="button-hero-get-certified">
+                  <Shield className="h-5 w-5 mr-2" />
+                  {t("cta.getCertified")}
                 </Button>
               </Link>
             </div>
@@ -109,7 +103,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <Link href="/book-training" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl block">
+            <Link href="/get-certified" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl block">
                 <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 h-full border-2 border-accent shadow-md ring-1 ring-accent/20" data-testid="card-b2b">
                   <div className="absolute top-0 left-0 right-0 bg-accent text-accent-foreground text-xs font-semibold text-center py-1.5 flex items-center justify-center gap-1.5">
                     <Star className="w-3 h-3 fill-current" />{t("common.mostPopular")}
@@ -129,13 +123,13 @@ export default function Home() {
                       ))}
                     </ul>
                     <div className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-accent text-accent-foreground px-4 py-2.5 text-sm font-medium transition-colors">
-                      {t("home.bookTrainingCta")} <ArrowRight className="w-4 h-4" />
+                      {t("cta.getCertified")} <ArrowRight className="w-4 h-4" />
                     </div>
                   </CardContent>
                 </Card>
             </Link>
 
-            <Link href="/in-person-training" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl block">
+            <Link href="/get-certified" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl block">
                 <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 h-full border-border hover:border-primary/40" data-testid="card-in-person">
                   <CardContent className="p-6 flex flex-col h-full">
                     <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
@@ -152,13 +146,13 @@ export default function Home() {
                       ))}
                     </ul>
                     <div className="w-full inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2.5 text-sm font-medium hover:bg-accent/5 transition-colors">
-                      {t("home.viewInPersonCta")} <ArrowRight className="w-4 h-4" />
+                      {t("cta.getCertified")} <ArrowRight className="w-4 h-4" />
                     </div>
                   </CardContent>
                 </Card>
             </Link>
 
-            <Link href="/renewal" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl block">
+            <Link href="/get-certified" className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl block">
                 <Card className="group relative overflow-hidden transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-0.5 h-full border-border hover:border-primary/40" data-testid="card-renew">
                   <CardContent className="p-6 flex flex-col h-full">
                     <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
@@ -192,9 +186,9 @@ export default function Home() {
               <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 tracking-tight" data-testid="text-b2b-section-title">{t("home.b2bSectionTitle")}</h2>
               <p className="text-white/80 text-lg mb-8 leading-relaxed">{t("home.b2bSectionDesc")}</p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/book-training">
+                <Link href="/get-certified">
                   <Button size="lg" className="w-full sm:w-auto bg-accent text-accent-foreground border-accent-border px-8" data-testid="button-b2b-quote">
-                    {t("home.bookTrainingCta")}
+                    {t("cta.getCertified")}
                   </Button>
                 </Link>
                 <Link href="/business">
@@ -278,14 +272,14 @@ export default function Home() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("home.readyToGetCertified")}</h2>
           <p className="text-white/80 text-lg mb-8">{t("home.readyToGetCertifiedDesc")}</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/book-training">
-              <Button size="lg" className="bg-accent text-accent-foreground border-accent-border px-8">
-                {t("home.bookTrainingCta")}
+            <Link href="/get-certified">
+              <Button size="lg" className="bg-accent text-accent-foreground border-accent-border px-8" data-testid="button-final-get-certified">
+                {t("cta.getCertified")}
               </Button>
             </Link>
-            <Link href="/in-person-training">
-              <Button size="lg" variant="outline" className="border-white/30 text-white bg-white/10 px-8">
-                {t("home.bookInPerson")}
+            <Link href="/renewal">
+              <Button size="lg" variant="outline" className="border-white/30 text-white bg-white/10 px-8" data-testid="button-final-renew">
+                {t("home.renewCta")}
               </Button>
             </Link>
           </div>

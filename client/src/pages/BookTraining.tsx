@@ -13,6 +13,7 @@ import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
 import AddonUpsell from "@/components/booking/AddonUpsell";
 import CardPaymentSection from "@/components/checkout/CardPaymentSection";
 import { computeBookingPrice, BOOKING_DEPOSIT_RATE } from "@shared/config/bookingPricing";
+import { trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -180,6 +181,12 @@ export default function BookTraining() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Track funnel entry: user landed on the booking page.
+  useEffect(() => {
+    trackEvent("booking_started", { step_name: "zip_check" });
+    trackEvent("booking_step_reached", { step: 1, step_name: "zip_check" });
+  }, []);
+
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
@@ -252,7 +259,10 @@ export default function BookTraining() {
       if (data.available) {
         setServiceArea(data.serviceArea);
         setCustomerZip(zip);
+        trackEvent("booking_step_reached", { step: 2, step_name: "product_selection", zip_code: zip });
       } else {
+        // Expansion intelligence: log unserved ZIPs to identify demand areas.
+        console.log(`[UNSERVED-ZIP] ${zip}`);
         setZipError(true);
         setServiceArea(null);
       }
@@ -290,7 +300,18 @@ export default function BookTraining() {
     participantCount >= 1;
 
   function goNext() {
-    if (step < 4) setStep((s) => (s + 1) as Step);
+    if (step < 4) {
+      setStep((s) => (s + 1) as Step);
+      const nextStep = step + 1;
+      const stepNames: Record<number, string> = { 1: "zip_check", 2: "date_slot", 3: "contact_details", 4: "review_payment" };
+      trackEvent("booking_step_reached", {
+        step: nextStep,
+        step_name: stepNames[nextStep],
+        ...(nextStep >= 3 ? { zip_code: customerZip } : {}),
+        ...(nextStep >= 4 ? { participant_count: participantCount } : {}),
+        ...(nextStep === 4 ? { total_price: totalEstimate } : {}),
+      });
+    }
   }
   function goBack() {
     if (step > 1) setStep((s) => (s - 1) as Step);
@@ -324,6 +345,11 @@ export default function BookTraining() {
       setBookingNumber(data.bookingNumber || "");
       setDepositInfo(data.pricing || null);
       setSubmitted(true);
+      trackEvent("booking_completed", {
+        total_price: data.pricing?.total ?? totalEstimate,
+        participant_count: participantCount,
+        zip_code: customerZip,
+      });
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
     onError: (err: Error) => {
@@ -558,17 +584,32 @@ export default function BookTraining() {
                     </div>
                   )}
                   {zipError && (
-                    <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                      <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 font-medium text-sm mb-1">
+                    <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                      <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 font-medium text-sm mb-3">
                         <AlertCircle className="w-5 h-5 shrink-0" />
                         {t("bookTraining.areaNotAvailable")}
                       </div>
-                      <p className="text-sm text-amber-600 dark:text-amber-400 ml-7">
-                        {t("bookTraining.areaNotAvailableDesc")}{" "}
-                        <Link href="/request-onsite-training" className="underline font-medium" data-testid="link-request-custom">
-                          {t("bookTraining.requestCustom")}
-                        </Link>
+                      <p className="text-sm text-amber-600 dark:text-amber-400 ml-7 mb-3">
+                        {t("bookTraining.areaNotAvailableDesc")}
                       </p>
+                      <div className="flex flex-col sm:flex-row gap-3 ml-7">
+                        <Link
+                          href="/online-training"
+                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-accent text-accent-foreground font-semibold text-sm hover:brightness-95 transition-all"
+                          data-testid="link-get-certified-online"
+                        >
+                          <Shield className="w-4 h-4" />
+                          {t("bookTraining.getCertifiedOnline")}
+                        </Link>
+                        <Link
+                          href="/request-quote"
+                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 font-semibold text-sm hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all"
+                          data-testid="link-request-custom-quote"
+                        >
+                          <ClipboardList className="w-4 h-4" />
+                          {t("bookTraining.requestCustomQuote")}
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>

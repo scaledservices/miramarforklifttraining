@@ -213,6 +213,8 @@
   },
   "guidedSelector": {
     "sectionLabel": "Comenzar",
+    "pageTitle": "Certifícate | {{brand}}",
+    "pageDescription": "Responde dos preguntas rápidas y te guiaremos al programa correcto de certificación de montacargas — en línea, práctico, o en sitio para equipos.",
     "title": "¿Qué Necesitas?",
     "subtitle": "Elige tu camino hacia la certificación — te guiaremos al programa correcto.",
     "locationTitle": "¿Dónde Necesitas Capacitación?",
@@ -1713,6 +1715,8 @@
     "areaNotAvailable": "No disponible actualmente en su área",
     "areaNotAvailableDesc": "Actualmente servimos el sur de California, centro de California y sur de Nevada.",
     "requestCustom": "Solicitar arreglos personalizados",
+    "getCertifiedOnline": "Certifícate en Línea",
+    "requestCustomQuote": "Solicitar Cotización Personalizada",
     "selectTraining": "Seleccionar Programa de Capacitación",
     "selectTrainingDesc": "Seleccione uno o más programas de capacitación y/o tipos de equipo para los que necesita certificación.",
     "perPerson": "por persona",

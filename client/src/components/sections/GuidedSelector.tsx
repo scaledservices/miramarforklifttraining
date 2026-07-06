@@ -35,7 +35,9 @@ interface LocationOption {
 }
 
 const locations: LocationOption[] = [
-  { id: "san-diego", labelKey: "guidedSelector.sanDiego", href: "/locations/san-diego" },
+  { id: "san-diego", labelKey: "guidedSelector.sanDiego", href: "/book-training" },
+  { id: "las-vegas", labelKey: "guidedSelector.lasVegas", href: "/book-training" },
+  { id: "fresno", labelKey: "guidedSelector.fresno", href: "/book-training" },
 ];
 
 export default function GuidedSelector() {
@@ -49,7 +51,7 @@ export default function GuidedSelector() {
       icon: Monitor,
       titleKey: "guidedSelector.onlineTitle",
       descKey: "guidedSelector.onlineDesc",
-      href: "/p/online-forklift-operator-training",
+      href: "/checkout",
       color: "text-accent",
       bgColor: "bg-accent/10",
       recommended: true,
@@ -64,7 +66,7 @@ export default function GuidedSelector() {
       icon: Wrench,
       titleKey: "guidedSelector.handsOnTitle",
       descKey: "guidedSelector.handsOnDesc",
-      href: "/hands-on-training",
+      href: "/book-training",
       color: "text-emerald-600 dark:text-emerald-400",
       bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
       features: [
@@ -78,7 +80,7 @@ export default function GuidedSelector() {
       icon: Users,
       titleKey: "guidedSelector.teamTitle",
       descKey: "guidedSelector.teamDesc",
-      href: "/p/online-forklift-operator-training?seats=5",
+      href: "/request-quote",
       color: "text-purple-600 dark:text-purple-400",
       bgColor: "bg-purple-50 dark:bg-purple-950/30",
       features: [
@@ -242,7 +244,7 @@ export default function GuidedSelector() {
               <button
                 type="button"
                 className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-accent underline-offset-4 hover:underline transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 rounded px-2 py-1"
-                onClick={() => navigate("/request-onsite-training")}
+                onClick={() => navigate("/request-quote")}
                 data-testid="selector-onsite-link"
               >
                 {t("guidedSelector.needOnsiteTraining")}

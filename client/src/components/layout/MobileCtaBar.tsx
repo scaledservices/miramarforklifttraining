@@ -7,7 +7,7 @@ import { brand } from "@shared/config/brand";
 const HIDDEN_PREFIXES = [
   "/admin", "/group", "/dashboard", "/course", "/checkout", "/cart",
   "/login", "/register", "/reset-password", "/accept-invite", "/request-quote",
-  "/book-training", "/reservar-capacitacion", "/pay-balance",
+  "/book-training", "/get-certified", "/reservar-capacitacion", "/pay-balance",
   "/pago", "/carrito", "/iniciar-sesion", "/crear-cuenta", "/restablecer-contrasena",
   "/aceptar-invitacion", "/panel", "/equipo",
 ];
@@ -32,12 +32,12 @@ export default function MobileCtaBar() {
         {t("mobileBar.call")}
       </a>
       <Link
-        href="/book-training"
+        href="/get-certified"
         className="flex items-center justify-center gap-2 py-3.5 text-sm font-semibold bg-accent text-accent-foreground"
         data-testid="mobile-cta-quote"
       >
         <CalendarDays className="w-4 h-4" />
-        {t("mobileBar.book")}
+        {t("cta.getCertified")}
       </Link>
     </div>
   );

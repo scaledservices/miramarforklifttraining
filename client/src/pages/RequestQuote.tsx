@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +8,7 @@ import { industry } from "@shared/config/industry";
 import { getActiveLocations, getLocation, type TrainingLocation } from "@shared/config/locations";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { trackLeadSubmit } from "@/lib/analytics";
+import { trackLeadSubmit, trackEvent } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -83,6 +83,11 @@ export default function RequestQuote() {
   const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
 
+  // Track funnel entry: user landed on the quote form.
+  useEffect(() => {
+    trackEvent("quote_started", {});
+  }, []);
+
   const defaultLocationSlug = activeLocations.length > 0 ? activeLocations[0].slug : "san-diego";
 
   const form = useForm<FormValues>({
@@ -138,6 +143,12 @@ export default function RequestQuote() {
     },
     onSuccess: () => {
       trackLeadSubmit(getLeadSourceFromUrl(), form.getValues("requestedLocationSlug"));
+      trackEvent("quote_submitted", {
+        lead_source: getLeadSourceFromUrl(),
+        trainee_count: form.getValues("traineeCount"),
+        training_location: form.getValues("trainingLocation"),
+        requested_location: form.getValues("requestedLocationSlug"),
+      });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
