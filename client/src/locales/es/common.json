@@ -1,4 +1,23 @@
 {
+  "admin": {
+    "bookings": {
+      "photos": {
+        "title": "Fotos de Capacitación",
+        "upload": "Subir Foto",
+        "uploadSuccess": "Foto subida",
+        "uploadError": "Error al subir la foto",
+        "noPhotos": "Aún no hay fotos",
+        "captionPlaceholder": "Agregar una descripción...",
+        "captionSaved": "Descripción guardada",
+        "captionError": "Error al guardar la descripción",
+        "deleted": "Foto eliminada",
+        "deleteError": "Error al eliminar la foto",
+        "shareWithCustomer": "Compartir con el Cliente",
+        "shareLinkCopied": "Enlace copiado al portapapeles",
+        "viewPhoto": "Foto"
+      }
+    }
+  },
   "nav": {
     "trainingPrograms": "Programas de Capacitación",
     "onlineTraining": "Capacitación en Línea",
@@ -2273,5 +2292,97 @@
     "dashboardCtaTitle": "Recomienda a un Amigo y Gana $50 de Crédito",
     "dashboardCtaDesc": "Comparte tu código de referido — tus amigos obtienen 10% de descuento, tú obtienes $50 después de que reserven.",
     "dashboardCtaLink": "Ir a Referidos"
+  },
+  "roleCerts": {
+    "title": "Recomendaciones de Certificaciones por Rol",
+    "subtitle": "Selecciona un rol de trabajo para ver las certificaciones recomendadas para tu equipo.",
+    "selectRoleLabel": "Selecciona un rol de trabajo",
+    "selectRolePlaceholder": "Elige un rol...",
+    "recommendedCertsLabel": "Certificaciones Recomendadas",
+    "noCerts": "No hay certificaciones recomendadas para este rol.",
+    "certs": {
+      "forklift": "Certificación de Montacargas",
+      "electric-pallet-jack": "Transpaleta Eléctrica",
+      "scissor-lift": "Plataforma de Tijera",
+      "aerial-boom-lift": "Plataforma de Brazo Articulado"
+    },
+    "roles": {
+      "warehouse_associate": {
+        "name": "Asociado de Almacén",
+        "description": "Los asociados operan frecuentemente montacargas y transpaletas eléctricas para mover inventario."
+      },
+      "warehouse_lead": {
+        "name": "Supervisor de Almacén",
+        "description": "Los supervisores trabajan con múltiples tipos de equipo y deben estar certificados en montacargas, plataformas de tijera y brazos articulados."
+      },
+      "forklift_operator": {
+        "name": "Operador de Montacargas",
+        "description": "La responsabilidad principal es operar montacargas; se requiere la certificación estándar de montacargas."
+      },
+      "warehouse_manager": {
+        "name": "Gerente de Almacén",
+        "description": "Los gerentes supervisan todas las operaciones de equipo y deben estar certificados en montacargas, plataformas de tijera y brazos articulados."
+      },
+      "delivery_driver": {
+        "name": "Conductor de Entrega",
+        "description": "Los conductores cargan y descargan usando transpaletas eléctricas en los sitios de entrega."
+      },
+      "maintenance_technician": {
+        "name": "Técnico de Mantenimiento",
+        "description": "Los técnicos operan montacargas y plataformas de tijera para acceder y dar servicio a equipos en altura."
+      },
+      "production_worker": {
+        "name": "Trabajador de Producción",
+        "description": "Los trabajadores mueven materiales usando montacargas y transpaletas eléctricas en el piso de producción."
+      },
+      "construction_worker": {
+        "name": "Trabajador de Construcción",
+        "description": "Los sitios de construcción requieren operación de montacargas y trabajo con brazos articulados para tareas elevadas."
+      },
+      "yard_worker": {
+        "name": "Trabajador de Patio",
+        "description": "Los trabajadores de patio operan montacargas para mover materiales y equipos en áreas de almacenamiento exterior."
+      },
+      "logistics_coordinator": {
+        "name": "Coordinador de Logística",
+        "description": "Los coordinadores manejan el movimiento de carga usando montacargas y transpaletas eléctricas en áreas de carga."
+      }
+    }
+  },
+  "compliance": {
+    "title": "Panel de Cumplimiento",
+    "subtitle": "Controle el estado de certificación de su equipo y manténgase listo para auditorías.",
+    "totalEmployees": "Empleados Totales",
+    "certified": "Certificados",
+    "expiringSoon": "Por Vencer",
+    "expired": "Vencidos",
+    "notCertified": "No Certificados",
+    "employeeTable": "Lista de Empleados",
+    "name": "Nombre",
+    "role": "Rol",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "roleTitle": "Puesto",
+    "roleTitlePlaceholder": "ej., Operador de Montacargas",
+    "certStatus": "Estado de Cert.",
+    "certNumber": "N.° de Cert.",
+    "expiryDate": "Fecha de Vencimiento",
+    "actions": "Acciones",
+    "addEmployee": "Agregar Empleado",
+    "importCsv": "Importar CSV",
+    "import": "Importar",
+    "pasteData": "Pegue los datos CSV a continuación",
+    "importHelpTitle": "Formato CSV",
+    "importHelpText": "Cada línea debe ser: nombre,correo,teléfono,puesto (correo, teléfono y puesto son opcionales). Se omitirá una fila de encabezado que comience con \"name,email\".",
+    "noEmployees": "No hay empleados en su lista todavía.",
+    "addFirstEmployee": "Agregue Su Primer Empleado",
+    "employeeAdded": "Empleado agregado exitosamente",
+    "employeeArchived": "Empleado archivado",
+    "bulkArchived": "Empleados archivados",
+    "archiveSelected": "Archivar ({{count}})",
+    "auditBinder": "Expediente de Auditoría",
+    "auditBinderDesc": "Descargue un informe de cumplimiento completo de su empresa.",
+    "downloadBinder": "Descargar Expediente de Auditoría",
+    "backToCrew": "Volver al Equipo"
   }
 }

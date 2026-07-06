@@ -1,4 +1,23 @@
 {
+  "admin": {
+    "bookings": {
+      "photos": {
+        "title": "Training Photos",
+        "upload": "Upload Photo",
+        "uploadSuccess": "Photo uploaded",
+        "uploadError": "Failed to upload photo",
+        "noPhotos": "No photos yet",
+        "captionPlaceholder": "Add a caption...",
+        "captionSaved": "Caption saved",
+        "captionError": "Failed to save caption",
+        "deleted": "Photo deleted",
+        "deleteError": "Failed to delete photo",
+        "shareWithCustomer": "Share with Customer",
+        "shareLinkCopied": "Share link copied to clipboard",
+        "viewPhoto": "Photo"
+      }
+    }
+  },
   "nav": {
     "trainingPrograms": "Training Programs",
     "onlineTraining": "Online Training",
@@ -2273,5 +2292,97 @@
     "dashboardCtaTitle": "Refer a Friend & Earn $50 Credit",
     "dashboardCtaDesc": "Share your referral code — friends get 10% off, you get $50 after they book.",
     "dashboardCtaLink": "Go to Referrals"
+  },
+  "roleCerts": {
+    "title": "Role Certification Recommendations",
+    "subtitle": "Select a job role to see recommended certifications for your team.",
+    "selectRoleLabel": "Select a job role",
+    "selectRolePlaceholder": "Choose a role...",
+    "recommendedCertsLabel": "Recommended Certifications",
+    "noCerts": "No certifications recommended for this role.",
+    "certs": {
+      "forklift": "Forklift Certification",
+      "electric-pallet-jack": "Electric Pallet Jack",
+      "scissor-lift": "Scissor Lift",
+      "aerial-boom-lift": "Aerial Boom Lift"
+    },
+    "roles": {
+      "warehouse_associate": {
+        "name": "Warehouse Associate",
+        "description": "Associates frequently operate forklifts and electric pallet jacks to move inventory."
+      },
+      "warehouse_lead": {
+        "name": "Warehouse Lead",
+        "description": "Leads supervise across multiple equipment types and must be certified on forklifts, scissor lifts, and boom lifts."
+      },
+      "forklift_operator": {
+        "name": "Forklift Operator",
+        "description": "Primary responsibility is operating forklifts; standard forklift certification is required."
+      },
+      "warehouse_manager": {
+        "name": "Warehouse Manager",
+        "description": "Managers oversee all equipment operations and should be certified on forklifts, scissor lifts, and boom lifts."
+      },
+      "delivery_driver": {
+        "name": "Delivery Driver",
+        "description": "Drivers load and unload using electric pallet jacks at delivery sites."
+      },
+      "maintenance_technician": {
+        "name": "Maintenance Technician",
+        "description": "Technicians operate forklifts and scissor lifts to access and service equipment at height."
+      },
+      "production_worker": {
+        "name": "Production Worker",
+        "description": "Workers move materials using forklifts and electric pallet jacks on the production floor."
+      },
+      "construction_worker": {
+        "name": "Construction Worker",
+        "description": "Construction sites require forklift operation and aerial boom lift work for elevated tasks."
+      },
+      "yard_worker": {
+        "name": "Yard Worker",
+        "description": "Yard workers operate forklifts to move materials and equipment around outdoor storage areas."
+      },
+      "logistics_coordinator": {
+        "name": "Logistics Coordinator",
+        "description": "Coordinators handle freight movement using forklifts and electric pallet jacks in loading areas."
+      }
+    }
+  },
+  "compliance": {
+    "title": "Compliance Dashboard",
+    "subtitle": "Track your team's certification status and stay audit-ready.",
+    "totalEmployees": "Total Employees",
+    "certified": "Certified",
+    "expiringSoon": "Expiring Soon",
+    "expired": "Expired",
+    "notCertified": "Not Certified",
+    "employeeTable": "Employee Roster",
+    "name": "Name",
+    "role": "Role",
+    "email": "Email",
+    "phone": "Phone",
+    "roleTitle": "Job Title",
+    "roleTitlePlaceholder": "e.g., Forklift Operator",
+    "certStatus": "Cert Status",
+    "certNumber": "Cert Number",
+    "expiryDate": "Expiry Date",
+    "actions": "Actions",
+    "addEmployee": "Add Employee",
+    "importCsv": "Import CSV",
+    "import": "Import",
+    "pasteData": "Paste CSV data below",
+    "importHelpTitle": "CSV Format",
+    "importHelpText": "Each line should be: name,email,phone,roleTitle (email, phone, and roleTitle are optional). A header row starting with \"name,email\" will be skipped.",
+    "noEmployees": "No employees in your roster yet.",
+    "addFirstEmployee": "Add Your First Employee",
+    "employeeAdded": "Employee added successfully",
+    "employeeArchived": "Employee archived",
+    "bulkArchived": "Employees archived",
+    "archiveSelected": "Archive ({{count}})",
+    "auditBinder": "Audit Binder",
+    "auditBinderDesc": "Download a comprehensive compliance report for your company.",
+    "downloadBinder": "Download Audit Binder",
+    "backToCrew": "Back to Crew"
   }
 }

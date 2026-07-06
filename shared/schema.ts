@@ -421,6 +421,21 @@ export type InsertBooking = z.infer<typeof insertBookingSchema>;
 export type ServiceArea = typeof serviceAreas.$inferSelect;
 export type Booking = typeof bookings.$inferSelect;
 
+export const bookingPhotos = pgTable("booking_photos", {
+  id: serial("id").primaryKey(),
+  bookingId: integer("booking_id").notNull().references(() => bookings.id),
+  url: text("url").notNull(),
+  caption: text("caption"),
+  uploadedBy: integer("uploaded_by").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("booking_photos_booking_id_idx").on(table.bookingId),
+]);
+
+export const insertBookingPhotoSchema = createInsertSchema(bookingPhotos).omit({ id: true, createdAt: true });
+export type InsertBookingPhoto = z.infer<typeof insertBookingPhotoSchema>;
+export type BookingPhoto = typeof bookingPhotos.$inferSelect;
+
 export interface AvailabilityRules {
   daysOfWeek: number[];
   timeSlots: { startTime: string; endTime: string }[];
@@ -504,6 +519,27 @@ export const companies = pgTable("companies", {
 }, (table) => [
   index("companies_assigned_rep_idx").on(table.assignedRepId),
 ]);
+
+export const employeeRoster = pgTable("employee_roster", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
+  userId: integer("user_id").references(() => users.id),
+  name: text("name").notNull(),
+  email: text("email"),
+  phone: text("phone"),
+  roleTitle: text("role_title"),
+  status: text("status", { enum: ["active", "archived"] }).notNull().default("active"),
+  addedById: integer("added_by_id").notNull().references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("employee_roster_company_id_idx").on(table.companyId),
+  index("employee_roster_user_id_idx").on(table.userId),
+  index("employee_roster_status_idx").on(table.status),
+]);
+
+export const insertEmployeeRosterSchema = createInsertSchema(employeeRoster).omit({ id: true, createdAt: true });
+export type InsertEmployeeRoster = z.infer<typeof insertEmployeeRosterSchema>;
+export type EmployeeRoster = typeof employeeRoster.$inferSelect;
 
 export const contacts = pgTable("contacts", {
   id: serial("id").primaryKey(),

@@ -12,7 +12,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, Users, BookOpen, TrendingUp, Award, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Users, BookOpen, TrendingUp, Award, ArrowLeft, ClipboardCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 function GroupSidebar() {
@@ -25,6 +25,7 @@ function GroupSidebar() {
     { title: t("group.seatAssignments"), href: "/group/seats", icon: BookOpen },
     { title: t("group.progress"), href: "/group/progress", icon: TrendingUp },
     { title: t("group.certifications"), href: "/group/certifications", icon: Award },
+    { title: t("compliance.title"), href: "/compliance-dashboard", icon: ClipboardCheck },
   ];
 
   return (

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import AdminLayout from "./AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,9 +31,13 @@ import {
   UserX,
   Loader2,
   QrCode,
+  Camera,
+  Trash2,
+  Share2,
+  Link2,
 } from "lucide-react";
 import PayLinkQRDialog from "@/components/admin/PayLinkQRDialog";
-import type { Booking, ServiceArea } from "@shared/schema";
+import type { Booking, ServiceArea, BookingPhoto } from "@shared/schema";
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
@@ -77,7 +82,11 @@ export default function AdminBookings() {
   const [rescheduleForm, setRescheduleForm] = useState({ sessionDate: "", startTime: "", endTime: "" });
   const [completePromptOpen, setCompletePromptOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  const [photoLightbox, setPhotoLightbox] = useState<BookingPhoto | null>(null);
+  const [captionInputs, setCaptionInputs] = useState<Record<number, string>>({});
+  const [shareLinkCopied, setShareLinkCopied] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const { data: bookings, isLoading } = useQuery<Booking[]>({
     queryKey: ["/api/bookings"],
@@ -179,6 +188,73 @@ export default function AdminBookings() {
     },
     onError: (err: Error) => toast({ title: err.message || "Failed to reschedule", variant: "destructive" }),
   });
+
+  // --- Photos ---
+  const photosQueryKey = ["/api/bookings", selectedBooking?.id, "photos"];
+
+  const { data: photos, isLoading: photosLoading } = useQuery<BookingPhoto[]>({
+    queryKey: photosQueryKey,
+    queryFn: async () => {
+      const res = await apiRequest("GET", `/api/bookings/${selectedBooking!.id}/photos`);
+      return res.json();
+    },
+    enabled: !!selectedBooking?.id,
+  });
+
+  const uploadPhotoMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("photo", file);
+      const res = await fetch(`/api/admin/bookings/${selectedBooking!.id}/photos`, {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Upload failed");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: photosQueryKey });
+      toast({ title: t("admin.bookings.photos.uploadSuccess") });
+    },
+    onError: (err: Error) => toast({ title: err.message || t("admin.bookings.photos.uploadError"), variant: "destructive" }),
+  });
+
+  const updateCaptionMutation = useMutation({
+    mutationFn: async ({ photoId, caption }: { photoId: number; caption: string }) => {
+      const res = await apiRequest("PATCH", `/api/admin/bookings/${selectedBooking!.id}/photos/${photoId}`, { caption });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: photosQueryKey });
+      toast({ title: t("admin.bookings.photos.captionSaved") });
+    },
+    onError: (err: Error) => toast({ title: err.message || t("admin.bookings.photos.captionError"), variant: "destructive" }),
+  });
+
+  const deletePhotoMutation = useMutation({
+    mutationFn: async (photoId: number) => {
+      await apiRequest("DELETE", `/api/admin/bookings/${selectedBooking!.id}/photos/${photoId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: photosQueryKey });
+      toast({ title: t("admin.bookings.photos.deleted") });
+    },
+    onError: (err: Error) => toast({ title: err.message || t("admin.bookings.photos.deleteError"), variant: "destructive" }),
+  });
+
+  const handleShareLink = () => {
+    if (!selectedBooking) return;
+    const shareUrl = `${window.location.origin}/bookings/${selectedBooking.id}/photos`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setShareLinkCopied(true);
+      toast({ title: t("admin.bookings.photos.shareLinkCopied") });
+      setTimeout(() => setShareLinkCopied(false), 3000);
+    });
+  };
 
   const searchLower = search.trim().toLowerCase();
   const filtered = (bookings || [])
@@ -568,6 +644,102 @@ export default function AdminBookings() {
                   </div>
                 )}
 
+                {/* Photos */}
+                <div className="space-y-3" data-testid="booking-photos-section">
+                  <div className="flex items-center justify-between">
+                    <div className="font-medium text-sm flex items-center gap-2">
+                      <Camera className="h-4 w-4 text-muted-foreground" />
+                      {t("admin.bookings.photos.title")}
+                    </div>
+                    {photos && photos.length > 0 && (
+                      <Button size="sm" variant="outline" onClick={handleShareLink} data-testid="button-share-photos">
+                        {shareLinkCopied ? <Link2 className="h-4 w-4 mr-1" /> : <Share2 className="h-4 w-4 mr-1" />}
+                        {t("admin.bookings.photos.shareWithCustomer")}
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Upload button */}
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <span className="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium h-9 px-4 bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-upload-photo">
+                      {uploadPhotoMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                      {t("admin.bookings.photos.upload")}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadPhotoMutation.mutate(file);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+
+                  {/* Photo grid */}
+                  {photosLoading ? (
+                    <Skeleton className="h-24 w-full" />
+                  ) : photos && photos.length > 0 ? (
+                    <div className="grid grid-cols-3 gap-2">
+                      {photos.map((photo) => (
+                        <div key={photo.id} className="relative group rounded-lg overflow-hidden border">
+                          <img
+                            src={photo.url}
+                            alt={photo.caption || "Training photo"}
+                            className="w-full h-24 object-cover cursor-pointer"
+                            onClick={() => setPhotoLightbox(photo)}
+                            data-testid={`img-booking-photo-${photo.id}`}
+                          />
+                          {photo.caption && (
+                            <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-1 truncate">
+                              {photo.caption}
+                            </div>
+                          )}
+                          <button
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deletePhotoMutation.mutate(photo.id);
+                            }}
+                            data-testid={`button-delete-photo-${photo.id}`}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">{t("admin.bookings.photos.noPhotos")}</p>
+                  )}
+
+                  {/* Caption editor for lightbox photo */}
+                  {photoLightbox && (
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        placeholder={t("admin.bookings.photos.captionPlaceholder")}
+                        value={captionInputs[photoLightbox.id] ?? photoLightbox.caption ?? ""}
+                        onChange={(e) => setCaptionInputs((prev) => ({ ...prev, [photoLightbox.id]: e.target.value }))}
+                        className="flex-1"
+                        data-testid="input-photo-caption"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          updateCaptionMutation.mutate({
+                            photoId: photoLightbox.id,
+                            caption: captionInputs[photoLightbox.id] ?? "",
+                          });
+                        }}
+                        disabled={updateCaptionMutation.isPending}
+                        data-testid="button-save-caption"
+                      >
+                        {t("common.save")}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex flex-wrap gap-2 pt-2">
                   {selectedBooking.status === "pending" && (
                     <Button
@@ -789,6 +961,28 @@ export default function AdminBookings() {
             amountDue={finance.balanceDue}
           />
         )}
+
+        {/* Photo lightbox */}
+        <Dialog open={!!photoLightbox} onOpenChange={() => setPhotoLightbox(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>{t("admin.bookings.photos.viewPhoto")}</DialogTitle>
+            </DialogHeader>
+            {photoLightbox && (
+              <div className="space-y-3">
+                <img
+                  src={photoLightbox.url}
+                  alt={photoLightbox.caption || "Training photo"}
+                  className="w-full rounded-lg max-h-[60vh] object-contain"
+                  data-testid="img-lightbox"
+                />
+                {photoLightbox.caption && (
+                  <p className="text-sm text-muted-foreground">{photoLightbox.caption}</p>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );

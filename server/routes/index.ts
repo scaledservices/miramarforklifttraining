@@ -25,6 +25,9 @@ import { registerDiscountRoutes } from "./discounts";
 import { registerReferralRoutes } from "./referrals";
 import { registerGeoRoutes } from "./geo";
 import { registerAuditBinderRoutes } from "./audit-binder";
+import { registerRosterRoutes } from "./roster";
+import { registerRoleCertRoutes } from "./role-certs";
+import { registerPhotoRoutes } from "./photos";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -75,6 +78,9 @@ export async function registerRoutes(
   registerReferralRoutes(app);
   registerGeoRoutes(app);
   registerAuditBinderRoutes(app);
+  registerRosterRoutes(app);
+  registerRoleCertRoutes(app);
+  registerPhotoRoutes(app);
 
   return httpServer;
 }

@@ -70,6 +70,7 @@ import ReferralProgram from "@/pages/ReferralProgram";
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const CoursePlayer = lazy(() => import("@/pages/CoursePlayer"));
 const GroupDashboard = lazy(() => import("@/pages/group/GroupDashboard"));
+const ComplianceDashboard = lazy(() => import("@/pages/ComplianceDashboard"));
 const GroupMembers = lazy(() => import("@/pages/group/GroupMembers"));
 const GroupSeats = lazy(() => import("@/pages/group/GroupSeats"));
 const GroupProgress = lazy(() => import("@/pages/group/GroupProgress"));
@@ -207,6 +208,8 @@ function AppRoutes() {
       <Route path="/group/seats">{() => <ProtectedRoute roles={["group_admin", "admin", "super_admin"]}><GroupSeats /></ProtectedRoute>}</Route>
       <Route path="/group/progress">{() => <ProtectedRoute roles={["group_admin", "admin", "super_admin"]}><GroupProgress /></ProtectedRoute>}</Route>
       <Route path="/group/certifications">{() => <ProtectedRoute roles={["group_admin", "admin", "super_admin"]}><GroupCertifications /></ProtectedRoute>}</Route>
+      <Route path="/compliance-dashboard">{() => <ProtectedRoute roles={["group_admin", "admin", "super_admin"]}><ComplianceDashboard /></ProtectedRoute>}</Route>
+      <Route path="/audit-binder/:companyId">{() => <ProtectedRoute roles={["group_admin", "admin", "super_admin"]}><AuditBinder /></ProtectedRoute>}</Route>
       <Route path="/admin">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminToday /></ProtectedRoute>}</Route>
       <Route path="/admin/today">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminToday /></ProtectedRoute>}</Route>
       <Route path="/admin/overview">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminDashboard /></ProtectedRoute>}</Route>
