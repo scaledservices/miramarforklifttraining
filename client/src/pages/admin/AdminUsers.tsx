@@ -13,8 +13,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Pencil, BookOpen, ShoppingCart, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import UserCard from "@/components/admin/users/UserCard";
 
-interface AdminUser {
+export interface AdminUser {
   id: number;
   name: string;
   email: string;
@@ -92,7 +93,30 @@ export default function AdminUsers() {
             ))}
           </div>
         ) : (
-          <div className="border rounded-md">
+          <>
+            {/* Mobile: cards */}
+            <div className="space-y-3 md:hidden" data-testid="list-users-mobile">
+              {filtered.map((user) => (
+                <UserCard
+                  key={user.id}
+                  user={user}
+                  currentUserRole={currentUser?.role}
+                  onRoleChange={(id, role) => roleMutation.mutate({ id, role })}
+                  onViewEnrollments={(id) => navigate(`/admin/enrollments?user=${id}`)}
+                  onViewOrders={(id) => navigate(`/admin/orders?user=${id}`)}
+                  onEdit={(u) => {
+                    setEditUser(u);
+                    setEditName(u.name);
+                  }}
+                />
+              ))}
+              {filtered.length === 0 && (
+                <p className="text-center text-muted-foreground py-10">No users found</p>
+              )}
+            </div>
+
+            {/* Desktop: table */}
+            <div className="border rounded-md hidden md:block" data-testid="table-users-desktop">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -189,7 +213,8 @@ export default function AdminUsers() {
                 )}
               </TableBody>
             </Table>
-          </div>
+            </div>
+          </>
         )}
       </div>
 

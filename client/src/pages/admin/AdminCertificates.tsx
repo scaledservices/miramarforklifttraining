@@ -9,8 +9,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Download, Ban, RefreshCw, Building2 } from "lucide-react";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
+import CertificateCard from "@/components/admin/certificates/CertificateCard";
 
-interface AdminCert {
+export interface AdminCert {
   id: number;
   certificateNumber: string;
   userId: number;
@@ -99,7 +100,28 @@ export default function AdminCertificates() {
             ))}
           </div>
         ) : (
-          <div className="border rounded-md">
+          <>
+            {/* Mobile: cards */}
+            <div className="space-y-3 md:hidden" data-testid="list-certs-mobile">
+              {certs.map((cert) => (
+                <CertificateCard
+                  key={cert.id}
+                  cert={cert}
+                  statusVariant={statusVariant}
+                  onDownload={downloadCert}
+                  onRevoke={(id) => revokeMutation.mutate(id)}
+                  onReissue={(id) => reissueMutation.mutate(id)}
+                  revoking={revokeMutation.isPending}
+                  reissuing={reissueMutation.isPending}
+                />
+              ))}
+              {certs.length === 0 && (
+                <p className="text-center text-muted-foreground py-10">No certificates found</p>
+              )}
+            </div>
+
+            {/* Desktop: table */}
+            <div className="border rounded-md hidden md:block" data-testid="table-certs-desktop">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -188,7 +210,8 @@ export default function AdminCertificates() {
                 )}
               </TableBody>
             </Table>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </AdminLayout>
