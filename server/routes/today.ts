@@ -8,6 +8,7 @@ import {
   onsiteTrainingRequests,
   contacts,
   companies,
+  contactSubmissions,
 } from "@shared/schema";
 import { requireRole } from "./middleware";
 
@@ -138,8 +139,9 @@ export function registerTodayRoutes(app: Express) {
         });
       }
 
-      // New leads: onsite training requests plus CRM contacts from the last 7 days.
-      const [requestRows, contactRows] = await Promise.all([
+      // New leads: onsite training requests, contact-form submissions, and CRM
+      // contacts from the last 7 days.
+      const [requestRows, contactRows, submissionRows] = await Promise.all([
         db
           .select()
           .from(onsiteTrainingRequests)
@@ -151,6 +153,11 @@ export function registerTodayRoutes(app: Express) {
           .leftJoin(companies, eq(contacts.companyId, companies.id))
           .where(gte(contacts.createdAt, sevenDaysAgo))
           .orderBy(asc(contacts.createdAt)),
+        db
+          .select()
+          .from(contactSubmissions)
+          .where(gte(contactSubmissions.createdAt, sevenDaysAgo))
+          .orderBy(asc(contactSubmissions.createdAt)),
       ]);
 
       const newLeads = [
@@ -173,6 +180,16 @@ export function registerTodayRoutes(app: Express) {
           detail: contact.title || null,
           status: null,
           createdAt: contact.createdAt,
+        })),
+        ...submissionRows.map((s) => ({
+          type: "contact" as const,
+          id: s.id,
+          name: s.name,
+          phone: s.phone,
+          company: null,
+          detail: s.message ? s.message.slice(0, 120) : null,
+          status: null,
+          createdAt: s.createdAt,
         })),
       ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
