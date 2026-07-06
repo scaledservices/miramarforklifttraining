@@ -10,7 +10,7 @@ import { INDUSTRIES } from "@shared/config/industries";
 import SEOHead from "@/components/seo/SEOHead";
 import { breadcrumbSchema } from "@/components/seo/StructuredData";
 import { SITE_URL } from "@/components/seo/siteUrl";
-import { ArrowRight, Truck, Phone } from "lucide-react";
+import { ArrowRight, Truck, Phone, Users } from "lucide-react";
 
 const INDUSTRY_ICONS: Record<string, string> = {
   warehousing: "📦",
@@ -119,6 +119,27 @@ export default function IndustriesHub() {
               </Button>
             </a>
           </div>
+        </div>
+
+        {/* Staffing Agency Program Link */}
+        <div className="mt-8 bg-gradient-to-r from-brand-dark to-[hsl(10,22%,16%)] text-white rounded-lg p-8 md:p-10 text-center">
+          <Badge variant="secondary" className="mb-3 bg-white/10 text-white border-white/20">
+            <Users className="w-3 h-3 mr-1" /> {isEs ? "Programa Especial" : "Special Program"}
+          </Badge>
+          <h3 className="text-xl md:text-2xl font-bold mb-2">
+            {isEs ? "Es Agencia de Personal Temporal?" : "Staffing Agency?"}
+          </h3>
+          <p className="text-white/80 mb-5 max-w-2xl mx-auto">
+            {isEs
+              ? "Certifique a sus trabajadores temporales en 24 horas con reservacion prioritaria, descuentos por volumen y facturacion net-30."
+              : "Get your temps certified in 24 hours with priority booking, volume pricing, and net-30 invoicing."}
+          </p>
+          <Link href="/staffing-agency-program">
+            <Button size="lg" className="bg-accent text-accent-foreground border-accent-border" data-testid="hub-cta-staffing">
+              {isEs ? "Ver Programa para Agencias" : "View Staffing Agency Program"}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

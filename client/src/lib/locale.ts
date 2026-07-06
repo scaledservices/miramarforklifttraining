@@ -47,6 +47,7 @@ const EN_TO_ES_SLUGS: Record<string, string> = {
   "/onsite-forklift-training": "/capacitacion-montacargas-en-sitio",
   "/forklift-certification-wallet-card": "/tarjeta-billetera-montacargas",
   "/industries": "/industrias",
+  "/staffing-agency-program": "/programa-agencias-personal",
   "/certifications": "/certificaciones",
   "/verify": "/verificar",
 };

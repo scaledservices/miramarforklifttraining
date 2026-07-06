@@ -69,6 +69,7 @@ import { useLocaleLocation } from "@/hooks/useLocaleLocation";
 import { DEFAULT_LOCALE, getStoredLocale } from "@/lib/locale";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ReferralProgram from "@/pages/ReferralProgram";
+import StaffingAgencyProgram from "@/pages/StaffingAgencyProgram";
 
 // Route-level code splitting: admin, group, and LMS pages load on demand.
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
@@ -185,6 +186,7 @@ function AppRoutes() {
       <Route path="/certificacion-montacargas-fresno">{() => <SpanishServiceArea city="fresno" />}</Route>
       <Route path="/industries" component={IndustriesHub} />
       <Route path="/industries/:slug">{(params: { slug: string }) => <IndustryLanding slug={params.slug} />}</Route>
+      <Route path="/staffing-agency-program" component={StaffingAgencyProgram} />
       <Route path="/renewal" component={RenewalPage} />
       <Route path="/faq" component={FAQPage} />
       <Route path="/in-person-training" component={InPersonTraining} />

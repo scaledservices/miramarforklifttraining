@@ -17,6 +17,10 @@ const ctaKeyMap: Record<string, string> = {
   "Order Kit": "ctaLabels.orderKit",
 };
 
+// NOTE: This component is currently unused — it is not imported anywhere in
+// the app. Kept for potential future use on landing/marketing pages. If you
+// are removing unused code, verify with the team first as it may be wired up
+// as part of an A/B test or planned page redesign.
 export default function PricingPreview() {
   const { t } = useTranslation();
   const featured = useTranslatedProducts(getFeaturedProducts());

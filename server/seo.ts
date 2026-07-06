@@ -43,6 +43,7 @@ const STATIC_MARKETING_PAGES = [
   "/industries/food-beverage",
   "/industries/lumber-building-materials",
   "/industries/shipping-ports",
+  "/staffing-agency-program",
   "/blog/osha-forklift-certification-requirements",
   "/blog/how-long-does-forklift-certification-take",
   "/blog/forklift-training-for-businesses",
@@ -91,6 +92,7 @@ const EN_TO_ES_STATIC_SLUGS: Record<string, string> = {
   "/industries/food-beverage": "/industrias/food-beverage",
   "/industries/lumber-building-materials": "/industrias/lumber-building-materials",
   "/industries/shipping-ports": "/industrias/shipping-ports",
+  "/staffing-agency-program": "/programa-agencias-personal",
 };
 
 const ES_TO_EN_SEO_SLUGS: Record<string, string> = {

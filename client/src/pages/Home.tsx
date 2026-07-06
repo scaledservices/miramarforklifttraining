@@ -291,6 +291,30 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Train-the-Trainer cross-sell banner */}
+      <section className="py-10 md:py-12 bg-muted/30" data-testid="ttt-cross-sell">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div>
+              <h3 className="text-xl font-bold mb-1" style={{ fontFamily: "'Roboto Slab', serif" }}>
+                {t("home.tttBannerTitle")}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {t("home.tttBannerDesc")}
+              </p>
+            </div>
+            <Link
+              href="/train-the-trainer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold whitespace-nowrap"
+              data-testid="ttt-banner-link"
+            >
+              {t("home.tttBannerCta")}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <FAQSection
         items={faqItems}
         maxItems={6}

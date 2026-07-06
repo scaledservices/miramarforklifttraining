@@ -247,6 +247,15 @@ export default function BookTraining() {
       }));
   }, [selectedDate, rawSlots]);
 
+  const nextAvailableDate = useMemo(() => {
+    if (!rawSlots || !Array.isArray(rawSlots)) return null;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const sorted = rawSlots
+      .filter((s) => s.available && s.date >= todayStr)
+      .sort((a, b) => a.date.localeCompare(b.date));
+    return sorted.length > 0 ? sorted[0].date : null;
+  }, [rawSlots]);
+
   const calWeeks = useMemo(() => generateCalendarDates(calYear, calMonth), [calYear, calMonth]);
 
   async function checkZip() {
@@ -700,6 +709,13 @@ export default function BookTraining() {
                     {t("bookTraining.chooseDateTime")}
                   </h2>
                   <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.chooseDateTimeDesc")}</p>
+
+                  {nextAvailableDate && !slotsLoading && (
+                    <p className="text-sm text-green-700 dark:text-green-400 mb-4 flex items-center gap-1.5" data-testid="text-next-available">
+                      <Calendar className="w-4 h-4" />
+                      {t("bookTraining.nextAvailable", { date: formatDate(nextAvailableDate, i18n.language || "en") })}
+                    </p>
+                  )}
 
                   {slotsLoading ? (
                     <div className="flex items-center justify-center py-12">
