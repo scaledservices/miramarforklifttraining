@@ -19,6 +19,8 @@ import { registerAssistantRoutes } from "./assistant";
 import { registerTrainingEventRoutes } from "./training-events";
 import { registerQuoteRoutes } from "./quotes";
 import { registerAuthorizeNetRoutes } from "./authorizeNet";
+import { registerTodayRoutes } from "./today";
+import { registerMoneyRoutes } from "./money";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -63,6 +65,8 @@ export async function registerRoutes(
   registerTrainingEventRoutes(app);
   registerQuoteRoutes(app);
   registerAuthorizeNetRoutes(app);
+  registerTodayRoutes(app);
+  registerMoneyRoutes(app);
 
   return httpServer;
 }

@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import AdminLayout from "./AdminLayout";
+import MoneySummaryCard from "@/components/admin/money/MoneySummaryCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -147,6 +148,8 @@ export default function AdminReports() {
           <h1 className="text-2xl font-bold" data-testid="text-reports-title">{t("adminReports.title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">{t("adminReports.description")}</p>
         </div>
+
+        <MoneySummaryCard />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card data-testid="card-conversion-lead">
