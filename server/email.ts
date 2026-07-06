@@ -1338,3 +1338,42 @@ export async function sendAbandonedCheckoutReminder(params: {
     actorUserId: params.actorUserId,
   });
 }
+
+
+export async function sendBalanceDueEmail(params: {
+  to: string;
+  contactName: string;
+  bookingNumber: string;
+  bookingId: number;
+  balanceDue: number;
+  actorUserId?: number;
+  locale?: string;
+}) {
+  const baseUrl = getSiteUrl();
+  const es = (params.locale || "en") === "es";
+  const payUrl = `${baseUrl}${es ? "/es" : "/en"}/pay-balance/${params.bookingId}`;
+
+  return sendEmail({
+    to: params.to,
+    subject: es
+      ? `Saldo pendiente - Reserva ${params.bookingNumber}`
+      : `Balance Due - Booking ${params.bookingNumber}`,
+    template: "balance_due",
+    payload: { bookingNumber: params.bookingNumber, balanceDue: params.balanceDue },
+    html: wrap(params.locale || "en", `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${es ? "Saldo Pendiente de su Capacitación" : "Your Training Balance Is Due"}</h2>
+      <p>${es ? `Hola ${params.contactName},` : `Hi ${params.contactName},`}</p>
+      <p>${es
+        ? `Gracias por capacitarse con nosotros. El saldo restante de su reserva <strong>${params.bookingNumber}</strong> es:`
+        : `Thank you for training with us. The remaining balance for your booking <strong>${params.bookingNumber}</strong> is:`}</p>
+      <p style="font-size: 26px; font-weight: bold; color: ${theme.email.headingColor}; text-align: center; margin: 24px 0;">$${params.balanceDue.toFixed(2)}</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${payUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${es ? "Pagar Saldo en Línea" : "Pay Balance Online"}</a>
+      </div>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${es
+        ? `¿Preguntas? Llámenos al ${brand.support.phone}.`
+        : `Questions? Call us at ${brand.support.phone}.`}</p>
+    `),
+    actorUserId: params.actorUserId,
+  });
+}

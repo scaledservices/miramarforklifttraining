@@ -400,7 +400,7 @@ export const bookings = pgTable("bookings", {
   contactPhone: text("contact_phone").notNull(),
   contactEmail: text("contact_email").notNull(),
   specialRequests: text("special_requests"),
-  status: text("status", { enum: ["pending", "confirmed", "cancelled", "completed"] }).notNull().default("pending"),
+  status: text("status", { enum: ["pending", "confirmed", "cancelled", "completed", "no_show"] }).notNull().default("pending"),
   orderId: integer("order_id").references(() => orders.id),
   totalPrice: numeric("total_price", { precision: 10, scale: 2 }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

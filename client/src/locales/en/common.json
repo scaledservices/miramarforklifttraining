@@ -1056,7 +1056,11 @@
     "section6Title": "6. Exceptions",
     "section6Text": "Refunds will not be issued for failure to pass the certification exam, inability to meet employer-specific requirements beyond the scope of our training, technical issues that have been documented and resolved by our support team, or dissatisfaction with {{body}} regulatory requirements that we are obligated to include in training content.",
     "section7Title": "7. Contact Us",
-    "section7Text": "For refund inquiries or to initiate a refund request, please contact us at {{email}} or through our Contact page. Please include your order number and reason for the refund request."
+    "section7Text": "For refund inquiries or to initiate a refund request, please contact us at {{email}} or through our Contact page. Please include your order number and reason for the refund request.",
+    "depositTitle": "In-Person & Onsite Training Deposits",
+    "depositText1": "You may reschedule your in-person or onsite training session free of charge up to 24 hours before the scheduled start time.",
+    "depositText2": "Deposits are fully refundable if Miramar cannot deliver the scheduled training. In all other cases, deposits are credited toward a rescheduled session rather than refunded.",
+    "depositText3": "No-shows without notice may forfeit up to 50% of the deposit."
   },
   "location": {
     "notFoundTitle": "Location Not Found",
@@ -1329,7 +1333,8 @@
     "viewPrograms": "View All Programs",
     "monday": "Monday",
     "wednesday": "Wednesday",
-    "friday": "Friday"
+    "friday": "Friday",
+    "bookNowCta": "Book This Training"
   },
   "instructor": {
     "seoTitle": "Become a Forklift Instructor | {{brand}}",
@@ -2187,6 +2192,9 @@
     "policyLink": "cancellation & refund policy",
     "freeReschedule": "free reschedule up to 24 hours before your session.",
     "processing": "Processing...",
-    "priceAnchor": "Hands-on certification runs $350+ per person elsewhere."
+    "priceAnchor": "Hands-on certification runs $350+ per person elsewhere.",
+    "largeGroupTitle": "Booking for 10 or more?",
+    "largeGroupDesc": "For large groups we build a custom quote with volume pricing — usually cheaper than standard rates.",
+    "largeGroupCta": "Get a Volume Quote"
   }
 }

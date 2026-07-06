@@ -74,6 +74,21 @@ export default function RefundPolicy() {
             </p>
           </section>
 
+          <section data-testid="section-training-deposits">
+            <h2 className="text-lg font-semibold">{t("refundPolicy.depositTitle")}</h2>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t("refundPolicy.depositText1")}
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t("refundPolicy.depositText2")}
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {t("refundPolicy.depositText3")}
+              </p>
+            </div>
+          </section>
+
           <section data-testid="section-exceptions">
             <h2 className="text-lg font-semibold">{t("refundPolicy.section6Title")}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed">

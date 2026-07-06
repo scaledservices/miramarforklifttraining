@@ -333,12 +333,19 @@ export default function ProductDetail() {
                   )}
 
                   {product.category === "hands-on" && typeof product.price === "number" && !product.courseSlug && (
-                    <Link href="/request-onsite-training">
-                      <Button size="lg" className="w-full bg-accent text-accent-foreground border-accent-border mb-3" data-testid="button-request-onsite-training">
-                        {t("productDetail.requestOnsiteTraining")}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </Link>
+                    <>
+                      <Link href={`/book-training/${product.slug}`}>
+                        <Button size="lg" className="w-full bg-accent text-accent-foreground border-accent-border mb-2" data-testid="button-book-now">
+                          {t("productDetail.bookNowCta")}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </Link>
+                      <div className="text-center mb-3">
+                        <Link href="/request-onsite-training" className="text-sm text-muted-foreground hover:text-accent underline underline-offset-4" data-testid="link-request-onsite-training">
+                          {t("productDetail.requestOnsiteTraining")}
+                        </Link>
+                      </div>
+                    </>
                   )}
 
                   {product.price === "call" && (

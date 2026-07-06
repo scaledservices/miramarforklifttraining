@@ -7,7 +7,7 @@ import { brand } from "@shared/config/brand";
 const HIDDEN_PREFIXES = [
   "/admin", "/group", "/dashboard", "/course", "/checkout", "/cart",
   "/login", "/register", "/reset-password", "/accept-invite", "/request-quote",
-  "/book-training", "/reservar-capacitacion",
+  "/book-training", "/reservar-capacitacion", "/pay-balance",
   "/pago", "/carrito", "/iniciar-sesion", "/crear-cuenta", "/restablecer-contrasena",
   "/aceptar-invitacion", "/panel", "/equipo",
 ];

@@ -3,7 +3,7 @@ import { storage } from "../storage";
 import { z } from "zod";
 import { brand } from "@shared/config/brand";
 import { documentCatalog, generateDocumentPdf, getDocumentDef } from "../document-pdf";
-import { sendBookingConfirmation, sendBookingCancellation, sendBookingConfirmedEmail, sendBookingCompletedEmail, sendBookingAdminNotificationToAll, sendBookingCancellationAdminAlert } from "../email";
+import { sendBookingConfirmation, sendBookingCancellation, sendBookingConfirmedEmail, sendBookingCompletedEmail, sendBookingAdminNotificationToAll, sendBookingCancellationAdminAlert, sendBalanceDueEmail } from "../email";
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, requireRole } from "./middleware";
 import { db } from "../db";
@@ -475,6 +475,332 @@ app.patch("/api/bookings/:id/confirm", requireRole("admin", "super_admin"), asyn
   } catch (error) {
     console.error("[Bookings] Confirm error:", error);
     return res.status(500).json({ error: "Failed to confirm booking" });
+  }
+});
+
+
+// ---------- Phase A: booking finance, balance collection, reschedule, no-show ----------
+
+async function getBookingFinance(bookingId: number) {
+  const booking = await storage.getBookingById(bookingId);
+  if (!booking) return null;
+  const total = Number(booking.totalPrice);
+  let paid = 0;
+  let payments: any[] = [];
+  if (booking.orderId) {
+    payments = await storage.getPaymentsByOrder(booking.orderId);
+    paid = payments
+      .filter((p: any) => p.status === "approved")
+      .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+    // Refunds reduce the paid total
+    paid -= payments
+      .filter((p: any) => p.status === "refunded")
+      .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+  }
+  const balanceDue = Math.max(0, Math.round((total - paid) * 100) / 100);
+  return { booking, total, paid: Math.round(paid * 100) / 100, balanceDue, payments };
+}
+
+app.get("/api/admin/bookings/:id/finance", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+  try {
+    const fin = await getBookingFinance(Number(req.params.id));
+    if (!fin) return res.status(404).json({ error: "Booking not found" });
+    const { booking, total, paid, balanceDue, payments } = fin;
+    return res.json({
+      bookingId: booking.id,
+      orderId: booking.orderId,
+      total,
+      paid,
+      balanceDue,
+      payments: payments.map((p: any) => ({ id: p.id, provider: p.provider, status: p.status, amount: Number(p.amount), createdAt: p.createdAt })),
+    });
+  } catch (error) {
+    console.error("[Bookings] Finance error:", error);
+    return res.status(500).json({ error: "Failed to load booking finance" });
+  }
+});
+
+app.post("/api/admin/bookings/:id/record-balance", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+  try {
+    const { method, amount, note } = req.body;
+    const ALLOWED_METHODS = ["cash", "check", "card_reader", "other"];
+    if (!ALLOWED_METHODS.includes(method)) return res.status(400).json({ error: "Invalid payment method" });
+    const amt = Number(amount);
+    if (!Number.isFinite(amt) || amt <= 0) return res.status(400).json({ error: "Invalid amount" });
+
+    const fin = await getBookingFinance(Number(req.params.id));
+    if (!fin) return res.status(404).json({ error: "Booking not found" });
+    if (!fin.booking.orderId) return res.status(400).json({ error: "Booking has no linked order" });
+    if (amt > fin.balanceDue + 0.01) {
+      return res.status(400).json({ error: `Amount exceeds balance due ($${fin.balanceDue.toFixed(2)})` });
+    }
+
+    await storage.createPayment({
+      orderId: fin.booking.orderId,
+      provider: `manual_${method}`,
+      providerTransactionId: null,
+      status: "approved",
+      amount: String(amt.toFixed(2)),
+      rawResponse: { recordedBy: req.session.userId, note: note || null },
+    });
+
+    const after = await getBookingFinance(fin.booking.id);
+    if (after && after.balanceDue <= 0.01) {
+      await storage.updateOrderStatus(fin.booking.orderId, "paid");
+    }
+
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "balance_payment_recorded",
+      entity: "booking",
+      entityId: String(fin.booking.id),
+      metadata: { bookingNumber: fin.booking.bookingNumber, method, amount: amt, note: note || null },
+    });
+
+    return res.json({ success: true, balanceDue: after?.balanceDue ?? 0 });
+  } catch (error) {
+    console.error("[Bookings] Record balance error:", error);
+    return res.status(500).json({ error: "Failed to record payment" });
+  }
+});
+
+app.post("/api/admin/bookings/:id/send-balance-link", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+  try {
+    const fin = await getBookingFinance(Number(req.params.id));
+    if (!fin) return res.status(404).json({ error: "Booking not found" });
+    if (fin.balanceDue <= 0.01) return res.status(400).json({ error: "No balance due on this booking" });
+
+    const linkLocale = await resolveLocale({ userId: fin.booking.userId ?? undefined });
+    await sendBalanceDueEmail({
+      to: fin.booking.contactEmail,
+      contactName: fin.booking.contactName,
+      bookingNumber: fin.booking.bookingNumber,
+      bookingId: fin.booking.id,
+      balanceDue: fin.balanceDue,
+      actorUserId: req.session.userId!,
+      locale: linkLocale,
+    });
+
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "balance_link_sent",
+      entity: "booking",
+      entityId: String(fin.booking.id),
+      metadata: { bookingNumber: fin.booking.bookingNumber, balanceDue: fin.balanceDue, to: fin.booking.contactEmail },
+    });
+
+    return res.json({ success: true });
+  } catch (error) {
+    console.error("[Bookings] Send balance link error:", error);
+    return res.status(500).json({ error: "Failed to send payment link" });
+  }
+});
+
+// Customer-facing: view own booking balance
+app.get("/api/bookings/:id/balance", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const fin = await getBookingFinance(Number(req.params.id));
+    if (!fin || fin.booking.userId !== req.session.userId) return res.status(404).json({ error: "Booking not found" });
+    return res.json({
+      bookingNumber: fin.booking.bookingNumber,
+      sessionDate: fin.booking.sessionDate,
+      total: fin.total,
+      paid: fin.paid,
+      balanceDue: fin.balanceDue,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to load balance" });
+  }
+});
+
+// Customer-facing: pay own remaining balance by card
+app.post("/api/bookings/:id/pay-balance", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const fin = await getBookingFinance(Number(req.params.id));
+    if (!fin || fin.booking.userId !== req.session.userId) return res.status(404).json({ error: "Booking not found" });
+    if (!fin.booking.orderId) return res.status(400).json({ error: "Booking has no linked order" });
+    if (fin.balanceDue <= 0.01) return res.status(400).json({ error: "No balance due" });
+    if (!isAuthorizeNetConfigured()) return res.status(400).json({ error: "Online payment is not available. Please call us." });
+
+    const { paymentNonce } = req.body;
+    if (!paymentNonce) return res.status(400).json({ error: "Payment details required" });
+
+    const surcharge = calculateCardSurcharge(fin.balanceDue);
+    const chargeAmount = Number((fin.balanceDue + surcharge).toFixed(2));
+
+    const order = await storage.getOrder(fin.booking.orderId);
+    const result = await createTransactionFromNonce(paymentNonce, chargeAmount, fin.booking.orderId, order?.orderNumber || `BAL-${fin.booking.bookingNumber}`, true);
+    if (!result.success) {
+      return res.status(400).json({ error: result.errorMessage || "Payment was declined" });
+    }
+
+    const { payments: paymentsTable } = await import("@shared/schema");
+    await db.insert(paymentsTable).values({
+      orderId: fin.booking.orderId,
+      provider: "authorize_net",
+      providerTransactionId: result.transactionId,
+      amount: String(chargeAmount),
+      status: "approved",
+    });
+    await storage.updateOrderStatus(fin.booking.orderId, "paid");
+
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "balance_paid_online",
+      entity: "booking",
+      entityId: String(fin.booking.id),
+      metadata: { bookingNumber: fin.booking.bookingNumber, amount: chargeAmount, transactionId: result.transactionId },
+    });
+
+    return res.json({ success: true, amountCharged: chargeAmount, surcharge });
+  } catch (error) {
+    console.error("[Bookings] Pay balance error:", error);
+    return res.status(500).json({ error: "Failed to process payment" });
+  }
+});
+
+app.patch("/api/admin/bookings/:id/reschedule", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+  try {
+    const { sessionDate, startTime, endTime } = req.body;
+    if (!sessionDate || !startTime || !endTime) return res.status(400).json({ error: "Date and time slot required" });
+
+    const booking = await storage.getBookingById(Number(req.params.id));
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
+    if (booking.status === "cancelled" || booking.status === "completed") {
+      return res.status(400).json({ error: `Cannot reschedule a ${booking.status} booking` });
+    }
+
+    const area = await storage.getServiceAreaById(booking.serviceAreaId);
+    const rules = area?.availabilityRules as any;
+    if (rules?.blackoutDates?.includes(sessionDate)) {
+      return res.status(400).json({ error: "That date is blocked for training" });
+    }
+    const trainerBusy = await storage.isTrainerBookedOnDate(sessionDate, booking.serviceAreaId);
+    if (trainerBusy) {
+      return res.status(409).json({ error: "The trainer is already booked at another location on this date" });
+    }
+
+    const { bookings: bookingsTable } = await import("@shared/schema");
+    const { eq: eqOp } = await import("drizzle-orm");
+    const [updated] = await db.update(bookingsTable)
+      .set({ sessionDate, startTime, endTime, updatedAt: new Date() })
+      .where(eqOp(bookingsTable.id, booking.id))
+      .returning();
+
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "booking_rescheduled",
+      entity: "booking",
+      entityId: String(booking.id),
+      metadata: { bookingNumber: booking.bookingNumber, from: `${booking.sessionDate} ${booking.startTime}`, to: `${sessionDate} ${startTime}` },
+    });
+
+    return res.json(updated);
+  } catch (error) {
+    console.error("[Bookings] Reschedule error:", error);
+    return res.status(500).json({ error: "Failed to reschedule booking" });
+  }
+});
+
+app.patch("/api/admin/bookings/:id/no-show", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+  try {
+    const booking = await storage.getBookingById(Number(req.params.id));
+    if (!booking) return res.status(404).json({ error: "Booking not found" });
+    if (booking.status !== "confirmed" && booking.status !== "pending") {
+      return res.status(400).json({ error: "Only pending or confirmed bookings can be marked no-show" });
+    }
+    const updated = await storage.updateBookingStatus(booking.id, "no_show");
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "booking_no_show",
+      entity: "booking",
+      entityId: String(booking.id),
+      metadata: { bookingNumber: booking.bookingNumber },
+    });
+    return res.json(updated);
+  } catch (error) {
+    return res.status(500).json({ error: "Failed to update booking" });
+  }
+});
+
+// ---------- Phase A: service-area management ----------
+
+function slugify(name: string): string {
+  return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+app.post("/api/admin/service-areas", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+  try {
+    const { name, state, zipPrefixes, cities, availabilityRules } = req.body;
+    if (!name || typeof name !== "string" || name.trim().length < 2) return res.status(400).json({ error: "Name is required" });
+    if (!state || typeof state !== "string" || state.trim().length < 2) return res.status(400).json({ error: "State is required" });
+    if (!Array.isArray(zipPrefixes) || zipPrefixes.length === 0 || !zipPrefixes.every((z: any) => /^\d{3,5}$/.test(String(z)))) {
+      return res.status(400).json({ error: "At least one ZIP code or 3-digit ZIP prefix is required" });
+    }
+
+    const { serviceAreas: areasTable } = await import("@shared/schema");
+    const slug = slugify(name);
+    const values: any = {
+      name: name.trim(),
+      slug,
+      state: state.trim().toUpperCase().slice(0, 2),
+      zipPrefixes: zipPrefixes.map((z: any) => String(z)),
+      cities: Array.isArray(cities) ? cities : [],
+      isActive: true,
+    };
+    if (availabilityRules) values.availabilityRules = availabilityRules;
+
+    const [created] = await db.insert(areasTable).values(values).returning();
+
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "service_area_created",
+      entity: "service_area",
+      entityId: String(created.id),
+      metadata: { name: created.name, slug: created.slug },
+    });
+
+    return res.status(201).json(created);
+  } catch (error: any) {
+    if (error?.code === "23505") return res.status(400).json({ error: "A service area with this name already exists" });
+    console.error("[ServiceAreas] Create error:", error);
+    return res.status(500).json({ error: "Failed to create service area" });
+  }
+});
+
+app.patch("/api/admin/service-areas/:id", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+  try {
+    const { name, state, zipPrefixes, cities, isActive } = req.body;
+    const { serviceAreas: areasTable } = await import("@shared/schema");
+    const { eq: eqOp } = await import("drizzle-orm");
+
+    const updates: any = { updatedAt: new Date() };
+    if (name !== undefined) updates.name = String(name).trim();
+    if (state !== undefined) updates.state = String(state).trim().toUpperCase().slice(0, 2);
+    if (zipPrefixes !== undefined) {
+      if (!Array.isArray(zipPrefixes) || !zipPrefixes.every((z: any) => /^\d{3,5}$/.test(String(z)))) {
+        return res.status(400).json({ error: "ZIP prefixes must be 3-5 digit codes" });
+      }
+      updates.zipPrefixes = zipPrefixes.map((z: any) => String(z));
+    }
+    if (cities !== undefined) updates.cities = Array.isArray(cities) ? cities : [];
+    if (isActive !== undefined) updates.isActive = Boolean(isActive);
+
+    const [updated] = await db.update(areasTable).set(updates).where(eqOp(areasTable.id, Number(req.params.id))).returning();
+    if (!updated) return res.status(404).json({ error: "Service area not found" });
+
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "service_area_updated",
+      entity: "service_area",
+      entityId: String(updated.id),
+      metadata: { name: updated.name, isActive: updated.isActive },
+    });
+
+    return res.json(updated);
+  } catch (error) {
+    console.error("[ServiceAreas] Update error:", error);
+    return res.status(500).json({ error: "Failed to update service area" });
   }
 });
 

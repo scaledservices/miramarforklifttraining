@@ -10,12 +10,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, MapPin, Clock, Phone, Users, Award, Shield } from "lucide-react";
 
 const COURSE_KEYS = [
-  { key: "standard", price: 200, equipmentKeys: ["counterbalanceForklift"] },
-  { key: "reachForklift", price: 280, equipmentKeys: ["counterbalanceForklift", "reachTruck"] },
-  { key: "orderPickerForklift", price: 280, equipmentKeys: ["counterbalanceForklift", "orderPicker"] },
-  { key: "forkliftScissorEpj", price: 300, equipmentKeys: ["counterbalanceForklift", "scissorLift", "electricPalletJack"] },
-  { key: "fullMultiEquipment", price: 350, equipmentKeys: ["counterbalanceForklift", "reachTruck", "orderPicker", "scissorLift", "electricPalletJack"] },
-  { key: "scissorAerial", price: 280, equipmentKeys: ["scissorLift", "aerialBoomLift"] },
+  { key: "standard", price: 200, slug: "standard-forklift-certification-san-diego", equipmentKeys: ["counterbalanceForklift"] },
+  { key: "reachForklift", price: 280, slug: "reach-forklift-training-san-diego", equipmentKeys: ["counterbalanceForklift", "reachTruck"] },
+  { key: "orderPickerForklift", price: 280, slug: "order-picker-forklift-training-san-diego", equipmentKeys: ["counterbalanceForklift", "orderPicker"] },
+  { key: "forkliftScissorEpj", price: 300, slug: "forklift-scissor-lift-epj-certification-san-diego", equipmentKeys: ["counterbalanceForklift", "scissorLift", "electricPalletJack"] },
+  { key: "fullMultiEquipment", price: 350, slug: "complete-equipment-certification-san-diego", equipmentKeys: ["counterbalanceForklift", "reachTruck", "orderPicker", "scissorLift", "electricPalletJack"] },
+  { key: "scissorAerial", price: 280, slug: "scissor-aerial-boom-lift-certification-san-diego", equipmentKeys: ["scissorLift", "aerialBoomLift"] },
 ] as const;
 
 export default function InPersonTraining() {
@@ -33,7 +33,7 @@ export default function InPersonTraining() {
         image="/images/hero-forklift.jpg"
         title={t("inPerson.heroTitle")}
         subtitle={t("inPerson.heroSubtitle")}
-        primaryCta={{ label: t("inPerson.getQuote"), href: "/request-quote" }}
+        primaryCta={{ label: t("home.bookTrainingCta"), href: "/book-training" }}
         secondaryCta={{ label: t("inPerson.callUs"), href: `tel:${brand.support.phoneTel}` }}
         badges={[t("hero.oshaAlignedTraining"), t("hero.sameDayCertification")]}
       />
@@ -62,14 +62,20 @@ export default function InPersonTraining() {
                       </div>
                     ))}
                   </div>
-                  <Link href="/request-quote">
-                    <Button variant="outline" className="w-full" data-testid={`button-quote-${course.key}`}>
-                      {t("inPerson.getQuote")}
+                  <Link href={`/book-training/${course.slug}`}>
+                    <Button variant="outline" className="w-full" data-testid={`button-book-${course.key}`}>
+                      {t("home.bookTrainingCta")}
                     </Button>
                   </Link>
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          <div className="mt-6 text-center">
+            <Link href="/request-quote" className="text-sm text-accent hover:underline" data-testid="link-large-group-quote">
+              {t("home.largeGroupLink")}
+            </Link>
           </div>
 
           <div className="mt-8 text-center">
@@ -159,7 +165,7 @@ export default function InPersonTraining() {
       <CTABand
         title={t("inPerson.ctaTitle")}
         subtitle={t("inPerson.ctaSubtitle")}
-        primaryCta={{ label: t("inPerson.getQuote"), href: "/request-quote" }}
+        primaryCta={{ label: t("home.bookTrainingCta"), href: "/book-training" }}
         secondaryCta={{ label: t("inPerson.callUs"), href: `tel:${brand.support.phoneTel}` }}
       />
     </>

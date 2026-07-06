@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -17,13 +18,17 @@ import {
   ChevronRight,
   CheckCircle,
   XCircle,
-  Clock,
   Eye,
   MapPin,
   Phone,
   Mail,
   Users,
-  FileText,
+  Search,
+  DollarSign,
+  Send,
+  CalendarClock,
+  UserX,
+  Loader2,
 } from "lucide-react";
 import type { Booking, ServiceArea } from "@shared/schema";
 
@@ -32,13 +37,43 @@ const statusColors: Record<string, string> = {
   confirmed: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   completed: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
   cancelled: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+  no_show: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
 };
+
+const statusLabels: Record<string, string> = {
+  pending: "Needs confirmation",
+  confirmed: "Confirmed",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  no_show: "No-show",
+};
+
+interface BookingFinance {
+  bookingId: number;
+  orderId: number | null;
+  total: number;
+  paid: number;
+  balanceDue: number;
+  payments: { id: number; provider: string; status: string; amount: number; createdAt: string }[];
+}
+
+function formatSession(b: Booking): string {
+  if (!b.sessionDate) return "—";
+  const d = new Date(`${b.sessionDate}T12:00:00`);
+  return `${d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} · ${b.startTime}`;
+}
 
 export default function AdminBookings() {
   const [view, setView] = useState<"calendar" | "list">("list");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(() => new Date());
+  const [recordOpen, setRecordOpen] = useState(false);
+  const [recordForm, setRecordForm] = useState({ method: "cash", amount: "", note: "" });
+  const [rescheduleOpen, setRescheduleOpen] = useState(false);
+  const [rescheduleForm, setRescheduleForm] = useState({ sessionDate: "", startTime: "", endTime: "" });
+  const [completePromptOpen, setCompletePromptOpen] = useState(false);
   const { toast } = useToast();
 
   const { data: bookings, isLoading } = useQuery<Booking[]>({
@@ -49,12 +84,25 @@ export default function AdminBookings() {
     queryKey: ["/api/service-areas"],
   });
 
+  const { data: finance, isLoading: financeLoading } = useQuery<BookingFinance>({
+    queryKey: ["/api/admin/bookings", selectedBooking?.id, "finance"],
+    queryFn: async () => {
+      const res = await apiRequest("GET", `/api/admin/bookings/${selectedBooking!.id}/finance`);
+      return res.json();
+    },
+    enabled: !!selectedBooking?.id,
+  });
+
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/admin/bookings"] });
+  };
+
   const confirmMutation = useMutation({
     mutationFn: (id: number) => apiRequest("PATCH", `/api/bookings/${id}/confirm`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
-      toast({ title: "Booking confirmed" });
-      setSelectedBooking(null);
+      invalidate();
+      toast({ title: "Booking confirmed — customer notified by email" });
     },
     onError: () => toast({ title: "Failed to confirm booking", variant: "destructive" }),
   });
@@ -62,8 +110,9 @@ export default function AdminBookings() {
   const completeMutation = useMutation({
     mutationFn: (id: number) => apiRequest("PATCH", `/api/bookings/${id}/complete`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
-      toast({ title: "Booking marked complete" });
+      invalidate();
+      toast({ title: "Training marked complete" });
+      setCompletePromptOpen(false);
       setSelectedBooking(null);
     },
     onError: () => toast({ title: "Failed to complete booking", variant: "destructive" }),
@@ -72,16 +121,74 @@ export default function AdminBookings() {
   const cancelMutation = useMutation({
     mutationFn: (id: number) => apiRequest("PATCH", `/api/bookings/${id}/cancel`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
+      invalidate();
       toast({ title: "Booking cancelled" });
       setSelectedBooking(null);
     },
     onError: () => toast({ title: "Failed to cancel booking", variant: "destructive" }),
   });
 
-  const filtered = (bookings || []).filter((b) =>
-    statusFilter === "all" ? true : b.status === statusFilter
-  );
+  const noShowMutation = useMutation({
+    mutationFn: (id: number) => apiRequest("PATCH", `/api/admin/bookings/${id}/no-show`),
+    onSuccess: () => {
+      invalidate();
+      toast({ title: "Marked as no-show" });
+      setSelectedBooking(null);
+    },
+    onError: () => toast({ title: "Failed to update booking", variant: "destructive" }),
+  });
+
+  const recordBalanceMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/admin/bookings/${selectedBooking!.id}/record-balance`, {
+        method: recordForm.method,
+        amount: Number(recordForm.amount),
+        note: recordForm.note || undefined,
+      });
+      return res.json();
+    },
+    onSuccess: (data: any) => {
+      invalidate();
+      toast({
+        title: "Payment recorded",
+        description: data.balanceDue > 0 ? `Remaining balance: $${data.balanceDue.toFixed(2)}` : "Balance fully paid",
+      });
+      setRecordOpen(false);
+      setRecordForm({ method: "cash", amount: "", note: "" });
+    },
+    onError: (err: Error) => toast({ title: err.message || "Failed to record payment", variant: "destructive" }),
+  });
+
+  const sendLinkMutation = useMutation({
+    mutationFn: () => apiRequest("POST", `/api/admin/bookings/${selectedBooking!.id}/send-balance-link`),
+    onSuccess: () => toast({ title: "Payment link emailed to customer" }),
+    onError: (err: Error) => toast({ title: err.message || "Failed to send link", variant: "destructive" }),
+  });
+
+  const rescheduleMutation = useMutation({
+    mutationFn: () =>
+      apiRequest("PATCH", `/api/admin/bookings/${selectedBooking!.id}/reschedule`, rescheduleForm),
+    onSuccess: () => {
+      invalidate();
+      toast({ title: "Booking rescheduled" });
+      setRescheduleOpen(false);
+      setSelectedBooking(null);
+    },
+    onError: (err: Error) => toast({ title: err.message || "Failed to reschedule", variant: "destructive" }),
+  });
+
+  const searchLower = search.trim().toLowerCase();
+  const filtered = (bookings || [])
+    .filter((b) => (statusFilter === "all" ? true : b.status === statusFilter))
+    .filter((b) =>
+      !searchLower
+        ? true
+        : [b.contactName, b.contactEmail, b.contactPhone, b.bookingNumber, b.customerCity]
+            .filter(Boolean)
+            .some((v) => String(v).toLowerCase().includes(searchLower))
+    )
+    // Upcoming sessions first, then most recent past
+    .sort((a, b) => (b.sessionDate || "").localeCompare(a.sessionDate || ""));
 
   const handleViewDetail = async (booking: Booking) => {
     try {
@@ -93,19 +200,29 @@ export default function AdminBookings() {
     }
   };
 
+  function handleMarkComplete() {
+    if (finance && finance.balanceDue > 0.01) {
+      setCompletePromptOpen(true);
+    } else {
+      completeMutation.mutate(selectedBooking!.id);
+    }
+  }
+
   const year = calendarMonth.getFullYear();
   const month = calendarMonth.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayOfWeek = new Date(year, month, 1).getDay();
 
   const calendarDays = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  // Calendar is keyed on the TRAINING SESSION date — this is a schedule, not an intake log.
   const bookingsByDate: Record<string, Booking[]> = {};
   (bookings || []).forEach((b) => {
-    const created = new Date(b.createdAt);
-    const dateStr = `${created.getFullYear()}-${String(created.getMonth() + 1).padStart(2, "0")}-${String(created.getDate()).padStart(2, "0")}`;
-    if (!bookingsByDate[dateStr]) bookingsByDate[dateStr] = [];
-    bookingsByDate[dateStr].push(b);
+    if (!b.sessionDate || b.status === "cancelled") return;
+    if (!bookingsByDate[b.sessionDate]) bookingsByDate[b.sessionDate] = [];
+    bookingsByDate[b.sessionDate].push(b);
   });
+
+  const todayStr = new Date().toISOString().slice(0, 10);
 
   return (
     <AdminLayout>
@@ -131,22 +248,33 @@ export default function AdminBookings() {
               data-testid="button-view-calendar"
             >
               <CalendarIcon className="h-4 w-4 mr-1" />
-              Calendar
+              Schedule
             </Button>
           </div>
         </div>
 
         {view === "list" && (
           <div className="flex flex-wrap gap-3 items-center">
+            <div className="relative flex-1 min-w-[220px] max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search name, phone, email, booking #"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+                data-testid="input-booking-search"
+              />
+            </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40" data-testid="select-status-filter">
+              <SelectTrigger className="w-44" data-testid="select-status-filter">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="pending">Needs confirmation</SelectItem>
                 <SelectItem value="confirmed">Confirmed</SelectItem>
                 <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="no_show">No-show</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
@@ -160,78 +288,131 @@ export default function AdminBookings() {
             ))}
           </div>
         ) : view === "list" ? (
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm" data-testid="table-bookings">
-                  <thead>
-                    <tr className="border-b bg-muted/40">
-                      <th className="text-left p-3 font-medium">Booking #</th>
-                      <th className="text-left p-3 font-medium">Contact</th>
-                      <th className="text-left p-3 font-medium">Location</th>
-                      <th className="text-left p-3 font-medium">Participants</th>
-                      <th className="text-left p-3 font-medium">Total</th>
-                      <th className="text-left p-3 font-medium">Status</th>
-                      <th className="text-left p-3 font-medium">Created</th>
-                      <th className="text-left p-3 font-medium">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filtered.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} className="p-6 text-center text-muted-foreground">
-                          No bookings found
-                        </td>
+          <>
+            {/* Mobile: card list */}
+            <div className="space-y-3 md:hidden">
+              {filtered.length === 0 ? (
+                <Card><CardContent className="p-6 text-center text-muted-foreground">No bookings found</CardContent></Card>
+              ) : (
+                filtered.map((booking) => (
+                  <Card key={booking.id} data-testid={`card-booking-${booking.id}`}>
+                    <CardContent className="p-4 space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-semibold">{booking.contactName}</span>
+                        <Badge variant="secondary" className={statusColors[booking.status] || ""}>
+                          {statusLabels[booking.status] || booking.status}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {formatSession(booking)} · {booking.participantCount} people · ${Number(booking.totalPrice).toFixed(2)}
+                      </div>
+                      <div className="flex gap-2 pt-1">
+                        <Button asChild size="sm" variant="outline" className="flex-1">
+                          <a href={`tel:${booking.contactPhone}`}><Phone className="h-4 w-4 mr-1" />Call</a>
+                        </Button>
+                        <Button size="sm" variant="outline" className="flex-1" onClick={() => handleViewDetail(booking)}>
+                          <Eye className="h-4 w-4 mr-1" />Details
+                        </Button>
+                        {booking.status === "pending" && (
+                          <Button size="sm" className="flex-1" onClick={() => confirmMutation.mutate(booking.id)} disabled={confirmMutation.isPending}>
+                            <CheckCircle className="h-4 w-4 mr-1" />Confirm
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+
+            {/* Desktop: table */}
+            <Card className="hidden md:block">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm" data-testid="table-bookings">
+                    <thead>
+                      <tr className="border-b bg-muted/40">
+                        <th className="text-left p-3 font-medium">Session</th>
+                        <th className="text-left p-3 font-medium">Contact</th>
+                        <th className="text-left p-3 font-medium">Location</th>
+                        <th className="text-left p-3 font-medium">People</th>
+                        <th className="text-left p-3 font-medium">Total</th>
+                        <th className="text-left p-3 font-medium">Status</th>
+                        <th className="text-left p-3 font-medium">Actions</th>
                       </tr>
-                    ) : (
-                      filtered.map((booking) => (
-                        <tr key={booking.id} className="border-b" data-testid={`row-booking-${booking.id}`}>
-                          <td className="p-3 font-mono text-xs" data-testid={`text-booking-number-${booking.id}`}>
-                            {booking.bookingNumber}
-                          </td>
-                          <td className="p-3">
-                            <div data-testid={`text-booking-contact-${booking.id}`}>{booking.contactName}</div>
-                            <div className="text-xs text-muted-foreground">{booking.contactEmail}</div>
-                          </td>
-                          <td className="p-3">
-                            <div className="text-xs">{booking.customerCity}, {booking.customerState}</div>
-                          </td>
-                          <td className="p-3" data-testid={`text-booking-participants-${booking.id}`}>
-                            {booking.participantCount}
-                          </td>
-                          <td className="p-3" data-testid={`text-booking-total-${booking.id}`}>
-                            ${Number(booking.totalPrice).toFixed(2)}
-                          </td>
-                          <td className="p-3">
-                            <Badge
-                              variant="secondary"
-                              className={statusColors[booking.status] || ""}
-                              data-testid={`badge-booking-status-${booking.id}`}
-                            >
-                              {booking.status}
-                            </Badge>
-                          </td>
-                          <td className="p-3 text-xs text-muted-foreground">
-                            {new Date(booking.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="p-3">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleViewDetail(booking)}
-                              data-testid={`button-view-booking-${booking.id}`}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
+                    </thead>
+                    <tbody>
+                      {filtered.length === 0 ? (
+                        <tr>
+                          <td colSpan={7} className="p-6 text-center text-muted-foreground">
+                            No bookings found
                           </td>
                         </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
+                      ) : (
+                        filtered.map((booking) => (
+                          <tr key={booking.id} className="border-b" data-testid={`row-booking-${booking.id}`}>
+                            <td className="p-3 whitespace-nowrap" data-testid={`text-booking-session-${booking.id}`}>
+                              <div className={booking.sessionDate === todayStr ? "font-bold text-brand-orange" : "font-medium"}>
+                                {formatSession(booking)}
+                              </div>
+                              <div className="text-xs text-muted-foreground font-mono">{booking.bookingNumber}</div>
+                            </td>
+                            <td className="p-3">
+                              <div data-testid={`text-booking-contact-${booking.id}`}>{booking.contactName}</div>
+                              <div className="text-xs space-x-2">
+                                <a href={`tel:${booking.contactPhone}`} className="text-brand-orange hover:underline">{booking.contactPhone}</a>
+                                <a href={`mailto:${booking.contactEmail}`} className="text-muted-foreground hover:underline">{booking.contactEmail}</a>
+                              </div>
+                            </td>
+                            <td className="p-3">
+                              <div className="text-xs">{booking.customerCity}, {booking.customerState}</div>
+                            </td>
+                            <td className="p-3" data-testid={`text-booking-participants-${booking.id}`}>
+                              {booking.participantCount}
+                            </td>
+                            <td className="p-3" data-testid={`text-booking-total-${booking.id}`}>
+                              ${Number(booking.totalPrice).toFixed(2)}
+                            </td>
+                            <td className="p-3">
+                              <Badge
+                                variant="secondary"
+                                className={statusColors[booking.status] || ""}
+                                data-testid={`badge-booking-status-${booking.id}`}
+                              >
+                                {statusLabels[booking.status] || booking.status}
+                              </Badge>
+                            </td>
+                            <td className="p-3">
+                              <div className="flex items-center gap-1">
+                                {booking.status === "pending" && (
+                                  <Button
+                                    size="sm"
+                                    onClick={() => confirmMutation.mutate(booking.id)}
+                                    disabled={confirmMutation.isPending}
+                                    data-testid={`button-quick-confirm-${booking.id}`}
+                                  >
+                                    Confirm
+                                  </Button>
+                                )}
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleViewDetail(booking)}
+                                  data-testid={`button-view-booking-${booking.id}`}
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </>
         ) : (
           <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-2">
@@ -240,6 +421,7 @@ export default function AdminBookings() {
               </Button>
               <CardTitle className="text-lg" data-testid="text-calendar-month">
                 {calendarMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                <span className="block text-xs font-normal text-muted-foreground text-center">Training sessions by date</span>
               </CardTitle>
               <Button variant="ghost" size="icon" onClick={() => setCalendarMonth(new Date(year, month + 1, 1))} data-testid="button-calendar-next">
                 <ChevronRight className="h-4 w-4" />
@@ -258,17 +440,18 @@ export default function AdminBookings() {
                 {calendarDays.map((day) => {
                   const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
                   const dayBookings = bookingsByDate[dateStr] || [];
+                  const isToday = dateStr === todayStr;
                   return (
-                    <div key={day} className="min-h-[80px] p-1 bg-background" data-testid={`calendar-day-${dateStr}`}>
-                      <div className="text-xs font-medium mb-1">{day}</div>
+                    <div key={day} className={`min-h-[80px] p-1 bg-background ${isToday ? "ring-2 ring-accent ring-inset" : ""}`} data-testid={`calendar-day-${dateStr}`}>
+                      <div className={`text-xs mb-1 ${isToday ? "font-bold text-brand-orange" : "font-medium"}`}>{day}</div>
                       {dayBookings.slice(0, 3).map((b) => (
                         <div
                           key={b.id}
-                          className={`text-[10px] px-1 rounded mb-0.5 cursor-pointer truncate ${statusColors[b.status] || "bg-muted"}`}
+                          className={`text-[11px] px-1 py-0.5 rounded mb-0.5 cursor-pointer truncate ${statusColors[b.status] || "bg-muted"}`}
                           onClick={() => handleViewDetail(b)}
                           data-testid={`calendar-booking-${b.id}`}
                         >
-                          {b.contactName}
+                          {b.startTime} {b.contactName} ({b.participantCount})
                         </div>
                       ))}
                       {dayBookings.length > 3 && (
@@ -282,8 +465,9 @@ export default function AdminBookings() {
           </Card>
         )}
 
+        {/* Detail dialog */}
         <Dialog open={!!selectedBooking} onOpenChange={() => setSelectedBooking(null)}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle data-testid="text-booking-detail-title">
                 Booking {selectedBooking?.bookingNumber}
@@ -293,11 +477,49 @@ export default function AdminBookings() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary" className={statusColors[selectedBooking.status] || ""} data-testid="badge-detail-status">
-                    {selectedBooking.status}
+                    {statusLabels[selectedBooking.status] || selectedBooking.status}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    Created {new Date(selectedBooking.createdAt).toLocaleString()}
+                    {formatSession(selectedBooking)}
                   </span>
+                </div>
+
+                {/* Money */}
+                <div className="rounded-lg border bg-muted/30 p-4 space-y-1.5 text-sm" data-testid="booking-finance">
+                  {financeLoading ? (
+                    <Skeleton className="h-16 w-full" />
+                  ) : finance ? (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Training total</span>
+                        <span className="font-medium">${finance.total.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Paid so far</span>
+                        <span className="font-medium text-brand-green">${finance.paid.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-base">
+                        <span className="font-semibold">Balance due</span>
+                        <span className={`font-bold ${finance.balanceDue > 0 ? "text-brand-orange" : "text-brand-green"}`} data-testid="text-balance-due">
+                          ${finance.balanceDue.toFixed(2)}
+                        </span>
+                      </div>
+                      {finance.balanceDue > 0.01 && (
+                        <div className="flex gap-2 pt-2">
+                          <Button size="sm" className="flex-1 bg-accent text-accent-foreground border-accent-border" onClick={() => { setRecordForm((f) => ({ ...f, amount: finance.balanceDue.toFixed(2) })); setRecordOpen(true); }} data-testid="button-record-balance">
+                            <DollarSign className="h-4 w-4 mr-1" />
+                            Record Payment
+                          </Button>
+                          <Button size="sm" variant="outline" className="flex-1" onClick={() => sendLinkMutation.mutate()} disabled={sendLinkMutation.isPending} data-testid="button-send-pay-link">
+                            {sendLinkMutation.isPending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Send className="h-4 w-4 mr-1" />}
+                            Email Pay Link
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-muted-foreground">No payment record linked</span>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -307,18 +529,14 @@ export default function AdminBookings() {
                       <span data-testid="text-detail-participants">{selectedBooking.participantCount} participants</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-muted-foreground" />
-                      <span data-testid="text-detail-total">${Number(selectedBooking.totalPrice).toFixed(2)}</span>
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <a href={`tel:${selectedBooking.contactPhone}`} className="text-brand-orange hover:underline" data-testid="text-detail-phone">{selectedBooking.contactPhone}</a>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span data-testid="text-detail-phone">{selectedBooking.contactPhone}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span data-testid="text-detail-email">{selectedBooking.contactEmail}</span>
+                      <a href={`mailto:${selectedBooking.contactEmail}`} className="text-brand-orange hover:underline truncate" data-testid="text-detail-email">{selectedBooking.contactEmail}</a>
                     </div>
                   </div>
                 </div>
@@ -343,22 +561,6 @@ export default function AdminBookings() {
                   </div>
                 )}
 
-                <div className="space-y-1 text-sm">
-                  <div className="font-medium">Session Details</div>
-                  <div className="text-muted-foreground" data-testid="text-detail-session">
-                    Date: {selectedBooking.sessionDate}<br />
-                    Time: {selectedBooking.startTime} - {selectedBooking.endTime}<br />
-                    Product: {selectedBooking.productSlug}
-                  </div>
-                </div>
-
-                {selectedBooking.orderId && (
-                  <div className="text-sm">
-                    <span className="font-medium">Linked Order: </span>
-                    <span className="text-muted-foreground" data-testid="text-detail-order">#{selectedBooking.orderId}</span>
-                  </div>
-                )}
-
                 <div className="flex flex-wrap gap-2 pt-2">
                   {selectedBooking.status === "pending" && (
                     <Button
@@ -374,7 +576,7 @@ export default function AdminBookings() {
                   {selectedBooking.status === "confirmed" && (
                     <Button
                       size="sm"
-                      onClick={() => completeMutation.mutate(selectedBooking.id)}
+                      onClick={handleMarkComplete}
                       disabled={completeMutation.isPending}
                       data-testid="button-complete-booking"
                     >
@@ -383,20 +585,186 @@ export default function AdminBookings() {
                     </Button>
                   )}
                   {(selectedBooking.status === "pending" || selectedBooking.status === "confirmed") && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => cancelMutation.mutate(selectedBooking.id)}
-                      disabled={cancelMutation.isPending}
-                      data-testid="button-cancel-booking"
-                    >
-                      <XCircle className="h-4 w-4 mr-1" />
-                      Cancel
-                    </Button>
+                    <>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setRescheduleForm({
+                            sessionDate: selectedBooking.sessionDate || "",
+                            startTime: selectedBooking.startTime || "",
+                            endTime: selectedBooking.endTime || "",
+                          });
+                          setRescheduleOpen(true);
+                        }}
+                        data-testid="button-reschedule-booking"
+                      >
+                        <CalendarClock className="h-4 w-4 mr-1" />
+                        Reschedule
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => noShowMutation.mutate(selectedBooking.id)}
+                        disabled={noShowMutation.isPending}
+                        data-testid="button-no-show-booking"
+                      >
+                        <UserX className="h-4 w-4 mr-1" />
+                        No-show
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => cancelMutation.mutate(selectedBooking.id)}
+                        disabled={cancelMutation.isPending}
+                        data-testid="button-cancel-booking"
+                      >
+                        <XCircle className="h-4 w-4 mr-1" />
+                        Cancel
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Record balance payment */}
+        <Dialog open={recordOpen} onOpenChange={setRecordOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Record Balance Payment</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>How was it paid?</Label>
+                <Select value={recordForm.method} onValueChange={(v) => setRecordForm((f) => ({ ...f, method: v }))}>
+                  <SelectTrigger data-testid="select-payment-method">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="check">Check</SelectItem>
+                    <SelectItem value="card_reader">Card reader on site</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Amount received</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={recordForm.amount}
+                  onChange={(e) => setRecordForm((f) => ({ ...f, amount: e.target.value }))}
+                  data-testid="input-record-amount"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Note (optional)</Label>
+                <Input
+                  placeholder="Check #, who paid, etc."
+                  value={recordForm.note}
+                  onChange={(e) => setRecordForm((f) => ({ ...f, note: e.target.value }))}
+                  data-testid="input-record-note"
+                />
+              </div>
+              <Button
+                className="w-full bg-accent text-accent-foreground border-accent-border"
+                onClick={() => recordBalanceMutation.mutate()}
+                disabled={recordBalanceMutation.isPending || !recordForm.amount}
+                data-testid="button-save-payment"
+              >
+                {recordBalanceMutation.isPending ? "Saving..." : "Save Payment"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Reschedule */}
+        <Dialog open={rescheduleOpen} onOpenChange={setRescheduleOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Reschedule Training</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>New date</Label>
+                <Input
+                  type="date"
+                  value={rescheduleForm.sessionDate}
+                  onChange={(e) => setRescheduleForm((f) => ({ ...f, sessionDate: e.target.value }))}
+                  data-testid="input-reschedule-date"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Start</Label>
+                  <Input
+                    type="time"
+                    value={rescheduleForm.startTime}
+                    onChange={(e) => setRescheduleForm((f) => ({ ...f, startTime: e.target.value }))}
+                    data-testid="input-reschedule-start"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>End</Label>
+                  <Input
+                    type="time"
+                    value={rescheduleForm.endTime}
+                    onChange={(e) => setRescheduleForm((f) => ({ ...f, endTime: e.target.value }))}
+                    data-testid="input-reschedule-end"
+                  />
+                </div>
+              </div>
+              <Button
+                className="w-full"
+                onClick={() => rescheduleMutation.mutate()}
+                disabled={rescheduleMutation.isPending || !rescheduleForm.sessionDate || !rescheduleForm.startTime || !rescheduleForm.endTime}
+                data-testid="button-save-reschedule"
+              >
+                {rescheduleMutation.isPending ? "Saving..." : "Reschedule"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Complete with outstanding balance prompt */}
+        <Dialog open={completePromptOpen} onOpenChange={setCompletePromptOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Balance still due</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 text-sm">
+              <p>
+                This booking still has <span className="font-bold text-brand-orange">${finance?.balanceDue.toFixed(2)}</span> outstanding.
+                Collect it before closing out the training.
+              </p>
+              <div className="flex flex-col gap-2">
+                <Button
+                  className="bg-accent text-accent-foreground border-accent-border"
+                  onClick={() => { setCompletePromptOpen(false); setRecordForm((f) => ({ ...f, amount: finance!.balanceDue.toFixed(2) })); setRecordOpen(true); }}
+                  data-testid="button-collect-first"
+                >
+                  <DollarSign className="h-4 w-4 mr-1" />
+                  Record payment now
+                </Button>
+                <Button variant="outline" onClick={() => sendLinkMutation.mutate()} disabled={sendLinkMutation.isPending} data-testid="button-email-link-first">
+                  <Send className="h-4 w-4 mr-1" />
+                  Email customer a pay link
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => completeMutation.mutate(selectedBooking!.id)}
+                  disabled={completeMutation.isPending}
+                  data-testid="button-complete-anyway"
+                >
+                  Mark complete anyway (balance stays due)
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </div>

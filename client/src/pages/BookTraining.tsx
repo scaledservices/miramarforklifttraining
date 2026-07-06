@@ -825,12 +825,23 @@ export default function BookTraining() {
                       id="book-participants"
                       type="number"
                       min={1}
+                      max={serviceArea?.availabilityRules?.maxParticipants ?? 10}
                       value={participantCount}
-                      onChange={(e) => setParticipantCount(Math.max(1, parseInt(e.target.value) || 1))}
+                      onChange={(e) => setParticipantCount(Math.min(serviceArea?.availabilityRules?.maxParticipants ?? 10, Math.max(1, parseInt(e.target.value) || 1)))}
                       data-testid="input-booking-participants"
                     />
                   </div>
                 </div>
+
+                {(participantCount >= 10 || participantCount >= (serviceArea?.availabilityRules?.maxParticipants ?? 10)) && (
+                  <div className="rounded-md bg-primary/10 border border-primary/40 p-4 space-y-1" data-testid="banner-large-group">
+                    <p className="text-sm font-semibold">{t("booking.largeGroupTitle")}</p>
+                    <p className="text-sm text-muted-foreground">{t("booking.largeGroupDesc")}</p>
+                    <Link href="/request-quote" className="text-sm font-medium text-accent hover:underline inline-block" data-testid="link-booking-large-group-quote">
+                      {t("booking.largeGroupCta")}
+                    </Link>
+                  </div>
+                )}
 
                 <div className="space-y-1.5">
                   <Label htmlFor="book-notes">{t("bookTraining.specialRequests")}</Label>

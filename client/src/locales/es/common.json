@@ -1056,7 +1056,11 @@
     "section6Title": "6. Excepciones",
     "section6Text": "Los reembolsos no se emitirán por no aprobar el examen de certificación, incapacidad para cumplir requisitos específicos del empleador fuera del alcance de nuestra capacitación, problemas técnicos que han sido documentados y resueltos por nuestro equipo de soporte, o insatisfacción con los requisitos regulatorios de {{body}} que estamos obligados a incluir en el contenido de capacitación.",
     "section7Title": "7. Contáctenos",
-    "section7Text": "Para consultas de reembolso o para iniciar una solicitud de reembolso, por favor contáctenos en {{email}} o a través de nuestra página de Contacto. Por favor incluya su número de pedido y el motivo de la solicitud de reembolso."
+    "section7Text": "Para consultas de reembolso o para iniciar una solicitud de reembolso, por favor contáctenos en {{email}} o a través de nuestra página de Contacto. Por favor incluya su número de pedido y el motivo de la solicitud de reembolso.",
+    "depositTitle": "Depósitos de Capacitación Presencial y en Sitio",
+    "depositText1": "Puede reprogramar su sesión de capacitación presencial o en sitio sin costo hasta 24 horas antes de la hora de inicio programada.",
+    "depositText2": "Los depósitos son totalmente reembolsables si Miramar no puede impartir la capacitación programada. En todos los demás casos, los depósitos se acreditan a una sesión reprogramada en lugar de reembolsarse.",
+    "depositText3": "Las ausencias sin previo aviso pueden perder hasta el 50% del depósito."
   },
   "location": {
     "notFoundTitle": "Ubicación No Encontrada",
@@ -1329,7 +1333,8 @@
     "viewPrograms": "Ver Todos los Programas",
     "monday": "Lunes",
     "wednesday": "Miércoles",
-    "friday": "Viernes"
+    "friday": "Viernes",
+    "bookNowCta": "Reservar Esta Capacitación"
   },
   "instructor": {
     "seoTitle": "Conviértase en Instructor de Montacargas | {{brand}}",
@@ -2187,6 +2192,9 @@
     "policyLink": "política de cancelación y reembolso",
     "freeReschedule": "reprogramación gratuita hasta 24 horas antes de su sesión.",
     "processing": "Procesando...",
-    "priceAnchor": "La certificación práctica cuesta $350+ por persona en otros lugares."
+    "priceAnchor": "La certificación práctica cuesta $350+ por persona en otros lugares.",
+    "largeGroupTitle": "¿Reservando para 10 o más?",
+    "largeGroupDesc": "Para grupos grandes preparamos una cotización personalizada con precios por volumen, que suele ser más económica que las tarifas estándar.",
+    "largeGroupCta": "Solicitar Cotización por Volumen"
   }
 }
