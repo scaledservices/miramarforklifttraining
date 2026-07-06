@@ -28,6 +28,8 @@ import { registerAuditBinderRoutes } from "./audit-binder";
 import { registerRosterRoutes } from "./roster";
 import { registerRoleCertRoutes } from "./role-certs";
 import { registerPhotoRoutes } from "./photos";
+import { registerInvoicingRoutes } from "./invoicing";
+import { registerStandingSessionRoutes } from "./standing-sessions";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -81,6 +83,8 @@ export async function registerRoutes(
   registerRosterRoutes(app);
   registerRoleCertRoutes(app);
   registerPhotoRoutes(app);
+  registerInvoicingRoutes(app);
+  registerStandingSessionRoutes(app);
 
   return httpServer;
 }

@@ -23,6 +23,7 @@ import {
   Sun,
   DollarSign,
   Tag,
+  Repeat,
 } from "lucide-react";
 import {
   Sidebar,
@@ -44,6 +45,7 @@ const operateItems: NavItem[] = [
   { title: "Today", url: "/admin", icon: Sun },
   { title: "Bookings", url: "/admin/bookings", icon: Clock },
   { title: "Availability", url: "/admin/sessions", icon: CalendarClock },
+  { title: "Standing Sessions", url: "/admin/standing-sessions", icon: Repeat },
   { title: "Leads", url: "/admin/leads", icon: Target },
   { title: "Customers", url: "/admin/users", icon: Users },
   { title: "Money", url: "/admin/money", icon: DollarSign },

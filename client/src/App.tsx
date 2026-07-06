@@ -54,6 +54,8 @@ import GetCertified from "@/pages/GetCertified";
 import LocationsHub from "@/pages/LocationsHub";
 import ServiceAreaPage from "@/pages/ServiceAreaPage";
 import ServiceAreasHub from "@/pages/ServiceAreasHub";
+import SpanishLanding from "@/pages/SpanishLanding";
+import SpanishServiceArea from "@/pages/SpanishServiceArea";
 import { CartProvider } from "@/contexts/CartContext";
 import DemoBanner from "@/components/DemoBanner";
 import SEOHead from "@/components/seo/SEOHead";
@@ -79,6 +81,7 @@ const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
 const AdminToday = lazy(() => import("@/pages/admin/AdminToday"));
 const AdminMoney = lazy(() => import("@/pages/admin/AdminMoney"));
 const AdminDiscounts = lazy(() => import("@/pages/admin/AdminDiscounts"));
+const AdminInvoicing = lazy(() => import("@/pages/admin/AdminInvoicing"));
 const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers"));
 const AdminCourses = lazy(() => import("@/pages/admin/AdminCourses"));
 const AdminCourseEditor = lazy(() => import("@/pages/admin/AdminCourseEditor"));
@@ -92,6 +95,7 @@ const AdminSeoPages = lazy(() => import("@/pages/admin/AdminSeoPages"));
 const AdminSeoHealth = lazy(() => import("@/pages/admin/AdminSeoHealth"));
 const AdminBookings = lazy(() => import("@/pages/admin/AdminBookings"));
 const AdminSessions = lazy(() => import("@/pages/admin/AdminSessions"));
+const AdminStandingSessions = lazy(() => import("@/pages/admin/AdminStandingSessions"));
 const AdminOnsiteRequests = lazy(() => import("@/pages/admin/AdminOnsiteRequests"));
 const AdminOnsiteRequestDetail = lazy(() => import("@/pages/admin/AdminOnsiteRequestDetail"));
 const AdminLeads = lazy(() => import("@/pages/admin/AdminLeads"));
@@ -173,6 +177,10 @@ function AppRoutes() {
       <Route path="/locations/:slug">{(params: { slug: string }) => <LocationPage location={params.slug} />}</Route>
       <Route path="/service-areas" component={ServiceAreasHub} />
       <Route path="/service-areas/:city">{(params: { city: string }) => <ServiceAreaPage city={params.city} />}</Route>
+      <Route path="/certificacion-montacargas" component={SpanishLanding} />
+      <Route path="/certificacion-montacargas-san-diego">{() => <SpanishServiceArea city="san-diego" />}</Route>
+      <Route path="/certificacion-montacargas-las-vegas">{() => <SpanishServiceArea city="las-vegas" />}</Route>
+      <Route path="/certificacion-montacargas-fresno">{() => <SpanishServiceArea city="fresno" />}</Route>
       <Route path="/renewal" component={RenewalPage} />
       <Route path="/faq" component={FAQPage} />
       <Route path="/in-person-training" component={InPersonTraining} />
@@ -215,6 +223,7 @@ function AppRoutes() {
       <Route path="/admin/overview">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminDashboard /></ProtectedRoute>}</Route>
       <Route path="/admin/money">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminMoney /></ProtectedRoute>}</Route>
       <Route path="/admin/discounts">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminDiscounts /></ProtectedRoute>}</Route>
+      <Route path="/admin/invoicing">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminInvoicing /></ProtectedRoute>}</Route>
       <Route path="/admin/users">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminUsers /></ProtectedRoute>}</Route>
       <Route path="/admin/courses">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminCourses /></ProtectedRoute>}</Route>
       <Route path="/admin/courses/new">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminCourseEditor /></ProtectedRoute>}</Route>
@@ -229,6 +238,7 @@ function AppRoutes() {
       <Route path="/admin/seo-health">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminSeoHealth /></ProtectedRoute>}</Route>
       <Route path="/admin/bookings">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminBookings /></ProtectedRoute>}</Route>
       <Route path="/admin/sessions">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminSessions /></ProtectedRoute>}</Route>
+      <Route path="/admin/standing-sessions">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminStandingSessions /></ProtectedRoute>}</Route>
       <Route path="/admin/leads">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminLeads /></ProtectedRoute>}</Route>
       <Route path="/admin/companies/:id">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminCompanyDetail /></ProtectedRoute>}</Route>
       <Route path="/admin/companies">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminCompanies /></ProtectedRoute>}</Route>

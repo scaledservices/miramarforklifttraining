@@ -228,6 +228,14 @@ const strings: Record<string, EmailStrings> = {
       cta: "Leave a Google Review",
       footer: "Your review helps other forklift operators find quality training. It only takes a minute, and we truly appreciate it.",
     },
+    invoice: {
+      subject: "Invoice from Miramar Forklift Training",
+      heading: "Invoice",
+      greeting: "Hi {name}",
+      body: "Invoice {invoice} for ${amount} ({terms}) is due by {due}.",
+      bookingLabel: "Booking:",
+      cta: "Please submit payment by the due date.",
+      footer: "Thank you for your business.",    },
   },
   es: {
     welcome: {
@@ -456,6 +464,14 @@ const strings: Record<string, EmailStrings> = {
       cta: "Dejar una Reseña en Google",
       footer: "Tu reseña ayuda a otros operadores de montacargas a encontrar capacitación de calidad. Solo toma un minuto, y te lo agradecemos mucho.",
     },
+    invoice: {
+      subject: "Factura de Miramar Forklift Training",
+      heading: "Factura",
+      greeting: "Hola {name}",
+      body: "Factura {invoice} por ${amount} ({terms}) vence el {due}.",
+      bookingLabel: "Reserva:",
+      cta: "Por favor envíe el pago antes de la fecha de vencimiento.",
+      footer: "Gracias por su negocio.",    },
   },
 };
 

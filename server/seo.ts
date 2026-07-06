@@ -123,10 +123,18 @@ const REDIRECT_MAP: Record<string, string> = {
   "osha-forklift-certification": "/online-forklift-certification",
   "forklift-license": "/online-forklift-certification",
   "forklift-training": "/online-forklift-certification",
-  "certificacion-montacargas": "/es/certificacion-de-montacargas-en-linea",
+  "certificacion-montacargas": "/es/certificacion-montacargas",
   "licencia-montacargas": "/es/certificacion-de-montacargas-en-linea",
   "capacitacion-montacargas": "/es/certificacion-de-montacargas-en-linea",
 };
+
+// Spanish-first SEO pages (no English counterpart — ES-only sitemap entries)
+const SPANISH_ONLY_PAGES = [
+  { path: "/certificacion-montacargas", priority: "0.9", changefreq: "weekly" },
+  { path: "/certificacion-montacargas-san-diego", priority: "0.8", changefreq: "monthly" },
+  { path: "/certificacion-montacargas-las-vegas", priority: "0.8", changefreq: "monthly" },
+  { path: "/certificacion-montacargas-fresno", priority: "0.8", changefreq: "monthly" },
+];
 
 export function registerSeoRoutes(app: Express) {
   for (const [slug, target] of Object.entries(REDIRECT_MAP)) {
@@ -168,6 +176,12 @@ export function registerSeoRoutes(app: Express) {
         const priority = page === "/" ? "1.0" : page === "/online-forklift-certification" ? "0.9" : "0.7";
 
         urls.push(buildUrlEntry(enLoc, esLoc, priority, "weekly"));
+      }
+
+      // Spanish-first SEO pages (no English counterpart)
+      for (const sp of SPANISH_ONLY_PAGES) {
+        const esLoc = `${SITE_URL}/es${sp.path}`;
+        urls.push(buildEsOnlyUrlEntry(esLoc, sp.priority, sp.changefreq));
       }
 
       for (const page of enSeoPages) {

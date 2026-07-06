@@ -35,6 +35,12 @@ async function getResendClient() {
   }
 }
 
+interface EmailAttachment {
+  filename: string;
+  content: Buffer;
+  contentType?: string;
+}
+
 interface EmailOptions {
   to: string;
   subject: string;
@@ -42,6 +48,7 @@ interface EmailOptions {
   template: string;
   payload?: Record<string, any>;
   actorUserId?: number;
+  attachments?: EmailAttachment[];
 }
 
 async function logEmailSend(options: EmailOptions) {
@@ -1674,5 +1681,37 @@ export async function sendRouteFillAlertEmail(params: {
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
     `),
+  });
+}
+
+export async function sendInvoiceEmail(params: {
+  to: string;
+  contactName: string;
+  companyName: string;
+  invoiceNumber: string;
+  amount: number;
+  terms: string;
+  dueDate: string;
+  bookingNumber?: string;
+  locale?: string;
+  attachments?: { filename: string; content: Buffer }[];
+}) {
+  const loc = params.locale || "en";
+  const es = loc === "es";
+  const _ = (key: string) => emailT(loc, "invoice", key);
+  await sendEmail({
+    to: params.to,
+    subject: `${_("subject")} — ${params.invoiceNumber}`,
+    html: await wrap({
+      title: _("subject"),
+      heading: _("heading"),
+      bodyHtml: `
+        <p>${_("greeting").replace("{name}", params.contactName)},</p>
+        <p>${_("body").replace("{invoice}", params.invoiceNumber).replace("{amount}", "$" + params.amount.toFixed(2)).replace("{terms}", params.terms).replace("{due}", params.dueDate)}</p>
+        ${params.bookingNumber ? `<p><strong>${_("bookingLabel")}</strong> ${params.bookingNumber}</p>` : ""}
+        <p>${_("cta")}</p>
+      `,
+    }),
+    attachments: params.attachments,
   });
 }

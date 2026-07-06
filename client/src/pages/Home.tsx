@@ -150,6 +150,17 @@ export default function Home() {
                   <span>{t("home.trust3")}</span>
                 </div>
               </div>
+              {locale === "en" && (
+                <div className="mt-6">
+                  <Link
+                    href="/es/certificacion-montacargas"
+                    className="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-accent transition-colors"
+                    data-testid="link-en-espanol"
+                  >
+                    🇪🇸 En Espanol
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </section>

@@ -6,6 +6,7 @@ import { runRecertRemindersJob } from "./recert-reminders";
 import { runSmsRemindersJob } from "./sms-reminders";
 import { runReviewRequestsJob } from "./review-requests";
 import { runRouteFillAlertsJob } from "./route-fill-alerts";
+import { runStandingSessionsJob } from "./standing-sessions";
 import { db } from "../db";
 import { sql } from "drizzle-orm";
 import crypto from "crypto";
@@ -48,6 +49,7 @@ async function runAllJobs() {
   await runWithLock("sms_reminders", runSmsRemindersJob);
   await runWithLock("review_requests", runReviewRequestsJob);
   await runWithLock("route_fill_alerts", runRouteFillAlertsJob);
+  await runWithLock("standing_sessions", runStandingSessionsJob);
 }
 
 export function startJobScheduler() {

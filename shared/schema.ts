@@ -955,3 +955,81 @@ export const contactFormSchema = z.object({
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;
+
+// ── Net-30 invoicing ──────────────────────────────────────────────────────────
+// Companies approved for credit can pay by invoice instead of card.
+// group_admin applies for credit; admin/super_admin approves with terms + limit.
+
+export const companyCredit = pgTable("company_credit", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
+  creditStatus: text("credit_status", { enum: ["pending", "approved", "denied"] }).notNull().default("pending"),
+  creditLimitCents: integer("credit_limit_cents"),
+  terms: text("terms", { enum: ["net15", "net30", "net60"] }),
+  approvedById: integer("approved_by_id").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("company_credit_company_id_idx").on(table.companyId),
+]);
+
+export const insertCompanyCreditSchema = createInsertSchema(companyCredit).omit({ id: true, createdAt: true, approvedById: true, approvedAt: true });
+export type InsertCompanyCredit = z.infer<typeof insertCompanyCreditSchema>;
+export type CompanyCredit = typeof companyCredit.$inferSelect;
+
+// Invoices generated when an admin sends an invoice for an order to a credit-approved company.
+export const invoices = pgTable("invoices", {
+  id: serial("id").primaryKey(),
+  invoiceNumber: text("invoice_number").notNull().unique(),
+  orderId: integer("order_id").notNull().references(() => orders.id),
+  companyId: integer("company_id").notNull().references(() => companies.id),
+  amountCents: integer("amount_cents").notNull(),
+  status: text("status", { enum: ["sent", "paid", "void"] }).notNull().default("sent"),
+  terms: text("terms", { enum: ["net15", "net30", "net60"] }).notNull().default("net30"),
+  sentTo: text("sent_to").notNull(),
+  sentAt: timestamp("sent_at").notNull().defaultNow(),
+  paidAt: timestamp("paid_at"),
+  paymentMethod: text("payment_method", { enum: ["cash", "check", "transfer", "other"] }),
+  paymentNote: text("payment_note"),
+  createdBy: integer("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("invoices_order_id_idx").on(table.orderId),
+  index("invoices_company_id_idx").on(table.companyId),
+  index("invoices_status_idx").on(table.status),
+]);
+
+export const insertInvoiceSchema = createInsertSchema(invoices).omit({ id: true, createdAt: true, invoiceNumber: true, sentAt: true });
+export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
+export type Invoice = typeof invoices.$inferSelect;
+
+// ---------------------------------------------------------------------------+
+// Standing Sessions — recurring weekly slots for regular B2B customers.
+// A standing session is a template: "Company X needs training every Tuesday
+// at 8am in San Diego." The template generates bookable bookings (one per
+// upcoming week) so the calendar shows them without manual entry.
+// ---------------------------------------------------------------------------+
+
+export const standingSessions = pgTable("standing_sessions", {
+  id: serial("id").primaryKey(),
+  companyId: integer("company_id").notNull().references(() => companies.id),
+  serviceAreaId: integer("service_area_id").notNull().references(() => serviceAreas.id),
+  dayOfWeek: integer("day_of_week").notNull(), // 0=Sun … 6=Sat
+  startTime: text("start_time").notNull(), // "HH:MM" 24h
+  endTime: text("end_time").notNull(), // "HH:MM" 24h
+  defaultParticipantCount: integer("default_participant_count").notNull().default(1),
+  productSlugs: text("product_slugs").array().notNull().default([]),
+  status: text("status", { enum: ["active", "paused"] }).notNull().default("active"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("standing_sessions_company_id_idx").on(table.companyId),
+  index("standing_sessions_service_area_id_idx").on(table.serviceAreaId),
+  index("standing_sessions_status_idx").on(table.status),
+  check("standing_sessions_day_of_week_check", sql`${table.dayOfWeek} >= 0 AND ${table.dayOfWeek} <= 6`),
+  check("standing_sessions_participant_count_check", sql`${table.defaultParticipantCount} > 0`),
+]);
+
+export const insertStandingSessionSchema = createInsertSchema(standingSessions).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertStandingSession = z.infer<typeof insertStandingSessionSchema>;
+export type StandingSession = typeof standingSessions.$inferSelect;
