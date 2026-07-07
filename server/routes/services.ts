@@ -3,7 +3,8 @@ import { storage } from "../storage";
 import { z } from "zod";
 import { brand } from "@shared/config/brand";
 import { documentCatalog, generateDocumentPdf, getDocumentDef } from "../document-pdf";
-import { sendBookingConfirmation, sendBookingCancellation, sendBookingConfirmedEmail, sendBookingCompletedEmail, sendBookingAdminNotificationToAll, sendBookingCancellationAdminAlert, sendBalanceDueEmail } from "../email";
+import { sendBookingConfirmation, sendBookingCancellation, sendBookingConfirmedEmail, sendBookingCompletedEmail, sendBookingAdminNotificationToAll, sendBookingCancellationAdminAlert, sendBalanceDueEmail, sendCertificationEmail } from "../email";
+import { generateCertificatePdf } from "../certificate-pdf";
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, requireRole } from "./middleware";
 import { db } from "../db";
@@ -876,6 +877,94 @@ app.patch("/api/bookings/:id/complete", requireRole("admin", "super_admin"), asy
       metadata: { bookingNumber: booking.bookingNumber },
     });
 
+    // Completing onsite training issues certifications, mirroring the LMS
+    // exam-pass flow in routes/lms.ts (enrollment → issueCertification →
+    // PDF → email → audit). Participants usually have no accounts, so the
+    // certification is issued to the booking user under the booking's
+    // contact name/email. Non-fatal: a cert failure must never undo the
+    // completion itself.
+    const issuedCerts: { certificateNumber: string; courseTitle: string }[] = [];
+    try {
+      if (!booking.orderId) {
+        console.warn(`[Bookings] Booking ${booking.id} has no order — skipping certificate issuance (enrollments require an order)`);
+      } else {
+        // bookings.productSlug persists the full selection, e.g.
+        // "standard-forklift-certification-san-diego + scissor-... | [Equipment: ...]"
+        const productPart = (booking.productSlug || "").split("|")[0];
+        const slugs = productPart
+          .split("+")
+          .map((s) => s.trim())
+          .filter((s) => s && !s.startsWith("[Equipment"));
+        const LOCATION_SUFFIXES = ["-san-diego", "-las-vegas", "-fresno"];
+
+        for (const rawSlug of slugs) {
+          let course = await storage.getCourseBySlug(rawSlug);
+          if (!course) {
+            const suffix = LOCATION_SUFFIXES.find((sf) => rawSlug.endsWith(sf));
+            if (suffix) course = await storage.getCourseBySlug(rawSlug.slice(0, -suffix.length));
+          }
+          if (!course) {
+            console.warn(`[Bookings] No course found for product "${rawSlug}" — no certificate issued for it`);
+            continue;
+          }
+
+          const enrollment = await storage.createEnrollment({
+            userId: booking.userId,
+            courseId: course.id,
+            orderId: booking.orderId,
+            status: "completed",
+          });
+
+          const cert = await storage.issueCertification({
+            enrollmentId: enrollment.id,
+            userId: booking.userId,
+            courseId: course.id,
+            status: "issued",
+            expiresAt: new Date(Date.now() + 3 * 365 * 24 * 60 * 60 * 1000),
+          });
+
+          try {
+            await generateCertificatePdf(cert.id);
+          } catch (pdfErr) {
+            console.error("[Bookings] Certificate PDF generation error (non-fatal):", pdfErr);
+          }
+
+          await storage.createAuditLog({
+            actorUserId: req.session.userId!,
+            action: "certification_issued",
+            entity: "certifications",
+            entityId: String(cert.id),
+            metadata: {
+              bookingId: booking.id,
+              bookingNumber: booking.bookingNumber,
+              courseId: course.id,
+              certificateNumber: cert.certificateNumber,
+              participantCount: booking.participantCount,
+            },
+          });
+
+          try {
+            const certLocale = await resolveLocale({ userId: booking.userId });
+            await sendCertificationEmail({
+              to: booking.contactEmail,
+              userName: booking.contactName,
+              courseName: course.title,
+              certificateNumber: cert.certificateNumber,
+              certificationId: cert.id,
+              actorUserId: req.session.userId!,
+              locale: certLocale,
+            });
+          } catch (certEmailErr) {
+            console.error("[Bookings] Certification email error (non-fatal):", certEmailErr);
+          }
+
+          issuedCerts.push({ certificateNumber: cert.certificateNumber, courseTitle: course.title });
+        }
+      }
+    } catch (certErr) {
+      console.error("[Bookings] Certificate issuance error (non-fatal):", certErr);
+    }
+
     try {
       const completeLocale = await resolveLocale({ userId: booking.userId ?? undefined });
       await sendBookingCompletedEmail({
@@ -892,7 +981,7 @@ app.patch("/api/bookings/:id/complete", requireRole("admin", "super_admin"), asy
       console.error("[Bookings] Completed email error (non-fatal):", emailErr);
     }
 
-    return res.json(updated);
+    return res.json({ ...updated, issuedCertifications: issuedCerts });
   } catch (error) {
     console.error("[Bookings] Complete error:", error);
     return res.status(500).json({ error: "Failed to complete booking" });
