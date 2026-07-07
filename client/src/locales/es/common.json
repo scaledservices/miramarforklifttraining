@@ -27,7 +27,15 @@
     "trainingLocations": "Ubicaciones",
     "viewAllPrograms": "Ver Todos los Programas",
     "resources": "Recursos",
-    "mainNavigation": "Navegación principal"
+    "mainNavigation": "Navegación principal",
+    "callUs": "Llámenos",
+    "faq": "Preguntas Frecuentes",
+    "renewal": "Renovación",
+    "getQuote": "Solicitar Cotización",
+    "inPersonTraining": "Capacitación Presencial",
+    "sanDiego": "San Diego",
+    "lasVegas": "Las Vegas",
+    "fresno": "Fresno"
   },
   "cta": {
     "getCertified": "Certifícate",
@@ -1055,30 +1063,12 @@
     "section11Text": "Si tiene preguntas o inquietudes sobre esta Política de Privacidad o nuestras prácticas de datos, por favor contáctenos en {{email}} o a través de nuestra página de Contacto."
   },
   "refundPolicy": {
-    "pageTitle": "Política de Reembolso",
-    "seoTitle": "Política de Reembolso",
-    "seoDescription": "Política de reembolso para programas de capacitación y certificación.",
-    "lastUpdated": "Última actualización: Enero 2025",
-    "warningTitle": "Importante: Los Reembolsos Después de la Certificación Resultan en Revocación del Certificado",
-    "warningText": "Si se emite un reembolso después de haber obtenido una certificación, el certificado asociado será <1>permanentemente revocado</1>. La página de verificación pública mostrará un estado de <3>REVOCADO</3> visible para cualquier empleador u organismo regulador que verifique el certificado. Esta acción no se puede deshacer.",
-    "section1Title": "1. Elegibilidad para Reembolso",
-    "section1Text": "Ofrecemos reembolsos bajo las siguientes condiciones: Si no ha iniciado ningún módulo de capacitación dentro de su curso comprado, puede solicitar un reembolso completo dentro de los 30 días de la compra. Si ha comenzado pero no completado la capacitación, puede solicitar un reembolso dentro de los 7 días de la compra, sujeto a una tarifa de procesamiento del 15%. No hay reembolsos disponibles después de haber completado todos los módulos de capacitación.",
-    "section2Title": "2. Reembolsos Después de la Certificación",
-    "section2Text": "Si se otorga un reembolso después de que se haya emitido una certificación, ocurrirá lo siguiente: la certificación será revocada inmediatamente; el estado del certificado en nuestro sistema de verificación pública se cambiará a \"revocado\"; cualquier tarjeta física de billetera asociada con la certificación será invalidada; el reembolso se procesará menos las tarifas de procesamiento aplicables.",
-    "section3Title": "3. Proceso de Reembolso",
-    "section3Text": "Para solicitar un reembolso, contacte a nuestro equipo de soporte en {{email}} con su número de pedido y el motivo de su solicitud. Las solicitudes de reembolso generalmente se procesan dentro de 5-10 días hábiles. Los reembolsos aprobados se acreditarán al método de pago original.",
-    "section4Title": "4. Pedidos de Tarjetas Físicas de Billetera",
-    "section4Text": "Los pedidos de tarjetas de billetera pueden cancelarse para un reembolso completo antes de ser enviados. Una vez que una tarjeta de billetera ha sido enviada, los reembolsos no están disponibles para los costos de envío. Si la certificación subyacente es reembolsada y revocada, el pedido de tarjeta de billetera también será cancelado.",
-    "section5Title": "5. Compras Grupales y Empresariales",
-    "section5Text": "Para compras grupales o empresariales, los reembolsos están disponibles para asientos no utilizados (inscripciones no asignadas o no iniciadas). Los asientos donde la capacitación ha sido iniciada o completada no son elegibles para reembolso. Los administradores de grupo deben contactar a nuestro equipo de soporte empresarial para solicitudes de reembolso que involucren múltiples asientos.",
-    "depositTitle": "Depositos para Sesiones de Capacitacion",
-    "depositText1": "Se requiere un deposito del 50% para asegurar su sesion de capacitacion. Este deposito reserva su fecha, hora e instructor.",
-    "depositText2": "Reprogramar es gratis si se solicita al menos 24 horas antes de su sesion programada. Si no podemos ofrecer la sesion de capacitacion por algun motivo de nuestra parte, su deposito sera reembolsado en su totalidad. Si necesita cancelar y no podemos reprogramar la cita, su deposito se emitira como credito para una sesion futura.",
-    "depositText3": "Si no se presenta a su sesion de capacitacion programada sin previo aviso, se perdera el 50% de su deposito. El saldo restante podra aplicarse como credito para una sesion futura a nuestra discrecion.",
-    "section6Title": "6. Excepciones",
-    "section6Text": "Los reembolsos no se emitirán por no aprobar el examen de certificación, incapacidad para cumplir requisitos específicos del empleador fuera del alcance de nuestra capacitación, problemas técnicos que han sido documentados y resueltos por nuestro equipo de soporte, o insatisfacción con los requisitos regulatorios de {{body}} que estamos obligados a incluir en el contenido de capacitación.",
-    "section7Title": "7. Contáctenos",
-    "section7Text": "Para consultas de reembolso o para iniciar una solicitud de reembolso, por favor contáctenos en {{email}} o a través de nuestra página de Contacto. Por favor incluya su número de pedido y el motivo de la solicitud de reembolso."
+    "seoTitle": "Politica de Reembolso",
+    "seoDescription": "Las solicitudes de reembolso para programas de capacitacion y certificacion se manejan caso por caso.",
+    "pageTitle": "Politica de Reembolso",
+    "lastUpdated": "Ultima actualizacion: Julio 2026",
+    "caseByCaseText": "Todas las solicitudes de reembolso se manejan caso por caso. Entendemos que los planes cambian y surgen situaciones inesperadas. Comuniquese con nosotros al {{phone}} o {{email}} para hablar de su situacion, y trabajaremos con usted para encontrar una solucion justa.",
+    "contactTitle": "Contactenos"
   },
   "location": {
     "notFoundTitle": "Ubicación No Encontrada",
@@ -1975,5 +1965,20 @@
     "learnMore": "Mas Informacion",
     "hubCtaTitle": "No Ve Su Industria?",
     "hubCtaSubtitle": "Capacitamos operadores en todas las industrias que usan camiones industriales motorizados. Contactenos para discutir sus necesidades especificas."
+  },
+  "staffingAgency": {
+    "navLabel": "Programa para Agencias de Personal",
+    "pageTitle": "Certificacion de Montacargas para Agencias de Personal — Rapida, Confiable y Cumple con OSHA",
+    "pageDescription": "Certifique a sus trabajadores temporales en 24 horas. Reservacion prioritaria, precios por volumen, registros digitales y facturacion net-30. Agencias de personal en San Diego, Las Vegas y Fresno."
+  },
+  "booking": {
+    "trainingTotal": "Total de Capacitacion",
+    "payNow": "Pagar Ahora",
+    "payNowCta": "Pagar ${{amount}}",
+    "paymentReceived": "Pago Recibido",
+    "paidInFull": "Estado",
+    "paidInFullBadge": "Pagado en Total",
+    "fullPaymentNote": "El pago completo se recolecta al momento de la reserva. Incluye 3% de recargo por tarjeta cuando aplique.",
+    "priceAnchor": "La certificacion practica cuesta $350+ por persona en otros lugares."
   }
 }

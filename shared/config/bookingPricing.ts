@@ -65,12 +65,17 @@ export function getAddonsForProducts(selectedSlugs: string[]): BookingAddon[] {
   return out;
 }
 
-// Automated volume discount advertised sitewide ("volume discounts for 5+").
-export const VOLUME_DISCOUNT_MIN_PARTICIPANTS = 5;
-export const VOLUME_DISCOUNT_RATE = 0.10;
+// Volume discount is disabled per Alberto's decision (2026-07-06):
+// "No automated bulk discounts. Pricing handled manually based on quote
+// requests." The constants are kept for reference but the discount is no
+// longer applied in computeBookingPrice.
+export const VOLUME_DISCOUNT_MIN_PARTICIPANTS = Infinity;
+export const VOLUME_DISCOUNT_RATE = 0;
 
-// Onsite bookings collect a deposit at booking time; balance is due on completion.
-export const BOOKING_DEPOSIT_RATE = 0.5;
+// Full payment is collected at booking time (100% upfront). Per Alberto's
+// decision (2026-07-06): "Customers must pay the full training fee at the time
+// of booking. Deposit-only bookings will not be offered."
+export const BOOKING_DEPOSIT_RATE = 1.0;
 
 export interface BookingPriceBreakdown {
   perPerson: number;
@@ -93,9 +98,10 @@ export function computeBookingPrice(productSlugs: string[], participantCount: nu
   }
 
   const subtotal = perPerson * participantCount;
-  const volumeDiscount = participantCount >= VOLUME_DISCOUNT_MIN_PARTICIPANTS
-    ? round2(subtotal * VOLUME_DISCOUNT_RATE)
-    : 0;
+  // Volume discount disabled per Alberto's decision (2026-07-06) — pricing for
+  // groups is handled manually via quote requests. The field stays in the
+  // breakdown for API compatibility but is always 0.
+  const volumeDiscount = 0;
   const total = round2(subtotal - volumeDiscount);
   const deposit = round2(total * BOOKING_DEPOSIT_RATE);
   const balance = round2(total - deposit);

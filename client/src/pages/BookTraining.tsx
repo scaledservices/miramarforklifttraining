@@ -202,6 +202,9 @@ export default function BookTraining() {
   const [bookingNumber, setBookingNumber] = useState("");
   const [depositInfo, setDepositInfo] = useState<{ deposit: number; depositSurcharge: number; depositCharged: number; balanceDue: number; volumeDiscount: number; total: number } | null>(null);
 
+  // Note: with 100% upfront payment (BOOKING_DEPOSIT_RATE = 1.0), deposit =
+  // total and balanceDue = 0. The variable names are kept for API compat.
+
   const handsOnProducts = useMemo(
     () => catalog.filter((p) => p.category === "hands-on"),
     []
@@ -430,11 +433,12 @@ export default function BookTraining() {
     0
   );
   const totalEstimate = productsSubtotal * participantCount;
-  // Authoritative pricing (volume discount + deposit) from the shared module the
-  // server also charges from — null when only custom equipment is selected.
+  // Authoritative pricing (full payment, no volume discount) from the shared
+  // module the server also charges from — null when only custom equipment is
+  // selected. With BOOKING_DEPOSIT_RATE = 1.0, deposit = total, balance = 0.
   const bookingPricing = computeBookingPrice(selectedProducts.map((pr) => pr.slug), participantCount);
   // Promo discount preview — same clamping rules as the server (percent capped
-  // at 100, fixed never below $0); deposit is 50% of the discounted total.
+  // at 100, fixed never below $0); full payment is charged on the discounted total.
   const discountAmount = bookingPricing && appliedDiscount
     ? appliedDiscount.discountType === "percent"
       ? Number((bookingPricing.total * (Math.min(Math.max(appliedDiscount.amount, 0), 100) / 100)).toFixed(2))
@@ -447,6 +451,7 @@ export default function BookTraining() {
         return { ...bookingPricing, total, deposit, balance: Number((total - deposit).toFixed(2)) };
       })()
     : bookingPricing;
+  // depositWithSurcharge is the amount charged now = full total + 3% card surcharge.
   const depositWithSurcharge = effectivePricing ? Number((effectivePricing.deposit * 1.03).toFixed(2)) : 0;
   const dayNames = useMemo(() => getDayNames(i18n.language || "en"), [i18n.language]);
 
@@ -476,12 +481,12 @@ export default function BookTraining() {
           {depositInfo && depositInfo.depositCharged > 0 && (
             <div className="bg-primary/10 border border-primary/40 rounded-lg p-4 text-left text-sm space-y-1" data-testid="deposit-receipt">
               <div className="flex justify-between font-semibold text-foreground">
-                <span>{t("booking.depositReceived")}</span>
+                <span>{t("booking.paymentReceived")}</span>
                 <span>${depositInfo.depositCharged.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
-                <span>{t("booking.balanceOnCompletion")}</span>
-                <span>${depositInfo.balanceDue.toFixed(2)}</span>
+                <span>{t("booking.paidInFull")}</span>
+                <span>{t("booking.paidInFullBadge")}</span>
               </div>
             </div>
           )}
@@ -1040,12 +1045,6 @@ export default function BookTraining() {
                         <span className="text-muted-foreground">{t("booking.trainingTotal")}</span>
                         <span className="font-medium">${bookingPricing.total.toFixed(2)}</span>
                       </div>
-                      {bookingPricing.volumeDiscount > 0 && (
-                        <div className="flex justify-between text-brand-green">
-                          <span>{t("booking.volumeDiscountApplied")}</span>
-                          <span>-${bookingPricing.volumeDiscount.toFixed(2)}</span>
-                        </div>
-                      )}
                       {appliedDiscount && discountAmount > 0 && (
                         <div className="flex justify-between text-brand-green" data-testid="row-promo-discount">
                           <span>{t("bookTraining.promoDiscount", { code: appliedDiscount.code })}</span>
@@ -1053,14 +1052,10 @@ export default function BookTraining() {
                         </div>
                       )}
                       <div className="flex justify-between font-semibold text-foreground">
-                        <span>{t("booking.depositDueToday")}</span>
+                        <span>{t("booking.payNow")}</span>
                         <span>${depositWithSurcharge.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between text-muted-foreground">
-                        <span>{t("booking.balanceOnCompletion")}</span>
-                        <span>${(effectivePricing ?? bookingPricing).balance.toFixed(2)}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground pt-1">{t("booking.depositNote")}</p>
+                      <p className="text-xs text-muted-foreground pt-1">{t("booking.fullPaymentNote")}</p>
                     </div>
                     <div className="space-y-1">
                       <div className="flex gap-2" data-testid="row-promo-input">
@@ -1094,7 +1089,7 @@ export default function BookTraining() {
                       chargeAmount={depositWithSurcharge}
                       pending={bookingMutation.isPending}
                       onPay={(nonce) => handleSubmit(nonce)}
-                      ctaLabel={t("booking.payDepositCta", { amount: depositWithSurcharge.toFixed(2) })}
+                      ctaLabel={t("booking.payNowCta", { amount: depositWithSurcharge.toFixed(2) })}
                       fallbackCtaLabel={t("bookTraining.confirmBooking")}
                     />
                   </div>
@@ -1219,15 +1214,9 @@ export default function BookTraining() {
                         <span className="font-bold text-lg text-foreground">${totalEstimate.toFixed(2)}</span>
                       </div>
                     )}
-                    {bookingPricing && bookingPricing.volumeDiscount > 0 && (
-                      <div className="flex justify-between mt-1 text-sm text-brand-green">
-                        <span>{t("booking.volumeDiscountApplied")}</span>
-                        <span>-${bookingPricing.volumeDiscount.toFixed(2)}</span>
-                      </div>
-                    )}
                     {bookingPricing && (
                       <div className="flex justify-between mt-1 text-sm">
-                        <span className="text-muted-foreground">{t("booking.depositDueToday")}</span>
+                        <span className="text-muted-foreground">{t("booking.payNow")}</span>
                         <span className="font-semibold">${depositWithSurcharge.toFixed(2)}</span>
                       </div>
                     )}

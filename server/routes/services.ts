@@ -202,7 +202,7 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
     // Optional promo code: validated and priced server-side (never trust the
     // client's discounted numbers), mirroring the online-checkout integration
     // in routes/authorizeNet.ts. Discount applies to the total before the
-    // 50% deposit split; redemption is recorded only after the booking exists.
+    // full-payment charge; redemption is recorded only after the booking exists.
     let appliedDiscount: { codeId: number; amount: number } | null = null;
     if (pricing && typeof req.body.discountCode === "string" && req.body.discountCode.trim()) {
       const validation = await validateDiscountCode(req.body.discountCode);
@@ -232,9 +232,10 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
       ? pricing.total.toFixed(2)
       : ((Number(productPrice) || 0) * Number(participantCount)).toFixed(2);
 
-    // Deposit-at-booking: when Authorize.net is configured and the selection has
-    // published pricing, a 50% deposit (plus card surcharge) is charged up front;
-    // balance is due on completion.
+    // Full-payment-at-booking: when Authorize.net is configured and the
+    // selection has published pricing, the full training fee (plus card
+    // surcharge) is charged up front. Balance is 0. Per Alberto's decision
+    // (2026-07-06): full payment required at booking, no deposit-only option.
     let orderId: number | null = null;
     let depositCharged = 0;
     let depositSurcharge = 0;
@@ -297,11 +298,11 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         orderId,
       });
     } catch (bookingErr) {
-      // The deposit has already been captured — surface enough detail for the
+      // The payment has already been captured — surface enough detail for the
       // office to reconcile manually rather than silently orphaning the charge.
-      console.error(`[Bookings] CRITICAL: deposit captured (order ${orderId}) but booking creation failed`, bookingErr);
+      console.error(`[Bookings] CRITICAL: payment captured (order ${orderId}) but booking creation failed`, bookingErr);
       return res.status(500).json({
-        error: "Your deposit was received but the booking could not be finalized. Please call us and reference your receipt — we will complete your booking manually.",
+        error: "Your payment was received but the booking could not be finalized. Please call us and reference your receipt — we will complete your booking manually.",
         orderId,
       });
     }

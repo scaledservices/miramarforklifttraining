@@ -31,7 +31,7 @@ interface PaymentConfig {
 }
 
 interface CardPaymentSectionProps {
-  /** Amount to charge now (deposit incl. surcharge), for the button label. */
+  /** Amount to charge now (full payment incl. surcharge), for the button label. */
   chargeAmount: number;
   pending: boolean;
   /** Called with the payment nonce once tokenization succeeds, or null when
