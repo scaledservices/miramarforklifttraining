@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Shield, ArrowRight, Monitor, Clock, Award, MapPin } from "lucide-react";
+import TrustBadgeBar from "@/components/sections/TrustBadgeBar";
 
 /**
  * Modified hero for out-of-region visitors.
@@ -22,6 +23,8 @@ export default function OnlineFirstHero() {
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.08),transparent_60%)]" />
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+
+      <TrustBadgeBar />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 lg:py-32">
         <div className="max-w-3xl">

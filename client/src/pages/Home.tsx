@@ -8,6 +8,7 @@ import { useRegion } from "@/hooks/useRegion";
 import { faqItems } from "@/data/faq";
 import FAQSection from "@/components/sections/FAQSection";
 import OnlineFirstHero from "@/components/sections/OnlineFirstHero";
+import TrustBadgeBar from "@/components/sections/TrustBadgeBar";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -101,6 +102,8 @@ export default function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-[hsl(10,22%,14%)]/95 via-[hsl(10,22%,18%)]/85 to-[hsl(10,22%,23%)]/55" />
           </div>
 
+          <TrustBadgeBar />
+
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 lg:py-32">
             <div className="max-w-3xl">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 mb-6 text-xs font-semibold uppercase tracking-wider bg-white/10 text-white/90 rounded-full backdrop-blur-sm border border-white/10">
@@ -132,7 +135,11 @@ export default function Home() {
                 </a>
               </div>
 
-              <div className="flex flex-wrap gap-x-6 gap-y-3 mt-8 text-sm text-white/80">
+              <p className="mt-5 text-sm font-semibold text-accent drop-shadow-sm" data-testid="text-hero-price-anchor">
+                {t("home.priceAnchorHero")}
+              </p>
+
+              <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6 text-sm text-white/80">
                 <div className="flex items-center gap-2">
                   <Shield className="w-4 h-4 text-accent" />
                   <span>{t("home.trust2")}</span>

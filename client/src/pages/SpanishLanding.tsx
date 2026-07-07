@@ -27,29 +27,29 @@ export default function SpanishLanding() {
 
   const faqs = [
     {
-      question: "¿Cuánto cuesta la certificacion de montacargas?",
+      question: "¿Cuánto cuesta la certificación de montacargas?",
       answer:
-        "La certificacion practica en nuestras instalaciones cuesta desde $200 por persona. La certificacion en linea cuesta $45.00. Para capacitacion en sitio para su equipo, ofrecemos cotizaciones personalizadas para su equipo. Llame al (858) 901-0149 para obtener una cotizacion personalizada.",
+        "La certificación práctica en nuestras instalaciones cuesta desde $200 por persona. La certificación en línea cuesta $45.00. Para capacitación en sitio para su equipo, ofrecemos cotizaciones personalizadas. Llame al (858) 901-0149 para obtener una cotización personalizada.",
     },
     {
-      question: "¿Cuanto tarda la certificacion de montacargas?",
+      question: "¿Cuánto tarda la certificación de montacargas?",
       answer:
-        "La capacitacion practica presencial se completa en un solo dia, y usted sale con su tarjeta de certificacion el mismo dia. La certificacion en linea se completa en aproximadamente 2 horas a su propio ritmo.",
+        "La capacitación práctica presencial se completa en un solo día, y usted sale con su tarjeta de certificación el mismo día. La certificación en línea se completa en aproximadamente 2 horas a su propio ritmo.",
     },
     {
-      question: "¿Es valida la certificacion para OSHA?",
+      question: "¿Es válida la certificación para OSHA?",
       answer:
-        "Si. Nuestros programas cumplen con el estandar 29 CFR 1910.178 de OSHA sobre vehiculos industriales motorizados. La certificacion es reconocida por OSHA y valida por 3 anos en todo Estados Unidos.",
+        "Sí. Nuestros programas cumplen con el estándar 29 CFR 1910.178 de OSHA sobre vehículos industriales motorizados. La certificación es reconocida por OSHA y válida por 3 años en todo Estados Unidos.",
     },
     {
       question: "¿Pueden capacitar a mi equipo en nuestras instalaciones?",
       answer:
-        "Si. Viajamos a su lugar de trabajo con todo el equipo y materiales necesarios. Capacitamos a sus operadores en el equipo que usan cada dia. Ofrecemos capacitacion en sitio en San Diego, Las Vegas, Fresno y areas cercanas.",
+        "Sí. Viajamos a su lugar de trabajo con todo el equipo y materiales necesarios. Capacitamos a sus operadores en el equipo que usan cada día. Ofrecemos capacitación en sitio en San Diego, Las Vegas, Fresno y áreas cercanas.",
     },
     {
-      question: "¿Cada cuando necesito renovar mi certificacion?",
+      question: "¿Cada cuándo necesito renovar mi certificación?",
       answer:
-        "OSHA requiere que los operadores de montacargas sean evaluados cada 3 anos. Si su certificacion ha expirado, puede renovarla en linea en aproximadamente 2 horas. Si cambio de equipo o de trabajo, necesita una nueva evaluacion.",
+        "OSHA requiere que los operadores de montacargas sean evaluados cada 3 años. Si su certificación ha expirado, puede renovarla en línea en aproximadamente 2 horas. Si cambió de equipo o de trabajo, necesita una nueva evaluación.",
     },
   ];
 
@@ -58,7 +58,7 @@ export default function SpanishLanding() {
   const breadcrumbs = breadcrumbSchema(
     [
       { name: "Inicio", url: "/" },
-      { name: "Certificacion de Montacargas", url: "/certificacion-montacargas" },
+      { name: "Certificación de Montacargas", url: "/certificacion-montacargas" },
     ],
     "es"
   );
@@ -116,7 +116,7 @@ export default function SpanishLanding() {
         <div className="absolute inset-0">
           <OptimizedImage
             src="/images/hero-forklift.jpg"
-            alt="Certificacion de montacargas"
+            alt="Certificación de montacargas"
             className="w-full h-full object-cover"
             loading="eager"
             fetchpriority="high"
@@ -148,6 +148,9 @@ export default function SpanishLanding() {
                 </Button>
               </a>
             </div>
+            <p className="mt-5 text-sm font-semibold text-accent drop-shadow-sm" data-testid="spanish-hero-price-anchor">
+              {t("home.priceAnchorHero")}
+            </p>
           </div>
         </div>
       </section>

@@ -21,6 +21,8 @@ interface TrainingOption {
   icon: typeof Monitor;
   titleKey: string;
   descKey: string;
+  priceKey: string;
+  priceNoteKey?: string;
   href: string;
   color: string;
   bgColor: string;
@@ -51,6 +53,8 @@ export default function GuidedSelector() {
       icon: Monitor,
       titleKey: "guidedSelector.onlineTitle",
       descKey: "guidedSelector.onlineDesc",
+      priceKey: "guidedSelector.onlinePrice",
+      priceNoteKey: "guidedSelector.onlinePriceNote",
       href: "/checkout",
       color: "text-accent",
       bgColor: "bg-accent/10",
@@ -66,6 +70,8 @@ export default function GuidedSelector() {
       icon: Wrench,
       titleKey: "guidedSelector.handsOnTitle",
       descKey: "guidedSelector.handsOnDesc",
+      priceKey: "guidedSelector.handsOnPrice",
+      priceNoteKey: "guidedSelector.handsOnPriceNote",
       href: "/book-training",
       color: "text-emerald-600 dark:text-emerald-400",
       bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
@@ -80,6 +86,8 @@ export default function GuidedSelector() {
       icon: Users,
       titleKey: "guidedSelector.teamTitle",
       descKey: "guidedSelector.teamDesc",
+      priceKey: "guidedSelector.teamPrice",
+      priceNoteKey: "guidedSelector.teamPriceNote",
       href: "/request-quote",
       color: "text-purple-600 dark:text-purple-400",
       bgColor: "bg-purple-50 dark:bg-purple-950/30",
@@ -153,7 +161,13 @@ export default function GuidedSelector() {
                       <div className={`w-14 h-14 rounded-xl ${option.bgColor} flex items-center justify-center mb-5`}>
                         <option.icon className={`w-7 h-7 ${option.color}`} />
                       </div>
-                      <h3 className="text-xl font-bold mb-2">{t(option.titleKey)}</h3>
+                      <h3 className="text-xl font-bold mb-1.5">{t(option.titleKey)}</h3>
+                      <div className="flex items-baseline gap-1.5 mb-3" data-testid={`selector-price-${option.id}`}>
+                        <span className="text-2xl font-bold tracking-tight">{t(option.priceKey)}</span>
+                        {option.priceNoteKey && (
+                          <span className="text-xs text-muted-foreground">{t(option.priceNoteKey)}</span>
+                        )}
+                      </div>
                       <p className="text-sm text-muted-foreground leading-relaxed mb-5">
                         {t(option.descKey)}
                       </p>

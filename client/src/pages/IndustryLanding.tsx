@@ -76,7 +76,7 @@ export default function IndustryLanding({ slug }: IndustryLandingProps) {
     "@context": "https://schema.org",
     "@type": "Service",
     name: isEs
-      ? `Certificacion de Montacargas para ${name}`
+      ? `Certificación de Montacargas para ${name}`
       : `Forklift Certification for ${name}`,
     description,
     provider: {
@@ -110,7 +110,7 @@ export default function IndustryLanding({ slug }: IndustryLandingProps) {
   const faqJsonLd = faqSchema(faqs, locale);
 
   const seoTitle = isEs
-    ? `Certificacion de Montacargas para ${name} | San Diego, Las Vegas y Fresno`
+    ? `Certificación de Montacargas para ${name} | San Diego, Las Vegas y Fresno`
     : `Forklift Certification for ${name} in San Diego, Las Vegas & Fresno`;
 
   const Icon = INDUSTRY_ICONS[slug] || Factory;
@@ -134,7 +134,7 @@ export default function IndustryLanding({ slug }: IndustryLandingProps) {
             </Badge>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6 drop-shadow-md">
               {isEs
-                ? `Certificacion de Montacargas para ${name} en San Diego, Las Vegas y Fresno`
+                ? `Certificación de Montacargas para ${name} en San Diego, Las Vegas y Fresno`
                 : `Forklift Certification for ${name} in San Diego, Las Vegas & Fresno`}
             </h1>
             <p className="text-lg sm:text-xl text-white/80 leading-relaxed mb-8 max-w-2xl">

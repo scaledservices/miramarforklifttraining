@@ -7,7 +7,6 @@ import { brand } from "@shared/config/brand";
 import { SITE_URL } from "@/components/seo/siteUrl";
 import { Phone, ArrowRight, Check, Users, Clock, Shield, CreditCard, LayoutDashboard } from "lucide-react";
 
-// PLACEHOLDER — content patched in by subsequent calls
 export default function StaffingAgencyProgram() {
   const { t } = useTranslation();
   const locale = useCurrentLocale();
@@ -24,50 +23,50 @@ export default function StaffingAgencyProgram() {
   const faqs = [
     {
       question: isEs
-        ? "Cuanto tarda la certificacion de un operador temporal?"
+        ? "¿Cuánto tarda la certificación de un operador temporal?"
         : "How fast can a temp operator get certified?",
       answer: isEs
-        ? "La certificacion en linea se completa en unas 2 horas. La capacitacion practica presencial se completa en un dia. Con prioridad de reservacion, podemos programar sus temps en 24 horas."
+        ? "La certificación en línea se completa en unas 2 horas. La capacitación práctica presencial se completa en un día. Con prioridad de reservación, podemos programar sus temps en 24 horas."
         : "Online certification takes about 2 hours. In-person hands-on training is completed in one day. With priority booking, we can schedule your temps within 24 hours.",
     },
     {
       question: isEs
-        ? "Pueden facturarnos con terminos net-30?"
+        ? "¿Pueden facturarnos con términos net-30?"
         : "Can we get net-30 invoicing?",
       answer: isEs
-        ? "Si. Las agencias aprobadas reciben facturacion mensual con terminos net-30. El proceso de aprobacion toma 1-2 dias habiles."
+        ? "Sí. Las agencias aprobadas reciben facturación mensual con términos net-30. El proceso de aprobación toma 1-2 días hábiles."
         : "Yes. Approved agencies receive monthly invoicing with net-30 terms. The approval process takes 1-2 business days.",
     },
     {
       question: isEs
-        ? "Que tipos de montacargas cubren en la certificacion?"
+        ? "¿Qué tipos de montacargas cubren en la certificación?"
         : "What forklift types do you certify?",
       answer: isEs
-        ? "Certificamos operadores en montacargas sentados, contrapesados, reach trucks, order pickers y camiones electricos de pie. Cubrimos las clases I-VI de OSHA."
+        ? "Certificamos operadores en montacargas sentados, contrapesados, reach trucks, order pickers y camiones eléctricos de pie. Cubrimos las clases I-VI de OSHA."
         : "We certify operators on sit-down, counterbalance, reach trucks, order pickers, and electric stand-up trucks. We cover OSHA Classes I-VI.",
     },
     {
       question: isEs
-        ? "Como funcionan los descuentos por volumen?"
-        : "How do volume discounts work?",
+        ? "¿Cómo funcionan los precios por volumen?"
+        : "How does volume pricing work?",
       answer: isEs
-        ? "1-5 temps al mes pagan tarifa estandar. 6-15 temps reciben 15% de descuento. 16 o mas reciben 25% de descuento. Los descuentos se aplican automaticamente cada mes."
-        : "1-5 temps per month pay standard rates. 6-15 temps get 15% off. 16+ temps get 25% off. Discounts are applied automatically each month.",
+        ? "Las agencias que certifican de forma regular reciben tarifas preferenciales. Díganos cuántos temps certifica al mes y le cotizamos una tarifa mensual fija para su agencia, normalmente el mismo día."
+        : "Agencies that certify regularly get preferred rates. Tell us how many temps you certify per month and we'll quote a set monthly rate for your agency, usually the same day.",
     },
     {
       question: isEs
-        ? "Pueden compartir certificaciones directamente con nuestros clientes?"
+        ? "¿Pueden compartir certificaciones directamente con nuestros clientes?"
         : "Can you share certifications directly with our clients?",
       answer: isEs
-        ? "Si. Cada certificado tiene un enlace de verificacion compartible. Usted o sus clientes pueden verificar la certificacion de un operador en cualquier momento."
+        ? "Sí. Cada certificado tiene un enlace de verificación compartible. Usted o sus clientes pueden verificar la certificación de un operador en cualquier momento."
         : "Yes. Each certificate has a shareable verification link. You or your clients can verify an operator's certification at any time.",
     },
     {
       question: isEs
-        ? "Que pasa si un operador temporal necesita recertificacion?"
+        ? "¿Qué pasa si un operador temporal necesita recertificación?"
         : "What if a temp operator needs recertification?",
       answer: isEs
-        ? "Las certificaciones son validas por 3 anos. Ofrecemos recertificacion con la misma prioridad de reservacion y precios con descuento."
+        ? "Las certificaciones son válidas por 3 años. Ofrecemos recertificación con la misma prioridad de reservación y precios con descuento."
         : "Certifications are valid for 3 years. We offer recertification with the same priority booking and discounted pricing.",
     },
   ];
@@ -78,7 +77,7 @@ export default function StaffingAgencyProgram() {
     "@context": "https://schema.org",
     "@type": "Service",
     name: isEs
-      ? "Programa de Certificacion para Agencias de Personal"
+      ? "Programa de Certificación para Agencias de Personal"
       : "Forklift Certification Program for Staffing Agencies",
     serviceType: "Forklift Operator Certification",
     provider: {
@@ -93,7 +92,7 @@ export default function StaffingAgencyProgram() {
     },
     areaServed: ["San Diego, CA", "Las Vegas, NV", "Fresno, CA"],
     description: isEs
-      ? "Certificacion rapida de montacargas para agencias de personal temporal. Reservacion prioritaria, precios por volumen, certificados digitales y facturacion net-30."
+      ? "Certificación rápida de montacargas para agencias de personal temporal. Reservación prioritaria, precios por volumen, certificados digitales y facturación net-30."
       : "Fast forklift certification for temp staffing agencies. Priority booking, volume pricing, digital certificates, and net-30 invoicing.",
     offers: [
       {
@@ -106,13 +105,13 @@ export default function StaffingAgencyProgram() {
         "@type": "Offer",
         name: "Volume (6-15 temps)",
         priceCurrency: "USD",
-        description: "15% discount for 6-15 temps per month",
+        description: "Preferred rates for 6-15 temps per month, quoted per agency",
       },
       {
         "@type": "Offer",
         name: "High Volume (16+ temps)",
         priceCurrency: "USD",
-        description: "25% discount for 16+ temps per month",
+        description: "Custom monthly pricing for 16+ temps per month",
       },
     ],
   };
@@ -121,10 +120,10 @@ export default function StaffingAgencyProgram() {
     <div>
       <SEOHead
         title={isEs
-          ? "Certificacion de Montacargas para Agencias de Personal | Miramar"
+          ? "Certificación de Montacargas para Agencias de Personal | Miramar"
           : "Forklift Certification for Staffing Agencies — Fast, Reliable, OSHA-Compliant"}
         description={isEs
-          ? "Certifique a sus trabajadores temporales en 24 horas. Reservacion prioritaria, descuentos por volumen, certificados digitales y facturacion net-30. Agencias de personal en San Diego, Las Vegas y Fresno."
+          ? "Certifique a sus trabajadores temporales en 24 horas. Reservación prioritaria, precios por volumen, certificados digitales y facturación net-30. Agencias de personal en San Diego, Las Vegas y Fresno."
           : "Get your temps certified in 24 hours. Priority scheduling, volume pricing, digital records, net-30 invoicing. For staffing agencies in San Diego, Las Vegas, and Fresno."}
         canonical="/staffing-agency-program"
         jsonLd={[breadcrumbs, faqStructuredData, serviceSchema]}
@@ -138,7 +137,7 @@ export default function StaffingAgencyProgram() {
             </span>
             <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
               {isEs
-                ? "Certificacion de Montacargas para Agencias de Personal — Rapida, Confiable y Cumple con OSHA"
+                ? "Certificación de Montacargas para Agencias de Personal — Rápida, Confiable y Cumple con OSHA"
                 : "Forklift Certification for Staffing Agencies — Fast, Reliable, OSHA-Compliant"}
             </h1>
             <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-8">
@@ -176,7 +175,7 @@ export default function StaffingAgencyProgram() {
               </div>
               <p className="text-red-800 text-lg leading-relaxed">
                 {isEs
-                  ? "Su cliente necesita un operador de montacargas certificado manana. Su trabajador temporal no tiene certificacion. Usted pierde la colocacion."
+                  ? "Su cliente necesita un operador de montacargas certificado mañana. Su trabajador temporal no tiene certificación. Usted pierde la colocación."
                   : "Your client needs a certified forklift operator tomorrow. Your temp doesn't have cert. You lose the placement."}
               </p>
             </div>
@@ -187,12 +186,12 @@ export default function StaffingAgencyProgram() {
                   <Check className="w-4 h-4" />
                 </span>
                 <h2 className="text-xl md:text-2xl font-bold text-brand-dark">
-                  {isEs ? "La Solucion" : "The Solution"}
+                  {isEs ? "La Solución" : "The Solution"}
                 </h2>
               </div>
               <p className="text-brand-dark text-lg leading-relaxed">
                 {isEs
-                  ? "El programa de agencias de Miramar — reservacion prioritaria, precios por volumen, registros digitales y certificacion el mismo dia."
+                  ? "El programa de agencias de Miramar — reservación prioritaria, precios por volumen, registros digitales y certificación el mismo día."
                   : "Miramar's staffing agency program — priority scheduling, volume pricing, digital records, same-day certs."}
               </p>
             </div>
@@ -208,7 +207,7 @@ export default function StaffingAgencyProgram() {
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 {isEs
-                  ? "Todo lo que su agencia necesita para certificar trabajadores temporales rapidamente."
+                  ? "Todo lo que su agencia necesita para certificar trabajadores temporales rápidamente."
                   : "Everything your agency needs to certify temps quickly and reliably."}
               </p>
             </div>
@@ -216,44 +215,44 @@ export default function StaffingAgencyProgram() {
               {[
                 {
                   icon: <Clock className="w-6 h-6" />,
-                  title: isEs ? "Reservacion Prioritaria" : "Priority Booking",
+                  title: isEs ? "Reservación Prioritaria" : "Priority Booking",
                   desc: isEs
-                    ? "Cupos del dia siguiente para sus trabajadores temporales. No espere semanas."
+                    ? "Cupos del día siguiente para sus trabajadores temporales. No espere semanas."
                     : "Next-day slots for your temps. Don't wait weeks for an opening.",
                 },
                 {
                   icon: <Users className="w-6 h-6" />,
-                  title: isEs ? "Descuentos por Volumen" : "Volume Discounts",
+                  title: isEs ? "Precios por Volumen" : "Volume Pricing",
                   desc: isEs
-                    ? "Hasta 25% de descuento para agencias con 10+ temps al mes."
-                    : "Up to 25% off for agencies certifying 10+ temps per month.",
+                    ? "Tarifas preferenciales para agencias que certifican de forma regular — cotizadas para su agencia."
+                    : "Preferred rates for agencies that certify regularly — quoted for your agency.",
                 },
                 {
                   icon: <Shield className="w-6 h-6" />,
                   title: isEs ? "Certificados Digitales" : "Digital Certificates",
                   desc: isEs
-                    ? "Enlaces de verificacion compartibles para sus clientes. Compruebe certificaciones al instante."
+                    ? "Enlaces de verificación compartibles para sus clientes. Compruebe certificaciones al instante."
                     : "Shareable verification links for your clients. Prove certification instantly.",
                 },
                 {
                   icon: <LayoutDashboard className="w-6 h-6" />,
-                  title: isEs ? "Panel de Gestion Grupal" : "Group Management Dashboard",
+                  title: isEs ? "Panel de Gestión Grupal" : "Group Management Dashboard",
                   desc: isEs
                     ? "Vea todos sus temps, certificaciones y estados de cumplimiento en un solo lugar."
                     : "See all your temps, certifications, and compliance status in one place.",
                 },
                 {
                   icon: <CreditCard className="w-6 h-6" />,
-                  title: isEs ? "Facturacion Net-30" : "Net-30 Invoicing",
+                  title: isEs ? "Facturación Net-30" : "Net-30 Invoicing",
                   desc: isEs
-                    ? "Facturacion mensual con terminos net-30 para agencias aprobadas. Sin pagos por certificado."
+                    ? "Facturación mensual con términos net-30 para agencias aprobadas. Sin pagos por certificado."
                     : "Monthly invoicing with net-30 terms for approved agencies. No per-cert payments.",
                 },
                 {
                   icon: <Check className="w-6 h-6" />,
                   title: isEs ? "Cumplimiento OSHA" : "OSHA-Compliant",
                   desc: isEs
-                    ? "Todas las certificaciones cumplen con 29 CFR 1910.178 de OSHA. Validas por 3 anos."
+                    ? "Todas las certificaciones cumplen con 29 CFR 1910.178 de OSHA. Válidas por 3 años."
                     : "All certifications meet OSHA 29 CFR 1910.178. Valid for 3 years.",
                 },
               ].map((benefit, i) => (
@@ -273,7 +272,7 @@ export default function StaffingAgencyProgram() {
         <section className="max-w-6xl mx-auto px-4 py-16 md:py-20">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              {isEs ? "Como Funciona" : "How It Works"}
+              {isEs ? "Cómo Funciona" : "How It Works"}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               {isEs
@@ -287,28 +286,28 @@ export default function StaffingAgencyProgram() {
                 step: "1",
                 title: isEs ? "Registre Su Agencia" : "Register Your Agency",
                 desc: isEs
-                  ? "Complete el formulario de registro. Aprobacion en 1-2 dias habiles."
+                  ? "Complete el formulario de registro. Aprobación en 1-2 días hábiles."
                   : "Fill out the registration form. Approval in 1-2 business days.",
               },
               {
                 step: "2",
                 title: isEs ? "Suba Su Lista de Temps" : "Upload Your Temp Roster",
                 desc: isEs
-                  ? "Suba la lista de trabajadores temporales que necesitan certificacion."
+                  ? "Suba la lista de trabajadores temporales que necesitan certificación."
                   : "Upload the list of temps that need certification.",
               },
               {
                 step: "3",
                 title: isEs ? "Los Certificamos" : "We Certify Them",
                 desc: isEs
-                  ? "Entrenamiento en linea o presencial. Certificacion el mismo dia."
+                  ? "Entrenamiento en línea o presencial. Certificación el mismo día."
                   : "Online or in-person training. Same-day certification.",
               },
               {
                 step: "4",
                 title: isEs ? "Comparta los Certificados" : "Share Digital Certs",
                 desc: isEs
-                  ? "Comparta enlaces de verificacion con sus clientes. Listo para trabajar."
+                  ? "Comparta enlaces de verificación con sus clientes. Listo para trabajar."
                   : "Share verification links with your clients. Ready to work.",
               },
             ].map((item, i) => (
@@ -339,7 +338,7 @@ export default function StaffingAgencyProgram() {
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 {isEs
-                  ? "Mientras mas temps certifique, mas ahorra. Descuentos automaticos cada mes."
+                  ? "Mientras más temps certifique, más ahorra. Descuentos automáticos cada mes."
                   : "The more temps you certify, the more you save. Discounts applied automatically each month."}
               </p>
             </div>
@@ -347,24 +346,24 @@ export default function StaffingAgencyProgram() {
               {/* Tier 1 */}
               <div className="bg-background border border-border rounded-lg p-6 text-center">
                 <h3 className="text-lg font-bold mb-2">
-                  {isEs ? "Estandar" : "Standard"}
+                  {isEs ? "Estándar" : "Standard"}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   {isEs ? "1-5 temps al mes" : "1-5 temps per month"}
                 </p>
                 <div className="text-3xl font-bold mb-2">
-                  {isEs ? "Tarifa Estandar" : "Standard Rates"}
+                  {isEs ? "Tarifa Estándar" : "Standard Rates"}
                 </div>
                 <ul className="text-sm text-muted-foreground space-y-2 text-left">
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Reservacion prioritaria" : "Priority booking"}</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Reservación prioritaria" : "Priority booking"}</li>
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Certificados digitales" : "Digital certificates"}</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Panel de gestion" : "Management dashboard"}</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Panel de gestión" : "Management dashboard"}</li>
                 </ul>
               </div>
               {/* Tier 2 - Featured */}
               <div className="bg-background border-2 border-accent rounded-lg p-6 text-center relative md:scale-105">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-full">
-                  {isEs ? "Mas Popular" : "Most Popular"}
+                  {isEs ? "Más Popular" : "Most Popular"}
                 </span>
                 <h3 className="text-lg font-bold mb-2">
                   {isEs ? "Volumen" : "Volume"}
@@ -373,11 +372,11 @@ export default function StaffingAgencyProgram() {
                   {isEs ? "6-15 temps al mes" : "6-15 temps per month"}
                 </p>
                 <div className="text-3xl font-bold mb-2 text-accent-foreground">
-                  15% {isEs ? "de descuento" : "off"}
+                  {isEs ? "Tarifas preferenciales" : "Preferred rates"}
                 </div>
                 <ul className="text-sm text-muted-foreground space-y-2 text-left">
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Todo lo de Estandar" : "Everything in Standard"}</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Facturacion net-30" : "Net-30 invoicing"}</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Todo lo de Estándar" : "Everything in Standard"}</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Facturación net-30" : "Net-30 invoicing"}</li>
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Soporte dedicado" : "Dedicated support"}</li>
                 </ul>
               </div>
@@ -390,18 +389,18 @@ export default function StaffingAgencyProgram() {
                   {isEs ? "16+ temps al mes" : "16+ temps per month"}
                 </p>
                 <div className="text-3xl font-bold mb-2 text-accent-foreground">
-                  25% {isEs ? "de descuento" : "off"}
+                  {isEs ? "Precios a la medida" : "Custom pricing"}
                 </div>
                 <ul className="text-sm text-muted-foreground space-y-2 text-left">
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Todo lo de Volumen" : "Everything in Volume"}</li>
-                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Capacitacion en su sitio" : "On-site training"}</li>
+                  <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Capacitación en su sitio" : "On-site training"}</li>
                   <li className="flex items-start gap-2"><Check className="w-4 h-4 mt-0.5 text-accent-foreground flex-shrink-0" /> {isEs ? "Gerente de cuenta" : "Account manager"}</li>
                 </ul>
               </div>
             </div>
             <p className="text-center text-sm text-muted-foreground mt-8">
               {isEs
-                ? "Terminos net-30 disponibles para agencias aprobadas. Contactenos para mas informacion."
+                ? "Términos net-30 disponibles para agencias aprobadas. Contáctenos para más información."
                 : "Net-30 terms available for approved agencies. Contact us to learn more."}
             </p>
           </div>

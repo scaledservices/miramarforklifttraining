@@ -444,22 +444,11 @@ export default function RequestOnsiteTraining() {
             <h3 className="font-semibold text-foreground">{t("onsiteTraining.pricingGuide")}</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("onsiteTraining.tier1")}</span>
-                <span className="font-medium">{t("onsiteTraining.tier1Price")}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("onsiteTraining.tier2")}</span>
-                <span className="font-medium">{t("onsiteTraining.tier2Price")}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("onsiteTraining.tier3")}</span>
-                <span className="font-medium">{t("onsiteTraining.tier3Price")}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("onsiteTraining.tier4")}</span>
-                <span className="font-medium">{t("onsiteTraining.tier4Price")}</span>
+                <span className="text-muted-foreground">{t("onsiteTraining.pricingFromLabel")}</span>
+                <span className="font-medium">{t("onsiteTraining.pricingFromValue")}</span>
               </div>
             </div>
+            <p className="text-sm text-muted-foreground">{t("onsiteTraining.pricingQuoteNote")}</p>
             <p className="text-xs text-muted-foreground">{t("onsiteTraining.travelNote")}</p>
           </div>
 

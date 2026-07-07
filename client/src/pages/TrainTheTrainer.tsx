@@ -114,7 +114,7 @@ export default function TrainTheTrainer() {
       {/* ─── HERO ─────────────────────────────────────────── */}
       <section className="bg-gradient-to-br from-brand-dark via-brand-dark to-[hsl(10,22%,15%)] text-white py-16 md:py-24 px-4">
         <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/20 text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium mb-6" style={{ backgroundColor: "rgba(255,195,38,0.15)", color: "#FFC326" }}>
+          <div className="inline-flex items-center gap-2 bg-accent/15 text-accent px-4 py-1.5 rounded-full text-sm font-medium mb-6">
             <Award className="w-4 h-4" />
             {t("trainTheTrainerPage.heroBadge")}
           </div>
@@ -160,8 +160,8 @@ export default function TrainTheTrainer() {
               <Card key={item.key} className="border-border hover:shadow-lg transition-shadow" data-testid={`kit-item-${item.key}`}>
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: "rgba(255,195,38,0.12)" }}>
-                      <item.icon className="w-5 h-5" style={{ color: "#FFC326" }} />
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-accent/10" >
+                      <item.icon className="w-5 h-5 text-accent" />
                     </div>
                     <p className="font-medium pt-1">{t(item.key)}</p>
                   </div>
@@ -194,7 +194,7 @@ export default function TrainTheTrainer() {
                   {t("trainTheTrainerPage.priceDigitalDesc")}
                 </p>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold" style={{ color: "#4f3b3b" }}>$350</span>
+                  <span className="text-4xl font-bold text-foreground">$350</span>
                   <span className="text-muted-foreground ml-2">{t("trainTheTrainerPage.priceOneTime")}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
@@ -205,7 +205,7 @@ export default function TrainTheTrainer() {
                     "trainTheTrainerPage.priceDigitalF4",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#019E7C" }} />
+                      <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-brand-green" />
                       <span>{t(f)}</span>
                     </li>
                   ))}
@@ -220,7 +220,7 @@ export default function TrainTheTrainer() {
 
             {/* Kit + Coaching */}
             <Card className="relative border-2 border-primary" data-testid="pricing-card-coaching">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full" style={{ backgroundColor: "#FFC326", color: "#4f3b3b" }}>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground text-xs font-bold px-4 py-1 rounded-full">
                 {t("trainTheTrainerPage.popular")}
               </div>
               <CardContent className="p-8">
@@ -231,7 +231,7 @@ export default function TrainTheTrainer() {
                   {t("trainTheTrainerPage.priceCoachingDesc")}
                 </p>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold" style={{ color: "#4f3b3b" }}>$750</span>
+                  <span className="text-4xl font-bold text-foreground">$750</span>
                   <span className="text-muted-foreground ml-2">{t("trainTheTrainerPage.priceOneTime")}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
@@ -242,7 +242,7 @@ export default function TrainTheTrainer() {
                     "trainTheTrainerPage.priceCoachingF4",
                   ].map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
-                      <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#019E7C" }} />
+                      <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-brand-green" />
                       <span>{t(f)}</span>
                     </li>
                   ))}
@@ -273,8 +273,8 @@ export default function TrainTheTrainer() {
             {whoFor.map((item) => (
               <Card key={item.key} className="border-border text-center" data-testid={`who-for-${item.key}`}>
                 <CardContent className="p-6">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: "rgba(255,195,38,0.12)" }}>
-                    <item.icon className="w-6 h-6" style={{ color: "#FFC326" }} />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 bg-accent/10" >
+                    <item.icon className="w-6 h-6 text-accent" />
                   </div>
                   <p className="font-medium">{t(item.key)}</p>
                 </CardContent>
@@ -289,7 +289,7 @@ export default function TrainTheTrainer() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 mb-4">
-              <Calculator className="w-6 h-6" style={{ color: "#FFC326" }} />
+              <Calculator className="w-6 h-6 text-accent" />
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4" style={{ fontFamily: "'Roboto Slab', serif" }}>
               {t("trainTheTrainerPage.roiTitle")}
@@ -318,7 +318,7 @@ export default function TrainTheTrainer() {
                     style={{ accentColor: "#FFC326" }}
                     data-testid="roi-operators-slider"
                   />
-                  <p className="text-2xl font-bold mt-2" style={{ color: "#4f3b3b" }}>
+                  <p className="text-2xl font-bold mt-2 text-foreground">
                     {operatorsPerYear}
                   </p>
                 </div>
@@ -338,7 +338,7 @@ export default function TrainTheTrainer() {
                     style={{ accentColor: "#FFC326" }}
                     data-testid="roi-cost-slider"
                   />
-                  <p className="text-2xl font-bold mt-2" style={{ color: "#4f3b3b" }}>
+                  <p className="text-2xl font-bold mt-2 text-foreground">
                     ${costPerOperator.toFixed(2)}
                   </p>
                 </div>
@@ -347,11 +347,11 @@ export default function TrainTheTrainer() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-border pt-6">
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground mb-1">{t("trainTheTrainerPage.roiWithoutKit")}</p>
-                  <p className="text-2xl font-bold" style={{ color: "#4f3b3b" }}>${withoutKitTotal.toFixed(0)}</p>
+                  <p className="text-2xl font-bold text-foreground">${withoutKitTotal.toFixed(0)}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground mb-1">{t("trainTheTrainerPage.roiWithKit")}</p>
-                  <p className="text-2xl font-bold" style={{ color: "#4f3b3b" }}>${kitPrice}</p>
+                  <p className="text-2xl font-bold text-foreground">${kitPrice}</p>
                 </div>
                 <div className="text-center">
                   <p className="text-sm text-muted-foreground mb-1">{t("trainTheTrainerPage.roiSavings")}</p>
@@ -390,7 +390,7 @@ export default function TrainTheTrainer() {
               <thead>
                 <tr>
                   <th className="text-left p-4 border-b-2 border-border font-semibold text-sm">{t("trainTheTrainerPage.cmpFeature")}</th>
-                  <th className="text-center p-4 border-b-2 border-border font-semibold text-sm" style={{ color: "#4f3b3b" }}>
+                  <th className="text-center p-4 border-b-2 border-border font-semibold text-sm text-foreground">
                     {t("trainTheTrainerPage.cmpDigitalKit")}
                   </th>
                   <th className="text-center p-4 border-b-2 border-border font-semibold text-sm">{t("trainTheTrainerPage.cmpInPerson")}</th>
@@ -416,7 +416,7 @@ export default function TrainTheTrainer() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {trustSignals.map((item) => (
               <div key={item.key} className="flex items-center gap-3 justify-center text-center sm:text-left" data-testid={`trust-${item.key}`}>
-                <item.icon className="w-8 h-8 shrink-0" style={{ color: "#FFC326" }} />
+                <item.icon className="w-8 h-8 shrink-0 text-accent" />
                 <p className="text-sm font-medium">{t(item.key)}</p>
               </div>
             ))}
@@ -443,8 +443,7 @@ export default function TrainTheTrainer() {
                 >
                   <span className="font-medium">{t(faq.qKey)}</span>
                   <ChevronDown
-                    className={`w-5 h-5 shrink-0 transition-transform ${openFaq === idx ? "rotate-180" : ""}`}
-                    style={{ color: "#FFC326" }}
+                    className={`w-5 h-5 shrink-0 text-accent transition-transform ${openFaq === idx ? "rotate-180" : ""}`}
                   />
                 </button>
                 {openFaq === idx && (
@@ -468,7 +467,7 @@ export default function TrainTheTrainer() {
             {t("trainTheTrainerPage.finalCtaSubtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-base px-8 py-3" style={{ backgroundColor: "#FFC326", color: "#4f3b3b" }}>
+            <Button asChild size="lg" className="bg-accent text-accent-foreground border-accent-border text-base px-8 py-3">
               <Link href={quoteHref}>
                 {t("trainTheTrainerPage.buyKit")}
                 <ArrowRight className="ml-2 w-5 h-5" />
