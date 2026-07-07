@@ -20,6 +20,10 @@ export const BOOKING_PRODUCT_PRICES: Record<string, number> = {
   "order-picker-forklift-training-las-vegas": 490,
   "forklift-scissor-lift-epj-certification-las-vegas": 550,
   "complete-equipment-certification-las-vegas": 650,
+  "forklift-train-the-trainer-san-diego": 750,
+  "forklift-train-the-trainer-las-vegas": 750,
+  "scissor-aerial-train-the-trainer-san-diego": 750,
+  "scissor-aerial-train-the-trainer-las-vegas": 750,
   "standard-forklift-certification-fresno": 280,
 };
 

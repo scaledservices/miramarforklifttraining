@@ -1,14 +1,16 @@
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Shield, ArrowRight, Monitor, Clock, Award } from "lucide-react";
+import { Shield, ArrowRight, Monitor, Clock, Award, MapPin } from "lucide-react";
 
 /**
- * Alternative hero for out-of-region visitors.
+ * Modified hero for out-of-region visitors.
  *
- * Promotes online certification as the primary path — visitors who aren't
- * in CA/NV can't easily attend in-person/hands-on sessions, so we lead with
- * the online course and de-emphasize the onsite offering.
+ * Promotes online certification as the primary path, but STILL shows the
+ * onsite offering so nothing is hidden. Visitors outside CA/NV see the
+ * online CTA first, followed by a secondary section that makes in-person
+ * training discoverable with a "Available in San Diego, Las Vegas & Fresno"
+ * label.
  */
 export default function OnlineFirstHero() {
   const { t } = useTranslation();
@@ -47,6 +49,7 @@ export default function OnlineFirstHero() {
             })}
           </p>
 
+          {/* Primary CTA: online */}
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href="/get-certified">
               <Button
@@ -90,6 +93,38 @@ export default function OnlineFirstHero() {
                 {t("home.onlineFirstBadge3", { defaultValue: "Same-day certificate" })}
               </span>
             </div>
+          </div>
+        </div>
+
+        {/* Secondary section: onsite is STILL visible, just de-emphasized */}
+        <div
+          className="mt-12 pt-8 border-t border-white/15 max-w-3xl"
+          data-testid="onsite-still-available"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-1">
+                {t("home.onlineFirstOnsiteHeading", {
+                  defaultValue: "Prefer In-Person Training?",
+                })}
+              </h2>
+              <p className="text-sm text-white/70 flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-accent shrink-0" />
+                {t("home.onlineFirstOnsiteLocations", {
+                  defaultValue: "Available in San Diego, Las Vegas & Fresno",
+                })}
+              </p>
+            </div>
+            <Link href="/book-training">
+              <Button
+                variant="outline"
+                className="border-white/30 text-white bg-white/10 hover:bg-white/20 whitespace-nowrap"
+                data-testid="button-online-first-onsite"
+              >
+                {t("home.onlineFirstOnsiteCta", { defaultValue: "Book Onsite Training" })}
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

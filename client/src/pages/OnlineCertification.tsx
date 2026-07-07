@@ -103,7 +103,7 @@ export default function OnlineCertification() {
             name: t("onlineCert.seoCourseName"),
             description: t("onlineCert.seoCourseDescription", { body: industry.regulatory.body }),
             url: "/online-forklift-certification",
-            price: 59.99,
+            price: 45,
             duration: "PT2H",
             locale,
             image: "/images/online-learning.jpg",
@@ -177,7 +177,7 @@ export default function OnlineCertification() {
           <Card className="border-border max-w-md mx-auto">
             <CardContent className="p-8">
               <div className="mb-6">
-                <span className="text-5xl font-bold text-foreground">$59.99</span>
+                <span className="text-5xl font-bold text-foreground">$45.00</span>
                 <span className="text-muted-foreground ml-2">{t("onlineCert.pricingPerPerson")}</span>
               </div>
               <ul className="space-y-3 text-left mb-8">

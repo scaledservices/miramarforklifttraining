@@ -28,10 +28,10 @@ export default function TrainTheTrainer() {
 
   // ROI calculator state
   const [operatorsPerYear, setOperatorsPerYear] = useState(20);
-  const [costPerOperator, setCostPerOperator] = useState(59.99);
+  const [costPerOperator, setCostPerOperator] = useState(45);
 
   const withoutKitTotal = operatorsPerYear * costPerOperator;
-  const kitPrice = 399;
+  const kitPrice = 350;
   const savings = withoutKitTotal - kitPrice;
   const savingsPositive = savings > 0;
 
@@ -194,7 +194,7 @@ export default function TrainTheTrainer() {
                   {t("trainTheTrainerPage.priceDigitalDesc")}
                 </p>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold" style={{ color: "#4f3b3b" }}>$399</span>
+                  <span className="text-4xl font-bold" style={{ color: "#4f3b3b" }}>$350</span>
                   <span className="text-muted-foreground ml-2">{t("trainTheTrainerPage.priceOneTime")}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
@@ -231,7 +231,7 @@ export default function TrainTheTrainer() {
                   {t("trainTheTrainerPage.priceCoachingDesc")}
                 </p>
                 <div className="mb-6">
-                  <span className="text-4xl font-bold" style={{ color: "#4f3b3b" }}>$799</span>
+                  <span className="text-4xl font-bold" style={{ color: "#4f3b3b" }}>$750</span>
                   <span className="text-muted-foreground ml-2">{t("trainTheTrainerPage.priceOneTime")}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
@@ -329,7 +329,7 @@ export default function TrainTheTrainer() {
                   <input
                     id="cost-per-operator"
                     type="range"
-                    min={44.99}
+                    min={45}
                     max={200}
                     step={5}
                     value={costPerOperator}
