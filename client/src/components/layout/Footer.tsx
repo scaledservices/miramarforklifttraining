@@ -38,7 +38,7 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 opacity-90">{t("footer.resources")}</h3>
             <ul className="space-y-2">
-              {/* Blog link hidden until blog content exists (senior review Section B.5) */}
+              <li><Link href="/blog" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-blog">{t("footer.blog", { defaultValue: "Blog" })}</Link></li>
               <li><Link href="/documentation" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-docs">{t("footer.documentation")}</Link></li>
               <li><Link href="/faq" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-faq">{t("footer.faq")}</Link></li>
               <li><Link href="/osha-compliance" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-osha">{t("footer.oshaCompliance")}</Link></li>
@@ -69,11 +69,11 @@ export default function Footer() {
               </li>
             </ul>
 
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 mt-6 opacity-90">Service Areas</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 mt-6 opacity-90">{t("footer.serviceAreas", { defaultValue: "Service Areas" })}</h3>
             <ul className="space-y-2">
-              <li><Link href="/service-areas/los-angeles" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-la">Onsite Training Los Angeles</Link></li>
-              <li><Link href="/service-areas/bakersfield" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-bakersfield">Onsite Training Bakersfield</Link></li>
-              <li><Link href="/service-areas/hayward" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-hayward">Onsite Training Hayward</Link></li>
+              <li><Link href="/service-areas/los-angeles" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-la">{t("footer.onsiteCity", { defaultValue: "Onsite Training {{city}}", city: "Los Angeles" })}</Link></li>
+              <li><Link href="/service-areas/bakersfield" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-bakersfield">{t("footer.onsiteCity", { defaultValue: "Onsite Training {{city}}", city: "Bakersfield" })}</Link></li>
+              <li><Link href="/service-areas/hayward" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-hayward">{t("footer.onsiteCity", { defaultValue: "Onsite Training {{city}}", city: "Hayward" })}</Link></li>
             </ul>
           </div>
         </div>
