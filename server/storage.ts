@@ -1240,6 +1240,9 @@ export class DatabaseStorage implements IStorage {
     if (!area) return [];
 
     const rules = area.availabilityRules as AvailabilityRules;
+    // Malformed/legacy rules (e.g. hand-seeded data) must degrade to "no
+    // slots", not crash the endpoint.
+    if (!rules || !Array.isArray((rules as any).daysOfWeek) || !Array.isArray((rules as any).timeSlots)) return [];
     const { daysOfWeek, timeSlots, maxParticipants, leadTimeDays, windowDays, blackoutDates } = rules;
 
     const today = new Date();

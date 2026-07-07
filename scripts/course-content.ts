@@ -20,7 +20,7 @@ export const CANONICAL_COURSE = {
   slug: "online-forklift-operator-certification",
   description: "Comprehensive OSHA-compliant powered industrial truck (forklift) operator training. Covers formal instruction, safety procedures, load handling, and employer documentation. Complete video training, knowledge checks, and pass the final exam to receive your industry-recognized certification. Note: OSHA also requires employer-conducted practical training and evaluation.",
   category: "forklift",
-  price: "59.99",
+  price: "45.00",
 };
 
 const img = (name: string) => `/images/training/${name}`;

@@ -303,22 +303,12 @@ async function buildOrder(
     }
     const course = await storage.getCourseBySlug(slug);
     if (!course) throw new Error(`Course not found: ${item.courseSlug}`);
+    // Flat per-seat pricing for any quantity (July 2026 decision: no automated
+    // volume discounts — group pricing is handled manually through quotes).
     const unitPrice = Number(course.price);
     const qty = item.quantity || 1;
-
-    const BULK_TIERS = [
-      { min: 25, price: 44.99 },
-      { min: 10, price: 49.99 },
-      { min: 5, price: 54.99 },
-    ];
-    let finalPrice = unitPrice;
-    if (course.slug === "online-forklift-operator-training" || course.slug === "certificacion-operador-montacargas-en-linea") {
-      for (const tier of BULK_TIERS) {
-        if (qty >= tier.min) { finalPrice = tier.price; break; }
-      }
-    }
-    orderItems.push({ courseId: course.id, quantity: qty, unitPrice: finalPrice });
-    total += finalPrice * qty;
+    orderItems.push({ courseId: course.id, quantity: qty, unitPrice });
+    total += unitPrice * qty;
   }
 
   const order = await storage.createOrder({

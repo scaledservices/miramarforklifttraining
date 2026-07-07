@@ -5,7 +5,7 @@ export const CANONICAL_COURSE_ES = {
   slug: "certificacion-operador-montacargas-en-linea",
   description: "Capacitación integral para operador de camiones industriales motorizados (montacargas) en cumplimiento con OSHA. Cubre instrucción formal, procedimientos de seguridad, manejo de cargas y documentación del empleador. Complete la capacitación en video, las verificaciones de conocimiento y apruebe el examen final para recibir su certificación reconocida por la industria. Nota: OSHA también requiere capacitación práctica y evaluación conducida por el empleador.",
   category: "forklift",
-  price: "59.99",
+  price: "45.00",
 };
 
 const img = (name: string) => `/images/training/${name}`;
