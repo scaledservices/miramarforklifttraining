@@ -197,7 +197,10 @@
     "terms": "Términos",
     "privacy": "Privacidad",
     "refundPolicy": "Política de Reembolso",
-    "contactUs": "Contáctenos"
+    "contactUs": "Contáctenos",
+    "renewal": "Renovación",
+    "requestQuote": "Solicitar una Cotización",
+    "referralProgram": "Programa de Referidos"
   },
   "badges": {
     "oshaAligned": "Alineado con OSHA",
@@ -235,7 +238,9 @@
     "sanDiego": "San Diego, CA",
     "lasVegas": "Las Vegas, NV",
     "fresno": "Fresno, CA",
-    "needOnsiteTraining": "¿Necesitas capacitación en tu instalación?"
+    "needOnsiteTraining": "¿Necesitas capacitación en tu instalación?",
+    "pageTitle": "Encuentra la Capacitación Adecuada para Ti",
+    "pageDescription": "Elige tu camino hacia la certificación — te guiaremos al programa correcto."
   },
   "home": {
     "getStarted": "Comenzar",
@@ -253,7 +258,50 @@
     "readyToGetCertified": "¿Listo para Certificarte?",
     "readyToGetCertifiedDesc": "Comienza tu certificación de montacargas hoy. Capacitación en línea disponible 24/7 con certificación instantánea al completar.",
     "individualAlt": "Operador individual completando certificación de montacargas en línea",
-    "businessAlt": "Equipo empresarial planificando programa de capacitación de montacargas"
+    "businessAlt": "Equipo empresarial planificando programa de capacitación de montacargas",
+    "heroTitle": "Certifícate en Montacargas — Rápido, Asequible, Alineado con OSHA",
+    "heroEyebrow": "Certificación de Montacargas Alineada con OSHA",
+    "heroSubtitle": "Completa tu certificación de operador de montacargas en línea o en nuestras instalaciones de capacitación en San Diego, Las Vegas y Fresno. Certificación el mismo día disponible.",
+    "howItWorksLabel": "Cómo Funciona",
+    "howItWorksTitle": "Certifícate en 3 Pasos Sencillos",
+    "getStartedLabel": "Comenzar",
+    "step1Title": "Elige Tu Programa",
+    "step1Desc": "Selecciona el camino de certificación que se ajuste a tus necesidades — en línea, presencial o en tu instalación.",
+    "step2Title": "Completa Tu Capacitación",
+    "step2Desc": "Avanza por el currículo alineado con OSHA a tu propio ritmo en línea, o asiste a una sesión práctica con equipo real.",
+    "step3Title": "Obtén Tu Certificado",
+    "step3Desc": "Aprobar la evaluación y recibe tu certificado imprimible inmediatamente. Certificación el mismo día disponible.",
+    "buyerTracksTitle": "Encuentra la Capacitación Adecuada para Ti",
+    "buyerTracksSubtitle": "Tres formas de certificarte — elige la que se ajuste a tu situación.",
+    "buyerCardCrewTitle": "Capacita a Tu Equipo",
+    "buyerCardCrewDesc": "Llevamos la capacitación a tu instalación con precios por volumen e instructores bilingües.",
+    "b2bF1": "El instructor viaja a tu sitio",
+    "b2bF2": "Descuentos por volumen para 5+ participantes",
+    "b2bF3": "Documentos de cumplimiento incluidos",
+    "buyerCardSelfTitle": "Certifícate en Persona",
+    "buyerCardSelfDesc": "Capacitación práctica con equipo real en nuestras instalaciones de San Diego, Las Vegas o Fresno.",
+    "inPersonF1": "Capacitación con equipo real",
+    "inPersonF2": "Tarjeta de certificación el mismo día",
+    "inPersonF3": "Desde 00/persona",
+    "buyerCardRenewTitle": "Renueva Tu Certificación",
+    "buyerCardRenewDesc": "Renueva tu certificación de montacargas en línea en aproximadamente 2 horas. Rápido y conveniente.",
+    "renewF1": "100% en línea, cualquier dispositivo",
+    "renewF2": "Listo en aproximadamente 2 horas",
+    "renewF3": "Certificado el mismo día",
+    "trust1": "Capacitación Alineada con OSHA",
+    "trust2": "Certificación el Mismo Día",
+    "trust3": "3 Ubicaciones: San Diego, Las Vegas y Fresno",
+    "trust4": "10+ Años de Experiencia",
+    "trustRealFacilities": "Instalaciones de Capacitación Reales",
+    "locationPillsTitle": "Ubicaciones de Capacitación",
+    "onlineFirstTitle": "Certifícate en Línea — El Camino Más Rápido a Tu Certificación de Montacargas",
+    "onlineFirstSubtitle": "Completa tu certificación de montacargas alineada con OSHA en línea por 9.99. A tu propio ritmo, compatible con móviles, con certificado instantáneo al completar. Sin cargos ocultos.",
+    "onlineFirstEyebrow": "Certificación en Línea",
+    "onlineFirstCta": "Certifícate en Línea — 9.99",
+    "onlineFirstBrowse": "Ver Todos los Programas",
+    "onlineFirstBadge1": "Alineado con OSHA",
+    "onlineFirstBadge2": "Certificado el Mismo Día",
+    "onlineFirstBadge3": "Reintentos Ilimitados"
   },
   "onlineCert": {
     "title": "Certificación de Operador de Montacargas en Línea",
@@ -772,7 +820,29 @@
     "validBadge": "Certificado Válido",
     "invalidBadge": "Certificado Inválido",
     "verificationProvidedBy": "Esta verificación es proporcionada por {{domain}}",
-    "complianceNote": "Programa de certificación conforme a {{body}} {{standard}}"
+    "complianceNote": "Programa de certificación conforme a {{body}} {{standard}}",
+    "lookupTitle": "Verificar una Certificación",
+    "lookupDesc": "Ingresa un número de certificado para verificar su validez.",
+    "lookupPlaceholder": "Ingresa el número de certificado",
+    "lookupButton": "Verificar",
+    "lookupHint": "Verifica el estado de cualquier certificación de montacargas emitida por {{brand}}.",
+    "recert": {
+      "expiresSoonTitle": "Certificación por Vencer",
+      "expiredTitle": "Certificación Vencida",
+      "desc": "Es hora de renovar tu certificación de montacargas. Mantente al día con los requisitos de OSHA.",
+      "bookCta": "Renovar Ahora",
+      "contactCta": "Contáctenos",
+      "reminderTitle": "Recibe un Recordatorio de Renovación",
+      "reminderHint": "Ingresa tu correo y te enviaremos un recordatorio cuando sea hora de renovar.",
+      "reminderName": "Tu Nombre",
+      "reminderEmail": "Dirección de Correo Electrónico",
+      "reminderPhone": "Teléfono (opcional)",
+      "reminderSubmit": "Establecer Recordatorio",
+      "reminderSubmitting": "Estableciendo recordatorio...",
+      "reminderSuccess": "¡Recordatorio establecido! Te contactaremos cuando sea hora de renovar.",
+      "reminderError": "Error al establecer el recordatorio. Por favor intenta de nuevo.",
+      "reminderContactRequired": "Por favor proporciona al menos un correo electrónico o número de teléfono."
+    }
   },
   "certification": {
     "notFoundTitle": "Certificación No Encontrada",
@@ -1302,7 +1372,9 @@
     "tryAgain": "Intentar de Nuevo"
   },
   "footerLocations": {
-    "sanDiego": "San Diego, CA"
+    "sanDiego": "San Diego, CA",
+    "lasVegas": "Las Vegas, NV",
+    "fresno": "Fresno, CA"
   },
   "groupCertsExtra": {
     "downloadFailed": "Descarga fallida",
@@ -1568,7 +1640,14 @@
     "whatsNextTitle": "¿Qué sucede después?",
     "nextStep1": "Revise su bandeja de entrada para un correo de confirmación",
     "nextStep2": "Nuestro equipo revisa y confirma su reserva",
-    "nextStep3": "La capacitación se realiza en su ubicación en la fecha programada"
+    "nextStep3": "La capacitación se realiza en su ubicación en la fecha programada",
+    "getCertifiedOnline": "Certifícate en Línea",
+    "promoPlaceholder": "Código promocional",
+    "promoApply": "Aplicar",
+    "promoApplied": "Código promocional aplicado",
+    "promoInvalid": "Código promocional inválido",
+    "promoDiscount": "Descuento",
+    "requestCustomQuote": "Solicitar una Cotización Personalizada"
   },
   "businessPage": {
     "heroTitle": "Capacitación de Montacargas para Tu Empresa",
@@ -1979,6 +2058,50 @@
     "paidInFull": "Estado",
     "paidInFullBadge": "Pagado en Total",
     "fullPaymentNote": "El pago completo se recolecta al momento de la reserva. Incluye 3% de recargo por tarjeta cuando aplique.",
-    "priceAnchor": "La certificacion practica cuesta $350+ por persona en otros lugares."
+    "priceAnchor": "La certificacion practica cuesta $350+ por persona en otros lugares.",
+    "depositDueToday": "Depósito a Pagar Hoy",
+    "balanceOnCompletion": "Saldo al Completar",
+    "depositNote": "Un depósito del 50% asegura tu sesión. El saldo restante se paga el día de la capacitación.",
+    "payDepositCta": "Pagar Depósito",
+    "depositReceived": "Depósito Recibido",
+    "volumeDiscountApplied": "Descuento por volumen aplicado",
+    "largeGroupTitle": "¿Grupo Grande?",
+    "largeGroupDesc": "Para grupos de 25+ participantes, contáctanos para precios y programación personalizados.",
+    "largeGroupCta": "Contactar para Precios Personalizados"
+  },
+  "mobileBar": {
+    "call": "Llamar"
+  },
+  "referral": {
+    "pageTitle": "Programa de Referidos",
+    "pageSubtitle": "Gana recompensas por cada operador que refieras a Miramar Forklift Training.",
+    "howItWorks": "Cómo Funciona",
+    "step1": "Comparte tu enlace de referido único con colegas y amigos",
+    "step2": "Ellos reservan y completan su certificación de montacargas con nosotros",
+    "step3": "Ganas 5 por cada referido exitoso",
+    "yourReferralCode": "Tu Código de Referido",
+    "yourCode": "Tu código",
+    "generateCode": "Generar Código",
+    "generating": "Generando...",
+    "codeGenerated": "¡Código de referido generado exitosamente!",
+    "generateFailed": "Error al generar el código. Por favor intenta de nuevo.",
+    "noCodeTitle": "Aún no tienes código de referido",
+    "noCodeDesc": "Genera tu código de referido único para comenzar a ganar recompensas.",
+    "shareTitle": "Comparte y Gana",
+    "shareAndEarn": "Comparte y Gana",
+    "sharePrompt": "Comparte tu enlace de referido",
+    "shareNow": "Compartir Ahora",
+    "shareText": "¡Obtén certificación de montacargas alineada con OSHA con Miramar Forklift Training!",
+    "shareableLink": "Enlace Compartible",
+    "linkCopied": "¡Enlace copiado al portapapeles!",
+    "copyFailed": "Error al copiar el enlace. Por favor intenta de nuevo.",
+    "qrAlt": "Código QR para tu enlace de referido",
+    "qrHint": "Escanea para visitar tu página de referido",
+    "bookNow": "Reservar Ahora",
+    "yourStats": "Tus Estadísticas",
+    "referralsMade": "Referidos Hechos",
+    "totalSavings": "Ahorro Total",
+    "yourEarnings": "Tus Ganancias",
+    "earnedFromReferrals": "Ganado por referidos"
   }
 }
