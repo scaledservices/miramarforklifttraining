@@ -29,7 +29,7 @@ export default function SpanishLanding() {
     {
       question: "¿Cuánto cuesta la certificacion de montacargas?",
       answer:
-        "La certificacion practica en nuestras instalaciones cuesta desde $200 por persona. La certificacion en linea cuesta $59.99. Para capacitacion en sitio para su equipo, ofrecemos descuentos por volumen a partir de 5 operadores. Llame al (858) 901-0149 para obtener una cotizacion personalizada.",
+        "La certificacion practica en nuestras instalaciones cuesta desde $200 por persona. La certificacion en linea cuesta $45.00. Para capacitacion en sitio para su equipo, ofrecemos cotizaciones personalizadas para su equipo. Llame al (858) 901-0149 para obtener una cotizacion personalizada.",
     },
     {
       question: "¿Cuanto tarda la certificacion de montacargas?",
@@ -269,7 +269,7 @@ export default function SpanishLanding() {
             <Card className="border-border">
               <CardContent className="p-6 text-center">
                 <p className="text-sm font-semibold text-brand-dark mb-2">{t("spanishLanding.pricingOnlineTitle")}</p>
-                <p className="text-3xl font-bold mb-2">$59.99</p>
+                <p className="text-3xl font-bold mb-2">$45.00</p>
                 <p className="text-sm text-muted-foreground">{t("spanishLanding.pricingOnlineDesc")}</p>
               </CardContent>
             </Card>

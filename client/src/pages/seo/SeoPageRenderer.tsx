@@ -74,7 +74,7 @@ export default function SeoPageRenderer() {
     jsonLdItems.push(courseSchema({
       name: page.heroH1,
       description: page.metaDescription,
-      price: 59.99,
+      price: 45.00,
       locale,
     }));
   }

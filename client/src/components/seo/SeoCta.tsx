@@ -10,7 +10,7 @@ interface SeoCtaProps {
   ctaHref?: string;
 }
 
-export default function SeoCta({ heading = "Ready to Get Certified?", subtext = `Complete your ${industry.regulatory.body}-compliant forklift certification online today. Same-day certification available.`, ctaText = "Start Certification — $59.99", ctaHref = "/online-forklift-certification" }: SeoCtaProps) {
+export default function SeoCta({ heading = "Ready to Get Certified?", subtext = `Complete your ${industry.regulatory.body}-compliant forklift certification online today. Same-day certification available.`, ctaText = "Start Certification — $45.00", ctaHref = "/online-forklift-certification" }: SeoCtaProps) {
   return (
     <section className="bg-brand-dark text-white py-12 md:py-16 rounded-lg" data-testid="seo-cta-band">
       <div className="max-w-3xl mx-auto px-4 text-center">

@@ -10,7 +10,7 @@ interface SeoStickyCtaProps {
   ctaHref?: string;
 }
 
-export default function SeoStickyCta({ price = "$59.99", ctaText = "Get Certified Now", ctaHref = "/online-forklift-certification" }: SeoStickyCtaProps) {
+export default function SeoStickyCta({ price = "$45.00", ctaText = "Get Certified Now", ctaHref = "/online-forklift-certification" }: SeoStickyCtaProps) {
   return (
     <div className="hidden lg:block" data-testid="seo-sticky-cta">
       <Card className="sticky top-24">

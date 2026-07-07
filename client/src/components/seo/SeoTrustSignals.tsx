@@ -5,7 +5,7 @@ const defaultSignals = [
   { icon: ShieldCheck, label: `${industry.regulatory.body}-Compliant`, sublabel: industry.regulatory.standard },
   { icon: Award, label: "Certificate Included", sublabel: "QR-verified PDF" },
   { icon: Clock, label: "Same-Day Certification", sublabel: "Complete at your pace" },
-  { icon: DollarSign, label: "$59.99", sublabel: "One-time payment" },
+  { icon: DollarSign, label: "$45.00", sublabel: "One-time payment" },
 ];
 
 interface TrustSignal {

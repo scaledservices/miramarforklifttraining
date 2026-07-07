@@ -232,7 +232,7 @@ The 3-year rule is a minimum. Recertification may be required earlier in these s
 
 Recertification follows the same structure as initial certification: formal instruction plus practical evaluation.
 
-**Online Recertification** covers the formal instruction portion. It is fast ($59.99, 1-2 hours) and can be completed from any device. This is ideal for experienced operators who just need the classroom refresher.
+**Online Recertification** covers the formal instruction portion. It is fast ($45.00, 1-2 hours) and can be completed from any device. This is ideal for experienced operators who just need the classroom refresher.
 
 **In-Person Recertification** includes both formal instruction and practical evaluation. This takes about 2 hours at one of our facilities (San Diego, Las Vegas, or Fresno) and costs $200 per person. This is required if your employer does not have a qualified person to conduct the practical evaluation in-house.
 
@@ -242,7 +242,7 @@ Recertification follows the same structure as initial certification: formal inst
 2. Choose your format: online (formal instruction only) or in-person (full recertification including practical evaluation).
 3. Complete the training and receive your updated certificate.
 
-${brand.name} offers both online and in-person recertification. The online course costs $59.99 and can be completed in 1-2 hours. The in-person option is available at our San Diego, Las Vegas, and Fresno facilities.`,
+${brand.name} offers both online and in-person recertification. The online course costs $45.00 and can be completed in 1-2 hours. The in-person option is available at our San Diego, Las Vegas, and Fresno facilities.`,
     category: "Certification",
     publishDate: "2025-04-15",
     readTime: "5 min read",
@@ -258,7 +258,7 @@ ${brand.name} offers both online and in-person recertification. The online cours
 ## Quick Comparison
 
 **Online Training**
-- Cost: $59.99
+- Cost: $45.00
 - Time: 1-2 hours, self-paced
 - Location: Anywhere with internet
 - Covers: Formal instruction (OSHA-required classroom portion)
@@ -278,7 +278,7 @@ Online training is a great fit when:
 - **You are an experienced operator** who needs the formal instruction refresher
 - **Your employer can conduct the practical evaluation** in-house using a qualified person
 - **You need to certify quickly** and cannot wait for a scheduled class
-- **Budget is a concern** — at $59.99, online is a fraction of the in-person cost
+- **Budget is a concern** — at $45.00, online is a fraction of the in-person cost
 - **You are not local** to San Diego, Las Vegas, or Fresno
 
 ## When In-Person Training Makes Sense
@@ -292,14 +292,14 @@ In-person training is the right choice when:
 
 ## The Hybrid Approach
 
-Many employers use a hybrid model: operators complete the online formal instruction ($59.99), then the employer conducts the practical evaluation in-house using a qualified supervisor. This gives full ${industry.regulatory.body} compliance at a lower cost and is perfectly acceptable under the standard.
+Many employers use a hybrid model: operators complete the online formal instruction ($45.00), then the employer conducts the practical evaluation in-house using a qualified supervisor. This gives full ${industry.regulatory.body} compliance at a lower cost and is perfectly acceptable under the standard.
 
 ## Cost Analysis
 
 For a single operator:
-- Online only: $59.99
+- Online only: $45.00
 - In-person: $200
-- Online + employer evaluation: $59.99
+- Online + employer evaluation: $45.00
 
 For a team of 10 operators:
 - All online: $599.90 (plus employer's evaluation time)
@@ -326,19 +326,19 @@ Not sure? Call us at ${brand.support.phone} and we will help you decide.`,
   {
     slug: "forklift-certification-cost-2026",
     title: "What Does Forklift Certification Cost in 2026?",
-    excerpt: "Forklift certification costs range from $59.99 to $500+. Learn what drives the price, what to watch for with hidden fees, and how to get the best value for your certification.",
+    excerpt: "Forklift certification costs range from $45.00 to $500+. Learn what drives the price, what to watch for with hidden fees, and how to get the best value for your certification.",
     content: `Forklift certification costs vary widely depending on the format, provider, and equipment type. Here is a transparent breakdown of what you can expect to pay in 2026.
 
 ## Online Forklift Certification
 
 Online certification covers the formal instruction portion of ${industry.regulatory.body} requirements.
 
-- **Typical cost**: $59.99 (at ${brand.name})
+- **Typical cost**: $45.00 (at ${brand.name})
 - **What is included**: Full online course, printable certificate, wallet card, employer verification, unlimited retakes
 - **Time to complete**: 1-2 hours
 - **Best for**: Experienced operators or those whose employer can do the practical evaluation
 
-Watch for providers charging extra for the certificate, wallet card, or retakes. At ${brand.name}, everything is included in the $59.99 price with no hidden fees.
+Watch for providers charging extra for the certificate, wallet card, or retakes. At ${brand.name}, everything is included in the $45.00 price with no hidden fees.
 
 ## In-Person Forklift Certification
 
@@ -377,11 +377,11 @@ When comparing providers, ask about these common hidden fees:
 - **Expedited processing**: Some charge for faster certificate delivery
 - **Verification fees**: Some charge employers to verify certifications
 
-At ${brand.name}, the price you see is the price you pay. Our online certification is $59.99 with everything included — no hidden fees, no upsells.
+At ${brand.name}, the price you see is the price you pay. Our online certification is $45.00 with everything included — no hidden fees, no upsells.
 
 ## Cost by Scenario
 
-**Single operator, experienced**: $59.99 (online) + employer evaluation
+**Single operator, experienced**: $45.00 (online) + employer evaluation
 **Single operator, new**: $200 (in-person at our facility)
 **Team of 5, same location**: $200-$280 per person (onsite) with volume discounts
 **Team of 10+, ongoing hiring**: $750 (Train the Trainer) + ongoing internal training costs
@@ -395,7 +395,7 @@ The cheapest option is not always the best value. Consider:
 3. **Employer acceptance** — Will your employer accept the certification?
 4. **Support** — Can you get help if you have questions during the course?
 
-Our online certification at $59.99 includes everything with no hidden fees. For full in-person certification, our training starts at $200. Call ${brand.support.phone} to discuss your specific needs.`,
+Our online certification at $45.00 includes everything with no hidden fees. For full in-person certification, our training starts at $200. Call ${brand.support.phone} to discuss your specific needs.`,
     category: "Pricing",
     publishDate: "2025-05-15",
     readTime: "6 min read",

@@ -47,7 +47,7 @@ export const blogEs: Record<string, BlogTranslation> = {
   },
   "forklift-certification-cost-2026": {
     title: "¿Cuánto Cuesta la Certificación de Montacargas en 2026?",
-    excerpt: "Los costos de certificación de montacargas varían desde $59.99 hasta más de $500. Conozca qué determina el precio, qué tener en cuenta con los cargos ocultos y cómo obtener el mejor valor para su certificación.",
+    excerpt: "Los costos de certificación de montacargas varían desde $45.00 hasta más de $500. Conozca qué determina el precio, qué tener en cuenta con los cargos ocultos y cómo obtener el mejor valor para su certificación.",
     category: "Precios",
     readTime: "6 min de lectura",
   },
