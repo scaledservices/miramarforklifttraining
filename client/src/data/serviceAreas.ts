@@ -6,6 +6,7 @@ export interface ServiceAreaTranslations {
     description: string;
   };
   intro?: string;
+  region?: string;
   industriesServed?: string[];
   whatsIncluded?: {
     title: string;
@@ -21,7 +22,15 @@ export interface ServiceAreaTranslations {
   }[];
   ctaTitle?: string;
   ctaSubtitle?: string;
+  heroImageAlt?: string;
 }
+
+export type ServiceAreaDistanceTier = "facility" | "nearby" | "onsite";
+export type ServiceAreaRegionGroup =
+  | "southern-california"
+  | "central-california"
+  | "southern-nevada"
+  | "northern-california";
 
 export interface ServiceAreaCity {
   slug: string;
@@ -29,6 +38,23 @@ export interface ServiceAreaCity {
   state: string;
   stateAbbrev: string;
   region: string;
+  /** Region bucket for the hub directory; legacy hand-written entries derive it via REGION_GROUP_FALLBACK. */
+  regionGroup?: ServiceAreaRegionGroup;
+  county?: string;
+  /** Approximate population — used only for hub ordering/prioritization. */
+  population?: number;
+  /** 3-digit ZIP prefixes, informational (booking availability is checked server-side). */
+  zipPrefixes?: string[];
+  landmark?: string;
+  /** Drive-time bucket to the nearest facility; drives the page CTA. Legacy entries omit it and keep the original CTA. */
+  distanceTier?: ServiceAreaDistanceTier;
+  nearestFacility?: {
+    slug: "san-diego" | "las-vegas" | "fresno";
+    name: string;
+    address: string;
+    driveMinutes: number;
+  };
+  heroImageAlt?: string;
   heroHeadline: string;
   heroSubtitle: string;
   seo: {
@@ -56,7 +82,9 @@ export interface ServiceAreaCity {
   es?: ServiceAreaTranslations;
 }
 
-export const SERVICE_AREA_CITIES: Record<string, ServiceAreaCity> = {
+// Hand-written flagship pages. These are preserved verbatim and always win
+// over generated entries on slug conflicts (see the merge at the bottom).
+const HAND_WRITTEN_CITIES: Record<string, ServiceAreaCity> = {
   "los-angeles": {
     slug: "los-angeles",
     city: "Los Angeles",
@@ -679,6 +707,29 @@ export const SERVICE_AREA_CITIES: Record<string, ServiceAreaCity> = {
   },
 };
 
+// Generated city pages (103 cities across Southern California, Central
+// California, and Southern Nevada). Facts live in serviceAreaCityFacts.ts
+// (regenerate with `node scripts/generate-city-facts.mjs`); bilingual page
+// content is expanded at runtime by serviceAreaGenerator.ts. Hand-written
+// entries override generated ones for the same slug.
+import { GENERATED_SERVICE_AREA_CITIES } from "./serviceAreaGenerator";
+
+export const SERVICE_AREA_CITIES: Record<string, ServiceAreaCity> = {
+  ...GENERATED_SERVICE_AREA_CITIES,
+  ...HAND_WRITTEN_CITIES,
+};
+
+/** Region buckets for the legacy hand-written pages (their data is frozen). */
+export const REGION_GROUP_FALLBACK: Record<string, ServiceAreaRegionGroup> = {
+  "los-angeles": "southern-california",
+  bakersfield: "central-california",
+  hayward: "northern-california",
+};
+
+export function getRegionGroup(area: ServiceAreaCity): ServiceAreaRegionGroup {
+  return area.regionGroup ?? REGION_GROUP_FALLBACK[area.slug] ?? "southern-california";
+}
+
 function localizeServiceArea(area: ServiceAreaCity, locale: string): ServiceAreaCity {
   if (locale !== "es" || !area.es) return area;
   const es = area.es;
@@ -688,12 +739,14 @@ function localizeServiceArea(area: ServiceAreaCity, locale: string): ServiceArea
     heroSubtitle: es.heroSubtitle ?? area.heroSubtitle,
     seo: es.seo ?? area.seo,
     intro: es.intro ?? area.intro,
+    region: es.region ?? area.region,
     industriesServed: es.industriesServed ?? area.industriesServed,
     whatsIncluded: es.whatsIncluded ?? area.whatsIncluded,
     whyOnsite: es.whyOnsite ?? area.whyOnsite,
     faqs: es.faqs ?? area.faqs,
     ctaTitle: es.ctaTitle ?? area.ctaTitle,
     ctaSubtitle: es.ctaSubtitle ?? area.ctaSubtitle,
+    heroImageAlt: es.heroImageAlt ?? area.heroImageAlt,
   };
 }
 

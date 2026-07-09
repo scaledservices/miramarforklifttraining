@@ -6,8 +6,8 @@ import { industry } from "@shared/config/industry";
 import SEOHead from "@/components/seo/SEOHead";
 import { SITE_URL } from "@/components/seo/siteUrl";
 import OptimizedImage from "@/components/ui/optimized-image";
-import { faqSchema, breadcrumbSchema } from "@/components/seo/StructuredData";
-import { getServiceAreaCity, getAllServiceAreaCities } from "@/data/serviceAreas";
+import { faqSchema, breadcrumbSchema, courseSchema } from "@/components/seo/StructuredData";
+import { getServiceAreaCity, getAllServiceAreaCities, getRegionGroup, SERVICE_AREA_CITIES } from "@/data/serviceAreas";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ import {
   Building2,
   ArrowRight,
   Phone,
+  Monitor,
+  Wrench,
 } from "lucide-react";
 
 interface ServiceAreaPageProps {
@@ -48,6 +50,27 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
 
   const BASE_URL = SITE_URL;
   const canonicalPath = `/service-areas/${slug}`;
+
+  // Distance-tier-aware primary CTA. Legacy hand-written pages have no
+  // distanceTier and keep their original CTA (book-training) unchanged.
+  const tier = area.distanceTier;
+  const primaryCta =
+    tier === "facility"
+      ? { href: "/book-training", label: t("serviceAreas.ctaButtonFacility"), line: t("serviceAreas.ctaLineFacility", { city: area.city }) }
+      : tier === "nearby"
+        ? { href: "/request-quote", label: t("serviceAreas.ctaButtonQuote"), line: t("serviceAreas.ctaLineNearby", { city: area.city }) }
+        : tier === "onsite"
+          ? { href: "/request-quote", label: t("serviceAreas.ctaButtonQuote"), line: t("serviceAreas.ctaLineOnsite", { city: area.city }) }
+          : { href: "/book-training", label: t("serviceAreas.bookCta"), line: null };
+
+  // Internal links: cities in the same region bucket (largest first), not the
+  // full 100+ list. Cap keeps the page focused and the DOM small.
+  const regionGroup = getRegionGroup(area);
+  const nearbyCityLinks = getAllServiceAreaCities(locale)
+    .filter((c) => c.slug !== slug && getRegionGroup(c) === regionGroup)
+    .sort((a, b) => (b.population ?? 0) - (a.population ?? 0))
+    .slice(0, 12);
+  const totalAreaCount = Object.keys(SERVICE_AREA_CITIES).length;
 
   // LocalBusiness schema with serviceArea — NOT physical NAP
   const localBusinessWithServiceArea = {
@@ -97,19 +120,40 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
 
   const faqs = faqSchema(area.faqs, locale);
 
+  const courseSchemas = [
+    courseSchema({
+      name: t("serviceAreas.schemaOnsiteCourseName", { city: area.city }),
+      description: t("serviceAreas.schemaOnsiteCourseDesc", { city: area.city, body: industry.regulatory.body }),
+      url: canonicalPath,
+      price: 200,
+      duration: "PT4H",
+      locale,
+      image: "/images/training-class.jpg",
+    }),
+    courseSchema({
+      name: t("serviceAreas.schemaOnlineCourseName"),
+      description: t("serviceAreas.schemaOnlineCourseDesc", { body: industry.regulatory.body }),
+      url: "/p/online-forklift-operator-training",
+      price: 45,
+      duration: "PT2H",
+      locale,
+      image: "/images/online-learning.jpg",
+    }),
+  ];
+
   return (
     <>
       <SEOHead
         title={area.seo.title}
         description={area.seo.description}
         canonical={canonicalPath}
-        jsonLd={[localBusinessWithServiceArea, breadcrumbs, faqs]}
+        jsonLd={[localBusinessWithServiceArea, breadcrumbs, faqs, ...courseSchemas]}
       />
 
       {/* Hero */}
       <section className="relative text-white py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0">
-          <OptimizedImage src="/images/hero-forklift.jpg" alt="" className="w-full h-full object-cover" loading="eager" fetchpriority="high" />
+          <OptimizedImage src="/images/hero-forklift.jpg" alt={area.heroImageAlt || ""} className="w-full h-full object-cover" loading="eager" fetchpriority="high" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-[hsl(10,22%,14%)]/95 via-[hsl(10,22%,18%)]/85 to-[hsl(10,22%,23%)]/60" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -123,10 +167,15 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
             <p className="text-lg sm:text-xl text-white/80 leading-relaxed mb-8 max-w-2xl">
               {area.heroSubtitle}
             </p>
+            {primaryCta.line && (
+              <p className="text-sm font-semibold text-accent mb-3" data-testid="text-cta-context">
+                {primaryCta.line}
+              </p>
+            )}
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/book-training">
+              <Link href={primaryCta.href}>
                 <Button size="lg" className="bg-accent text-accent-foreground border-accent-border" data-testid="hero-primary-cta">
-                  {t("serviceAreas.bookCta")}
+                  {primaryCta.label}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
@@ -202,6 +251,18 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
                       <p className="text-sm text-muted-foreground">{area.city}, {area.state}</p>
                     </div>
                   </div>
+                  {area.nearestFacility && (
+                    <div className="flex items-start gap-3" data-testid="nearest-facility-info">
+                      <Building2 className="w-5 h-5 text-brand-dark shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">{t("serviceAreas.nearestFacilityLabel")}</p>
+                        <p className="text-sm text-muted-foreground">{area.nearestFacility.address}</p>
+                        <p className="text-xs text-brand-green font-medium mt-0.5">
+                          {t("serviceAreas.driveTime", { minutes: area.nearestFacility.driveMinutes, city: area.city })}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex items-start gap-3">
                     <Phone className="w-5 h-5 text-brand-dark shrink-0 mt-0.5" />
                     <div>
@@ -242,9 +303,9 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Link href="/book-training">
+                    <Link href={primaryCta.href}>
                       <Button className="w-full bg-accent text-accent-foreground" data-testid="button-request-quote">
-                        {t("serviceAreas.bookCta")}
+                        {primaryCta.label}
                       </Button>
                     </Link>
                     <a href={`tel:${brand.support.phoneTel}`}>
@@ -260,8 +321,81 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
         </div>
       </section>
 
+      {/* Training options — onsite > hands-on > online, per business priority */}
+      <section className="py-16 md:py-20 bg-card border-y border-border" data-testid="training-options-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="text-brand-orange text-sm font-semibold uppercase tracking-wider">{t("serviceAreas.optionsTag")}</span>
+            <h2 className="text-3xl font-bold mt-2 mb-4 tracking-tight">
+              {t("serviceAreas.optionsHeading", { city: area.city })}
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              {t("serviceAreas.optionsSubtitle", { city: area.city })}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <Card className="border-2 border-accent shadow-md ring-1 ring-accent/20 h-full" data-testid="option-onsite">
+              <CardContent className="p-6 flex flex-col h-full">
+                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
+                  <Truck className="w-6 h-6 text-brand-dark" />
+                </div>
+                <h3 className="font-bold text-lg mb-1">{t("serviceAreas.optOnsiteTitle")}</h3>
+                <p className="text-sm font-semibold text-brand-green mb-2">{t("serviceAreas.optOnsitePrice")}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
+                  {t("serviceAreas.optOnsiteDesc", { city: area.city })}
+                </p>
+                <Link href="/request-quote">
+                  <Button className="w-full bg-accent text-accent-foreground" data-testid="option-onsite-cta">
+                    {t("serviceAreas.ctaButtonQuote")}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+            <Card className="border-border h-full" data-testid="option-hands-on">
+              <CardContent className="p-6 flex flex-col h-full">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center mb-4">
+                  <Wrench className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <h3 className="font-bold text-lg mb-1">
+                  {t("serviceAreas.optHandsOnTitle", { facility: area.nearestFacility?.name ?? "San Diego" })}
+                </h3>
+                <p className="text-sm font-semibold text-brand-green mb-2">{t("serviceAreas.optHandsOnPrice")}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
+                  {t("serviceAreas.optHandsOnDesc", { facility: area.nearestFacility?.name ?? "San Diego" })}
+                </p>
+                <Link href="/book-training">
+                  <Button variant="outline" className="w-full" data-testid="option-hands-on-cta">
+                    {t("serviceAreas.ctaButtonFacility")}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+            <Card className="border-border h-full" data-testid="option-online">
+              <CardContent className="p-6 flex flex-col h-full">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center mb-4">
+                  <Monitor className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="font-bold text-lg mb-1">{t("serviceAreas.optOnlineTitle")}</h3>
+                <p className="text-sm font-semibold text-brand-green mb-2">{t("serviceAreas.optOnlinePrice")}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4 flex-1">
+                  {t("serviceAreas.optOnlineDesc")}
+                </p>
+                <Link href="/p/online-forklift-operator-training">
+                  <Button variant="outline" className="w-full" data-testid="option-online-cta">
+                    {t("serviceAreas.optOnlineCta")}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* What's Included */}
-      <section className="py-16 md:py-20 bg-card border-y border-border">
+      <section className="py-16 md:py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-brand-orange text-sm font-semibold uppercase tracking-wider">{t("serviceAreas.includedTag")}</span>
@@ -300,7 +434,7 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
       </section>
 
       {/* Areas Served */}
-      <section className="py-16 md:py-20 bg-background">
+      <section className="py-16 md:py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold tracking-tight mb-3">
@@ -326,7 +460,7 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 md:py-20 bg-card border-y border-border">
+      <section className="py-16 md:py-20 bg-background">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
@@ -351,28 +485,38 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
         </div>
       </section>
 
-      {/* Other Service Areas */}
-      <section className="py-16 md:py-20 bg-background">
+      {/* Nearby city pages — internal links scoped to the same region */}
+      <section className="py-16 md:py-20 bg-card border-y border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold tracking-tight mb-3">{t("serviceAreas.otherAreasHeading")}</h2>
             <p className="text-muted-foreground">{t("serviceAreas.otherAreasSubtitle")}</p>
           </div>
           <div className="flex flex-wrap justify-center gap-3">
-            {getAllServiceAreaCities(locale)
-              .filter((c) => c.slug !== slug)
-              .map((c) => (
-                <Link key={c.slug} href={`/service-areas/${c.slug}`}>
-                  <Button variant="outline" className="gap-2" data-testid={`link-service-area-${c.slug}`}>
-                    <MapPin className="w-4 h-4 text-brand-dark" />
-                    {c.city}, {c.stateAbbrev}
-                  </Button>
-                </Link>
-              ))}
+            {nearbyCityLinks.map((c) => (
+              <Link key={c.slug} href={`/service-areas/${c.slug}`}>
+                <Button variant="outline" className="gap-2" data-testid={`link-service-area-${c.slug}`}>
+                  <MapPin className="w-4 h-4 text-brand-dark" />
+                  {c.city}, {c.stateAbbrev}
+                </Button>
+              </Link>
+            ))}
+            <Link href="/service-areas">
+              <Button variant="ghost" className="gap-2" data-testid="link-all-service-areas">
+                {t("serviceAreas.viewAllAreas", { count: totalAreaCount })}
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
             <Link href="/locations">
               <Button variant="ghost" className="gap-2">
                 <Building2 className="w-4 h-4" />
                 {t("serviceAreas.viewFacilities")}
+              </Button>
+            </Link>
+            <Link href="/training-programs">
+              <Button variant="ghost" className="gap-2" data-testid="link-training-programs">
+                {t("serviceAreas.viewPrograms")}
+                <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
@@ -389,13 +533,13 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
             {area.ctaSubtitle}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/book-training">
+            <Link href={primaryCta.href}>
               <Button
                 size="lg"
                 className="bg-accent text-accent-foreground border-accent-border"
                 data-testid="cta-band-primary"
               >
-                {t("serviceAreas.bookCta")}
+                {primaryCta.label}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -408,6 +552,17 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
           </div>
         </div>
       </section>
+
+      {/* Sticky mobile CTA */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border p-3" data-testid="sticky-mobile-cta-area">
+        <Link href={primaryCta.href}>
+          <Button size="lg" className="w-full bg-accent text-accent-foreground border-accent-border" data-testid="button-sticky-area-cta">
+            <Shield className="h-5 w-5 mr-2" />
+            {primaryCta.label}
+          </Button>
+        </Link>
+      </div>
+      <div className="md:hidden h-20" aria-hidden="true" />
     </>
   );
 }

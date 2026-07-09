@@ -1,4 +1,5 @@
 import i18n from "@/i18n";
+import { GENERATED_CITY_SLUGS } from "@/data/serviceAreaCityFacts";
 
 export type Locale = "en" | "es";
 export const SUPPORTED_LOCALES: Locale[] = ["en", "es"];
@@ -51,6 +52,17 @@ const EN_TO_ES_SLUGS: Record<string, string> = {
   "/certifications": "/certificaciones",
   "/verify": "/verificar",
 };
+
+// Generated service-area city pages get Spanish URLs at
+// /es/certificacion-montacargas-<slug>, which route to the same
+// ServiceAreaPage with Spanish content. The three facility cities are
+// excluded — their bare /certificacion-montacargas-* URLs are hand-built
+// SpanishServiceArea pages registered as static routes in App.tsx.
+const ES_STATIC_CITY_SLUGS = new Set(["san-diego", "las-vegas", "fresno"]);
+for (const slug of GENERATED_CITY_SLUGS) {
+  if (ES_STATIC_CITY_SLUGS.has(slug)) continue;
+  EN_TO_ES_SLUGS[`/service-areas/${slug}`] = `/certificacion-montacargas-${slug}`;
+}
 
 const ES_TO_EN_SLUGS: Record<string, string> = {};
 for (const [en, es] of Object.entries(EN_TO_ES_SLUGS)) {
