@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckCircle, Building2, Users, MapPin, Phone, Mail, Calendar, CalendarDays, ClipboardList, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/seo/SEOHead";
+import { formatUsPhone, normalizeEmail, capitalizeWords, digitsOnly } from "@/lib/inputFormat";
 
 const EQUIPMENT_KEYS = [
   "counterbalanceForklift",
@@ -254,14 +255,14 @@ export default function RequestQuote() {
                   <FormField control={form.control} name="firstName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("requestQuote.firstName")}</FormLabel>
-                      <FormControl><Input placeholder="Jane" {...field} data-testid="input-first-name" /></FormControl>
+                      <FormControl><Input placeholder="Jane" {...field} type="text" autoComplete="given-name" onBlur={() => field.onChange(capitalizeWords(field.value.trim()))} data-testid="input-first-name" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="lastName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("requestQuote.lastName")}</FormLabel>
-                      <FormControl><Input placeholder="Smith" {...field} data-testid="input-last-name" /></FormControl>
+                      <FormControl><Input placeholder="Smith" {...field} type="text" autoComplete="family-name" onBlur={() => field.onChange(capitalizeWords(field.value.trim()))} data-testid="input-last-name" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -270,7 +271,7 @@ export default function RequestQuote() {
                 <FormField control={form.control} name="companyName" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("requestQuote.companyNameOptional")}</FormLabel>
-                    <FormControl><Input placeholder="Acme Logistics" {...field} data-testid="input-company-name" /></FormControl>
+                    <FormControl><Input placeholder="Acme Logistics" {...field} type="text" autoComplete="organization" data-testid="input-company-name" /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />
@@ -279,14 +280,14 @@ export default function RequestQuote() {
                   <FormField control={form.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("requestQuote.email")}</FormLabel>
-                      <FormControl><Input type="email" placeholder="jane@company.com" {...field} data-testid="input-email" /></FormControl>
+                      <FormControl><Input type="email" inputMode="email" autoComplete="email" placeholder="jane@company.com" {...field} onChange={(e) => field.onChange(normalizeEmail(e.target.value))} data-testid="input-email" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="phone" render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("requestQuote.phoneOptional")}</FormLabel>
-                      <FormControl><Input type="tel" placeholder="(555) 555-5555" {...field} data-testid="input-phone" /></FormControl>
+                      <FormControl><Input type="tel" inputMode="tel" autoComplete="tel" maxLength={14} placeholder="(555) 555-5555" {...field} onChange={(e) => field.onChange(formatUsPhone(e.target.value))} data-testid="input-phone" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -348,26 +349,26 @@ export default function RequestQuote() {
                     <p className="text-sm font-medium">{t("requestQuote.yourTrainingAddress")}</p>
                     <FormField control={form.control} name="trainingAddress" render={({ field }) => (
                       <FormItem>
-                        <FormControl><Input placeholder={t("requestQuote.streetPlaceholder")} {...field} data-testid="input-training-address" /></FormControl>
+                        <FormControl><Input type="text" autoComplete="street-address" placeholder={t("requestQuote.streetPlaceholder")} {...field} data-testid="input-training-address" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <div className="grid grid-cols-6 gap-3">
                       <FormField control={form.control} name="city" render={({ field }) => (
                         <FormItem className="col-span-3">
-                          <FormControl><Input placeholder={t("requestQuote.cityPlaceholder")} {...field} data-testid="input-city" /></FormControl>
+                          <FormControl><Input type="text" autoComplete="address-level2" placeholder={t("requestQuote.cityPlaceholder")} {...field} onBlur={() => field.onChange(capitalizeWords((field.value ?? "").trim()))} data-testid="input-city" /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )} />
                       <FormField control={form.control} name="state" render={({ field }) => (
                         <FormItem className="col-span-1">
-                          <FormControl><Input placeholder="CA" maxLength={2} {...field} data-testid="input-state" /></FormControl>
+                          <FormControl><Input type="text" autoComplete="address-level1" placeholder="CA" maxLength={2} {...field} onChange={(e) => field.onChange(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))} data-testid="input-state" /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )} />
                       <FormField control={form.control} name="zip" render={({ field }) => (
                         <FormItem className="col-span-2">
-                          <FormControl><Input placeholder="92121" maxLength={10} {...field} data-testid="input-zip" /></FormControl>
+                          <FormControl><Input type="text" inputMode="numeric" autoComplete="postal-code" placeholder="92121" maxLength={5} {...field} onChange={(e) => field.onChange(digitsOnly(e.target.value).slice(0, 5))} data-testid="input-zip" /></FormControl>
                           <FormMessage />
                         </FormItem>
                       )} />
@@ -379,7 +380,7 @@ export default function RequestQuote() {
                   <FormField control={form.control} name="traineeCount" render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("requestQuote.participantCount")}</FormLabel>
-                      <FormControl><Input type="number" min={1} placeholder={t("requestQuote.participantPlaceholder")} {...field} data-testid="input-trainee-count" /></FormControl>
+                      <FormControl><Input type="number" inputMode="numeric" min={1} placeholder={t("requestQuote.participantPlaceholder")} {...field} data-testid="input-trainee-count" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />

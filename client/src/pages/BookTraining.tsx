@@ -14,6 +14,15 @@ import AddonUpsell from "@/components/booking/AddonUpsell";
 import CardPaymentSection from "@/components/checkout/CardPaymentSection";
 import { computeBookingPrice, BOOKING_DEPOSIT_RATE } from "@shared/config/bookingPricing";
 import { trackEvent } from "@/lib/analytics";
+import {
+  formatUsPhone,
+  isValidUsPhone,
+  normalizeEmail,
+  isValidEmail,
+  capitalizeWords,
+  digitsOnly,
+  generateTempPassword,
+} from "@/lib/inputFormat";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -116,10 +125,17 @@ export default function BookTraining() {
   const { productSlug } = useParams<{ productSlug?: string }>();
   const [, navigate] = useLocation();
   const { t, i18n } = useTranslation();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, register: registerAccount } = useAuth();
   const { toast } = useToast();
 
   const [step, setStep] = useState<Step>(1);
+
+  // Silent account creation on the Details → Payment transition. The account
+  // is created from the contact fields the customer already filled in, so
+  // they never enter their email twice. If the email already has an account,
+  // step 4 shows the inline sign-in prefilled with that email instead.
+  const [creatingAccount, setCreatingAccount] = useState(false);
+  const [accountAutoCreated, setAccountAutoCreated] = useState(false);
 
   const [zip, setZip] = useState("");
   const [checkingZip, setCheckingZip] = useState(false);
@@ -320,27 +336,51 @@ export default function BookTraining() {
   const canProceedStep2 = selectedDate && selectedSlot;
   const canProceedStep3 =
     contactName.trim().length >= 2 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail) &&
-    contactPhone.trim().length >= 7 &&
+    isValidEmail(contactEmail) &&
+    isValidUsPhone(contactPhone) &&
     customerAddress.trim().length >= 3 &&
     customerCity.trim().length >= 2 &&
     customerState.length >= 2 &&
     customerZip.length >= 5 &&
     participantCount >= 1;
 
-  function goNext() {
-    if (step < 4) {
-      setStep((s) => (s + 1) as Step);
-      const nextStep = step + 1;
-      const stepNames: Record<number, string> = { 1: "zip_check", 2: "date_slot", 3: "contact_details", 4: "review_payment" };
-      trackEvent("booking_step_reached", {
-        step: nextStep,
-        step_name: stepNames[nextStep],
-        ...(nextStep >= 3 ? { zip_code: customerZip } : {}),
-        ...(nextStep >= 4 ? { participant_count: participantCount } : {}),
-        ...(nextStep === 4 ? { total_price: totalEstimate } : {}),
-      });
+  async function goNext() {
+    if (step >= 4) return;
+
+    // Leaving Details: silently create the customer's account from the
+    // fields they just filled in (name + email + phone) so payment can
+    // proceed without a second email entry. Existing emails fall through to
+    // the prefilled inline sign-in on the payment step.
+    if (step === 3 && !isAuthenticated) {
+      setCreatingAccount(true);
+      try {
+        await registerAccount({
+          name: contactName.trim(),
+          email: normalizeEmail(contactEmail),
+          password: generateTempPassword(),
+          phone: contactPhone || undefined,
+          locale: i18n.language?.startsWith("es") ? "es" : "en",
+        });
+        setAccountAutoCreated(true);
+        trackEvent("booking_step_reached", { step: 3.5, step_name: "account_autocreated" });
+      } catch {
+        // Most likely 409 (account exists) — step 4 shows sign-in prefilled.
+        setAccountAutoCreated(false);
+      } finally {
+        setCreatingAccount(false);
+      }
     }
+
+    setStep((s) => (s + 1) as Step);
+    const nextStep = step + 1;
+    const stepNames: Record<number, string> = { 1: "zip_check", 2: "date_slot", 3: "contact_details", 4: "review_payment" };
+    trackEvent("booking_step_reached", {
+      step: nextStep,
+      step_name: stepNames[nextStep],
+      ...(nextStep >= 3 ? { zip_code: customerZip } : {}),
+      ...(nextStep >= 4 ? { participant_count: participantCount } : {}),
+      ...(nextStep === 4 ? { total_price: totalEstimate } : {}),
+    });
   }
   function goBack() {
     if (step > 1) setStep((s) => (s - 1) as Step);
@@ -574,10 +614,21 @@ export default function BookTraining() {
           ))}
         </div>
 
-        {/* Goal gradient — visitors who see progress finish more often */}
-        <p className="text-center text-sm font-medium text-brand-green -mt-4 mb-8" data-testid="text-booking-progress">
-          {t("bookTraining.progressLabel", { percent: step * 25 })}
-        </p>
+        {/* Goal gradient — starts at 25%, never 0. Purchase-style progress. */}
+        <div className="-mt-4 mb-8 max-w-md mx-auto" data-testid="booking-progress-bar">
+          <div className="flex items-center justify-between text-xs font-medium mb-1.5">
+            <span className="text-muted-foreground">{t("bookTraining.stepProgress", { step, total: 4 })}</span>
+            <span className="text-brand-green" data-testid="text-booking-progress">
+              {t("bookTraining.progressLabel", { percent: step * 25 })}
+            </span>
+          </div>
+          <div className="h-2 rounded-full bg-muted overflow-hidden">
+            <div
+              className="h-full rounded-full bg-brand-green transition-all duration-500"
+              style={{ width: `${step * 25}%` }}
+            />
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
@@ -592,6 +643,10 @@ export default function BookTraining() {
                   <div className="flex gap-2">
                     <Input
                       data-testid="input-booking-zip"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="postal-code"
+                      maxLength={5}
                       placeholder={t("bookTraining.zipPlaceholder")}
                       aria-label={t("bookTraining.zipPlaceholder")}
                       value={zip}
@@ -875,8 +930,11 @@ export default function BookTraining() {
                     <Label htmlFor="book-contact-name">{t("bookTraining.contactNameLabel")} *</Label>
                     <Input
                       id="book-contact-name"
+                      type="text"
+                      autoComplete="name"
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
+                      onBlur={(e) => setContactName(capitalizeWords(e.target.value.trim()))}
                       placeholder="Jane Smith"
                       data-testid="input-booking-name"
                     />
@@ -885,6 +943,8 @@ export default function BookTraining() {
                     <Label htmlFor="book-company">{t("bookTraining.companyLabel")}</Label>
                     <Input
                       id="book-company"
+                      type="text"
+                      autoComplete="organization"
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
                       placeholder={t("common.optional")}
@@ -899,22 +959,33 @@ export default function BookTraining() {
                     <Input
                       id="book-email"
                       type="email"
+                      inputMode="email"
+                      autoComplete="email"
                       value={contactEmail}
-                      onChange={(e) => setContactEmail(e.target.value)}
+                      onChange={(e) => setContactEmail(normalizeEmail(e.target.value))}
                       placeholder="jane@company.com"
                       data-testid="input-booking-email"
                     />
+                    {contactEmail.length > 0 && !isValidEmail(contactEmail) && (
+                      <p className="text-xs text-destructive" data-testid="text-email-invalid">{t("form.emailInvalid")}</p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="book-phone">{t("form.phone")} *</Label>
                     <Input
                       id="book-phone"
                       type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
+                      maxLength={14}
                       value={contactPhone}
-                      onChange={(e) => setContactPhone(e.target.value)}
+                      onChange={(e) => setContactPhone(formatUsPhone(e.target.value))}
                       placeholder="(555) 555-5555"
                       data-testid="input-booking-phone"
                     />
+                    {contactPhone.length > 0 && !isValidUsPhone(contactPhone) && (
+                      <p className="text-xs text-destructive" data-testid="text-phone-invalid">{t("form.phoneInvalid")}</p>
+                    )}
                   </div>
                 </div>
 
@@ -922,6 +993,8 @@ export default function BookTraining() {
                   <p className="text-sm font-medium mb-3">{t("bookTraining.trainingLocation")} *</p>
                   <div className="space-y-3">
                     <Input
+                      type="text"
+                      autoComplete="street-address"
                       value={customerAddress}
                       onChange={(e) => setCustomerAddress(e.target.value)}
                       placeholder={t("onsiteTraining.streetAddress")}
@@ -931,14 +1004,18 @@ export default function BookTraining() {
                     <div className="grid grid-cols-6 gap-3">
                       <Input
                         className="col-span-3"
+                        type="text"
+                        autoComplete="address-level2"
                         value={customerCity}
                         onChange={(e) => setCustomerCity(e.target.value)}
+                        onBlur={(e) => setCustomerCity(capitalizeWords(e.target.value.trim()))}
                         placeholder={t("onsiteTraining.city")}
                         aria-label={t("onsiteTraining.city")}
                         data-testid="input-booking-city"
                       />
                       <select
                         className="col-span-1 h-10 rounded-md border border-input bg-background px-2 text-sm"
+                        autoComplete="address-level1"
                         value={customerState}
                         onChange={(e) => setCustomerState(e.target.value)}
                         aria-label={t("onsiteTraining.state")}
@@ -951,11 +1028,14 @@ export default function BookTraining() {
                       </select>
                       <Input
                         className="col-span-2"
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="postal-code"
                         value={customerZip}
-                        onChange={(e) => setCustomerZip(e.target.value)}
+                        onChange={(e) => setCustomerZip(digitsOnly(e.target.value).slice(0, 5))}
                         placeholder={t("onsiteTraining.zip")}
                         aria-label={t("onsiteTraining.zip")}
-                        maxLength={10}
+                        maxLength={5}
                         data-testid="input-booking-zip-address"
                       />
                     </div>
@@ -968,6 +1048,7 @@ export default function BookTraining() {
                     <Input
                       id="book-participants"
                       type="number"
+                      inputMode="numeric"
                       min={1}
                       max={serviceArea?.availabilityRules?.maxParticipants ?? 10}
                       value={participantCount}
@@ -1057,7 +1138,26 @@ export default function BookTraining() {
                 </div>
 
                 {!isAuthenticated && (
-                  <CheckoutInlineAuth />
+                  <CheckoutInlineAuth
+                    defaultMode="login"
+                    defaultEmail={contactEmail}
+                    defaultName={contactName}
+                    defaultPhone={contactPhone}
+                    notice={t("bookTraining.existingAccountNote")}
+                  />
+                )}
+
+                {isAuthenticated && (
+                  <div className="rounded-md bg-muted/50 border border-border px-4 py-3 text-sm" data-testid="text-booking-as">
+                    <p className="font-medium text-foreground">
+                      {t("bookTraining.bookingAs", { name: user?.name || contactName, email: user?.email || contactEmail })}
+                    </p>
+                    {accountAutoCreated && (
+                      <p className="text-muted-foreground text-xs mt-1" data-testid="text-account-autocreated">
+                        {t("bookTraining.accountCreatedNote")}
+                      </p>
+                    )}
+                  </div>
                 )}
 
                 {isAuthenticated && bookingPricing && (
@@ -1161,14 +1261,24 @@ export default function BookTraining() {
                 <Button
                   onClick={goNext}
                   disabled={
+                    creatingAccount ||
                     (step === 1 && !canProceedStep1) ||
                     (step === 2 && !canProceedStep2) ||
                     (step === 3 && !canProceedStep3)
                   }
                   data-testid="button-step-next"
                 >
-                  {t("common.next")}
-                  <ChevronRight className="w-4 h-4 ml-1" />
+                  {creatingAccount ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      {t("bookTraining.settingUp")}
+                    </>
+                  ) : (
+                    <>
+                      {step === 3 ? t("bookTraining.continueToPayment") : t("common.next")}
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </>
+                  )}
                 </Button>
               )}
             </div>

@@ -11,19 +11,37 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, User, Mail, Lock, Phone, ShieldCheck } from "lucide-react";
 import { SiGoogle, SiLinkedin, SiFacebook } from "react-icons/si";
 import { Link } from "wouter";
+import { formatUsPhone, normalizeEmail, capitalizeWords } from "@/lib/inputFormat";
 
 type AuthMode = "register" | "login";
 
-export default function CheckoutInlineAuth() {
+interface CheckoutInlineAuthProps {
+  /** Initial tab. Booking prefers "login" when the email already has an account. */
+  defaultMode?: AuthMode;
+  /** Prefill from fields the customer already entered — never ask for the email twice. */
+  defaultEmail?: string;
+  defaultName?: string;
+  defaultPhone?: string;
+  /** Contextual note shown above the tabs (e.g. "you already have an account"). */
+  notice?: string;
+}
+
+export default function CheckoutInlineAuth({
+  defaultMode = "register",
+  defaultEmail = "",
+  defaultName = "",
+  defaultPhone = "",
+  notice,
+}: CheckoutInlineAuthProps = {}) {
   const { t, i18n } = useTranslation();
   const { login, register, isLoggingIn, isRegistering } = useAuth();
   const { toast } = useToast();
-  const [mode, setMode] = useState<AuthMode>("register");
+  const [mode, setMode] = useState<AuthMode>(defaultMode);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(defaultName);
+  const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(defaultPhone);
 
   const { data: providers } = useQuery<{ google: boolean; linkedin: boolean; facebook: boolean }>({
     queryKey: ["/api/auth/providers"],
@@ -70,6 +88,12 @@ export default function CheckoutInlineAuth() {
         <p className="text-sm text-muted-foreground mb-5">
           {t("checkoutAuth.subtitle")}
         </p>
+
+        {notice && (
+          <p className="text-sm bg-primary/10 border border-primary/40 rounded-md px-3 py-2 mb-4" data-testid="text-auth-notice">
+            {notice}
+          </p>
+        )}
 
         <div
           className="flex rounded-lg border overflow-hidden mb-5"
@@ -178,9 +202,11 @@ export default function CheckoutInlineAuth() {
                   <Input
                     id="checkout-name"
                     type="text"
+                    autoComplete="name"
                     placeholder={t("form.placeholderName")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    onBlur={(e) => setName(capitalizeWords(e.target.value.trim()))}
                     required
                     className="pl-10"
                     data-testid="input-checkout-name"
@@ -196,9 +222,11 @@ export default function CheckoutInlineAuth() {
                 <Input
                   id="checkout-email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   placeholder={t("form.placeholderEmail")}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(normalizeEmail(e.target.value))}
                   required
                   className="pl-10"
                   data-testid="input-checkout-email"
@@ -213,6 +241,7 @@ export default function CheckoutInlineAuth() {
                 <Input
                   id="checkout-password"
                   type="password"
+                  autoComplete={mode === "register" ? "new-password" : "current-password"}
                   placeholder={
                     mode === "register"
                       ? t("form.placeholderCreatePassword")
@@ -236,9 +265,12 @@ export default function CheckoutInlineAuth() {
                   <Input
                     id="checkout-phone"
                     type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    maxLength={14}
                     placeholder={t("form.placeholderPhone")}
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(formatUsPhone(e.target.value))}
                     className="pl-10"
                     data-testid="input-checkout-phone"
                   />

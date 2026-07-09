@@ -20,6 +20,7 @@ import {
   ArrowRight, RefreshCw, Info,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { formatUsPhone, normalizeEmail, capitalizeWords } from "@/lib/inputFormat";
 
 interface AssistantAction {
   type: "navigate" | "create_ticket" | "verify_cert" | "course_info";
@@ -627,9 +628,12 @@ function ContactForm({ formRef }: { formRef: React.RefObject<HTMLDivElement> }) 
                 <Label htmlFor="name" className="text-sm mb-1.5 block">{t("supportPage.fullName")}</Label>
                 <Input
                   id="name"
+                  type="text"
+                  autoComplete="name"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onBlur={(e) => setFormData({ ...formData, name: capitalizeWords(e.target.value.trim()) })}
                   placeholder={t("supportPage.placeholderName")}
                   data-testid="input-name"
                 />
@@ -639,9 +643,11 @@ function ContactForm({ formRef }: { formRef: React.RefObject<HTMLDivElement> }) 
                 <Input
                   id="email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, email: normalizeEmail(e.target.value) })}
                   placeholder="you@company.com"
                   data-testid="input-email"
                 />
@@ -654,8 +660,11 @@ function ContactForm({ formRef }: { formRef: React.RefObject<HTMLDivElement> }) 
                 <Input
                   id="phone"
                   type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  maxLength={14}
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, phone: formatUsPhone(e.target.value) })}
                   placeholder="(555) 555-5555"
                   data-testid="input-phone"
                 />

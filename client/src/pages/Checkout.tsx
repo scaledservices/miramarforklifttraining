@@ -16,6 +16,7 @@ import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
 import { useTranslation } from "react-i18next";
 import { brand } from "@shared/config/brand";
 import { trackCheckoutContact } from "@/lib/analytics";
+import { formatCardNumber, digitsOnly } from "@/lib/inputFormat";
 
 interface PaymentConfig {
   configured: boolean;
@@ -371,9 +372,10 @@ export default function Checkout() {
                           type="text"
                           inputMode="numeric"
                           autoComplete="cc-number"
+                          maxLength={19}
                           placeholder="1234 5678 9012 3456"
                           value={cardForm.cardNumber}
-                          onChange={(e) => setCardForm({ ...cardForm, cardNumber: e.target.value })}
+                          onChange={(e) => setCardForm({ ...cardForm, cardNumber: formatCardNumber(e.target.value) })}
                           disabled={isProcessing}
                           data-testid="input-card-number"
                         />
@@ -389,7 +391,7 @@ export default function Checkout() {
                             placeholder="MM"
                             maxLength={2}
                             value={cardForm.month}
-                            onChange={(e) => setCardForm({ ...cardForm, month: e.target.value })}
+                            onChange={(e) => setCardForm({ ...cardForm, month: digitsOnly(e.target.value).slice(0, 2) })}
                             disabled={isProcessing}
                             data-testid="input-card-month"
                           />
@@ -404,7 +406,7 @@ export default function Checkout() {
                             placeholder="YY"
                             maxLength={2}
                             value={cardForm.year}
-                            onChange={(e) => setCardForm({ ...cardForm, year: e.target.value })}
+                            onChange={(e) => setCardForm({ ...cardForm, year: digitsOnly(e.target.value).slice(0, 2) })}
                             disabled={isProcessing}
                             data-testid="input-card-year"
                           />
@@ -419,7 +421,7 @@ export default function Checkout() {
                             placeholder="123"
                             maxLength={4}
                             value={cardForm.cardCode}
-                            onChange={(e) => setCardForm({ ...cardForm, cardCode: e.target.value })}
+                            onChange={(e) => setCardForm({ ...cardForm, cardCode: digitsOnly(e.target.value).slice(0, 4) })}
                             disabled={isProcessing}
                             data-testid="input-card-code"
                           />
@@ -433,9 +435,9 @@ export default function Checkout() {
                           inputMode="numeric"
                           autoComplete="postal-code"
                           placeholder="12345"
-                          maxLength={10}
+                          maxLength={5}
                           value={cardForm.zip}
-                          onChange={(e) => setCardForm({ ...cardForm, zip: e.target.value })}
+                          onChange={(e) => setCardForm({ ...cardForm, zip: digitsOnly(e.target.value).slice(0, 5) })}
                           disabled={isProcessing}
                           data-testid="input-card-zip"
                         />

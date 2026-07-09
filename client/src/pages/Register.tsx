@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, User, Mail, Lock, Phone } from "lucide-react";
 import { SiGoogle, SiLinkedin, SiFacebook } from "react-icons/si";
 import Logo from "@/components/ui/Logo";
+import { formatUsPhone, normalizeEmail, capitalizeWords } from "@/lib/inputFormat";
 
 function getRedirectPath(user: any): string {
   const params = new URLSearchParams(window.location.search);
@@ -142,9 +143,11 @@ export default function Register() {
                 <Input
                   id="name"
                   type="text"
+                  autoComplete="name"
                   placeholder={t("form.placeholderName")}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  onBlur={(e) => setName(capitalizeWords(e.target.value.trim()))}
                   required
                   className="pl-10"
                   data-testid="input-name"
@@ -158,9 +161,11 @@ export default function Register() {
                 <Input
                   id="email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   placeholder={t("form.placeholderEmail")}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(normalizeEmail(e.target.value))}
                   required
                   readOnly={!!prefillEmail}
                   className={`pl-10 ${prefillEmail ? "bg-muted" : ""}`}
@@ -175,6 +180,7 @@ export default function Register() {
                 <Input
                   id="password"
                   type="password"
+                  autoComplete="new-password"
                   placeholder={t("form.placeholderCreatePassword")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -192,9 +198,12 @@ export default function Register() {
                 <Input
                   id="phone"
                   type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  maxLength={14}
                   placeholder={t("form.placeholderPhone")}
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(formatUsPhone(e.target.value))}
                   className="pl-10"
                   data-testid="input-phone"
                 />

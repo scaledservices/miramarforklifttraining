@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, Mail, Lock } from "lucide-react";
 import { SiGoogle, SiLinkedin, SiFacebook } from "react-icons/si";
 import Logo from "@/components/ui/Logo";
+import { normalizeEmail } from "@/lib/inputFormat";
 
 function getRedirectPath(user: any): string {
   const params = new URLSearchParams(window.location.search);
@@ -136,9 +137,11 @@ export default function Login() {
                 <Input
                   id="email"
                   type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   placeholder={t("form.placeholderEmail")}
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(normalizeEmail(e.target.value))}
                   required
                   className="pl-10"
                   data-testid="input-email"
@@ -152,6 +155,7 @@ export default function Login() {
                 <Input
                   id="password"
                   type="password"
+                  autoComplete="current-password"
                   placeholder={t("form.placeholderPassword")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

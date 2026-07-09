@@ -61,9 +61,11 @@ function RequestResetForm() {
           <Input
             id="email"
             type="email"
+            inputMode="email"
+            autoComplete="email"
             placeholder={t("form.placeholderEmail")}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value.toLowerCase().replace(/\s/g, ""))}
             required
             className="pl-10"
             data-testid="input-email"
@@ -143,6 +145,7 @@ function ConfirmResetForm({ token }: { token: string }) {
           <Input
             id="password"
             type="password"
+            autoComplete="new-password"
             placeholder={t("form.placeholderNewPassword")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -160,6 +163,7 @@ function ConfirmResetForm({ token }: { token: string }) {
           <Input
             id="confirm-password"
             type="password"
+            autoComplete="new-password"
             placeholder={t("form.placeholderConfirmPassword")}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}

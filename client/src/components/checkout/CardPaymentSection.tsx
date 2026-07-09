@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "wouter";
 import { Loader2, Lock, CreditCard } from "lucide-react";
+import { formatCardNumber, digitsOnly } from "@/lib/inputFormat";
 
 // Same Accept.js (v1) integration as Checkout.tsx — card data goes directly to
 // Authorize.net via Accept.dispatchData; only the opaque nonce reaches our server.
@@ -179,9 +180,10 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
               id="bk-cardNumber"
               inputMode="numeric"
               autoComplete="cc-number"
+              maxLength={19}
               placeholder="1234 5678 9012 3456"
               value={cardForm.cardNumber}
-              onChange={(e) => setCardForm((f) => ({ ...f, cardNumber: e.target.value }))}
+              onChange={(e) => setCardForm((f) => ({ ...f, cardNumber: formatCardNumber(e.target.value) }))}
               data-testid="input-booking-card-number"
             />
           </div>
@@ -189,22 +191,22 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
             <div>
               <Label htmlFor="bk-cardMonth">{t("checkout.cardMonth", { defaultValue: "MM" })}</Label>
               <Input id="bk-cardMonth" inputMode="numeric" autoComplete="cc-exp-month" placeholder="MM" maxLength={2}
-                value={cardForm.month} onChange={(e) => setCardForm((f) => ({ ...f, month: e.target.value }))} data-testid="input-booking-card-month" />
+                value={cardForm.month} onChange={(e) => setCardForm((f) => ({ ...f, month: digitsOnly(e.target.value).slice(0, 2) }))} data-testid="input-booking-card-month" />
             </div>
             <div>
               <Label htmlFor="bk-cardYear">{t("checkout.cardYear", { defaultValue: "YY" })}</Label>
               <Input id="bk-cardYear" inputMode="numeric" autoComplete="cc-exp-year" placeholder="YY" maxLength={2}
-                value={cardForm.year} onChange={(e) => setCardForm((f) => ({ ...f, year: e.target.value }))} data-testid="input-booking-card-year" />
+                value={cardForm.year} onChange={(e) => setCardForm((f) => ({ ...f, year: digitsOnly(e.target.value).slice(0, 2) }))} data-testid="input-booking-card-year" />
             </div>
             <div>
               <Label htmlFor="bk-cardCode">{t("checkout.cardCode", { defaultValue: "CVV" })}</Label>
               <Input id="bk-cardCode" inputMode="numeric" autoComplete="cc-csc" placeholder="123" maxLength={4}
-                value={cardForm.cardCode} onChange={(e) => setCardForm((f) => ({ ...f, cardCode: e.target.value }))} data-testid="input-booking-card-cvv" />
+                value={cardForm.cardCode} onChange={(e) => setCardForm((f) => ({ ...f, cardCode: digitsOnly(e.target.value).slice(0, 4) }))} data-testid="input-booking-card-cvv" />
             </div>
             <div>
               <Label htmlFor="bk-cardZip">{t("checkout.cardZip", { defaultValue: "ZIP" })}</Label>
-              <Input id="bk-cardZip" inputMode="numeric" autoComplete="postal-code" placeholder="92121" maxLength={10}
-                value={cardForm.zip} onChange={(e) => setCardForm((f) => ({ ...f, zip: e.target.value }))} data-testid="input-booking-card-zip" />
+              <Input id="bk-cardZip" inputMode="numeric" autoComplete="postal-code" placeholder="92121" maxLength={5}
+                value={cardForm.zip} onChange={(e) => setCardForm((f) => ({ ...f, zip: digitsOnly(e.target.value).slice(0, 5) }))} data-testid="input-booking-card-zip" />
             </div>
           </div>
         </div>
