@@ -1224,7 +1224,17 @@
     "sameDayCert": "Certificación el mismo día",
     "oshaAligned": "Currículo alineado con {{body}}",
     "tenYearsExp": "Más de 10 años de experiencia en capacitación",
-    "viewCourses": "Ver Cursos y Precios"
+    "viewCourses": "Ver Cursos y Precios",
+    "whyChooseTitleDefault": "Por que elegir Miramar Forklift Training?",
+    "sd": {
+      "whyChooseTitle": "Por que capacitarse en nuestra instalacion de San Diego?"
+    },
+    "lv": {
+      "whyChooseTitle": "Por que capacitarse en nuestra instalacion de Las Vegas?"
+    },
+    "fr": {
+      "whyChooseTitle": "Por que capacitarse en nuestra instalacion de Fresno?"
+    }
   },
   "seoPage": {
     "startCertification": "Iniciar Certificación — $45.00",

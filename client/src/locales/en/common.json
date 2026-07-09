@@ -1224,7 +1224,17 @@
     "sameDayCert": "Same-day certification",
     "oshaAligned": "{{body}}-aligned curriculum",
     "tenYearsExp": "10+ years of training experience",
-    "viewCourses": "View Courses & Pricing"
+    "viewCourses": "View Courses & Pricing",
+    "whyChooseTitleDefault": "Why Choose Miramar Forklift Training?",
+    "sd": {
+      "whyChooseTitle": "Why Train at Our San Diego Facility?"
+    },
+    "lv": {
+      "whyChooseTitle": "Why Train at Our Las Vegas Facility?"
+    },
+    "fr": {
+      "whyChooseTitle": "Why Train at Our Fresno Facility?"
+    }
   },
   "seoPage": {
     "startCertification": "Start Certification — $45.00",

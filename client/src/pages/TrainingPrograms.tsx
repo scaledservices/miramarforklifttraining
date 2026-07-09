@@ -145,7 +145,7 @@ export default function TrainingPrograms() {
       key: "online",
       label: t("trainingPrograms.onlineTraining"),
       icon: Monitor,
-      href: "/online-training",
+      href: "/p/online-forklift-operator-training",
       description: t("trainingPrograms.onlineTrainingDesc"),
     },
     {

@@ -82,7 +82,7 @@ function DesktopNav() {
 
   const trainingCategories = [
     { label: t("nav.inPersonTraining"), href: "/in-person-training", icon: Wrench },
-    { label: t("nav.onlineTraining"), href: "/online-training", icon: Monitor },
+    { label: t("nav.onlineTraining"), href: "/p/online-forklift-operator-training", icon: Monitor },
     { label: t("nav.trainTheTrainer"), href: "/train-the-trainer", icon: GraduationCap },
     { label: t("nav.renewal"), href: "/renewal", icon: RefreshCw },
   ];
@@ -109,7 +109,7 @@ function DesktopNav() {
 
   const isTrainingActive =
     location.startsWith("/training-programs") ||
-    location.startsWith("/online-training") ||
+    location.startsWith("/online-training") || location.startsWith("/p/online-forklift") ||
     location.startsWith("/in-person-training") ||
     location.startsWith("/hands-on-training") ||
     location.startsWith("/train-the-trainer") ||
@@ -379,7 +379,7 @@ function MobileNav() {
 
   const isTrainingActive =
     location.startsWith("/training-programs") ||
-    location.startsWith("/online-training") ||
+    location.startsWith("/online-training") || location.startsWith("/p/online-forklift") ||
     location.startsWith("/in-person-training") ||
     location.startsWith("/hands-on-training") ||
     location.startsWith("/train-the-trainer") ||
@@ -394,7 +394,7 @@ function MobileNav() {
 
   const trainingCategories = [
     { label: t("nav.inPersonTraining"), href: "/in-person-training" },
-    { label: t("nav.onlineTraining"), href: "/online-training" },
+    { label: t("nav.onlineTraining"), href: "/p/online-forklift-operator-training" },
     { label: t("nav.trainTheTrainer"), href: "/train-the-trainer" },
     { label: t("nav.renewal"), href: "/renewal" },
     { label: t("nav.viewAllPrograms"), href: "/training-programs" },

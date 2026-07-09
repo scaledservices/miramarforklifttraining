@@ -12,7 +12,7 @@ export default function ProgramCards() {
       icon: Monitor,
       title: t("programCards.onlineTitle"),
       description: t("programCards.onlineDesc"),
-      href: "/online-training",
+      href: "/p/online-forklift-operator-training",
       cta: t("cta.startOnlineTraining"),
       color: "text-brand-dark",
       bgColor: "bg-primary/15",

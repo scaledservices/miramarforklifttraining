@@ -630,7 +630,7 @@ export default function BookTraining() {
                       </p>
                       <div className="flex flex-col sm:flex-row gap-3 ml-7">
                         <Link
-                          href="/online-training"
+                          href="/p/online-forklift-operator-training"
                           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-accent text-accent-foreground font-semibold text-sm hover:brightness-95 transition-all"
                           data-testid="link-get-certified-online"
                         >

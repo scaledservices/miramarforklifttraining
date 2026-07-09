@@ -167,7 +167,7 @@ function AppRoutes() {
       <Route path="/get-certified" component={GetCertified} />
       <Route path="/online-forklift-certification" component={OnlineCertification} />
       <Route path="/training-programs" component={TrainingPrograms} />
-      <Route path="/online-training" component={OnlineTraining} />
+      <Route path="/online-training">{() => <Redirect to="/p/online-forklift-operator-training" />}</Route>
       <Route path="/hands-on-training" component={HandsOnTraining} />
       <Route path="/train-the-trainer" component={TrainTheTrainer} />
       <Route path="/business" component={Business} />

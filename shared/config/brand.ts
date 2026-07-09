@@ -24,7 +24,7 @@ export const brand = {
   },
 
   emails: {
-    noreply: process.env.FROM_EMAIL_OVERRIDE || "noreply@miramarforklift.com",
+    noreply: (typeof process !== "undefined" && process.env?.FROM_EMAIL_OVERRIDE) || "noreply@miramarforklift.com",
   // staging → FROM_EMAIL_OVERRIDE=noreply@resend.dev (bypasses domain verification)
     fromName: "Miramar Forklift Training",
     get from() {

@@ -64,7 +64,7 @@ export default function OnlineFirstHero() {
                 {t("home.onlineFirstCta", { defaultValue: "Get Certified Online" })}
               </Button>
             </Link>
-            <Link href="/online-training">
+            <Link href="/p/online-forklift-operator-training">
               <Button
                 size="lg"
                 variant="outline"

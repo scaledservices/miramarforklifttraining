@@ -28,6 +28,8 @@ const onlineProduct = catalog.find(
 )!;
 
 const locationKeys: Record<string, string> = {
+  "fresno": "guidedSelector.fresno",
+  "las-vegas": "guidedSelector.lasVegas",
   "san-diego": "guidedSelector.sanDiego",
 };
 

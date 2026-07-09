@@ -23,7 +23,7 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 opacity-90">{t("footer.training")}</h3>
             <ul className="space-y-2">
-              <li><Link href="/online-training" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-online">{t("footer.onlineTraining")}</Link></li>
+              <li><Link href="/p/online-forklift-operator-training" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-online">{t("footer.onlineTraining")}</Link></li>
               <li><Link href="/hands-on-training" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-hands-on">{t("footer.handsOnTraining")}</Link></li>
               <li><Link href="/train-the-trainer" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-trainer">{t("footer.trainTheTrainer")}</Link></li>
               <li><Link href="/training-programs" className="text-sm opacity-75 transition-opacity hover:opacity-100" data-testid="footer-link-programs">{t("footer.allPrograms")}</Link></li>
