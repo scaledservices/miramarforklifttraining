@@ -64,7 +64,9 @@
     "manageGroup": "Manage Crew",
     "startCourse": "Start Training",
     "resumeCourse": "Resume Course",
-    "viewCertificate": "View Certificate"
+    "viewCertificate": "View Certificate",
+    "getCertifiedToday": "Get Certified Today",
+    "getFastQuote": "Get a Fast Quote"
   },
   "hero": {
     "title": "Get Forklift Certified — Fast, Affordable, OSHA-Aligned",
@@ -248,7 +250,17 @@
     "fresno": "Fresno, CA",
     "needOnsiteTraining": "Need training at your facility instead?",
     "pageTitle": "Find the Right Training for You",
-    "pageDescription": "Choose your path to certification — we'll guide you to the right program."
+    "pageDescription": "Choose your path to certification — we'll guide you to the right program.",
+    "onsiteTitle": "Onsite Training at Your Facility",
+    "onsiteDesc": "We bring instructors and OSHA-aligned training to your site in San Diego, Las Vegas, or Fresno. The best value for crews of any size.",
+    "onsitePrice": "From $200",
+    "onsitePriceNote": "per person",
+    "onsiteNote": "Fast quote — we respond within one business day",
+    "onsiteFeature1": "Trainer travels to your site",
+    "onsiteFeature2": "Whole crew certified in one visit",
+    "onsiteFeature3": "Compliance documentation included",
+    "handsOnNote": "Classes Mon, Wed & Fri — limited seats per session",
+    "onlineAnchor": "vs. from $280 for in-person training"
   },
   "home": {
     "getStarted": "Get Started",
@@ -314,7 +326,38 @@
     "onlineFirstBadge2": "Same-Day Certificate",
     "onlineFirstBadge3": "Unlimited Retakes",
     "bookTrainingCta": "Book Training",
-    "largeGroupLink": "Training a large group? Request a custom quote"
+    "largeGroupLink": "Training a large group? Request a custom quote",
+    "heroEyebrowUnified": "Onsite & In-Person Forklift Training — San Diego, Las Vegas & Fresno",
+    "heroTitleUnified": "Forklift Certification at Your Site or Ours — Same Day",
+    "heroSubtitleUnified": "Our instructors bring OSHA-aligned training to your facility, or train hands-on at one of our 3 training centers. Online certification is available for renewals and out-of-area operators.",
+    "priceAnchorUnified": "Onsite crew training from $200/person · hands-on from $280 · online renewal $45",
+    "lossTitle": "Uncertified operators put your business at risk",
+    "lossDesc": "OSHA penalties for untrained forklift operators can exceed $16,000 per violation — and repeat violations cost up to 10x more. One training session protects your crew and your company.",
+    "lossCta": "Fix It Today",
+    "renewCta": "Renew Online",
+    "testimonialsLabel": "Trusted by Operators & Employers",
+    "testimonialsTitle": "What Our Students Say",
+    "testimonial1Quote": "Our whole warehouse crew got certified in one afternoon. The trainer came to our facility and handled everything, including the paperwork.",
+    "testimonial1Name": "Carlos M.",
+    "testimonial1Role": "Warehouse Supervisor, San Diego",
+    "testimonial2Quote": "Booked Monday, certified Wednesday. Real equipment, patient instructor, and I walked out with my wallet card the same day.",
+    "testimonial2Name": "Danielle R.",
+    "testimonial2Role": "Forklift Operator, Las Vegas",
+    "testimonial3Quote": "Renewed my certification online during a lunch break. The certificate downloaded in under two hours.",
+    "testimonial3Name": "Miguel A.",
+    "testimonial3Role": "Forklift Operator, Fresno",
+    "industriesLabel": "Industries We Train",
+    "industriesTitle": "Training Built for Your Industry",
+    "industriesSubtitle": "Every industry runs different equipment on different schedules. Tell us yours and we'll build the training around it.",
+    "industryWarehousingTitle": "Warehousing",
+    "industryWarehousingDesc": "High-turnover crews, reach trucks, and order pickers — we certify new hires fast so shifts stay covered.",
+    "industryConstructionTitle": "Construction",
+    "industryConstructionDesc": "Rough-terrain forklift and aerial lift training that keeps your jobsite inspection-ready.",
+    "industryLogisticsTitle": "Logistics",
+    "industryLogisticsDesc": "Keep freight moving — we schedule group training around your shifts, days or evenings.",
+    "industryManufacturingTitle": "Manufacturing",
+    "industryManufacturingDesc": "Reduce incidents on the floor with OSHA-aligned training on your own equipment.",
+    "industryCta": "Get a quote for your team"
   },
   "onlineCert": {
     "title": "Online Forklift Operator Certification",
@@ -1677,7 +1720,8 @@
     "addonsTitle": "Popular Add-Ons",
     "addonsDesc": "Get certified on more equipment during the same visit — no extra trip needed.",
     "addonAdd": "Add to training",
-    "addonAdded": "Added to your training"
+    "addonAdded": "Added to your training",
+    "progressLabel": "You're {{percent}}% done"
   },
   "businessPage": {
     "heroTitle": "Forklift Training for Your Business",

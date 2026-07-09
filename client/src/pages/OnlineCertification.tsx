@@ -116,7 +116,7 @@ export default function OnlineCertification() {
         imageAlt={t("productImages.onlineLearning")}
         title={t("onlineCert.heroTitle")}
         subtitle={t("onlineCert.heroSubtitle")}
-        primaryCta={{ label: t("cta.getCertifiedOnline"), href: "/checkout" }}
+        primaryCta={{ label: t("cta.getCertifiedOnline"), href: "/p/online-forklift-operator-training" }}
         secondaryCta={{ label: t("cta.viewAllPrograms"), href: "/training-programs" }}
       />
       <TrustBar />
@@ -203,7 +203,7 @@ export default function OnlineCertification() {
                 </li>
               </ul>
               <p className="text-xs text-muted-foreground mb-6">{t("onlineCert.pricingNoHiddenFees")}</p>
-              <Link href="/checkout">
+              <Link href="/p/online-forklift-operator-training">
                 <Button size="lg" className="w-full bg-accent text-accent-foreground border-accent-border" data-testid="button-pricing-cta">
                   {t("cta.getCertifiedOnline")}
                   <ArrowRight className="w-4 h-4 ml-2" />

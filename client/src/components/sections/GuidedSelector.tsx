@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Monitor,
   Wrench,
-  Users,
+  Building2,
   ArrowRight,
   ArrowLeft,
   MapPin,
@@ -27,6 +27,8 @@ interface TrainingOption {
   color: string;
   bgColor: string;
   recommended?: boolean;
+  noteKey?: string;
+  anchorKey?: string;
   features: string[];
 }
 
@@ -47,22 +49,25 @@ export default function GuidedSelector() {
   const [step, setStep] = useState<Step>("type");
   const [, navigate] = useLocation();
 
+  // Business priority order: onsite > hands-on > online. The onsite card
+  // keeps the historical id "team" so E2E selectors stay stable.
   const trainingOptions: TrainingOption[] = [
     {
-      id: "online",
-      icon: Monitor,
-      titleKey: "guidedSelector.onlineTitle",
-      descKey: "guidedSelector.onlineDesc",
-      priceKey: "guidedSelector.onlinePrice",
-      priceNoteKey: "guidedSelector.onlinePriceNote",
-      href: "/checkout",
+      id: "team",
+      icon: Building2,
+      titleKey: "guidedSelector.onsiteTitle",
+      descKey: "guidedSelector.onsiteDesc",
+      priceKey: "guidedSelector.onsitePrice",
+      priceNoteKey: "guidedSelector.onsitePriceNote",
+      href: "/request-quote",
       color: "text-accent",
       bgColor: "bg-accent/10",
       recommended: true,
+      noteKey: "guidedSelector.onsiteNote",
       features: [
-        "guidedSelector.onlineFeature1",
-        "guidedSelector.onlineFeature2",
-        "guidedSelector.onlineFeature3",
+        "guidedSelector.onsiteFeature1",
+        "guidedSelector.onsiteFeature2",
+        "guidedSelector.onsiteFeature3",
       ],
     },
     {
@@ -75,6 +80,7 @@ export default function GuidedSelector() {
       href: "/book-training",
       color: "text-emerald-600 dark:text-emerald-400",
       bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+      noteKey: "guidedSelector.handsOnNote",
       features: [
         "guidedSelector.handsOnFeature1",
         "guidedSelector.handsOnFeature2",
@@ -82,19 +88,21 @@ export default function GuidedSelector() {
       ],
     },
     {
-      id: "team",
-      icon: Users,
-      titleKey: "guidedSelector.teamTitle",
-      descKey: "guidedSelector.teamDesc",
-      priceKey: "guidedSelector.teamPrice",
-      priceNoteKey: "guidedSelector.teamPriceNote",
-      href: "/request-quote",
-      color: "text-purple-600 dark:text-purple-400",
-      bgColor: "bg-purple-50 dark:bg-purple-950/30",
+      id: "online",
+      icon: Monitor,
+      titleKey: "guidedSelector.onlineTitle",
+      descKey: "guidedSelector.onlineDesc",
+      priceKey: "guidedSelector.onlinePrice",
+      priceNoteKey: "guidedSelector.onlinePriceNote",
+      anchorKey: "guidedSelector.onlineAnchor",
+      href: "/p/online-forklift-operator-training",
+      color: "text-blue-600 dark:text-blue-400",
+      bgColor: "bg-blue-50 dark:bg-blue-950/30",
+      noteKey: "guidedSelector.startIn2Hours",
       features: [
-        "guidedSelector.teamFeature1",
-        "guidedSelector.teamFeature2",
-        "guidedSelector.teamFeature3",
+        "guidedSelector.onlineFeature1",
+        "guidedSelector.onlineFeature2",
+        "guidedSelector.onlineFeature3",
       ],
     },
   ];
@@ -162,10 +170,13 @@ export default function GuidedSelector() {
                         <option.icon className={`w-7 h-7 ${option.color}`} />
                       </div>
                       <h3 className="text-xl font-bold mb-1.5">{t(option.titleKey)}</h3>
-                      <div className="flex items-baseline gap-1.5 mb-3" data-testid={`selector-price-${option.id}`}>
+                      <div className="flex items-baseline gap-1.5 mb-3 flex-wrap" data-testid={`selector-price-${option.id}`}>
                         <span className="text-2xl font-bold tracking-tight">{t(option.priceKey)}</span>
                         {option.priceNoteKey && (
                           <span className="text-xs text-muted-foreground">{t(option.priceNoteKey)}</span>
+                        )}
+                        {option.anchorKey && (
+                          <span className="text-xs text-muted-foreground w-full">{t(option.anchorKey)}</span>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground leading-relaxed mb-5">
@@ -193,15 +204,15 @@ export default function GuidedSelector() {
                         {option.id === "hands-on"
                           ? t("guidedSelector.chooseLocation")
                           : option.id === "team"
-                          ? t("cta.trainYourCrew")
+                          ? t("cta.getFastQuote")
                           : t("cta.getCertifiedNow")}
                         <ArrowRight className="w-4 h-4" />
                       </div>
 
-                      {isRecommended && (
+                      {option.noteKey && (
                         <div className="flex items-center justify-center gap-1.5 mt-3 text-xs text-muted-foreground">
-                          <Zap className="w-3 h-3 text-accent" />
-                          <span>{t("guidedSelector.startIn2Hours")}</span>
+                          <Zap className={`w-3 h-3 ${option.color}`} />
+                          <span>{t(option.noteKey)}</span>
                         </div>
                       )}
                     </CardContent>

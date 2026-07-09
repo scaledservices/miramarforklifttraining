@@ -64,7 +64,9 @@
     "manageGroup": "Administrar Equipo",
     "startCourse": "Comenzar Capacitación",
     "resumeCourse": "Continuar Curso",
-    "viewCertificate": "Ver Certificado"
+    "viewCertificate": "Ver Certificado",
+    "getCertifiedToday": "Certifícate Hoy",
+    "getFastQuote": "Obtén una Cotización Rápida"
   },
   "hero": {
     "title": "Certifícate en Montacargas — Rápido, Asequible, Alineado con OSHA",
@@ -248,7 +250,17 @@
     "fresno": "Fresno, CA",
     "needOnsiteTraining": "¿Necesitas capacitación en tu instalación?",
     "pageTitle": "Encuentra la Capacitación Adecuada para Ti",
-    "pageDescription": "Elige tu camino hacia la certificación — te guiaremos al programa correcto."
+    "pageDescription": "Elige tu camino hacia la certificación — te guiaremos al programa correcto.",
+    "onsiteTitle": "Capacitación en Su Instalación",
+    "onsiteDesc": "Llevamos instructores y capacitación alineada con OSHA a su sitio en San Diego, Las Vegas o Fresno. El mejor valor para equipos de cualquier tamaño.",
+    "onsitePrice": "Desde $200",
+    "onsitePriceNote": "por persona",
+    "onsiteNote": "Cotización rápida — respondemos en un día hábil",
+    "onsiteFeature1": "El instructor viaja a su sitio",
+    "onsiteFeature2": "Todo el equipo certificado en una visita",
+    "onsiteFeature3": "Documentación de cumplimiento incluida",
+    "handsOnNote": "Clases lun, mié y vie — cupos limitados por sesión",
+    "onlineAnchor": "vs. desde $280 por capacitación en persona"
   },
   "home": {
     "getStarted": "Comenzar",
@@ -314,7 +326,38 @@
     "onlineFirstBadge2": "Certificado el Mismo Día",
     "onlineFirstBadge3": "Reintentos Ilimitados",
     "bookTrainingCta": "Reservar Capacitación",
-    "largeGroupLink": "¿Capacitas a un grupo grande? Solicita una cotización personalizada"
+    "largeGroupLink": "¿Capacitas a un grupo grande? Solicita una cotización personalizada",
+    "heroEyebrowUnified": "Capacitación de Montacargas en Sitio y en Persona — San Diego, Las Vegas y Fresno",
+    "heroTitleUnified": "Certificación de Montacargas en Su Sitio o en el Nuestro — El Mismo Día",
+    "heroSubtitleUnified": "Nuestros instructores llevan la capacitación alineada con OSHA a su instalación, o entrene de manera práctica en uno de nuestros 3 centros. La certificación en línea está disponible para renovaciones y operadores fuera del área.",
+    "priceAnchorUnified": "Capacitación en su sitio desde $200/persona · práctica desde $280 · renovación en línea $45",
+    "lossTitle": "Los operadores sin certificar ponen en riesgo su negocio",
+    "lossDesc": "Las multas de OSHA por operadores de montacargas sin capacitar pueden superar los $16,000 por infracción — y las infracciones repetidas cuestan hasta 10 veces más. Una sola sesión de capacitación protege a su equipo y a su empresa.",
+    "lossCta": "Resuélvalo Hoy",
+    "renewCta": "Renovar en Línea",
+    "testimonialsLabel": "La Confianza de Operadores y Empleadores",
+    "testimonialsTitle": "Lo Que Dicen Nuestros Estudiantes",
+    "testimonial1Quote": "Todo nuestro equipo de almacén se certificó en una tarde. El instructor vino a nuestra instalación y se encargó de todo, incluido el papeleo.",
+    "testimonial1Name": "Carlos M.",
+    "testimonial1Role": "Supervisor de Almacén, San Diego",
+    "testimonial2Quote": "Reservé el lunes, certificado el miércoles. Equipo real, instructor paciente, y salí con mi tarjeta el mismo día.",
+    "testimonial2Name": "Danielle R.",
+    "testimonial2Role": "Operadora de Montacargas, Las Vegas",
+    "testimonial3Quote": "Renové mi certificación en línea durante el almuerzo. El certificado se descargó en menos de dos horas.",
+    "testimonial3Name": "Miguel A.",
+    "testimonial3Role": "Operador de Montacargas, Fresno",
+    "industriesLabel": "Industrias Que Capacitamos",
+    "industriesTitle": "Capacitación Diseñada para Su Industria",
+    "industriesSubtitle": "Cada industria opera equipos diferentes con horarios diferentes. Díganos la suya y adaptaremos la capacitación.",
+    "industryWarehousingTitle": "Almacenes",
+    "industryWarehousingDesc": "Equipos con alta rotación, reach trucks y order pickers — certificamos a los nuevos empleados rápido para cubrir los turnos.",
+    "industryConstructionTitle": "Construcción",
+    "industryConstructionDesc": "Capacitación en montacargas todo terreno y plataformas aéreas que mantiene su obra lista para inspecciones.",
+    "industryLogisticsTitle": "Logística",
+    "industryLogisticsDesc": "Mantenga la carga en movimiento — programamos capacitación grupal según sus turnos, de día o de noche.",
+    "industryManufacturingTitle": "Manufactura",
+    "industryManufacturingDesc": "Reduzca incidentes en la planta con capacitación alineada con OSHA en su propio equipo.",
+    "industryCta": "Obtenga una cotización para su equipo"
   },
   "onlineCert": {
     "title": "Certificación de Operador de Montacargas en Línea",
@@ -1674,7 +1717,8 @@
     "addonsTitle": "Complementos Populares",
     "addonsDesc": "Certifícate en más equipos durante la misma visita — sin necesidad de otro viaje.",
     "addonAdd": "Agregar a tu capacitación",
-    "addonAdded": "Agregado a tu capacitación"
+    "addonAdded": "Agregado a tu capacitación",
+    "progressLabel": "Ya completaste el {{percent}}%"
   },
   "businessPage": {
     "heroTitle": "Capacitación de Montacargas para Tu Empresa",

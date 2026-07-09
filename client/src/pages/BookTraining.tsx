@@ -261,6 +261,14 @@ export default function BookTraining() {
 
   const calWeeks = useMemo(() => generateCalendarDates(calYear, calMonth), [calYear, calMonth]);
 
+  // Smart default: pre-fill the nearest available date when the calendar
+  // step opens so the visitor starts one click from a time slot.
+  useEffect(() => {
+    if (step === 2 && !selectedDate && nextAvailableDate) {
+      setSelectedDate(nextAvailableDate);
+    }
+  }, [step, selectedDate, nextAvailableDate]);
+
   async function checkZip() {
     if (!/^\d{5}$/.test(zip)) return;
     setCheckingZip(true);
@@ -271,6 +279,15 @@ export default function BookTraining() {
       if (data.available) {
         setServiceArea(data.serviceArea);
         setCustomerZip(zip);
+        // Smart default: pre-select the area's most popular course (standard
+        // forklift) so the visitor never starts from an empty selection.
+        setSelectedProducts((prev) => {
+          if (prev.length > 0) return prev;
+          const defaultProduct = catalog.find(
+            (p) => p.slug === `standard-forklift-certification-${data.serviceArea.slug}` && p.category === "hands-on"
+          );
+          return defaultProduct ? [defaultProduct] : prev;
+        });
         trackEvent("booking_step_reached", { step: 2, step_name: "product_selection", zip_code: zip });
       } else {
         // Expansion intelligence: log unserved ZIPs to identify demand areas.
@@ -556,6 +573,11 @@ export default function BookTraining() {
             </div>
           ))}
         </div>
+
+        {/* Goal gradient — visitors who see progress finish more often */}
+        <p className="text-center text-sm font-medium text-brand-green -mt-4 mb-8" data-testid="text-booking-progress">
+          {t("bookTraining.progressLabel", { percent: step * 25 })}
+        </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
