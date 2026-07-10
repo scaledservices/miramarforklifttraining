@@ -1772,7 +1772,8 @@
     "settingUp": "Creando su cuenta…",
     "bookingAs": "Reservando como {{name}} ({{email}})",
     "accountCreatedNote": "Creamos su cuenta automáticamente — un correo de bienvenida va en camino. Puede establecer una contraseña cuando quiera con \"Olvidé mi contraseña\".",
-    "existingAccountNote": "Buenas noticias — ya tiene una cuenta con este correo. Inicie sesión abajo para completar su compra."
+    "existingAccountNote": "Buenas noticias — ya tiene una cuenta con este correo. Inicie sesión abajo para completar su compra.",
+    "accountSetupRetryNote": "No pudimos crear su cuenta automáticamente. Cree una abajo para completar su compra — sus datos ya están completados."
   },
   "businessPage": {
     "heroTitle": "Capacitación de Montacargas para Tu Empresa",
@@ -2489,7 +2490,8 @@
     "imported_one": "Se importó {{count}} empleado",
     "imported_other": "Se importaron {{count}} empleados",
     "employeeArchived": "Empleado archivado",
-    "bulkArchived": "Empleados seleccionados archivados"
+    "bulkArchived": "Empleados seleccionados archivados",
+    "binderUnavailableNote": "Disponible después de que se emita la primera certificación vinculada a su empresa."
   },
   "auditBinder": {
     "title": "Carpeta de Auditoría OSHA",

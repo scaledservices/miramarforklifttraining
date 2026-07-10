@@ -6,7 +6,10 @@ import { discountCodes, discountRedemptions, type DiscountCode } from "@shared/s
 import { requireRole } from "./middleware";
 import { rateLimit } from "../rate-limit";
 
-const validateLimiter = rateLimit({ name: "discount_validate", windowMs: 60_000, max: 20 });
+// Kept deliberately tight: the endpoint discloses discount type/amount for a
+// valid code (checkout needs it for the price preview), so slowing enumeration
+// is the practical mitigation without breaking the preview UX.
+const validateLimiter = rateLimit({ name: "discount_validate", windowMs: 60_000, max: 10 });
 
 // ---------------------------------------------------------------------------
 // Reusable helpers (designed so the booking flow can import these later)

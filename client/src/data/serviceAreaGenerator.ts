@@ -139,15 +139,19 @@ export function generateServiceAreaCity(c: CityFacts): ServiceAreaCity {
   // the trailing sentence is dropped when the full version would run over.
   const clamp160 = (full: string, tail: string) =>
     full.length <= 160 ? full : full.slice(0, full.length - tail.length).trimEnd();
+  // Long city names blow past Google's ~60-char title display once the brand
+  // suffix is appended — drop the middle segment rather than the city name.
+  const titleWithOsha = `Forklift Training ${c.name}, ${c.stateAbbrev} | OSHA Certification`;
+  const titleEsWithOsha = `Capacitación de Montacargas ${c.name}, ${c.stateAbbrev} | Certificación OSHA`;
   const seo = {
-    title: `Forklift Training ${c.name}, ${c.stateAbbrev} | OSHA Certification`,
+    title: titleWithOsha.length <= 60 ? titleWithOsha : `Forklift Training ${c.name}, ${c.stateAbbrev}`,
     description: clamp160(
       `Forklift certification in ${c.name}, ${c.stateAbbrev}. OSHA-aligned onsite training from $280/person, hands-on classes, and a $45 online course. Same-day certificates.`,
       " Same-day certificates.",
     ),
   };
   const seoEs = {
-    title: `Capacitación de Montacargas ${c.name}, ${c.stateAbbrev} | Certificación OSHA`,
+    title: titleEsWithOsha.length <= 60 ? titleEsWithOsha : `Capacitación de Montacargas ${c.name}, ${c.stateAbbrev}`,
     description: clamp160(
       `Certificación de montacargas en ${c.name}, ${c.stateAbbrev}. Capacitación en sitio alineada con OSHA desde $280/persona y curso en línea de $45. Certificados el mismo día.`,
       " Certificados el mismo día.",

@@ -243,8 +243,8 @@ export default function TrainingPrograms() {
         title={t("trainingPrograms.title")}
         subtitle={t("trainingPrograms.subtitle")}
         primaryCta={{
-          label: t("cta.getCertifiedOnline"),
-          href: "/online-forklift-certification",
+          label: t("cta.getCertifiedToday"),
+          href: "/get-certified",
         }}
       />
 

@@ -100,11 +100,21 @@ export function courseSchema(course: {
     ...(course.price !== undefined && {
       offers: {
         "@type": "Offer",
-        price: course.price,
+        // schema.org expects price as a string; numbers trigger warnings in
+        // Google's structured-data validation.
+        price: course.price.toFixed(2),
         priceCurrency: "USD",
         availability: "https://schema.org/InStock",
+        category: "Paid",
+        ...(course.url && { url: `${BASE_URL}/${locale}${course.url}` }),
       },
     }),
+    // Google requires hasCourseInstance for Course rich-result eligibility.
+    hasCourseInstance: {
+      "@type": "CourseInstance",
+      courseMode: course.url?.includes("online") ? "Online" : "Onsite",
+      ...(course.duration && { courseWorkload: course.duration }),
+    },
     ...(course.duration && { timeRequired: course.duration }),
   };
 }

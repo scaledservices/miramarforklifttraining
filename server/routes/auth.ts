@@ -8,6 +8,7 @@ import type { User } from "@shared/schema";
 import { getPostLoginRedirect } from "@shared/roles";
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, sanitizeReturnTo, sanitizeUser, loginLimiter, resetRequestLimiter, resetConfirmLimiter, acceptInviteLimiter } from "./middleware";
+import { pool } from "../db";
 
 export async function registerAuthRoutes(app: Express) {
 app.post("/api/auth/register", async (req: Request, res: Response) => {
@@ -300,6 +301,16 @@ app.post("/api/auth/password-reset-confirm", resetConfirmLimiter, async (req: Re
 
     const result = await confirmPasswordReset(token, password);
     if ("error" in result) return res.status(400).json({ error: result.error });
+
+    // Kill every existing session for this user — if the reset was triggered
+    // because the account was compromised, the attacker's session dies too.
+    // (connect-pg-simple stores the session JSON in the "session" table.)
+    try {
+      await pool.query(`DELETE FROM "session" WHERE sess->>'userId' = $1`, [String(result.userId)]);
+    } catch (e) {
+      console.error("[Auth] Failed to invalidate sessions after password reset:", e);
+    }
+
     return res.json({ success: true });
   } catch (error) {
     console.error("[Auth] Password reset confirm error:", error);
@@ -350,6 +361,20 @@ app.post("/api/auth/accept-invite", acceptInviteLimiter, requireAuth, async (req
       return res.status(400).json({ error: "This invite has expired. Please ask your crew admin to send a new one." });
     }
 
+    // Deliberate decision: accepting with a different email than the invite
+    // was sent to is ALLOWED (the token itself is the secret, and workers
+    // often sign up with a personal address). We record the mismatch in the
+    // audit log so group admins can trace it if a seat looks wrong.
+    const acceptingUser = await storage.getUser(req.session.userId!);
+    const emailMismatch = !!(
+      acceptingUser?.email &&
+      member.email &&
+      acceptingUser.email.toLowerCase() !== member.email.toLowerCase()
+    );
+    if (emailMismatch) {
+      console.warn(`[Auth] Invite ${member.id} accepted by ${acceptingUser!.email} (invited: ${member.email})`);
+    }
+
     const updated = await storage.acceptInvite(member.id, req.session.userId!);
 
     let assignedEnrollmentId: number | null = null;
@@ -374,7 +399,7 @@ app.post("/api/auth/accept-invite", acceptInviteLimiter, requireAuth, async (req
       action: "invite_accepted",
       entity: "group_members",
       entityId: String(member.id),
-      metadata: { groupId: member.groupId, assignedEnrollmentId, seatAssignmentFailed },
+      metadata: { groupId: member.groupId, assignedEnrollmentId, seatAssignmentFailed, emailMismatch },
     });
 
     const redirectTo = assignedEnrollmentId

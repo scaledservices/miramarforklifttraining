@@ -104,7 +104,11 @@ export default function Home() {
         canonical="/"
         jsonLd={[
           organizationSchema(locale),
-          faqSchema(faqItems.slice(0, 6).map(({ question, answer }) => ({ question, answer })), locale),
+          // faqItems are English-only content — emitting them with
+          // inLanguage:"es" on the Spanish page is invalid, so EN only.
+          ...(locale === "en"
+            ? [faqSchema(faqItems.slice(0, 6).map(({ question, answer }) => ({ question, answer })), locale)]
+            : []),
         ]}
       />
 

@@ -1775,7 +1775,8 @@
     "settingUp": "Setting up your account…",
     "bookingAs": "Booking as {{name}} ({{email}})",
     "accountCreatedNote": "We created your account automatically — a welcome email is on its way. You can set a password anytime with \"Forgot password\".",
-    "existingAccountNote": "Good news — you already have an account with this email. Sign in below to finish your purchase."
+    "existingAccountNote": "Good news — you already have an account with this email. Sign in below to finish your purchase.",
+    "accountSetupRetryNote": "We couldn't set up your account automatically. Create one below to finish your purchase — your details are already filled in."
   },
   "businessPage": {
     "heroTitle": "Forklift Training for Your Business",
@@ -2489,7 +2490,8 @@
     "imported_one": "{{count}} employee imported",
     "imported_other": "{{count}} employees imported",
     "employeeArchived": "Employee archived",
-    "bulkArchived": "Selected employees archived"
+    "bulkArchived": "Selected employees archived",
+    "binderUnavailableNote": "Available after your first company-linked certification is issued."
   },
   "auditBinder": {
     "title": "OSHA Audit Binder",

@@ -227,15 +227,20 @@ export default function GroupMembers() {
     for (let i = 0; i < parsed.length; i++) {
       const { name, email } = parsed[i];
       try {
-        const res = await apiRequest("POST", `/api/groups/${group.id}/invite`, { email, name });
-        if (!res.ok) {
-          const data = await res.json();
-          results.push({ name, email, success: false, error: data.error || t("common.error") });
-        } else {
-          results.push({ name, email, success: true });
-        }
+        // apiRequest throws on non-2xx (message: "<status>: <json>"), so a
+        // returned response is always ok.
+        await apiRequest("POST", `/api/groups/${group.id}/invite`, { email, name });
+        results.push({ name, email, success: true });
       } catch (err: any) {
-        results.push({ name, email, success: false, error: err.message || t("groupMembers.networkError") });
+        // Surface the server's human message instead of the raw "409: {...}".
+        let message = err?.message || t("groupMembers.networkError");
+        const jsonPart = message.match(/^\d{3}:\s*(\{[\s\S]*\})$/)?.[1];
+        if (jsonPart) {
+          try {
+            message = JSON.parse(jsonPart).error || message;
+          } catch {}
+        }
+        results.push({ name, email, success: false, error: message });
       }
       setBulkProgress({ sent: i + 1, total: parsed.length });
     }

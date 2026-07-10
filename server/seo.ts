@@ -2,6 +2,7 @@ import { Express, Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { isAdminRole } from "@shared/roles";
 import { brand } from "@shared/config/brand";
+import { GENERATED_CITY_SLUGS } from "../client/src/data/serviceAreaCityFacts";
 
 const SITE_URL = process.env.SITE_URL || `https://${brand.domain}`;
 
@@ -109,6 +110,20 @@ const ES_TO_EN_SEO_SLUGS: Record<string, string> = {
 const EN_TO_ES_SEO_SLUGS: Record<string, string> = {};
 for (const [es, en] of Object.entries(ES_TO_EN_SEO_SLUGS)) {
   EN_TO_ES_SEO_SLUGS[en] = es;
+}
+
+// Generated service-area city pages (103 cities) — pulled from the same data
+// file the client renders from, so the sitemap can never drift from the
+// routes that actually exist. The three facility cities keep their bare-slug
+// Spanish pages (static SpanishServiceArea routes); every other city's ES
+// version lives at /certificacion-montacargas-<slug> (see client locale map).
+const ES_STATIC_CITY_SLUGS = new Set(["san-diego", "las-vegas", "fresno"]);
+for (const slug of GENERATED_CITY_SLUGS) {
+  const path = `/service-areas/${slug}`;
+  if (!STATIC_MARKETING_PAGES.includes(path)) STATIC_MARKETING_PAGES.push(path);
+  EN_TO_ES_STATIC_SLUGS[path] = ES_STATIC_CITY_SLUGS.has(slug)
+    ? path
+    : `/certificacion-montacargas-${slug}`;
 }
 
 const NOINDEX_PATHS = [

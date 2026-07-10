@@ -129,12 +129,24 @@ export default function ComplianceDashboard() {
   const employees = rosterData?.employees || [];
   const certifications = companyCertsData?.certifications || [];
 
-  // Match employees to certifications by userId or email
+  // Match employees to certifications by userId — keep the NEWEST cert per
+  // operator (issued beats non-issued; ties broken by issuedAt) so a stale or
+  // revoked cert never shadows a current one.
   const certByUserId = useMemo(() => {
     const map = new Map<number, Certification>();
+    const issuedTime = (c: any) => (c.issuedAt ? new Date(c.issuedAt).getTime() : 0);
     for (const cert of certifications) {
-      // keep the latest cert
-      if (!map.has(cert.userId) || (cert.status === "issued")) {
+      const existing: any = map.get(cert.userId);
+      if (!existing) {
+        map.set(cert.userId, cert);
+        continue;
+      }
+      const certIssued = cert.status === "issued";
+      const existingIssued = existing.status === "issued";
+      if (
+        (certIssued && !existingIssued) ||
+        (certIssued === existingIssued && issuedTime(cert) > issuedTime(existing))
+      ) {
         map.set(cert.userId, cert);
       }
     }
@@ -420,18 +432,27 @@ export default function ComplianceDashboard() {
                 </p>
               </div>
             </div>
-            <Link
-              href={
-                discoveredCompanyId
-                  ? `/audit-binder/${discoveredCompanyId}`
-                  : "/audit-binder"
-              }
-            >
-              <Button variant="outline" className="gap-2">
-                <Download className="h-4 w-4" />
-                {t("compliance.downloadBinder")}
-              </Button>
-            </Link>
+            {discoveredCompanyId ? (
+              <Link href={`/audit-binder/${discoveredCompanyId}`}>
+                <Button variant="outline" className="gap-2">
+                  <Download className="h-4 w-4" />
+                  {t("compliance.downloadBinder")}
+                </Button>
+              </Link>
+            ) : (
+              // Company id is discovered from issued group certifications; until
+              // the first company-linked cert exists there is no binder to open —
+              // say so instead of linking to an empty page.
+              <div className="text-right">
+                <Button variant="outline" className="gap-2" disabled data-testid="button-binder-disabled">
+                  <Download className="h-4 w-4" />
+                  {t("compliance.downloadBinder")}
+                </Button>
+                <p className="text-xs text-muted-foreground mt-1 max-w-[220px]">
+                  {t("compliance.binderUnavailableNote")}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

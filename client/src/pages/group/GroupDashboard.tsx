@@ -37,7 +37,10 @@ export default function GroupDashboard() {
   const memberCount = membersData?.members?.length || 0;
   const totalEnrollments = enrollmentsData?.enrollments?.length || 0;
   const completedEnrollments = enrollmentsData?.enrollments?.filter((e: any) => e.status === "completed").length || 0;
-  const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
+  // Rate is over ASSIGNED seats — buying spare seats shouldn't drag the
+  // displayed completion percentage down.
+  const assignedEnrollments = enrollmentsData?.enrollments?.filter((e: any) => e.userId).length || 0;
+  const completionRate = assignedEnrollments > 0 ? Math.round((completedEnrollments / assignedEnrollments) * 100) : 0;
   const totalCerts = certsData?.certifications?.length || 0;
   const unassignedSeats = enrollmentsData?.enrollments?.filter((e: any) => !e.userId).length || 0;
 

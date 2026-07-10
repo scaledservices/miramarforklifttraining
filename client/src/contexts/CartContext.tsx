@@ -78,7 +78,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => prev.filter((i) => i.courseSlug !== courseSlug));
   }, []);
 
-  const updateQuantity = useCallback((courseSlug: string, quantity: number) => {
+  const updateQuantity = useCallback((courseSlug: string, rawQuantity: number) => {
+    // Same 1–100 bounds as the ProductDetail seat picker; the server still
+    // recomputes pricing, this just keeps the cart UI sane.
+    const quantity = Math.min(100, rawQuantity);
     if (quantity < 1) return;
     setItems((prev) =>
       prev.map((i) => {

@@ -136,6 +136,10 @@ export default function BookTraining() {
   // step 4 shows the inline sign-in prefilled with that email instead.
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [accountAutoCreated, setAccountAutoCreated] = useState(false);
+  // 409 = email already registered → prefilled sign-in; anything else
+  // (network/5xx) → prefilled sign-up so the user isn't asked for a password
+  // to an account that doesn't exist.
+  const [authFallbackMode, setAuthFallbackMode] = useState<"login" | "register">("login");
 
   const [zip, setZip] = useState("");
   const [checkingZip, setCheckingZip] = useState(false);
@@ -363,9 +367,9 @@ export default function BookTraining() {
         });
         setAccountAutoCreated(true);
         trackEvent("booking_step_reached", { step: 3.5, step_name: "account_autocreated" });
-      } catch {
-        // Most likely 409 (account exists) — step 4 shows sign-in prefilled.
+      } catch (err: any) {
         setAccountAutoCreated(false);
+        setAuthFallbackMode(/already exists|^409/i.test(err?.message ?? "") ? "login" : "register");
       } finally {
         setCreatingAccount(false);
       }
@@ -1139,11 +1143,15 @@ export default function BookTraining() {
 
                 {!isAuthenticated && (
                   <CheckoutInlineAuth
-                    defaultMode="login"
+                    defaultMode={authFallbackMode}
                     defaultEmail={contactEmail}
                     defaultName={contactName}
                     defaultPhone={contactPhone}
-                    notice={t("bookTraining.existingAccountNote")}
+                    notice={
+                      authFallbackMode === "login"
+                        ? t("bookTraining.existingAccountNote")
+                        : t("bookTraining.accountSetupRetryNote")
+                    }
                   />
                 )}
 

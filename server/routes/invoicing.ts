@@ -14,6 +14,7 @@ import { generateInvoicePdf } from "../invoice-pdf";
 import { pdfStore } from "../pdf-store";
 import { sendInvoiceEmail } from "../email";
 import { brand } from "@shared/config/brand";
+import { isAdminRole } from "@shared/roles";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -217,11 +218,22 @@ export function registerInvoicingRoutes(app: Express) {
     }
   });
 
-  // GET /api/credit/status/:companyId — check credit status for a company
+  // GET /api/credit/status/:companyId — check credit status for a company.
+  // Credit terms/limits are business-sensitive: admins see any company,
+  // everyone else only the company they actually manage/belong to.
   app.get("/api/credit/status/:companyId", requireAuth, async (req: Request, res: Response) => {
     try {
       const companyId = parseInt(String(req.params.companyId), 10);
       if (isNaN(companyId)) return res.status(400).json({ error: "Invalid company ID" });
+
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) return res.status(401).json({ error: "Authentication required" });
+      if (!isAdminRole(user.role)) {
+        const ownCompanyId = await resolveCompanyIdForUser(user.id, user.role);
+        if (ownCompanyId !== companyId) {
+          return res.status(403).json({ error: "Forbidden" });
+        }
+      }
 
       const [credit] = await db
         .select()

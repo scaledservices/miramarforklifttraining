@@ -6,7 +6,7 @@ import { industry } from "@shared/config/industry";
 import SEOHead from "@/components/seo/SEOHead";
 import { SITE_URL } from "@/components/seo/siteUrl";
 import OptimizedImage from "@/components/ui/optimized-image";
-import { faqSchema, breadcrumbSchema, courseSchema } from "@/components/seo/StructuredData";
+import { faqSchema, breadcrumbSchema, courseSchema, serviceAreaSchema } from "@/components/seo/StructuredData";
 import { getServiceAreaCity, getAllServiceAreaCities, getRegionGroup, SERVICE_AREA_CITIES } from "@/data/serviceAreas";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
@@ -72,42 +72,18 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
     .slice(0, 12);
   const totalAreaCount = Object.keys(SERVICE_AREA_CITIES).length;
 
-  // LocalBusiness schema with serviceArea — NOT physical NAP
-  const localBusinessWithServiceArea = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: brand.name,
+  // LocalBusiness with areaServed via the shared helper — keeps the stable
+  // @id anchor and one generator for every service-area page.
+  const localBusinessWithServiceArea = serviceAreaSchema({
+    slug,
+    city: area.city,
+    state: area.state,
+    stateAbbrev: area.stateAbbrev,
     description: t("serviceAreas.schemaDescription", { city: area.city, state: area.state, body: industry.regulatory.body }),
-    url: `${BASE_URL}${canonicalPath}`,
-    telephone: brand.support.phoneE164,
-    priceRange: "$$",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: brand.address.street,
-      addressLocality: brand.address.city,
-      addressRegion: brand.address.state,
-      postalCode: brand.address.zip,
-      addressCountry: "US",
-    },
-    areaServed: {
-      "@type": "City",
-      name: area.city,
-      addressRegion: area.stateAbbrev,
-    },
-    serviceType: "Onsite Forklift Training",
-    hasOfferingCatalog: {
-      "@type": "OfferCatalog",
-      name: "Onsite Forklift Certification Programs",
-      itemListElement: area.whatsIncluded.map((item) => ({
-        "@type": "Offer",
-        itemOffered: {
-          "@type": "Service",
-          name: item.title,
-          description: item.description,
-        },
-      })),
-    },
-  };
+    locale,
+    services: area.whatsIncluded,
+    nearbyAreas: area.nearbyAreas,
+  });
 
   const breadcrumbs = breadcrumbSchema(
     [
