@@ -1061,3 +1061,54 @@ export const systemLogs = pgTable("system_logs", {
 
 export type SystemLog = typeof systemLogs.$inferSelect;
 export type InsertSystemLog = typeof systemLogs.$inferInsert;
+
+// -----------------------------------------------------------------------------
+// Analytics: self-hosted pageview + event tracking.
+// Every page load and CTA click logs a row. Queried via GET /api/admin/analytics.
+// Pruned after 90 days by the analytics-cleanup job.
+// No FK on userId — analytics must never fail because a user row went away.
+// -----------------------------------------------------------------------------
+export const pageViews = pgTable("page_views", {
+  id: serial("id").primaryKey(),
+  path: text("path").notNull(), // e.g. /en/service-areas/chula-vista
+  locale: text("locale").notNull().default("en"), // en | es
+  referrer: text("referrer"), // document.referrer (full URL, nullable)
+  referrerSource: text("referrer_source"), // categorized: google | direct | bing | yahoo | facebook | instagram | linkedin | reddit | direct | other
+  sessionId: text("session_id"), // anonymous session ID (localStorage, 30-min window)
+  userId: integer("user_id"), // if logged in
+  userAgent: text("user_agent"),
+  isMobile: boolean("is_mobile").notNull().default(false),
+  country: text("country"),
+  region: text("region"), // state
+  city: text("city"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("page_views_created_idx").on(table.createdAt),
+  index("page_views_path_created_idx").on(table.path, table.createdAt),
+  index("page_views_session_idx").on(table.sessionId),
+]);
+
+export type PageView = typeof pageViews.$inferSelect;
+export type InsertPageView = typeof pageViews.$inferInsert;
+
+// Conversion events: CTA clicks, form submissions, bookings, purchases
+export const analyticsEvents = pgTable("analytics_events", {
+  id: serial("id").primaryKey(),
+  eventType: text("event_type").notNull(), // cta_click | quote_submit | booking_started | booking_completed | checkout_start | purchase | lead_submit
+  path: text("path").notNull(), // page where event occurred
+  ctaLabel: text("cta_label"), // button text/label
+  ctaDestination: text("cta_destination"), // where the CTA links to
+  leadSource: text("lead_source"), // organic | referral | direct | paid | rep_sourced
+  sessionId: text("session_id"),
+  userId: integer("user_id"),
+  metadata: jsonb("metadata"), // additional event-specific data
+  revenue: numeric("revenue", { precision: 10, scale: 2 }), // if event has revenue impact
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("analytics_events_created_idx").on(table.createdAt),
+  index("analytics_events_type_created_idx").on(table.eventType, table.createdAt),
+  index("analytics_events_session_idx").on(table.sessionId),
+]);
+
+export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
+export type InsertAnalyticsEvent = typeof analyticsEvents.$inferInsert;

@@ -8,7 +8,9 @@ import {
   CalendarDays,
   Target,
   DollarSign,
+  TrendingUp,
   Menu,
+  MoreHorizontal,
   Users,
   Award,
   Clock,
@@ -41,6 +43,7 @@ const TABS: Tab[] = [
 ];
 
 const MORE_ITEMS: Tab[] = [
+  { key: "analytics", labelKey: "adminUx.navAnalytics", fallback: "Analytics", url: "/admin/analytics", icon: TrendingUp },
   { key: "customers", labelKey: "adminUx.navCustomers", fallback: "Customers", url: "/admin/users", icon: Users },
   { key: "certificates", labelKey: "adminUx.navCertificates", fallback: "Certificates", url: "/admin/certificates", icon: Award },
   { key: "bookings", labelKey: "adminUx.navBookings", fallback: "All Bookings", url: "/admin/bookings", icon: Clock },

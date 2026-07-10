@@ -19,6 +19,7 @@ import {
   Target,
   Building2,
   BarChart3,
+  TrendingUp,
   FileText,
   Sun,
   DollarSign,
@@ -49,6 +50,7 @@ const operateItems: NavItem[] = [
   { title: "Leads", url: "/admin/leads", icon: Target },
   { title: "Customers", url: "/admin/users", icon: Users },
   { title: "Money", url: "/admin/money", icon: DollarSign },
+  { title: "Analytics", url: "/admin/analytics", icon: TrendingUp },
   { title: "Discounts", url: "/admin/discounts", icon: Tag },
   { title: "Certificates", url: "/admin/certificates", icon: Award },
 ];

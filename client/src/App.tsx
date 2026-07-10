@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { installGlobalErrorReporting } from "@/lib/errorReporting";
+import { initAnalytics } from "@/lib/tracker";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { brand } from "@shared/config/brand";
@@ -117,6 +118,7 @@ const AdminInstructorApplications = lazy(() => import("@/pages/admin/AdminInstru
 const AdminInstructorApplicationDetail = lazy(() => import("@/pages/admin/AdminInstructorApplicationDetail"));
 const AdminInstructors = lazy(() => import("@/pages/admin/AdminInstructors"));
 const AdminInstructorDetail = lazy(() => import("@/pages/admin/AdminInstructorDetail"));
+const AdminAnalytics = lazy(() => import("@/pages/admin/AdminAnalytics"));
 const AuditBinder = lazy(() => import("@/pages/AuditBinder"));
 
 function HydrationReveal() {
@@ -263,6 +265,7 @@ function AppRoutes() {
       <Route path="/admin/instructor-applications">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminInstructorApplications /></ProtectedRoute>}</Route>
       <Route path="/admin/instructors/:id">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminInstructorDetail /></ProtectedRoute>}</Route>
       <Route path="/admin/instructors">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminInstructors /></ProtectedRoute>}</Route>
+      <Route path="/admin/analytics">{() => <ProtectedRoute roles={["admin", "super_admin"]}><AdminAnalytics /></ProtectedRoute>}</Route>
       <Route path="/:slug*" component={SeoPageRenderer} />
       <Route component={NotFound} />
     </Switch>
@@ -305,6 +308,7 @@ function AppContent() {
 
 // Window-level error + unhandled-rejection reporting to /api/client-errors.
 installGlobalErrorReporting();
+initAnalytics();
 
 function App() {
   return (
