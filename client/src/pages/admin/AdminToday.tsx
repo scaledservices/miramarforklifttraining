@@ -31,6 +31,8 @@ import {
   formatDay,
 } from "@/components/admin/today/types";
 import { type MoneySummary } from "@/components/admin/money/types";
+import { useMoneyInsights } from "@/components/admin/money/useMoneyInsights";
+import { Sparkline, TrendChip, InsightLine, pctChange } from "@/components/admin/viz";
 
 function SectionTitle({ icon: Icon, children, count }: { icon: any; children: React.ReactNode; count?: number }) {
   return (
@@ -67,6 +69,8 @@ export default function AdminToday() {
   const { data: statement } = useQuery<{ totals?: { alberto: number } }>({
     queryKey: ["/api/admin/money/statement"],
   });
+  // Day-level trend: this week vs the same days last week, plus a sparkline.
+  const insights = useMoneyInsights();
 
   // Certificates issued in the last 7 days (for the quick-stats strip).
   const { data: certsData } = useQuery<{ certifications: { issuedAt: string }[] }>({
@@ -98,6 +102,33 @@ export default function AdminToday() {
     onError: () => toast({ title: t("adminUx.toastConfirmFailed", { defaultValue: "Failed to confirm booking" }), variant: "destructive" }),
   });
 
+  // Optimistic: the chip flips to "Contacted" immediately, rolls back on error.
+  const contactedMutation = useMutation({
+    mutationFn: (id: number) => apiRequest("PATCH", `/api/admin/onsite-requests/${id}`, { status: "contacted" }),
+    onMutate: async (id: number) => {
+      await queryClient.cancelQueries({ queryKey: ["/api/admin/today"] });
+      const previous = queryClient.getQueryData<TodayData>(["/api/admin/today"]);
+      if (previous) {
+        queryClient.setQueryData<TodayData>(["/api/admin/today"], {
+          ...previous,
+          newLeads: previous.newLeads.map((l) =>
+            l.type === "onsite_request" && l.id === id ? { ...l, status: "contacted" } : l
+          ),
+        });
+      }
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(["/api/admin/today"], ctx.previous);
+      toast({ title: t("adminUx.toastContactedFailed", { defaultValue: "Could not update the lead" }), variant: "destructive" });
+    },
+    onSuccess: () => {
+      toast({ title: t("adminUx.toastContacted", { defaultValue: "Lead marked as contacted" }) });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/today"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/leads"] });
+    },
+  });
+
   if (isLoading || !data) {
     return (
       <AdminLayout>
@@ -115,6 +146,23 @@ export default function AdminToday() {
   // needs-action list to everything else so nothing appears twice.
   const awaiting = data.awaitingConfirmation.filter((b) => b.sessionDate !== data.date);
   const needsActionCount = awaiting.length + data.unpaidBalances.length;
+
+  // Plain-language money insight: this week vs the same days last week.
+  const weekPct = pctChange(insights.thisWeekSoFar, insights.lastWeekSameSpan);
+  const moneyInsight =
+    weekPct === null
+      ? null
+      : Math.abs(weekPct) < 1
+        ? t("adminUx.insightMoneyFlat", { defaultValue: "Money this week is about the same as last week." })
+        : weekPct > 0
+          ? t("adminUx.insightMoneyUp", {
+              pct: Math.round(weekPct),
+              defaultValue: "Money is up {{pct}}% compared to the same days last week.",
+            })
+          : t("adminUx.insightMoneyDown", {
+              pct: Math.abs(Math.round(weekPct)),
+              defaultValue: "Money is down {{pct}}% compared to the same days last week.",
+            });
 
   return (
     <AdminLayout>
@@ -134,9 +182,28 @@ export default function AdminToday() {
               <DollarSign className="h-4 w-4 text-brand-green" />
               {t("adminUx.moneyThisWeek", { defaultValue: "Money this week" })}
             </div>
-            <p className="text-2xl font-bold" data-testid="text-week-collected">
-              {money ? formatMoney(money.week.collected) : "—"}
-            </p>
+            <div className="flex items-end justify-between gap-3">
+              <div className="flex items-baseline gap-2 min-w-0">
+                <p className="text-2xl font-bold tabular-nums" data-testid="text-week-collected">
+                  {money ? formatMoney(money.week.collected) : "—"}
+                </p>
+                {!insights.loading && (
+                  <TrendChip
+                    current={insights.thisWeekSoFar}
+                    previous={insights.lastWeekSameSpan}
+                    compareLabel={t("adminUx.vsLastWeek", { defaultValue: "vs last week" })}
+                    testId="chip-week-trend"
+                  />
+                )}
+              </div>
+              {!insights.loading && (
+                <Sparkline
+                  values={insights.daily(14)}
+                  label={t("adminUx.sparkMoney14d", { defaultValue: "Money collected per day, last 14 days" })}
+                  testId="spark-money-14d"
+                />
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {money && money.week.outstanding > 0.01
                 ? t("adminUx.moneyOutstanding", {
@@ -156,6 +223,7 @@ export default function AdminToday() {
                 </>
               )}
             </p>
+            {moneyInsight && <div className="mt-2"><InsightLine testId="insight-money-week">{moneyInsight}</InsightLine></div>}
             <Button asChild variant="ghost" size="sm" className="mt-2 -ml-2">
               <Link href="/admin/money" data-testid="link-money-story">
                 {t("adminUx.moneySeeMore", { defaultValue: "See all money" })}
@@ -169,16 +237,19 @@ export default function AdminToday() {
         <div className="grid grid-cols-3 gap-3" data-testid="row-quick-stats">
           <QuickStat
             label={t("adminUx.statSessions", { defaultValue: "Sessions this week" })}
+            hint={t("adminUx.statSessionsHint", { defaultValue: "Training sessions booked in the next 7 days" })}
             value={data.week.reduce((n, d) => n + d.groups.reduce((m, g) => m + g.bookingCount, 0), 0)}
             testId="stat-sessions-week"
           />
           <QuickStat
             label={t("adminUx.statLeads", { defaultValue: "New leads" })}
+            hint={t("adminUx.statLeadsHint", { defaultValue: "People who asked about training in the last 7 days" })}
             value={data.newLeads.length}
             testId="stat-leads-week"
           />
           <QuickStat
             label={t("adminUx.statCerts", { defaultValue: "Certificates issued" })}
+            hint={t("adminUx.statCertsHint", { defaultValue: "Certificates issued in the last 7 days" })}
             value={certsThisWeek}
             testId="stat-certs-week"
           />
@@ -187,10 +258,10 @@ export default function AdminToday() {
         {/* Today's sessions */}
         <section className="space-y-3">
           <SectionTitle icon={Sun} count={data.todaySessions.length}>
-            Today's Sessions
+            {t("adminUx.sectionTodaySessions", { defaultValue: "Today's Sessions" })}
           </SectionTitle>
           {data.todaySessions.length === 0 ? (
-            <EmptyNote>No training sessions scheduled today.</EmptyNote>
+            <EmptyNote>{t("adminUx.emptyTodaySessions", { defaultValue: "No training sessions scheduled today." })}</EmptyNote>
           ) : (
             data.todaySessions.map((b) => (
               <TodaySessionCard
@@ -208,11 +279,11 @@ export default function AdminToday() {
         {/* Needs action */}
         <section className="space-y-3">
           <SectionTitle icon={AlertCircle} count={needsActionCount}>
-            Needs Action
+            {t("adminUx.sectionNeedsAction", { defaultValue: "Needs Action" })}
           </SectionTitle>
 
           {needsActionCount === 0 ? (
-            <EmptyNote>Nothing waiting on you. Nice.</EmptyNote>
+            <EmptyNote>{t("adminUx.emptyNeedsAction", { defaultValue: "Nothing waiting on you. Nice." })}</EmptyNote>
           ) : (
             <>
               {awaiting.map((b) => (
@@ -232,9 +303,9 @@ export default function AdminToday() {
 
         {/* This week */}
         <section className="space-y-3">
-          <SectionTitle icon={CalendarDays}>This Week</SectionTitle>
+          <SectionTitle icon={CalendarDays}>{t("adminUx.sectionThisWeek", { defaultValue: "This Week" })}</SectionTitle>
           {data.week.length === 0 ? (
-            <EmptyNote>No sessions booked in the next 7 days.</EmptyNote>
+            <EmptyNote>{t("adminUx.emptyThisWeek", { defaultValue: "No sessions booked in the next 7 days." })}</EmptyNote>
           ) : (
             <Card>
               <CardContent className="p-0 divide-y">
@@ -269,12 +340,19 @@ export default function AdminToday() {
         {/* New leads */}
         <section className="space-y-3">
           <SectionTitle icon={UserPlus} count={data.newLeads.length}>
-            New Leads (last 7 days)
+            {t("adminUx.sectionNewLeads", { defaultValue: "New Leads (last 7 days)" })}
           </SectionTitle>
           {data.newLeads.length === 0 ? (
-            <EmptyNote>No new leads this week.</EmptyNote>
+            <EmptyNote>{t("adminUx.emptyNewLeads", { defaultValue: "No new leads this week." })}</EmptyNote>
           ) : (
-            data.newLeads.map((lead) => <LeadRow key={`${lead.type}-${lead.id}`} lead={lead} />)
+            data.newLeads.map((lead) => (
+              <LeadRow
+                key={`${lead.type}-${lead.id}`}
+                lead={lead}
+                onMarkContacted={(id) => contactedMutation.mutate(id)}
+                contactedPending={contactedMutation.isPending}
+              />
+            ))
           )}
           <Button asChild variant="outline" className="w-full">
             <Link href="/admin/onsite-requests" data-testid="link-all-requests">
@@ -297,11 +375,11 @@ export default function AdminToday() {
   );
 }
 
-function QuickStat({ label, value, testId }: { label: string; value: number; testId: string }) {
+function QuickStat({ label, hint, value, testId }: { label: string; hint?: string; value: number; testId: string }) {
   return (
-    <Card data-testid={testId}>
+    <Card data-testid={testId} title={hint}>
       <CardContent className="p-3 text-center">
-        <p className="text-2xl font-bold">{value}</p>
+        <p className="text-2xl font-bold tabular-nums">{value}</p>
         <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{label}</p>
       </CardContent>
     </Card>
@@ -386,19 +464,42 @@ function UnpaidRow({ booking: b }: { booking: TodayBooking }) {
   );
 }
 
-function LeadRow({ lead }: { lead: TodayLead }) {
+function LeadRow({
+  lead,
+  onMarkContacted,
+  contactedPending,
+}: {
+  lead: TodayLead;
+  onMarkContacted: (id: number) => void;
+  contactedPending: boolean;
+}) {
+  const { t } = useTranslation();
   const viewHref = lead.type === "onsite_request" ? `/admin/onsite-requests/${lead.id}` : "/admin/leads";
+  // Only brand-new onsite leads get the one-tap advance; everything else
+  // already moved down the pipeline.
+  const canMarkContacted = lead.type === "onsite_request" && lead.status === "new_lead";
   return (
     <Card data-testid={`card-lead-${lead.type}-${lead.id}`}>
       <CardContent className="p-4 space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <div>
+          <div className="min-w-0">
             <span className="font-semibold">{lead.name}</span>
             {lead.company && <span className="text-sm text-muted-foreground"> · {lead.company}</span>}
           </div>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            {new Date(lead.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            {lead.status === "contacted" && (
+              <Badge
+                variant="secondary"
+                className="bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200"
+                data-testid={`chip-lead-contacted-${lead.type}-${lead.id}`}
+              >
+                {t("adminUx.leadContactedChip", { defaultValue: "Contacted" })}
+              </Badge>
+            )}
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              {new Date(lead.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+            </span>
+          </div>
         </div>
         {lead.detail && <div className="text-sm text-muted-foreground">{lead.detail}</div>}
         <div className="flex gap-2 pt-1">
@@ -406,13 +507,26 @@ function LeadRow({ lead }: { lead: TodayLead }) {
             <Button asChild size="lg" variant="outline" className="flex-1">
               <a href={`tel:${lead.phone}`} data-testid={`link-call-lead-${lead.type}-${lead.id}`}>
                 <Phone className="h-4 w-4 mr-1" />
-                Call
+                {t("adminUx.actionCall", { defaultValue: "Call" })}
               </a>
+            </Button>
+          )}
+          {canMarkContacted && (
+            <Button
+              size="lg"
+              variant="outline"
+              className="flex-1"
+              disabled={contactedPending}
+              onClick={() => onMarkContacted(lead.id)}
+              data-testid={`button-contacted-lead-${lead.id}`}
+            >
+              <CheckCircle className="h-4 w-4 mr-1" />
+              {t("adminUx.actionMarkContacted", { defaultValue: "Contacted" })}
             </Button>
           )}
           <Button asChild size="lg" variant="outline" className="flex-1">
             <Link href={viewHref} data-testid={`link-view-lead-${lead.type}-${lead.id}`}>
-              View
+              {t("adminUx.actionView", { defaultValue: "View" })}
               <ChevronRight className="h-4 w-4 ml-1" />
             </Link>
           </Button>
