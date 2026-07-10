@@ -42,6 +42,7 @@ function track(path: string, data: Record<string, any> = {}) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      credentials: "include",
       keepalive: true,
     }).catch(() => {});
   }
@@ -59,6 +60,7 @@ function trackEvent(eventType: string, path: string, data: Record<string, any> =
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      credentials: "include",
       keepalive: true,
     }).catch(() => {});
   }

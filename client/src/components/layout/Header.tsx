@@ -658,7 +658,7 @@ export default function Header() {
       data-testid="header"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4 h-16">
+        <div className="flex items-center justify-between gap-4 h-20">
           <Link href="/" className="flex items-center shrink-0" data-testid="link-logo">
             <Logo variant="navbar" theme="dark" />
           </Link>

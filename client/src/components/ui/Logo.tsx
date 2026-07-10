@@ -9,17 +9,17 @@ interface LogoProps {
 
 export default function Logo({ variant = "navbar", theme = "light", className = "", loading = "eager" }: LogoProps) {
   if (variant === "navbar") {
-    // Dark asset is 591x170; light navbar asset is 192x192. Rendered at h-10 (40px).
+    // Dark asset is 707x354 (2:1); light navbar asset is 112x56. Rendered at h-[4.5rem] (72px).
     const isDark = theme === "dark";
     return (
       <img
         src={isDark ? brand.logo.fullDark : brand.logo.navbar}
         alt={brand.name}
-        width={isDark ? 139 : 40}
-        height={40}
+        width={isDark ? 144 : 144}
+        height={72}
         loading={loading}
         decoding="async"
-        className={`h-10 w-auto ${className}`}
+        className={`h-[4.5rem] w-auto ${className}`}
         data-testid="logo-navbar"
       />
     );
@@ -45,9 +45,9 @@ export default function Logo({ variant = "navbar", theme = "light", className = 
     <img
       src={src}
       alt={brand.name}
-      // Intrinsic dimensions (dark: 591x170, light: 600x269) to reserve aspect ratio; CSS controls rendered size.
-      width={isDark ? 591 : 600}
-      height={isDark ? 170 : 269}
+      // Intrinsic dimensions (dark: 707x354, light: 1881x836) to reserve aspect ratio; CSS controls rendered size.
+      width={isDark ? 707 : 1881}
+      height={isDark ? 354 : 836}
       loading={loading}
       decoding="async"
       className={`h-16 w-auto ${className}`}

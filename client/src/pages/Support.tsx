@@ -338,6 +338,7 @@ function ChatPanel({
           conversationHistory,
           pageContext: window.location.pathname,
         }),
+        credentials: "include",
         signal: abortControllerRef.current.signal,
       });
 
