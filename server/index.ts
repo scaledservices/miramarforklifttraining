@@ -6,11 +6,28 @@ import { serveStatic } from "./static";
 import { registerSsrMiddleware } from "./seo-ssr";
 import { createServer } from "http";
 import { startJobScheduler } from "./jobs";
-import { ensureSequences } from "./db";
+import { ensureSequences, pool } from "./db";
 import { isStripeConfigured } from "./stripeClient";
 import { WebhookHandlers } from "./webhookHandlers";
+import { installConsoleCapture, errorHandler, logger, logDbError } from "./monitoring";
 
 const isProduction = process.env.NODE_ENV === "production";
+
+// Structured logging: capture console.error/console.warn into system_logs so
+// every existing catch block is persisted, and record crashes before exit.
+installConsoleCapture();
+
+pool.on("error", (err) => logDbError("Postgres pool error", err));
+
+process.on("uncaughtException", (err) => {
+  logger.error("Uncaught exception — exiting", { error: err });
+  // Give the fire-and-forget DB write a moment, then preserve crash semantics.
+  setTimeout(() => process.exit(1), 500);
+});
+
+process.on("unhandledRejection", (reason) => {
+  logger.error("Unhandled promise rejection", { error: reason });
+});
 
 if (isProduction && process.env.DEMO_MODE === "true") {
   console.error("FATAL: DEMO_MODE=true is not allowed in production. Payments would be bypassed. Exiting.");
@@ -174,18 +191,7 @@ app.use((req, res, next) => {
 
   await registerRoutes(httpServer, app);
 
-  app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    console.error("Internal Server Error:", err);
-
-    if (res.headersSent) {
-      return next(err);
-    }
-
-    return res.status(status).json({ message });
-  });
+  app.use(errorHandler);
 
   registerSsrMiddleware(app);
 

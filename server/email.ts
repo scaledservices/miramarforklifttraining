@@ -5,6 +5,7 @@ import { brand } from "@shared/config/brand";
 import { theme } from "@shared/config/theme";
 import { industry } from "@shared/config/industry";
 import { t as emailT } from "./email-i18n";
+import { logEmailError } from "./monitoring";
 import QRCode from "qrcode";
 
 function getSiteUrl(): string {
@@ -125,7 +126,7 @@ async function sendEmail(options: EmailOptions): Promise<boolean> {
         html: options.html,
       });
       if (result.error) {
-        console.error(`[EMAIL] Resend error:`, result.error);
+        logEmailError("Resend rejected the send", result.error, { to: options.to, subject: options.subject });
         if (outboxId) {
           await updateOutboxDelivery(outboxId, {
             providerStatus: "failed",
@@ -143,7 +144,7 @@ async function sendEmail(options: EmailOptions): Promise<boolean> {
       }
       return true;
     } catch (err) {
-      console.error(`[EMAIL] Resend send failed:`, err);
+      logEmailError("Resend send threw", err, { to: options.to, subject: options.subject });
       if (outboxId) {
         await updateOutboxDelivery(outboxId, {
           providerStatus: "error",

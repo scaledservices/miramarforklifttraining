@@ -30,6 +30,8 @@ import { registerRoleCertRoutes } from "./role-certs";
 import { registerPhotoRoutes } from "./photos";
 import { registerInvoicingRoutes } from "./invoicing";
 import { registerStandingSessionRoutes } from "./standing-sessions";
+import { registerLogRoutes } from "./logs";
+import { requestContextMiddleware } from "../monitoring";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -58,6 +60,9 @@ export async function registerRoutes(
 
   app.use(passport.initialize());
   app.use(csrfProtection);
+  // After session middleware: every log line inside a request now carries
+  // path, method, userId, and (sanitized, on errors) the request body.
+  app.use(requestContextMiddleware);
 
   registerSeoRoutes(app);
 
@@ -85,6 +90,7 @@ export async function registerRoutes(
   registerPhotoRoutes(app);
   registerInvoicingRoutes(app);
   registerStandingSessionRoutes(app);
+  registerLogRoutes(app);
 
   return httpServer;
 }

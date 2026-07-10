@@ -1,6 +1,8 @@
 import { Switch, Route, Router, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { installGlobalErrorReporting } from "@/lib/errorReporting";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { brand } from "@shared/config/brand";
@@ -301,21 +303,26 @@ function AppContent() {
   );
 }
 
+// Window-level error + unhandled-rejection reporting to /api/client-errors.
+installGlobalErrorReporting();
+
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <TooltipProvider>
-          <Router hook={useLocaleLocation}>
-            <ThemeInjector />
-            <HydrationReveal />
-            <LocaleRedirect />
-            <AppContent />
-            <Toaster />
-          </Router>
-        </TooltipProvider>
-      </CartProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <CartProvider>
+          <TooltipProvider>
+            <Router hook={useLocaleLocation}>
+              <ThemeInjector />
+              <HydrationReveal />
+              <LocaleRedirect />
+              <AppContent />
+              <Toaster />
+            </Router>
+          </TooltipProvider>
+        </CartProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

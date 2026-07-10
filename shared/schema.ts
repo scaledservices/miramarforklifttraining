@@ -1033,3 +1033,31 @@ export const standingSessions = pgTable("standing_sessions", {
 export const insertStandingSessionSchema = createInsertSchema(standingSessions).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertStandingSession = z.infer<typeof insertStandingSessionSchema>;
 export type StandingSession = typeof standingSessions.$inferSelect;
+
+// -----------------------------------------------------------------------------
+// System logs: structured error/warn/info events from server, jobs, and the
+// browser. Written by server/monitoring.ts; queried via GET /api/admin/logs;
+// rows older than 30 days are pruned by the log-cleanup job.
+// No FK on userId — a log write must never fail because a user row went away.
+// -----------------------------------------------------------------------------
+export const systemLogs = pgTable("system_logs", {
+  id: serial("id").primaryKey(),
+  level: text("level", { enum: ["error", "warn", "info"] }).notNull(),
+  source: text("source").notNull().default("server"), // server | client | job | email | payment | db
+  message: text("message").notNull(),
+  stack: text("stack"),
+  requestPath: text("request_path"),
+  requestMethod: text("request_method"),
+  userId: integer("user_id"),
+  requestBody: jsonb("request_body"), // sanitized — payment/auth fields redacted before write
+  metadata: jsonb("metadata"),
+  environment: text("environment").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("system_logs_created_idx").on(table.createdAt),
+  index("system_logs_level_created_idx").on(table.level, table.createdAt),
+  index("system_logs_source_created_idx").on(table.source, table.createdAt),
+]);
+
+export type SystemLog = typeof systemLogs.$inferSelect;
+export type InsertSystemLog = typeof systemLogs.$inferInsert;

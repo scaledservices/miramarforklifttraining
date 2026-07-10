@@ -7,9 +7,11 @@ import { runSmsRemindersJob } from "./sms-reminders";
 import { runReviewRequestsJob } from "./review-requests";
 import { runRouteFillAlertsJob } from "./route-fill-alerts";
 import { runStandingSessionsJob } from "./standing-sessions";
+import { runLogCleanupJob } from "./log-cleanup";
 import { db } from "../db";
 import { sql } from "drizzle-orm";
 import crypto from "crypto";
+import { logJobError } from "../monitoring";
 
 function jobLockKey(jobName: string): string {
   const hash = crypto.createHash("sha256").update(jobName).digest();
@@ -35,7 +37,7 @@ async function runWithLock(jobName: string, fn: () => Promise<void>): Promise<vo
   try {
     await fn();
   } catch (err) {
-    console.error(`[JOB] ${jobName} failed:`, err);
+    logJobError(jobName, err);
   } finally {
     await releaseAdvisoryLock(key);
   }
@@ -50,6 +52,7 @@ async function runAllJobs() {
   await runWithLock("review_requests", runReviewRequestsJob);
   await runWithLock("route_fill_alerts", runRouteFillAlertsJob);
   await runWithLock("standing_sessions", runStandingSessionsJob);
+  await runWithLock("log_cleanup", runLogCleanupJob);
 }
 
 export function startJobScheduler() {

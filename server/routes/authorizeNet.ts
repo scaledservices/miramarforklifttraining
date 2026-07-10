@@ -16,6 +16,7 @@ import {
 } from "../authorizeNetClient";
 import { sendOrderReceipt, sendNewOrderAdminAlert } from "../email";
 import { resolveLocale } from "../locale-resolver";
+import { logger, logPaymentError } from "../monitoring";
 import { requireAuth, payLimiter } from "./middleware";
 
 export function registerAuthorizeNetRoutes(app: Express) {
@@ -151,6 +152,15 @@ export function registerAuthorizeNetRoutes(app: Express) {
 
       if (!result.success) {
         // Leave order as pending on failure (no "failed" status in schema)
+        logger.warn(`Payment declined: order ${order.orderNumber}`, {
+          source: "payment",
+          metadata: {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            amount: total,
+            declineReason: result.errorMessage,
+          },
+        });
         return res.status(400).json({
           error: result.errorMessage || "Payment was declined",
           orderId: order.id,
@@ -186,7 +196,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
         discountAmount: discountResult.discountAmount > 0 ? discountResult.discountAmount : undefined,
       });
     } catch (error: any) {
-      console.error("[AuthorizeNet] Charge error:", error);
+      logPaymentError("Charge failed", error, { endpoint: "charge" });
       return res.status(500).json({ error: error.message || "Internal server error" });
     }
   });
@@ -253,7 +263,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
 
       return res.json({ success: true, transactionId: refundResult.transactionId });
     } catch (error: any) {
-      console.error("[AuthorizeNet] Refund error:", error);
+      logPaymentError("Refund failed", error, { endpoint: "refund", orderId: req.params.id });
       return res.status(500).json({ error: "Internal server error" });
     }
   });
