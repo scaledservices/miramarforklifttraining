@@ -1,4 +1,8 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient, QueryFunction, QueryCache, MutationCache } from "@tanstack/react-query";
+
+export function isAuthError(error: unknown): boolean {
+  return error instanceof Error && /^401[:\s]/.test(error.message);
+}
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -41,7 +45,24 @@ export const getQueryFn: <T>(options: {
     return await res.json();
   };
 
+// Session expiry: /api/auth/me is cached and never 401s itself, so without
+// this the client keeps believing it's authenticated after the cookie dies
+// and surfaces raw "401: ..." strings mid-flow. Any 401 from any query or
+// mutation clears the cached auth state, which flips isAuthenticated and lets
+// ProtectedRoute / inline-auth components re-prompt for sign-in.
+function handleAuthError(error: unknown) {
+  if (isAuthError(error)) {
+    queryClient.setQueryData(["/api/auth/me"], { user: null });
+  }
+}
+
 export const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: handleAuthError,
+  }),
+  mutationCache: new MutationCache({
+    onError: handleAuthError,
+  }),
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),

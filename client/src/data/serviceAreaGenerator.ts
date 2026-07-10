@@ -142,14 +142,14 @@ export function generateServiceAreaCity(c: CityFacts): ServiceAreaCity {
   const seo = {
     title: `Forklift Training ${c.name}, ${c.stateAbbrev} | OSHA Certification`,
     description: clamp160(
-      `Forklift certification in ${c.name}, ${c.stateAbbrev}. OSHA-aligned onsite training from $200/person, hands-on classes, and a $45 online course. Same-day certificates.`,
+      `Forklift certification in ${c.name}, ${c.stateAbbrev}. OSHA-aligned onsite training from $280/person, hands-on classes, and a $45 online course. Same-day certificates.`,
       " Same-day certificates.",
     ),
   };
   const seoEs = {
     title: `Capacitación de Montacargas ${c.name}, ${c.stateAbbrev} | Certificación OSHA`,
     description: clamp160(
-      `Certificación de montacargas en ${c.name}, ${c.stateAbbrev}. Capacitación en sitio alineada con OSHA desde $200/persona y curso en línea de $45. Certificados el mismo día.`,
+      `Certificación de montacargas en ${c.name}, ${c.stateAbbrev}. Capacitación en sitio alineada con OSHA desde $280/persona y curso en línea de $45. Certificados el mismo día.`,
       " Certificados el mismo día.",
     ),
   };
@@ -268,7 +268,7 @@ export function generateServiceAreaCity(c: CityFacts): ServiceAreaCity {
   const faqs = [
     {
       question: `How much does forklift certification cost in ${c.name}?`,
-      answer: `Onsite forklift training in ${c.name} starts at $200 per person for standard counterbalance certification, with the exact price depending on group size, equipment types, and location — request a quote for an exact number. Hands-on classes at our ${fac.name} training center start at $280 per person. The online certification course is a flat $45 and covers the OSHA-required formal instruction portion.`,
+      answer: `Onsite forklift training in ${c.name} starts at $280 per person for standard counterbalance certification (scissor and aerial lift training starts at $200), with the exact price depending on group size, equipment types, and location — request a quote for an exact number. Hands-on classes at our ${fac.name} training center also start at $280 per person. The online certification course is a flat $45 and covers the OSHA-required formal instruction portion.`,
     },
     {
       question: `How long does forklift training take in ${c.name}?`,
@@ -297,7 +297,7 @@ export function generateServiceAreaCity(c: CityFacts): ServiceAreaCity {
   const faqsEs = [
     {
       question: `¿Cuánto cuesta la certificación de montacargas en ${c.name}?`,
-      answer: `La capacitación de montacargas en sitio en ${c.name} comienza en $200 por persona para la certificación estándar de contrapeso; el precio exacto depende del tamaño del grupo, los tipos de equipo y la ubicación — solicite una cotización para un número exacto. Las clases prácticas en nuestro centro de ${fac.name} comienzan en $280 por persona. El curso de certificación en línea cuesta $45 y cubre la parte de instrucción formal requerida por OSHA.`,
+      answer: `La capacitación de montacargas en sitio en ${c.name} comienza en $280 por persona para la certificación estándar de contrapeso (la capacitación en plataformas de tijera y aéreas comienza en $200); el precio exacto depende del tamaño del grupo, los tipos de equipo y la ubicación — solicite una cotización para un número exacto. Las clases prácticas en nuestro centro de ${fac.name} también comienzan en $280 por persona. El curso de certificación en línea cuesta $45 y cubre la parte de instrucción formal requerida por OSHA.`,
     },
     {
       question: `¿Cuánto dura la capacitación de montacargas en ${c.name}?`,

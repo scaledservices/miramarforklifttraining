@@ -10,12 +10,16 @@ import { DollarSign, FileText, CheckCircle, XCircle } from "lucide-react";
 
 export default function AdminInvoicing() {
   const { t } = useTranslation();
+  // Both endpoints return joined rows with the entity nested
+  // ({ credit: {...}, companyName } / { invoice: {...}, companyName }) —
+  // flatten here so the tables read plain fields.
   const { data: creditApps = [] } = useQuery<any[]>({
     queryKey: ["/api/admin/credit"],
     queryFn: async () => {
       const res = await fetch("/api/admin/credit", { credentials: "include" });
       if (!res.ok) return [];
-      return res.json();
+      const rows = await res.json();
+      return rows.map((r: any) => ({ ...r.credit, companyName: r.companyName, companyEmail: r.companyEmail, approvedByName: r.approvedByName }));
     },
   });
   const { data: invoices = [] } = useQuery<any[]>({
@@ -23,7 +27,8 @@ export default function AdminInvoicing() {
     queryFn: async () => {
       const res = await fetch("/api/admin/invoices", { credentials: "include" });
       if (!res.ok) return [];
-      return res.json();
+      const rows = await res.json();
+      return rows.map((r: any) => ({ ...r.invoice, companyName: r.companyName, companyEmail: r.companyEmail, orderNumber: r.orderNumber }));
     },
   });
 
@@ -41,7 +46,7 @@ export default function AdminInvoicing() {
 
   const markPaidMutation = useMutation({
     mutationFn: (invoiceId: number) =>
-      apiRequest("PATCH", `/api/admin/invoices/${invoiceId}/mark-paid`, { paymentMethod: "manual", paymentNote: "Recorded by admin" }),
+      apiRequest("PATCH", `/api/admin/invoices/${invoiceId}/mark-paid`, { paymentMethod: "other", paymentNote: "Recorded by admin" }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/admin/invoices"] }),
   });
 

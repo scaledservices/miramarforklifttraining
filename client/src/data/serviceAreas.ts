@@ -167,7 +167,7 @@ const HAND_WRITTEN_CITIES: Record<string, ServiceAreaCity> = {
       {
         question: "How much does onsite forklift training cost in Los Angeles?",
         answer:
-          "Onsite forklift training in Los Angeles starts at $200 per person for standard counterbalance certification. Pricing varies based on equipment types, number of operators, and your specific location within the LA metro area. Volume discounts are available for groups of 5 or more. Request a quote for an exact price based on your needs.",
+          "Onsite forklift training in Los Angeles starts at $280 per person for standard counterbalance certification. Pricing varies based on equipment types, number of operators, and your specific location within the LA metro area. Volume discounts are available for groups of 5 or more. Request a quote for an exact price based on your needs.",
       },
       {
         question: "How long does onsite forklift training take at our LA facility?",
@@ -258,7 +258,7 @@ const HAND_WRITTEN_CITIES: Record<string, ServiceAreaCity> = {
         {
           question: "¿Cuánto cuesta la capacitación de montacargas en sitio en Los Angeles?",
           answer:
-            "La capacitación de montacargas en sitio en Los Angeles comienza en $200 por persona para la certificación estándar de contrapeso. El precio varía según los tipos de equipo, el número de operadores y su ubicación específica dentro del área metropolitana de LA. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto según sus necesidades.",
+            "La capacitación de montacargas en sitio en Los Angeles comienza en $280 por persona para la certificación estándar de contrapeso. El precio varía según los tipos de equipo, el número de operadores y su ubicación específica dentro del área metropolitana de LA. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto según sus necesidades.",
         },
         {
           question: "¿Cuánto dura la capacitación en sitio en nuestra instalación de LA?",
@@ -374,7 +374,7 @@ const HAND_WRITTEN_CITIES: Record<string, ServiceAreaCity> = {
       {
         question: "How much does onsite forklift training cost in Bakersfield?",
         answer:
-          "Onsite forklift training in Bakersfield starts at $200 per person for standard counterbalance certification. Pricing depends on the number of operators, equipment types, and your specific location within Kern County. Volume discounts are available for groups of 5 or more. Request a quote for an exact price.",
+          "Onsite forklift training in Bakersfield starts at $280 per person for standard counterbalance certification. Pricing depends on the number of operators, equipment types, and your specific location within Kern County. Volume discounts are available for groups of 5 or more. Request a quote for an exact price.",
       },
       {
         question: "Do you serve all of Kern County, or just Bakersfield?",
@@ -465,7 +465,7 @@ const HAND_WRITTEN_CITIES: Record<string, ServiceAreaCity> = {
         {
           question: "¿Cuánto cuesta la capacitación de montacargas en sitio en Bakersfield?",
           answer:
-            "La capacitación de montacargas en sitio en Bakersfield comienza en $200 por persona para la certificación estándar de contrapeso. El precio depende del número de operadores, los tipos de equipo y su ubicación específica dentro del condado de Kern. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto.",
+            "La capacitación de montacargas en sitio en Bakersfield comienza en $280 por persona para la certificación estándar de contrapeso. El precio depende del número de operadores, los tipos de equipo y su ubicación específica dentro del condado de Kern. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto.",
         },
         {
           question: "¿Atienden todo el condado de Kern o solo Bakersfield?",
@@ -581,7 +581,7 @@ const HAND_WRITTEN_CITIES: Record<string, ServiceAreaCity> = {
       {
         question: "How much does onsite forklift training cost in Hayward?",
         answer:
-          "Onsite forklift training in Hayward starts at $200 per person for standard counterbalance certification. Pricing varies based on equipment types, number of operators, and your specific location within the Bay Area. Volume discounts are available for groups of 5 or more. Request a quote for an exact price.",
+          "Onsite forklift training in Hayward starts at $280 per person for standard counterbalance certification. Pricing varies based on equipment types, number of operators, and your specific location within the Bay Area. Volume discounts are available for groups of 5 or more. Request a quote for an exact price.",
       },
       {
         question: "Do you serve the entire Bay Area, or just Hayward?",
@@ -672,7 +672,7 @@ const HAND_WRITTEN_CITIES: Record<string, ServiceAreaCity> = {
         {
           question: "¿Cuánto cuesta la capacitación de montacargas en sitio en Hayward?",
           answer:
-            "La capacitación de montacargas en sitio en Hayward comienza en $200 por persona para la certificación estándar de contrapeso. El precio varía según los tipos de equipo, el número de operadores y su ubicación específica dentro del Área de la Bahía. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto.",
+            "La capacitación de montacargas en sitio en Hayward comienza en $280 por persona para la certificación estándar de contrapeso. El precio varía según los tipos de equipo, el número de operadores y su ubicación específica dentro del Área de la Bahía. Hay descuentos por volumen disponibles para grupos de 5 o más. Solicite una cotización para obtener un precio exacto.",
         },
         {
           question: "¿Atienden toda el Área de la Bahía o solo Hayward?",

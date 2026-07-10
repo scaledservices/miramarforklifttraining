@@ -338,8 +338,8 @@ export default function StaffingAgencyProgram() {
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 {isEs
-                  ? "Mientras más temps certifique, más ahorra. Descuentos automáticos cada mes."
-                  : "The more temps you certify, the more you save. Discounts applied automatically each month."}
+                  ? "Mientras más temps certifique, más ahorra. Las tarifas por volumen se cotizan para su agencia y se revisan cada mes."
+                  : "The more temps you certify, the more you save. Volume rates are quoted for your agency and reviewed monthly."}
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-6">

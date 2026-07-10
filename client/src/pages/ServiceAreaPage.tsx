@@ -553,16 +553,8 @@ export default function ServiceAreaPage({ city: slug }: ServiceAreaPageProps) {
         </div>
       </section>
 
-      {/* Sticky mobile CTA */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border p-3" data-testid="sticky-mobile-cta-area">
-        <Link href={primaryCta.href}>
-          <Button size="lg" className="w-full bg-accent text-accent-foreground border-accent-border" data-testid="button-sticky-area-cta">
-            <Shield className="h-5 w-5 mr-2" />
-            {primaryCta.label}
-          </Button>
-        </Link>
-      </div>
-      <div className="md:hidden h-20" aria-hidden="true" />
+      {/* Mobile sticky CTA is provided by the global MobileCtaBar (App.tsx) —
+          do not add a page-level fixed bottom bar here, they overlap. */}
     </>
   );
 }

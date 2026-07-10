@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, isAuthError } from "@/lib/queryClient";
 import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -226,7 +226,14 @@ export default function Checkout() {
       }
     },
     onError: (error: any) => {
-      setPaymentError(error.message || t("checkout.paymentFailed"));
+      // Expired session: the global 401 handler has already flipped the auth
+      // state so the inline sign-in reappears — show a human message, not
+      // the raw "401: {...}" string.
+      if (isAuthError(error)) {
+        setPaymentError(t("checkout.sessionExpired", { defaultValue: "Your session expired. Please sign in again below — your cart is saved." }));
+      } else {
+        setPaymentError(error.message || t("checkout.paymentFailed"));
+      }
       setIsProcessing(false);
     },
   });
@@ -241,22 +248,22 @@ export default function Checkout() {
     }
 
     if (!paymentConfig?.clientKey || !paymentConfig?.apiLoginID || !acceptLoaded || !window.Accept) {
-      setPaymentError("Payment system is loading. Please try again in a moment.");
+      setPaymentError(t("booking.paymentLoading", { defaultValue: "Payment system is loading. Please try again in a moment." }));
       return;
     }
 
     // Basic validation
     const cardNumber = cardForm.cardNumber.replace(/\s/g, "");
     if (!cardNumber || cardNumber.length < 13) {
-      setPaymentError("Please enter a valid card number.");
+      setPaymentError(t("checkout.invalidCard", { defaultValue: "Please enter a valid card number." }));
       return;
     }
     if (!cardForm.month || !cardForm.year) {
-      setPaymentError("Please enter the card expiration date.");
+      setPaymentError(t("checkout.invalidExpiry", { defaultValue: "Please enter the card expiration date." }));
       return;
     }
     if (!cardForm.cardCode || cardForm.cardCode.length < 3) {
-      setPaymentError("Please enter the card CVV code.");
+      setPaymentError(t("checkout.invalidCvv", { defaultValue: "Please enter the card CVV code." }));
       return;
     }
 
@@ -286,13 +293,13 @@ export default function Checkout() {
             isCardPayment: true,
           });
         } else {
-          const errMsg = response.messages.message?.[0]?.text || "Payment authorization failed.";
+          const errMsg = response.messages.message?.[0]?.text || t("checkout.paymentFailed");
           setPaymentError(errMsg);
           setIsProcessing(false);
         }
       });
     } catch (err: any) {
-      setPaymentError(err.message || "Payment initialization failed");
+      setPaymentError(err.message || t("checkout.paymentFailed"));
       setIsProcessing(false);
     }
   }

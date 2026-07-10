@@ -1,4 +1,5 @@
 import { getActiveLocations } from "./locations";
+import { BOOKING_PRODUCT_PRICES } from "./bookingPricing";
 
 export const brand = {
   name: "Miramar Forklift Training",
@@ -60,14 +61,17 @@ export const brand = {
     invoiceNumber: "INV",
   },
 
+  // Display pricing derives from the authoritative charge table in
+  // bookingPricing.ts — never hardcode numbers here. LocationPage renders
+  // this grid, so it must match what the booking wizard actually charges.
   pricing: {
     inPerson: {
-      standard: { name: "Standard Forklift", price: 200 },
-      reachForklift: { name: "Reach Truck + Forklift", price: 280 },
-      orderPickerForklift: { name: "Order Picker + Forklift", price: 280 },
-      forkliftScissorEpj: { name: "Forklift + Scissor Lift + EPJ", price: 300 },
-      fullMultiEquipment: { name: "Full Multi-Equipment", price: 350 },
-      scissorAerial: { name: "Scissor Lift + Aerial", price: 280 },
+      standard: { name: "Standard Forklift", price: BOOKING_PRODUCT_PRICES["standard-forklift-certification-san-diego"] },
+      scissorAerial: { name: "Scissor Lift + Aerial", price: BOOKING_PRODUCT_PRICES["scissor-aerial-boom-lift-certification-san-diego"] },
+      reachForklift: { name: "Reach Truck + Forklift", price: BOOKING_PRODUCT_PRICES["reach-forklift-training-san-diego"] },
+      orderPickerForklift: { name: "Order Picker + Forklift", price: BOOKING_PRODUCT_PRICES["order-picker-forklift-training-san-diego"] },
+      forkliftScissorEpj: { name: "Forklift + Scissor Lift + EPJ", price: BOOKING_PRODUCT_PRICES["forklift-scissor-lift-epj-certification-san-diego"] },
+      fullMultiEquipment: { name: "Full Multi-Equipment", price: BOOKING_PRODUCT_PRICES["complete-equipment-certification-san-diego"] },
     },
   },
 

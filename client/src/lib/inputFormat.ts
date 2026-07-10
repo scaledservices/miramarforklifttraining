@@ -6,9 +6,16 @@ export function digitsOnly(value: string): string {
   return value.replace(/\D/g, "");
 }
 
-/** Progressive US phone formatting: 8589010149 → (858) 901-0149. Max 10 digits. */
+/** US phone digits: strips formatting AND a leading +1 country code (browser autofill often supplies it). */
+export function usPhoneDigits(value: string): string {
+  let d = digitsOnly(value);
+  if (d.length === 11 && d.startsWith("1")) d = d.slice(1);
+  return d.slice(0, 10);
+}
+
+/** Progressive US phone formatting: 8589010149 or +18589010149 → (858) 901-0149. */
 export function formatUsPhone(value: string): string {
-  const d = digitsOnly(value).slice(0, 10);
+  const d = usPhoneDigits(value);
   if (d.length === 0) return "";
   if (d.length < 4) return `(${d}`;
   if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
@@ -16,7 +23,7 @@ export function formatUsPhone(value: string): string {
 }
 
 export function isValidUsPhone(value: string): boolean {
-  return digitsOnly(value).length === 10;
+  return usPhoneDigits(value).length === 10;
 }
 
 export function normalizeEmail(value: string): string {

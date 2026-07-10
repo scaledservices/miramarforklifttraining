@@ -13,73 +13,35 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-const compliancePoints = [
-  {
-    icon: BookOpen,
-    title: "Knowledge-Based Training",
-    description:
-      `Our online courses cover all ${industry.regulatory.body}-required topics including truck-related topics (operating instructions, warnings, precautions), workplace-related topics (surface conditions, load manipulation, pedestrian traffic), and the requirements of the ${industry.regulatory.body} standard itself.`,
-  },
-  {
-    icon: ClipboardList,
-    title: "Evaluation and Testing",
-    description:
-      `Operators must pass a comprehensive knowledge assessment demonstrating understanding of safe forklift operation principles. Our exams are designed to verify competency across all ${industry.regulatory.body}-mandated training topics.`,
-  },
-  {
-    icon: Users,
-    title: "Employer Hands-On Evaluation",
-    description:
-      `${industry.regulatory.body} requires employers to provide hands-on practical training and evaluation specific to the workplace. We provide employer documentation templates including evaluation checklists, training record templates, and operator authorization forms to help employers complete this requirement.`,
-  },
-  {
-    icon: RefreshCw,
-    title: "Refresher Training",
-    description:
-      `Per ${industry.regulatory.body} requirements, operators must receive refresher training when involved in an accident or near-miss, observed operating unsafely, assigned to a different type of truck, or when workplace conditions change. Certifications are valid for ${industry.regulatory.certificationValidity}.`,
-  },
-];
+// Stable ids keep data-testids locale-independent; all copy lives in
+// oshaCompliance.* i18n keys (EN + ES).
+const COMPLIANCE_POINTS = [
+  { id: "knowledge-based-training", icon: BookOpen, titleKey: "oshaCompliance.point1Title", descKey: "oshaCompliance.point1Desc" },
+  { id: "evaluation-and-testing", icon: ClipboardList, titleKey: "oshaCompliance.point2Title", descKey: "oshaCompliance.point2Desc" },
+  { id: "employer-hands-on-evaluation", icon: Users, titleKey: "oshaCompliance.point3Title", descKey: "oshaCompliance.point3Desc" },
+  { id: "refresher-training", icon: RefreshCw, titleKey: "oshaCompliance.point4Title", descKey: "oshaCompliance.point4Desc" },
+] as const;
 
-const oshaTopics = [
-  "Operating instructions, warnings, and precautions for the types of truck the operator will be authorized to operate",
-  "Differences between the truck and the automobile",
-  "Truck controls and instrumentation: where they are located, what they do, and how they work",
-  "Engine or motor operation",
-  "Steering and maneuvering",
-  "Visibility (including restrictions due to loading)",
-  "Fork and attachment adaptation, operation, and use limitations",
-  "Vehicle capacity",
-  "Vehicle stability",
-  "Vehicle inspection and maintenance",
-  "Refueling and/or charging and recharging of batteries",
-  "Operating limitations",
-  "Any other operating instructions, warnings, or precautions listed in the operator's manual",
-  "Surface conditions where the vehicle will be operated",
-  "Composition of loads to be carried and load stability",
-  "Load manipulation, stacking, and unstacking",
-  "Pedestrian traffic in areas where the vehicle will be operated",
-  "Narrow aisles and other restricted places where the vehicle will be operated",
-  "Hazardous (classified) locations where the vehicle will be operated",
-  "Ramps and other sloped surfaces that could affect the vehicle's stability",
-  "Closed environments and other areas where insufficient ventilation could cause a buildup of carbon monoxide or diesel exhaust",
-  "Other unique or potentially hazardous environmental conditions in the workplace",
-];
+const TOPIC_COUNT = 22;
 
 export default function OshaCompliance() {
   const { t } = useTranslation();
+  const body = industry.regulatory.body;
+  const standard = industry.regulatory.standard;
+
   return (
     <>
     <SEOHead
-      title={t("seo.oshaCompliance.title", { body: industry.regulatory.body })}
-      description={t("seo.oshaCompliance.description", { body: industry.regulatory.body, standard: industry.regulatory.standard })}
+      title={t("seo.oshaCompliance.title", { body })}
+      description={t("seo.oshaCompliance.description", { body, standard })}
       canonical="/osha-compliance"
     />
     <div className="max-w-4xl mx-auto px-4 py-12 space-y-8" data-testid="page-osha-compliance">
       <div className="flex items-center gap-3 flex-wrap">
         <ShieldCheck className="h-7 w-7 text-accent" />
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold" data-testid="text-osha-title">{industry.regulatory.body} Compliance</h1>
-          <p className="text-muted-foreground mt-1">How our certification meets federal requirements</p>
+          <h1 className="text-2xl md:text-3xl font-bold" data-testid="text-osha-title">{t("oshaCompliance.title", { body })}</h1>
+          <p className="text-muted-foreground mt-1">{t("oshaCompliance.subtitle")}</p>
         </div>
       </div>
 
@@ -90,27 +52,29 @@ export default function OshaCompliance() {
               <ShieldCheck className="h-3 w-3 mr-1" />
               {industry.regulatory.alignmentLabel.charAt(0).toUpperCase() + industry.regulatory.alignmentLabel.slice(1)}
             </Badge>
-            <Badge variant="secondary" data-testid="badge-cfr-reference">{industry.regulatory.standard}</Badge>
+            <Badge variant="secondary" data-testid="badge-cfr-reference">{standard}</Badge>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Our forklift certification training program is designed to comply with {industry.regulatory.body} Standard {industry.regulatory.standard} - Powered Industrial Trucks. This federal regulation establishes the requirements for the training and certification of forklift (powered industrial truck) operators in general industry workplaces. Our program addresses the knowledge-based training component as outlined in the standard.
+            {t("oshaCompliance.overview", { body, standard })}
           </p>
         </CardContent>
       </Card>
 
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold" data-testid="text-compliance-heading">How We Meet {industry.regulatory.body} Requirements</h2>
+        <h2 className="text-xl font-semibold" data-testid="text-compliance-heading">{t("oshaCompliance.howWeMeetHeading", { body })}</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          {compliancePoints.map((point) => (
-            <Card key={point.title} data-testid={`card-compliance-${point.title.toLowerCase().replace(/\s+/g, "-")}`}>
+          {COMPLIANCE_POINTS.map((point) => (
+            <Card key={point.id} data-testid={`card-compliance-${point.id}`}>
               <CardContent className="py-5 space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="h-9 w-9 rounded-md bg-accent/20 flex items-center justify-center shrink-0">
                     <point.icon className="h-4 w-4 text-accent" />
                   </div>
-                  <h3 className="font-semibold text-sm">{point.title}</h3>
+                  <h3 className="font-semibold text-sm">{t(point.titleKey, { body })}</h3>
                 </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{point.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {t(point.descKey, { body, standard, validity: industry.regulatory.certificationValidity })}
+                </p>
               </CardContent>
             </Card>
           ))}
@@ -119,17 +83,17 @@ export default function OshaCompliance() {
 
       <Card data-testid="card-training-topics">
         <CardHeader>
-          <CardTitle className="text-lg">{industry.regulatory.body}-Required Training Topics Covered</CardTitle>
+          <CardTitle className="text-lg">{t("oshaCompliance.topicsTitle", { body })}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Per {industry.regulatory.standard}(l)(3), our training program covers all of the following topics as applicable:
+            {t("oshaCompliance.topicsIntro", { standard })}
           </p>
           <div className="grid gap-2">
-            {oshaTopics.map((topic, i) => (
+            {Array.from({ length: TOPIC_COUNT }, (_, i) => (
               <div key={i} className="flex items-start gap-2" data-testid={`topic-item-${i}`}>
                 <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
-                <p className="text-sm text-muted-foreground">{topic}</p>
+                <p className="text-sm text-muted-foreground">{t(`oshaCompliance.topic${i + 1}`)}</p>
               </div>
             ))}
           </div>
@@ -138,38 +102,32 @@ export default function OshaCompliance() {
 
       <Card data-testid="card-three-part">
         <CardHeader>
-          <CardTitle className="text-lg">The Three-Part {industry.regulatory.body} Training Requirement</CardTitle>
+          <CardTitle className="text-lg">{t("oshaCompliance.threePartTitle", { body })}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {industry.regulatory.body} requires forklift operator training to consist of three parts. Our online certification addresses the first component, while employers must ensure completion of all three:
+            {t("oshaCompliance.threePartIntro", { body })}
           </p>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
               <Badge variant="default" className="bg-green-600 border-green-600 shrink-0 mt-0.5">1</Badge>
               <div>
-                <p className="font-semibold text-sm">Formal Instruction (Covered by Our Program)</p>
-                <p className="text-sm text-muted-foreground">
-                  Lecture, discussion, interactive computer learning, video, and written material covering the required topics. Our online course fulfills this requirement.
-                </p>
+                <p className="font-semibold text-sm">{t("oshaCompliance.part1Title")}</p>
+                <p className="text-sm text-muted-foreground">{t("oshaCompliance.part1Desc")}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Badge variant="secondary" className="shrink-0 mt-0.5">2</Badge>
               <div>
-                <p className="font-semibold text-sm">Practical Training (Employer Responsibility)</p>
-                <p className="text-sm text-muted-foreground">
-                  Hands-on demonstrations and exercises performed by the trainee under the supervision of the employer's designated trainer, using the specific equipment in the actual workplace.
-                </p>
+                <p className="font-semibold text-sm">{t("oshaCompliance.part2Title")}</p>
+                <p className="text-sm text-muted-foreground">{t("oshaCompliance.part2Desc")}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <Badge variant="secondary" className="shrink-0 mt-0.5">3</Badge>
               <div>
-                <p className="font-semibold text-sm">Evaluation (Employer Responsibility)</p>
-                <p className="text-sm text-muted-foreground">
-                  Evaluation of the operator's performance in the workplace by the employer. We provide evaluation checklists and documentation templates to assist employers with this requirement.
-                </p>
+                <p className="font-semibold text-sm">{t("oshaCompliance.part3Title")}</p>
+                <p className="text-sm text-muted-foreground">{t("oshaCompliance.part3Desc")}</p>
               </div>
             </div>
           </div>
@@ -179,12 +137,12 @@ export default function OshaCompliance() {
       <Card data-testid="card-disclaimer">
         <CardContent className="py-6">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            <span className="font-semibold">Disclaimer:</span> While our training program is designed to meet {industry.regulatory.body} {industry.regulatory.standard} requirements for the formal instruction component, it is the employer's responsibility to ensure all three training components (formal instruction, practical training, and evaluation) are completed before authorizing an operator to use a powered industrial truck. {brand.domain} provides the knowledge-based training component and employer documentation tools. Employers should consult with their safety professionals to ensure full compliance with all applicable federal, state, and local regulations.
+            <span className="font-semibold">{t("oshaCompliance.disclaimerLabel")}</span>{" "}
+            {t("oshaCompliance.disclaimerText", { body, standard, domain: brand.domain })}
           </p>
         </CardContent>
       </Card>
     </div>
     </>
   );
-
 }

@@ -16,17 +16,33 @@ import { SiGoogle, SiLinkedin, SiFacebook } from "react-icons/si";
 import Logo from "@/components/ui/Logo";
 import { formatUsPhone, normalizeEmail, capitalizeWords } from "@/lib/inputFormat";
 
+// Only same-origin absolute paths — rejects protocol-relative (//host),
+// backslash tricks, and auth-page loops. Validate AFTER decoding so
+// %2F%2Fevil.com can't sneak through.
+function isSafeInternalPath(path: string): boolean {
+  return (
+    path.startsWith("/") &&
+    !path.startsWith("//") &&
+    !path.includes("\\") &&
+    !path.startsWith("/login") &&
+    !path.startsWith("/register")
+  );
+}
+
 function getRedirectPath(user: any): string {
-  const params = new URLSearchParams(window.location.search);
-  const next = params.get("next");
-  if (next && next.startsWith("/") && !next.startsWith("/login") && !next.startsWith("/register")) {
-    return decodeURIComponent(next);
+  const rawNext = new URLSearchParams(window.location.search).get("next");
+  if (rawNext) {
+    let next = rawNext;
+    try {
+      next = decodeURIComponent(rawNext);
+    } catch {}
+    if (isSafeInternalPath(next)) return next;
   }
 
   const stored = localStorage.getItem("postAuthRedirect");
   if (stored) {
     localStorage.removeItem("postAuthRedirect");
-    return stored;
+    if (isSafeInternalPath(stored)) return stored;
   }
 
   if (user.role === "super_admin" || user.role === "admin") return "/admin";

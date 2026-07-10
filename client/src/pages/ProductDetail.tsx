@@ -348,6 +348,21 @@ export default function ProductDetail() {
                     </>
                   )}
 
+                  {/* Trainer programs & business products have no self-serve
+                      checkout path (no courseSlug) — route TTT sessions to the
+                      quote flow and shipped kits/cards to contact, so no product
+                      is a dead end. */}
+                  {(product.category === "trainer" || product.category === "business") &&
+                    typeof product.price === "number" &&
+                    !product.courseSlug && (
+                      <Link href={product.classSchedule?.length ? "/request-quote?ref=train-the-trainer" : "/contact"}>
+                        <Button size="lg" className="w-full bg-accent text-accent-foreground border-accent-border mb-3" data-testid="button-trainer-cta">
+                          {ctaKeyMap[product.ctaLabel] ? t(ctaKeyMap[product.ctaLabel]) : product.ctaLabel}
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </Button>
+                      </Link>
+                    )}
+
                   {product.price === "call" && (
                     <Link href="/contact">
                       <Button size="lg" className="w-full bg-accent text-accent-foreground border-accent-border mb-3" data-testid="button-contact-pricing">

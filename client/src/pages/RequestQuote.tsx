@@ -231,7 +231,7 @@ export default function RequestQuote() {
                 <CheckCircle className="w-4 h-4 shrink-0 text-brand-green mt-0.5" />
                 <div>
                   <span className="font-medium text-foreground">{t("requestQuote.priceOnsiteLabel", { defaultValue: "Onsite / Company Training" })}</span>
-                  <span className="block text-muted-foreground">{t("requestQuote.priceOnsiteValue", { defaultValue: "From $200-280 per person depending on group size" })}</span>
+                  <span className="block text-muted-foreground">{t("requestQuote.priceOnsiteValue", { defaultValue: "From $280 per person depending on group size and equipment" })}</span>
                 </div>
               </div>
               <div className="flex items-start gap-2">
