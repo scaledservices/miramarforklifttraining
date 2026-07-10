@@ -58,6 +58,8 @@ export interface UnifiedLead {
   city: string | null;
   state: string | null;
   isOverdue: boolean;
+  /** Where the lead came from (?ref= attribution: city page, ad, campaign); null when unknown. */
+  leadSource: string | null;
   // Contact extras
   message: string | null;
 }
@@ -103,6 +105,7 @@ export function onsiteToUnified(lead: OnsiteLead): UnifiedLead {
     city: lead.city,
     state: lead.state,
     isOverdue: lead.isOverdue,
+    leadSource: lead.leadSource,
     message: null,
   };
 }
@@ -124,6 +127,7 @@ export function contactToUnified(sub: ContactSubmission): UnifiedLead {
     city: null,
     state: null,
     isOverdue: false,
+    leadSource: null,
     message: sub.message,
   };
 }

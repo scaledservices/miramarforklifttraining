@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminMobileNav from "@/components/admin/AdminMobileNav";
 import { Link } from "wouter";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,11 +25,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </Link>
             </Button>
           </header>
-          <main className="flex-1 p-6 overflow-auto" data-testid="admin-main-content">
+          {/* Bottom padding on phones clears the fixed bottom tab bar */}
+          <main className="flex-1 p-4 md:p-6 pb-24 md:pb-6 overflow-auto" data-testid="admin-main-content">
             {children}
           </main>
         </div>
       </div>
+      <AdminMobileNav />
     </SidebarProvider>
   );
 }

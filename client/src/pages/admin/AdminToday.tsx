@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import AdminLayout from "./AdminLayout";
-import MoneySummaryCard from "@/components/admin/money/MoneySummaryCard";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,7 @@ import {
   Loader2,
 } from "lucide-react";
 import TodaySessionCard from "@/components/admin/today/TodaySessionCard";
+import FulfillTrainingSheet from "@/components/admin/today/FulfillTrainingSheet";
 import {
   type TodayData,
   type TodayBooking,
@@ -28,6 +30,7 @@ import {
   formatMoney,
   formatDay,
 } from "@/components/admin/today/types";
+import { type MoneySummary } from "@/components/admin/money/types";
 
 function SectionTitle({ icon: Icon, children, count }: { icon: any; children: React.ReactNode; count?: number }) {
   return (
@@ -53,32 +56,46 @@ function EmptyNote({ children }: { children: React.ReactNode }) {
 
 export default function AdminToday() {
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const { data, isLoading } = useQuery<TodayData>({
     queryKey: ["/api/admin/today"],
   });
 
+  // Money story: this week's collected/outstanding + Alberto's cut this month.
+  const { data: money } = useQuery<MoneySummary>({ queryKey: ["/api/admin/money/summary"] });
+  const { data: statement } = useQuery<{ totals?: { alberto: number } }>({
+    queryKey: ["/api/admin/money/statement"],
+  });
+
+  // Certificates issued in the last 7 days (for the quick-stats strip).
+  const { data: certsData } = useQuery<{ certifications: { issuedAt: string }[] }>({
+    queryKey: ["/api/admin/certifications"],
+  });
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const certsThisWeek = (certsData?.certifications ?? []).filter(
+    (c) => c.issuedAt && new Date(c.issuedAt).getTime() >= weekAgo
+  ).length;
+
+  // Fulfillment: "Complete" on a session card opens the one-screen checklist
+  // instead of firing a bare mutation.
+  const [fulfillBooking, setFulfillBooking] = useState<TodayBooking | null>(null);
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["/api/admin/today"] });
     queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/admin/certifications"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/admin/money/summary"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/admin/money/statement"] });
   };
 
   const confirmMutation = useMutation({
     mutationFn: (id: number) => apiRequest("PATCH", `/api/bookings/${id}/confirm`),
     onSuccess: () => {
       invalidate();
-      toast({ title: "Booking confirmed — customer notified by email" });
+      toast({ title: t("adminUx.toastConfirmed", { defaultValue: "Booking confirmed — customer notified by email" }) });
     },
-    onError: () => toast({ title: "Failed to confirm booking", variant: "destructive" }),
-  });
-
-  const completeMutation = useMutation({
-    mutationFn: (id: number) => apiRequest("PATCH", `/api/bookings/${id}/complete`),
-    onSuccess: () => {
-      invalidate();
-      toast({ title: "Training marked complete" });
-    },
-    onError: () => toast({ title: "Failed to complete booking", variant: "destructive" }),
+    onError: () => toast({ title: t("adminUx.toastConfirmFailed", { defaultValue: "Failed to confirm booking" }), variant: "destructive" }),
   });
 
   if (isLoading || !data) {
@@ -110,7 +127,62 @@ export default function AdminToday() {
           <p className="text-muted-foreground">{formatDay(data.date, { weekday: "long", month: "long", day: "numeric" })}</p>
         </div>
 
-        <MoneySummaryCard />
+        {/* Money story — collected, outstanding, and your cut, in one line */}
+        <Card data-testid="card-money-story">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+              <DollarSign className="h-4 w-4 text-brand-green" />
+              {t("adminUx.moneyThisWeek", { defaultValue: "Money this week" })}
+            </div>
+            <p className="text-2xl font-bold" data-testid="text-week-collected">
+              {money ? formatMoney(money.week.collected) : "—"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {money && money.week.outstanding > 0.01
+                ? t("adminUx.moneyOutstanding", {
+                    amount: formatMoney(money.week.outstanding),
+                    defaultValue: "{{amount}} still to collect",
+                  })
+                : t("adminUx.moneyAllCollected", { defaultValue: "Everything collected. Nice." })}
+              {statement?.totals != null && (
+                <>
+                  {" · "}
+                  <span className="font-medium text-foreground">
+                    {t("adminUx.moneyYourCut", {
+                      amount: formatMoney(statement.totals.alberto),
+                      defaultValue: "Your cut this month: {{amount}}",
+                    })}
+                  </span>
+                </>
+              )}
+            </p>
+            <Button asChild variant="ghost" size="sm" className="mt-2 -ml-2">
+              <Link href="/admin/money" data-testid="link-money-story">
+                {t("adminUx.moneySeeMore", { defaultValue: "See all money" })}
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Quick stats: the week at a glance */}
+        <div className="grid grid-cols-3 gap-3" data-testid="row-quick-stats">
+          <QuickStat
+            label={t("adminUx.statSessions", { defaultValue: "Sessions this week" })}
+            value={data.week.reduce((n, d) => n + d.groups.reduce((m, g) => m + g.bookingCount, 0), 0)}
+            testId="stat-sessions-week"
+          />
+          <QuickStat
+            label={t("adminUx.statLeads", { defaultValue: "New leads" })}
+            value={data.newLeads.length}
+            testId="stat-leads-week"
+          />
+          <QuickStat
+            label={t("adminUx.statCerts", { defaultValue: "Certificates issued" })}
+            value={certsThisWeek}
+            testId="stat-certs-week"
+          />
+        </div>
 
         {/* Today's sessions */}
         <section className="space-y-3">
@@ -125,9 +197,9 @@ export default function AdminToday() {
                 key={b.id}
                 booking={b}
                 onConfirm={(id) => confirmMutation.mutate(id)}
-                onComplete={(id) => completeMutation.mutate(id)}
+                onComplete={() => setFulfillBooking(b)}
                 confirmPending={confirmMutation.isPending}
-                completePending={completeMutation.isPending}
+                completePending={false}
               />
             ))
           )}
@@ -212,7 +284,27 @@ export default function AdminToday() {
           </Button>
         </section>
       </div>
+
+      <FulfillTrainingSheet
+        booking={fulfillBooking}
+        open={fulfillBooking !== null}
+        onOpenChange={(open) => {
+          if (!open) setFulfillBooking(null);
+        }}
+        onCompleted={invalidate}
+      />
     </AdminLayout>
+  );
+}
+
+function QuickStat({ label, value, testId }: { label: string; value: number; testId: string }) {
+  return (
+    <Card data-testid={testId}>
+      <CardContent className="p-3 text-center">
+        <p className="text-2xl font-bold">{value}</p>
+        <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{label}</p>
+      </CardContent>
+    </Card>
   );
 }
 
