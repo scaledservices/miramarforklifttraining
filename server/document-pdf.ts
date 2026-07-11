@@ -55,9 +55,9 @@ export const documentCatalog: DocumentDef[] = [
   },
   {
     id: "site-presentation",
-    title: "Forklift Certified Training Presentation",
+    title: "Miramar Forklift Training Presentation",
     description: `Comprehensive ${industry.regulatory.body}-compliant PIT operator certification training presentation covering all 7 equipment classes, tire types, fuel types, attachments, regulatory framework, safe operating procedures, and certification process.`,
-    filename: "Forklift-Certified-Training.pdf",
+    filename: "Miramar-Forklift-Training.pdf",
     category: "training",
   },
 ];
