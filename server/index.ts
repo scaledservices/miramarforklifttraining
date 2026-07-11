@@ -4,7 +4,8 @@ import compression from "compression";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { registerSsrMiddleware } from "./seo-ssr";
-import { createServer } from "http";
+import { createServer } from "https";
+import { readFileSync } from "fs";
 import { startJobScheduler } from "./jobs";
 import { ensureSequences, pool } from "./db";
 import { isStripeConfigured } from "./stripeClient";
@@ -50,7 +51,20 @@ if (isProduction && process.env.PDF_STORAGE_MODE === "object") {
 }
 
 const app = express();
-const httpServer = createServer(app);
+
+const isDev = !isProduction;
+let sslOptions = undefined;
+if (isDev) {
+  try {
+    sslOptions = {
+      key: readFileSync("key.pem"),
+      cert: readFileSync("cert.pem"),
+    };
+  } catch {
+    console.warn("SSL certs not found, falling back to HTTP. Generate with: openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=localhost'");
+  }
+}
+const httpServer = sslOptions ? createServer(sslOptions, app) : createServer(app);
 
 app.use(helmet({
   contentSecurityPolicy: {
