@@ -11,6 +11,12 @@ import { sql, eq } from "drizzle-orm";
 import { generateCertificatePdf } from "../server/certificate-pdf";
 import { CANONICAL_COURSE, COURSE_STEPS } from "./course-content";
 import { CANONICAL_COURSE_ES, COURSE_STEPS_ES } from "./course-content-es";
+import { CANONICAL_COURSE as AERIAL_COURSE, COURSE_STEPS as AERIAL_STEPS } from "./course-content-aerial";
+import { CANONICAL_COURSE_ES as AERIAL_COURSE_ES, COURSE_STEPS_ES as AERIAL_STEPS_ES } from "./course-content-aerial-es";
+import { CANONICAL_COURSE as FORKLIFT_TTT_COURSE, COURSE_STEPS as FORKLIFT_TTT_STEPS } from "./course-content-forklift-ttt";
+import { CANONICAL_COURSE_ES as FORKLIFT_TTT_COURSE_ES, COURSE_STEPS_ES as FORKLIFT_TTT_STEPS_ES } from "./course-content-forklift-ttt-es";
+import { CANONICAL_COURSE as AERIAL_TTT_COURSE, COURSE_STEPS as AERIAL_TTT_STEPS } from "./course-content-aerial-ttt";
+import { CANONICAL_COURSE_ES as AERIAL_TTT_COURSE_ES, COURSE_STEPS_ES as AERIAL_TTT_STEPS_ES } from "./course-content-aerial-ttt-es";
 
 const DEMO_PASSWORD = "DemoPass!234";
 
@@ -225,6 +231,85 @@ export async function seedDemoData() {
   }
 
   console.log(`[SEED] Created ${COURSE_STEPS_ES.length} steps for Spanish course`);
+
+  // Helper function to seed a course with steps and questions
+  async function seedCourse(courseDef: { title: string; slug: string; description: string; category: string; price: string }, steps: StepDef[] | any[], language: string = "en", thumbnailUrl: string | null = null) {
+    console.log(`[SEED] Creating course: ${courseDef.title} (${language})`);
+    const inserted = await db.insert(courses).values({
+      title: courseDef.title,
+      slug: courseDef.slug,
+      description: courseDef.description,
+      category: courseDef.category,
+      price: courseDef.price,
+      isActive: true,
+      language,
+      thumbnailUrl,
+    }).returning();
+    const course = inserted[0];
+
+    for (let i = 0; i < steps.length; i++) {
+      const stepDef = steps[i];
+      const stepInserted = await db.insert(courseSteps).values({
+        courseId: course.id,
+        stepOrder: i + 1,
+        title: stepDef.title,
+        type: stepDef.type,
+        config: stepDef.config,
+        estimatedMinutes: stepDef.estimatedMinutes,
+      }).returning();
+      const step = stepInserted[0];
+
+      if (stepDef.questions && stepDef.questions.length > 0) {
+        for (let j = 0; j < stepDef.questions.length; j++) {
+          const q = stepDef.questions[j];
+          await db.insert(examQuestions).values({
+            stepId: step.id,
+            question: q.question,
+            type: q.type,
+            options: q.options,
+            correctAnswers: q.correctAnswers,
+            explanation: q.explanation,
+            order: j + 1,
+          });
+        }
+      }
+    }
+    console.log(`[SEED] Created ${steps.length} steps for ${courseDef.slug}`);
+    return course;
+  }
+
+  // ═══ SEED NEW COURSES ═══
+  // Aerial & Scissor Lift Certification (EN + ES)
+  await seedCourse(AERIAL_COURSE, AERIAL_STEPS, "en", "/images/training/aerial-lift-hero.svg");
+  await seedCourse(AERIAL_COURSE_ES, AERIAL_STEPS_ES, "es", "/images/training/aerial-lift-hero.svg");
+
+  // Forklift Train the Trainer (EN + ES)
+  await seedCourse(FORKLIFT_TTT_COURSE, FORKLIFT_TTT_STEPS, "en", "/images/training/train-the-trainer-hero.svg");
+  await seedCourse(FORKLIFT_TTT_COURSE_ES, FORKLIFT_TTT_STEPS_ES, "es", "/images/training/train-the-trainer-hero.svg");
+
+  // Forklift Train the Trainer Combo (Inc. Kit) — same content, different slug/price
+  await seedCourse(
+    { ...FORKLIFT_TTT_COURSE, title: "Forklift Train the Trainer Certification (Combo w/ Kit)", slug: "online-forklift-train-the-trainer-combo", price: "480.00", description: FORKLIFT_TTT_COURSE.description + " This combo includes a physical training kit shipped to your facility with all materials, forms, certificates, and wallet cards." },
+    FORKLIFT_TTT_STEPS, "en", "/images/training/train-the-trainer-hero.svg"
+  );
+  await seedCourse(
+    { ...FORKLIFT_TTT_COURSE_ES, title: "Certificación Capacitar al Capacitador de Montacargas (Combo con Kit)", slug: "certificacion-capacitar-capacitador-montacargas-combo-en-linea", price: "480.00", description: FORKLIFT_TTT_COURSE_ES.description + " Este combo incluye un kit físico de capacitación enviado a sus instalaciones con todos los materiales, formularios, certificados y tarjetas." },
+    FORKLIFT_TTT_STEPS_ES, "es", "/images/training/train-the-trainer-hero.svg"
+  );
+
+  // Aerial & Scissor Lift Train the Trainer (EN + ES)
+  await seedCourse(AERIAL_TTT_COURSE, AERIAL_TTT_STEPS, "en", "/images/training/train-the-trainer-hero.svg");
+  await seedCourse(AERIAL_TTT_COURSE_ES, AERIAL_TTT_STEPS_ES, "es", "/images/training/train-the-trainer-hero.svg");
+
+  // Aerial & Scissor Lift Train the Trainer Combo (Inc. Kit) — same content, different slug/price
+  await seedCourse(
+    { ...AERIAL_TTT_COURSE, title: "Aerial & Scissor Lift Train the Trainer Certification (Combo w/ Kit)", slug: "online-aerial-train-the-trainer-combo", price: "480.00", description: AERIAL_TTT_COURSE.description + " This combo includes a physical training kit shipped to your facility with all aerial lift materials, forms, certificates, and wallet cards." },
+    AERIAL_TTT_STEPS, "en", "/images/training/train-the-trainer-hero.svg"
+  );
+  await seedCourse(
+    { ...AERIAL_TTT_COURSE_ES, title: "Certificación Capacitar al Capacitador de Elevadores Aéreos (Combo con Kit)", slug: "certificacion-capacitar-capacitador-elevadores-aereos-combo-en-linea", price: "480.00", description: AERIAL_TTT_COURSE_ES.description + " Este combo incluye un kit físico de capacitación enviado a sus instalaciones." },
+    AERIAL_TTT_STEPS_ES, "es", "/images/training/train-the-trainer-hero.svg"
+  );
 
   console.log("[SEED] Creating group...");
   const [group] = await db.insert(groups).values({

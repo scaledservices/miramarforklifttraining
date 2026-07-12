@@ -5,8 +5,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, BookOpen, TrendingUp, Award, ChevronRight, ShoppingCart } from "lucide-react";
+import { Users, BookOpen, TrendingUp, Award, ChevronRight, ShoppingCart, GraduationCap, AlertTriangle, Lightbulb } from "lucide-react";
 import GroupLayout from "./GroupLayout";
+
+// Course recommendation logic based on completed certifications
+const COURSE_RECOMMENDATIONS: Record<string, { slug: string; title: string; reason: string }[]> = {
+  "online-forklift-operator-certification": [
+    { slug: "online-aerial-scissor-lift-training", title: "Aerial & Scissor Lift Certification", reason: "Expand your team's qualifications with aerial lift certification" },
+    { slug: "online-forklift-train-the-trainer", title: "Forklift Train the Trainer", reason: "Build internal training capacity — train your own operators" },
+  ],
+  "online-aerial-scissor-lift-certification": [
+    { slug: "online-forklift-operator-training", title: "Forklift Operator Certification", reason: "Complete your team's forklift certification" },
+    { slug: "online-aerial-train-the-trainer", title: "Aerial Lift Train the Trainer", reason: "Build internal training capacity for aerial lifts" },
+  ],
+  "online-forklift-train-the-trainer": [
+    { slug: "online-aerial-train-the-trainer", title: "Aerial Lift Train the Trainer", reason: "Expand your trainer qualifications to aerial lifts" },
+  ],
+};
 
 export default function GroupDashboard() {
   const { t } = useTranslation();
@@ -205,6 +220,101 @@ export default function GroupDashboard() {
             </CardContent>
           </Card>
         )}
+
+        {/* Course Recommendations based on completed certifications */}
+        {!isLoading && totalCerts > 0 && (() => {
+          const certs = certsData?.certifications || [];
+          const recommendations: { slug: string; title: string; reason: string }[] = [];
+          const seenSlugs = new Set<string>();
+
+          certs.forEach((cert: any) => {
+            const courseSlug = cert.courseSlug || cert.course?.slug;
+            const recs = COURSE_RECOMMENDATIONS[courseSlug];
+            if (recs) {
+              recs.forEach(rec => {
+                if (!seenSlugs.has(rec.slug)) {
+                  seenSlugs.add(rec.slug);
+                  recommendations.push(rec);
+                }
+              });
+            }
+          });
+
+          // Also check for upcoming certification expirations
+          const upcomingExpirations = certs.filter((cert: any) => {
+            if (!cert.expiresAt) return false;
+            const expiry = new Date(cert.expiresAt);
+            const daysUntilExpiry = Math.floor((expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+            return daysUntilExpiry <= 90 && daysUntilExpiry >= 0;
+          });
+
+          if (recommendations.length === 0 && upcomingExpirations.length === 0) return null;
+
+          return (
+            <div className="space-y-4">
+              {recommendations.length > 0 && (
+                <Card data-testid="card-course-recommendations">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-yellow-500" />
+                      Recommended Next Steps for Your Team
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {recommendations.map((rec) => (
+                      <div key={rec.slug} className="flex items-center justify-between gap-4 p-3 rounded-lg border">
+                        <div className="flex items-center gap-3">
+                          <GraduationCap className="h-8 w-8 text-primary" />
+                          <div>
+                            <p className="font-medium">{rec.title}</p>
+                            <p className="text-sm text-muted-foreground">{rec.reason}</p>
+                          </div>
+                        </div>
+                        <Link href={`/p/${rec.slug}`}>
+                          <Button size="sm" variant="outline">
+                            Learn More
+                          </Button>
+                        </Link>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
+
+              {upcomingExpirations.length > 0 && (
+                <Card data-testid="card-cert-expirations" className="border-orange-400">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-orange-500" />
+                      Upcoming Certification Expirations
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    {upcomingExpirations.map((cert: any) => {
+                      const expiry = new Date(cert.expiresAt);
+                      const daysUntilExpiry = Math.floor((expiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                      return (
+                        <div key={cert.id} className="flex items-center justify-between gap-4 p-3 rounded-lg border border-orange-200 bg-orange-50">
+                          <div>
+                            <p className="font-medium">{cert.userName || cert.courseName || "Team member"}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {cert.courseName || "Certification"} expires in {daysUntilExpiry} days ({expiry.toLocaleDateString()})
+                            </p>
+                          </div>
+                          <Link href={`/p/online-forklift-operator-training`}>
+                            <Button size="sm" variant="outline">
+                              Recertify Now
+                            </Button>
+                          </Link>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </GroupLayout>
   );

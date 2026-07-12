@@ -1,0 +1,18 @@
+<svg width="800" height="400" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="400" fill="#4f3b3b"/>
+  <rect x="50" y="50" width="700" height="300" fill="#5d4646" rx="12"/>
+  <!-- Boom lift silhouette -->
+  <rect x="150" y="280" width="120" height="40" fill="#FFC326" rx="4"/>
+  <rect x="170" y="250" width="15" height="30" fill="#FFC326"/>
+  <rect x="190" y="200" width="10" height="50" fill="#FFC326"/>
+  <rect x="200" y="140" width="80" height="60" fill="#019E7C" rx="4"/>
+  <line x1="190" y1="220" x2="240" y2="170" stroke="#FFC326" stroke-width="6"/>
+  <text x="400" y="100" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#FFC326">Aerial Lift Certification</text>
+  <text x="400" y="135" font-family="Arial, sans-serif" font-size="16" fill="#ffffff">OSHA 29 CFR 1926.453 + ANSI A92</text>
+  <text x="400" y="165" font-family="Arial, sans-serif" font-size="14" fill="#cccccc">Scissor Lifts, Boom Lifts, MEWPs</text>
+  <!-- Ground line -->
+  <rect x="50" y="320" width="700" height="2" fill="#FFC326"/>
+  <!-- Wheels -->
+  <circle cx="180" cy="325" r="12" fill="#333"/>
+  <circle cx="240" cy="325" r="12" fill="#333"/>
+</svg>
