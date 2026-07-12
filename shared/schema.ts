@@ -514,10 +514,13 @@ export const companies = pgTable("companies", {
   assignedRepId: integer("assigned_rep_id").references(() => users.id),
   leadSource: text("lead_source"),
   notes: text("notes"),
+  importBatchId: text("import_batch_id"),
+  sourceEra: text("source_era"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => [
   index("companies_assigned_rep_idx").on(table.assignedRepId),
+  index("companies_import_batch_id_idx").on(table.importBatchId),
 ]);
 
 export const employeeRoster = pgTable("employee_roster", {
@@ -554,10 +557,12 @@ export const contacts = pgTable("contacts", {
   isPrimary: boolean("is_primary").notNull().default(false),
   notes: text("notes"),
   tags: text("tags").array().default([]),
+  importBatchId: text("import_batch_id"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => [
   index("contacts_company_id_idx").on(table.companyId),
   index("contacts_user_id_idx").on(table.userId),
+  index("contacts_import_batch_id_idx").on(table.importBatchId),
 ]);
 
 export const repAttribution = pgTable("rep_attribution", {
@@ -812,6 +817,11 @@ export const trainingEvents = pgTable("training_events", {
   equipmentTypes: text("equipment_types").array().notNull().default([]),
   instructorId: integer("instructor_id").references(() => instructors.id),
   adminNotes: text("admin_notes"),
+  revenue: integer("revenue"),
+  rawEmployeesCode: text("raw_employees_code"),
+  sourceEra: text("source_era"),
+  statusNotes: text("status_notes"),
+  importBatchId: text("import_batch_id"),
   createdByUserId: integer("created_by_user_id").references(() => users.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -821,6 +831,7 @@ export const trainingEvents = pgTable("training_events", {
   index("training_events_lead_id_idx").on(table.originatingLeadId),
   index("training_events_scheduled_start_idx").on(table.scheduledStart),
   index("training_events_location_slug_idx").on(table.locationSlug),
+  index("training_events_import_batch_id_idx").on(table.importBatchId),
 ]);
 
 export const insertTrainingEventSchema = createInsertSchema(trainingEvents).omit({ id: true, status: true, createdAt: true, updatedAt: true });
