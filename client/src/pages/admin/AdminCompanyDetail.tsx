@@ -27,6 +27,8 @@ import { useTranslation } from "react-i18next";
 import { STATUS_LABELS, type OnsiteStatus } from "@shared/config/onsite-states";
 import { EVENT_STATUS_LABELS, type TrainingEventStatus } from "@shared/config/training-events";
 import { getAllLocations } from "@shared/config/locations";
+import CompanyTimeline from "@/components/admin/CompanyTimeline";
+import MapView from "@/components/admin/MapView";
 
 interface Company {
   id: number;
@@ -483,6 +485,30 @@ export default function AdminCompanyDetail() {
           </div>
         )}
 
+        {/* Map showing company location relative to facilities */}
+        {company.billingCity && (
+          <div className="space-y-2">
+            <h2 className="font-semibold flex items-center gap-2 text-sm">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              {t("adminUx.companyLocationMap", { defaultValue: "Location Map" })}
+            </h2>
+            <MapView
+              companies={[{
+                id: company.id,
+                name: company.name,
+                billingCity: company.billingCity,
+                billingState: company.billingState,
+                phone: company.phone,
+                email: company.email,
+                industry: company.industry,
+                requestCount: summaryStats?.leadCount ?? 0,
+              }]}
+              height={300}
+              showServiceAreas={true}
+            />
+          </div>
+        )}
+
         <div className="bg-card border rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="font-semibold flex items-center gap-2">
@@ -900,6 +926,17 @@ export default function AdminCompanyDetail() {
             </Table>
           )}
         </div>
+
+        {/* Activity Timeline — merges requests, quotes, orders, events, certs */}
+        <CompanyTimeline
+          companyId={Number(id)}
+          requests={requests}
+          orders={orders}
+          events={companyEvents}
+          certs={companyCerts}
+          quotes={[]}
+          companyCreatedAt={company.createdAt}
+        />
       </div>
     </AdminLayout>
   );

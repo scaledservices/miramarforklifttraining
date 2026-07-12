@@ -28,7 +28,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import AdminLayout from "./AdminLayout";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { InsightLine, TrendChip, pctChange } from "@/components/admin/viz";
+import { InsightLine, TrendChip, pctChange, VIZ_GREEN } from "@/components/admin/viz";
 import { formatMoney } from "@/components/admin/money/types";
 import type { OnsiteLead } from "@/components/admin/leads/lead-types";
 
@@ -206,33 +206,39 @@ export default function AdminDashboard() {
           Dashboard
         </h1>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Link href="/admin/users" className="block" data-testid="link-dashboard-users">
+            <MetricCard
+              title={t("adminUx.dashboardTotalUsers", { defaultValue: "Total Users" })}
+              value={metrics?.totalUsers}
+              icon={<Users className="h-4 w-4 text-muted-foreground" />}
+              isLoading={isLoading}
+              testId="card-metric-users"
+            />
+          </Link>
+          <Link href="/admin/orders" className="block" data-testid="link-dashboard-orders">
+            <MetricCard
+              title={t("adminUx.dashboardTotalOrders", { defaultValue: "Total Orders" })}
+              value={metrics?.totalOrders}
+              icon={<ShoppingCart className="h-4 w-4 text-muted-foreground" />}
+              isLoading={isLoading}
+              testId="card-metric-orders"
+            />
+          </Link>
+          <Link href="/admin/money" className="block" data-testid="link-dashboard-revenue">
+            <MetricCard
+              title={t("adminUx.dashboardTotalRevenue", { defaultValue: "Total Revenue" })}
+              value={metrics?.totalRevenue != null ? `$${metrics.totalRevenue.toFixed(2)}` : undefined}
+              icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+              isLoading={isLoading}
+              testId="card-metric-revenue"
+            />
+          </Link>
           <MetricCard
-            title="Total Users"
-            value={metrics?.totalUsers}
-            icon={<Users className="h-4 w-4 text-muted-foreground" />}
-            isLoading={isLoading}
-            testId="card-metric-users"
-          />
-          <MetricCard
-            title="Total Orders"
-            value={metrics?.totalOrders}
-            icon={<ShoppingCart className="h-4 w-4 text-muted-foreground" />}
-            isLoading={isLoading}
-            testId="card-metric-orders"
-          />
-          <MetricCard
-            title="Total Revenue"
-            value={metrics?.totalRevenue != null ? `$${metrics.totalRevenue.toFixed(2)}` : undefined}
-            icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
-            isLoading={isLoading}
-            testId="card-metric-revenue"
-          />
-          <MetricCard
-            title="Completion Rate"
-            value="--"
+            title={t("adminUx.dashboardGrowthRate", { defaultValue: "Growth (7d)" })}
+            value={revenuePct !== null ? `${revenuePct > 0 ? "+" : ""}${revenuePct.toFixed(1)}%` : "—"}
             icon={<TrendingUp className="h-4 w-4 text-muted-foreground" />}
-            isLoading={isLoading}
-            testId="card-metric-completion"
+            isLoading={profitLoading}
+            testId="card-metric-growth"
           />
         </div>
 
@@ -437,6 +443,93 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* New vs Existing customer split */}
+            <Card data-testid="card-customer-split" className="lg:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {t("adminUx.customerSplitTitle", { defaultValue: "New vs Existing Customers" })}
+                </CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                {(() => {
+                  const paidOrders = (ordersData?.orders ?? []).filter((o) => o.status === "paid");
+                  if (paidOrders.length === 0) {
+                    return (
+                      <p className="text-sm text-muted-foreground py-4 text-center">
+                        {t("adminUx.customerSplitEmpty", { defaultValue: "No paid orders yet." })}
+                      </p>
+                    );
+                  }
+                  // Group by user, first order = new, rest = existing
+                  const byUser = new Map<string, DashOrder[]>();
+                  for (const o of paidOrders) {
+                    const key = String(o.userName);
+                    if (!byUser.has(key)) byUser.set(key, []);
+                    byUser.get(key)!.push(o);
+                  }
+                  let newCustomers = 0;
+                  let existingCustomers = 0;
+                  for (const [, userOrders] of Array.from(byUser.entries())) {
+                    const sorted = userOrders.sort((a: DashOrder, b: DashOrder) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+                    // First order is "new", rest are "existing"
+                    newCustomers++;
+                    existingCustomers += sorted.length - 1;
+                  }
+                  const total = newCustomers + existingCustomers;
+                  const newPct = total > 0 ? Math.round((newCustomers / total) * 100) : 0;
+                  const existPct = 100 - newPct;
+                  return (
+                    <div className="space-y-3">
+                      {/* Stacked bar */}
+                      <div className="flex h-8 rounded-lg overflow-hidden">
+                        <div
+                          className="flex items-center justify-center text-xs font-bold text-white"
+                          style={{ width: `${Math.max(newPct, 5)}%`, backgroundColor: VIZ_GREEN }}
+                          data-testid="bar-new-customers"
+                        >
+                          {newPct}%
+                        </div>
+                        <div
+                          className="flex items-center justify-center text-xs font-bold text-white"
+                          style={{ width: `${Math.max(existPct, 5)}%`, backgroundColor: "#3b82f6" }}
+                          data-testid="bar-existing-customers"
+                        >
+                          {existPct}%
+                        </div>
+                      </div>
+                      {/* Legend + numbers */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full" style={{ backgroundColor: VIZ_GREEN }} />
+                          <div>
+                            <p className="text-sm font-bold">{newCustomers}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {t("adminUx.customerSplitNew", { defaultValue: "New customers" })}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full bg-blue-500" />
+                          <div>
+                            <p className="text-sm font-bold">{existingCustomers}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {t("adminUx.customerSplitExisting", { defaultValue: "Returning customers" })}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <InsightLine testId="insight-customer-split">
+                        {newPct >= 50
+                          ? t("adminUx.insightNewHeavy", { pct: newPct, defaultValue: "{{pct}}% of orders are from new customers — growth is strong." })
+                          : t("adminUx.insightReturningHeavy", { pct: existPct, defaultValue: "{{pct}}% of orders are from returning customers — loyalty is strong." })}
+                      </InsightLine>
+                    </div>
+                  );
+                })()}
+              </CardContent>
+            </Card>
 
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Leads by source */}
