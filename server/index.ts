@@ -4,7 +4,8 @@ import compression from "compression";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { registerSsrMiddleware } from "./seo-ssr";
-import { createServer } from "https";
+import { createServer as createHttpsServer } from "https";
+import { createServer as createHttpServer } from "http";
 import { readFileSync } from "fs";
 import { startJobScheduler } from "./jobs";
 import { ensureSequences, pool } from "./db";
@@ -64,7 +65,7 @@ if (isDev) {
     console.warn("SSL certs not found, falling back to HTTP. Generate with: openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj '/CN=localhost'");
   }
 }
-const httpServer = sslOptions ? createServer(sslOptions, app) : createServer(app);
+const httpServer = sslOptions ? createHttpsServer(sslOptions, app) : createHttpServer(app);
 
 app.use(helmet({
   contentSecurityPolicy: {
