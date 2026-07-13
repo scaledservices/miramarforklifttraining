@@ -360,6 +360,433 @@
     color: hsl(140 50% 65%);
   }
 
+  /* ── Interactive lesson elements ─────────────────────────────── */
+
+  /* Hotspot diagram pins */
+  .hotspot-marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 9999px;
+    background-color: #ffc326;
+    color: #1a1a1a;
+    border: 2px solid #1a1a1a;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, background-color 0.15s ease;
+    animation: hotspot-pulse 2s ease-in-out infinite;
+  }
+
+  .hotspot-marker:hover,
+  .hotspot-marker:focus-visible {
+    transform: translate(-50%, -50%) scale(1.15);
+    animation: none;
+  }
+
+  .hotspot-marker:focus-visible {
+    outline: 2px solid #019e7c;
+    outline-offset: 2px;
+  }
+
+  .hotspot-marker-visited {
+    animation: none;
+    background-color: #019e7c;
+    color: white;
+    border-color: white;
+  }
+
+  .hotspot-marker-active {
+    animation: none;
+    background-color: #ff7f00;
+    color: white;
+    border-color: white;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+
+  @keyframes hotspot-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 195, 38, 0.6);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(255, 195, 38, 0);
+    }
+  }
+
+  .dark .hotspot-marker {
+    border-color: #f5f5f5;
+  }
+
+  /* Flip cards */
+  .flip-card {
+    perspective: 800px;
+    min-height: 8rem;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    text-align: inherit;
+    display: block;
+    width: 100%;
+  }
+
+  .flip-card:focus-visible {
+    outline: 2px solid #019e7c;
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+
+  .flip-card-inner {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 8rem;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+  }
+
+  .flip-card-flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flip-card-front,
+  .flip-card-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .flip-card-front {
+    background-color: #4f3b3b;
+    color: #ffc326;
+    font-weight: 600;
+    border: 1px solid #4f3b3b;
+  }
+
+  .flip-card-back {
+    background-color: hsl(45 100% 96%);
+    color: hsl(25 40% 20%);
+    border: 1px solid #ffc326;
+    transform: rotateY(180deg);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .flip-card-text {
+    display: block;
+  }
+
+  .dark .flip-card-back {
+    background-color: hsl(35 30% 14%);
+    color: hsl(45 60% 85%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flip-card-inner {
+      transition: none;
+    }
+    .hotspot-marker {
+      animation: none;
+    }
+  }
+
+  /* Drag and drop */
+  .drag-drop-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    border: 1.5px solid #4f3b3b;
+    background-color: white;
+    color: #1a1a1a;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+  }
+
+  .drag-drop-item:hover:not(:disabled) {
+    border-color: #ffc326;
+    background-color: hsl(45 100% 96%);
+  }
+
+  .drag-drop-item:focus-visible {
+    outline: 2px solid #019e7c;
+    outline-offset: 2px;
+  }
+
+  .drag-drop-item-selected {
+    border-color: #ff7f00;
+    background-color: hsl(30 100% 95%);
+    box-shadow: 0 0 0 2px rgba(255, 127, 0, 0.3);
+  }
+
+  .drag-drop-item-small {
+    padding: 0.25rem 0.625rem;
+    font-size: 0.8125rem;
+  }
+
+  .drag-drop-item-correct {
+    border-color: #019e7c;
+    background-color: hsl(140 40% 95%);
+  }
+
+  .drag-drop-item-wrong {
+    border-color: hsl(0 70% 55%);
+    background-color: hsl(0 70% 96%);
+  }
+
+  .drag-drop-target {
+    display: block;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 2px dashed hsl(25 15% 60%);
+    background-color: hsl(45 30% 97%);
+    min-height: 3rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .drag-drop-target:focus-visible {
+    outline: 2px solid #019e7c;
+    outline-offset: 2px;
+  }
+
+  .drag-drop-target-ready {
+    border-color: #ff7f00;
+    background-color: hsl(30 100% 96%);
+  }
+
+  .dark .drag-drop-item {
+    background-color: hsl(0 0% 12%);
+    color: hsl(0 0% 92%);
+    border-color: hsl(25 15% 45%);
+  }
+
+  .dark .drag-drop-item:hover:not(:disabled) {
+    background-color: hsl(35 30% 16%);
+  }
+
+  .dark .drag-drop-item-selected {
+    background-color: hsl(30 60% 16%);
+    border-color: #ff7f00;
+  }
+
+  .dark .drag-drop-item-correct {
+    background-color: hsl(140 30% 14%);
+    border-color: #019e7c;
+  }
+
+  .dark .drag-drop-item-wrong {
+    background-color: hsl(0 40% 15%);
+    border-color: hsl(0 60% 50%);
+  }
+
+  .dark .drag-drop-target {
+    background-color: hsl(0 0% 10%);
+    border-color: hsl(25 10% 35%);
+  }
+
+  .dark .drag-drop-target-ready {
+    background-color: hsl(30 40% 13%);
+    border-color: #ff7f00;
+  }
+
+  /* Scenario choices */
+  .scenario-choice {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    border: 1.5px solid hsl(25 15% 75%);
+    background-color: white;
+    color: #1a1a1a;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+  }
+
+  .scenario-choice:hover:not(:disabled) {
+    border-color: #ffc326;
+    background-color: hsl(45 100% 96%);
+  }
+
+  .scenario-choice:focus-visible {
+    outline: 2px solid #019e7c;
+    outline-offset: 2px;
+  }
+
+  .scenario-choice-letter {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    background-color: #4f3b3b;
+    color: #ffc326;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .scenario-choice-correct {
+    border-color: #019e7c;
+    background-color: hsl(140 40% 95%);
+  }
+
+  .scenario-choice-wrong {
+    border-color: hsl(0 70% 55%);
+    background-color: hsl(0 70% 96%);
+  }
+
+  .scenario-choice-dimmed {
+    opacity: 0.5;
+  }
+
+  .dark .scenario-choice {
+    background-color: hsl(0 0% 12%);
+    color: hsl(0 0% 92%);
+    border-color: hsl(25 10% 35%);
+  }
+
+  .dark .scenario-choice:hover:not(:disabled) {
+    background-color: hsl(35 30% 16%);
+  }
+
+  .dark .scenario-choice-correct {
+    background-color: hsl(140 30% 14%);
+    border-color: #019e7c;
+  }
+
+  .dark .scenario-choice-wrong {
+    background-color: hsl(0 40% 15%);
+    border-color: hsl(0 60% 50%);
+  }
+
+  /* Embedded quiz */
+  .embedded-quiz {
+    border: 1px solid #ffc326;
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    background-color: hsl(45 100% 97%);
+  }
+
+  .dark .embedded-quiz {
+    background-color: hsl(35 30% 10%);
+    border-color: hsl(45 60% 40%);
+  }
+
+  .embedded-quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1.5px solid hsl(25 15% 78%);
+    background-color: white;
+    color: #1a1a1a;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    touch-action: manipulation;
+  }
+
+  .embedded-quiz-option:hover:not(:disabled) {
+    border-color: #ffc326;
+  }
+
+  .embedded-quiz-option:focus-visible {
+    outline: 2px solid #019e7c;
+    outline-offset: 2px;
+  }
+
+  .embedded-quiz-option-selected {
+    border-color: #4f3b3b;
+    background-color: hsl(45 60% 95%);
+  }
+
+  .embedded-quiz-option-correct {
+    border-color: #019e7c;
+    background-color: hsl(140 40% 95%);
+  }
+
+  .embedded-quiz-option-wrong {
+    border-color: hsl(0 70% 55%);
+    background-color: hsl(0 70% 96%);
+  }
+
+  .embedded-quiz-radio {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    border: 1.5px solid #4f3b3b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .embedded-quiz-checkbox {
+    border-radius: 0.25rem;
+  }
+
+  .embedded-quiz-radio-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 9999px;
+    background-color: #4f3b3b;
+  }
+
+  .dark .embedded-quiz-option {
+    background-color: hsl(0 0% 12%);
+    color: hsl(0 0% 92%);
+    border-color: hsl(25 10% 35%);
+  }
+
+  .dark .embedded-quiz-option-selected {
+    background-color: hsl(35 30% 16%);
+    border-color: #ffc326;
+  }
+
+  .dark .embedded-quiz-option-correct {
+    background-color: hsl(140 30% 14%);
+    border-color: #019e7c;
+  }
+
+  .dark .embedded-quiz-option-wrong {
+    background-color: hsl(0 40% 15%);
+    border-color: hsl(0 60% 50%);
+  }
+
+  .dark .embedded-quiz-radio {
+    border-color: hsl(45 60% 60%);
+  }
+
+  .dark .embedded-quiz-radio-dot {
+    background-color: #ffc326;
+  }
+
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
   .border.active-elevate:not(.no-active-interaction-elevate)::after,
   .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,

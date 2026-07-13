@@ -1,4 +1,5 @@
-import { StepDef, QuestionDef } from "./course-content";
+import type { LessonBlock } from "@shared/lesson-blocks";
+import { StepDef } from "./course-content";
 
 export const CANONICAL_COURSE_ES = {
   title: "Certificación en Línea para Operador de Montacargas",
@@ -9,34 +10,9 @@ export const CANONICAL_COURSE_ES = {
 };
 
 const img = (name: string) => `/images/training/${name}`;
+const photo = (name: string) => `/images/training/photos/${name}`;
 
-function lessonHtml(opts: {
-  title: string;
-  image: string;
-  sections: { heading?: string; content: string }[];
-  takeaways: string[];
-  tip?: string;
-  warning?: string;
-}): string {
-  const tipBlock = opts.tip ? `<div class="callout callout-tip"><strong>💡 Consejo:</strong> ${opts.tip}</div>` : "";
-  const warnBlock = opts.warning ? `<div class="callout callout-warning"><strong>⚠️ Advertencia:</strong> ${opts.warning}</div>` : "";
-  const sectionHtml = opts.sections.map(s =>
-    (s.heading ? `<h3>${s.heading}</h3>` : "") + s.content
-  ).join("\n");
-  const takeawayItems = opts.takeaways.map(t => `<li>${t}</li>`).join("");
-
-  return `<div class="lesson-content">
-<img src="${opts.image}" alt="${opts.title}" class="lesson-hero-image" />
-<h2>${opts.title}</h2>
-${sectionHtml}
-${tipBlock}
-${warnBlock}
-<div class="key-takeaways">
-<h4>📝 Puntos Clave</h4>
-<ul>${takeawayItems}</ul>
-</div>
-</div>`;
-}
+const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
 export const COURSE_STEPS_ES: StepDef[] = [
   // ═══ MÓDULO 0: Bienvenida + Cumplimiento OSHA ═══
@@ -45,49 +21,66 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Bienvenido a la Certificación de Operador de Montacargas",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Bienvenido a la Certificación de Operador de Montacargas",
-        image: img("forklift-hero.svg"),
-        sections: [
-          { heading: "Acerca de Este Curso", content: "<p>¡Bienvenido! Este curso en línea proporciona la porción de <strong>instrucción formal</strong> de la certificación de operador de camiones industriales motorizados (PIT/montacargas) en cumplimiento con OSHA. El curso toma aproximadamente <strong>45–60 minutos</strong> para completar.</p>" },
-          { heading: "Qué Incluye", content: "<ul><li>Módulos de capacitación interactivos que cubren todos los temas requeridos por OSHA</li><li>Cuestionarios de verificación de conocimiento a lo largo del curso</li><li>Examen final de certificación (80% para aprobar)</li><li>Certificado digital con credencial verificada por código QR</li><li>Paquete de documentación del empleador para evaluación práctica</li></ul>" },
-          { heading: "Qué NO Incluye", content: "<p>OSHA requiere <strong>tres componentes</strong> para la certificación completa: (1) instrucción formal (este curso), (2) capacitación práctica/en persona, y (3) una evaluación del desempeño del operador. Su empleador debe realizar la parte práctica en su lugar de trabajo. Proporcionamos todos los formularios que necesitan en el Módulo 7.</p>" },
-          { heading: "Cómo Navegar", content: "<p>Complete cada paso en orden. Puede seguir su progreso usando la barra lateral. Si necesita detenerse, su progreso se guarda automáticamente. Puede retomar el examen final hasta 3 veces.</p>" },
-        ],
-        takeaways: [
-          "Este curso cubre el requisito de instrucción formal",
-          "Su empleador también debe realizar capacitación práctica y evaluación",
-          "Complete todos los módulos y apruebe el examen final con 80% o más",
-          "Su progreso se guarda automáticamente — reanude en cualquier momento",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("warehouse-aisle-scene.svg"), alt: "Pasillo de almacén con estanterías de tarimas y una puerta de carga" },
+      { type: "heading", level: 2, text: "Bienvenido a la Certificación de Operador de Montacargas" },
+      { type: "heading", level: 3, text: "Acerca de Este Curso" },
+      { type: "paragraph", html: "¡Bienvenido! Este curso en línea proporciona la porción de <strong>instrucción formal</strong> de la certificación de operador de camiones industriales motorizados (PIT/montacargas) en cumplimiento con OSHA. El curso toma aproximadamente <strong>45–60 minutos</strong> para completar." },
+      { type: "heading", level: 3, text: "Qué Incluye" },
+      { type: "list", items: [
+        "Módulos de capacitación interactivos que cubren todos los temas requeridos por OSHA",
+        "Cuestionarios de verificación de conocimiento a lo largo del curso",
+        "Examen final de certificación (80% para aprobar)",
+        "Certificado digital con credencial verificada por código QR",
+        "Paquete de documentación del empleador para evaluación práctica",
+      ] },
+      { type: "heading", level: 3, text: "Qué NO Incluye" },
+      { type: "paragraph", html: "OSHA requiere <strong>tres componentes</strong> para la certificación completa: (1) instrucción formal (este curso), (2) capacitación práctica/en persona, y (3) una evaluación del desempeño del operador. Su empleador debe realizar la parte práctica en su lugar de trabajo. Proporcionamos todos los formularios que necesitan en el Módulo 7." },
+      { type: "heading", level: 3, text: "Cómo Navegar" },
+      { type: "paragraph", html: "Complete cada paso en orden. Puede seguir su progreso usando la barra lateral. Si necesita detenerse, su progreso se guarda automáticamente. Puede retomar el examen final hasta 3 veces." },
+      { type: "callout", variant: "tip", text: "Esté atento a los diagramas interactivos, tarjetas giratorias y escenarios a lo largo del curso — son la forma más rápida de afianzar lo que aprende." },
+      { type: "key_takeaways", items: [
+        "Este curso cubre el requisito de instrucción formal",
+        "Su empleador también debe realizar capacitación práctica y evaluación",
+        "Complete todos los módulos y apruebe el examen final con 80% o más",
+        "Su progreso se guarda automáticamente — reanude en cualquier momento",
+      ] },
+    ]),
   },
   {
     module: "Bienvenida y Cumplimiento OSHA",
     title: "Cumplimiento OSHA: Lo Que Cubre Este Curso",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Cumplimiento OSHA: Lo Que Cubre Este Curso",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Requisito de Tres Partes de OSHA", content: "<p>Bajo <strong>29 CFR 1910.178(l)</strong>, OSHA requiere que todos los operadores de montacargas reciban:</p><ol><li><strong>Instrucción formal</strong> — capacitación en aula o en línea cubriendo temas de seguridad (este curso)</li><li><strong>Capacitación práctica</strong> — experiencia práctica operando el equipo específico en el lugar de trabajo</li><li><strong>Evaluación</strong> — un supervisor debe observar y evaluar la competencia del operador</li></ol>" },
-          { heading: "Lo Que Proporcionamos", content: "<ul><li>Instrucción formal completa cubriendo todos los temas requeridos por OSHA</li><li>Evaluación de conocimiento mediante examen final</li><li>Certificado de finalización para la porción de instrucción formal</li><li>Paquete de documentación del empleador incluyendo listas de evaluación, permisos y hojas de asistencia</li></ul>" },
-          { heading: "Lo Que Su Empleador Debe Hacer", content: "<p>Después de completar este curso, su empleador/supervisor debe:</p><ul><li>Proporcionar capacitación práctica en el equipo específico que operará</li><li>Evaluar su desempeño en el lugar de trabajo real</li><li>Completar y mantener la documentación requerida (proporcionada en el Módulo 7)</li><li>Re-evaluar a los operadores al menos cada 3 años</li></ul>" },
-          { content: "<p><em>Importante: Este curso en línea por sí solo no satisface completamente los requisitos de OSHA. La capacitación práctica y la evaluación deben ser completadas por su empleador en su lugar de trabajo.</em></p>" },
-        ],
-        takeaways: [
-          "OSHA requiere instrucción formal + capacitación práctica + evaluación",
-          "Este curso cubre la instrucción formal y la evaluación de conocimiento",
-          "Su empleador debe completar la capacitación práctica y la evaluación",
-          "Los operadores deben ser re-evaluados al menos cada 3 años",
-        ],
-        warning: "No opere un montacargas hasta que su empleador haya completado su capacitación práctica y evaluación.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("ppe-workers-scene.svg"), alt: "Trabajadores con EPP completo frente a un montacargas" },
+      { type: "heading", level: 2, text: "Cumplimiento OSHA: Lo Que Cubre Este Curso" },
+      { type: "heading", level: 3, text: "Requisito de Tres Partes de OSHA" },
+      { type: "paragraph", html: "Bajo <strong>29 CFR 1910.178(l)</strong>, OSHA requiere que todos los operadores de montacargas completen tres componentes antes de operar en el trabajo. Explore cada uno en el diagrama a continuación." },
+      { type: "hotspot_diagram", src: img("osha-compliance.svg"), alt: "Infografía del requisito de capacitación de tres partes de OSHA",
+        caption: "OSHA 29 CFR 1910.178(l): las tres partes son requeridas.",
+        hotspots: [
+          { x: 17, y: 42, label: "1. Instrucción Formal", description: "Capacitación en aula o en línea que cubre todos los temas de seguridad de OSHA — eso es exactamente lo que proporciona este curso. Termina con una evaluación de conocimiento (su examen final)." },
+          { x: 48, y: 42, label: "2. Capacitación Práctica", description: "Experiencia práctica operando el equipo específico en su lugar de trabajo, proporcionada por su empleador después de que termine este curso." },
+          { x: 78, y: 42, label: "3. Evaluación", description: "Un supervisor o instructor calificado debe observarlo operar y aprobar su competencia. Incluimos los formularios de evaluación en el Módulo 7." },
+          { x: 50, y: 80, label: "Operador Certificado", description: "Solo después de completar los tres componentes es usted un operador completamente certificado. La re-evaluación es requerida al menos cada 3 años." },
+        ] },
+      { type: "heading", level: 3, text: "Lo Que Su Empleador Debe Hacer" },
+      { type: "list", items: [
+        "Proporcionar capacitación práctica en el equipo específico que operará",
+        "Evaluar su desempeño en el lugar de trabajo real",
+        "Completar y mantener la documentación requerida (proporcionada en el Módulo 7)",
+        "Re-evaluar a los operadores al menos cada 3 años",
+      ] },
+      { type: "paragraph", html: "<em>Importante: Este curso en línea por sí solo no satisface completamente los requisitos de OSHA. La capacitación práctica y la evaluación deben ser completadas por su empleador en su lugar de trabajo.</em>" },
+      { type: "callout", variant: "warning", text: "No opere un montacargas hasta que su empleador haya completado su capacitación práctica y evaluación." },
+      { type: "key_takeaways", items: [
+        "OSHA requiere instrucción formal + capacitación práctica + evaluación",
+        "Este curso cubre la instrucción formal y la evaluación de conocimiento",
+        "Su empleador debe completar la capacitación práctica y la evaluación",
+        "Los operadores deben ser re-evaluados al menos cada 3 años",
+      ] },
+    ]),
   },
   {
     module: "Bienvenida y Cumplimiento OSHA",
@@ -107,50 +100,83 @@ export const COURSE_STEPS_ES: StepDef[] = [
     module: "Fundamentos y Responsabilidades del Montacargas",
     title: "¿Qué es un Camión Industrial Motorizado (PIT)?",
     type: "lesson",
-    estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "¿Qué es un Camión Industrial Motorizado (PIT)?",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Definición", content: "<p>Un <strong>Camión Industrial Motorizado (PIT)</strong> es cualquier vehículo móvil autopropulsado utilizado para transportar, empujar, jalar, levantar, apilar o escalonar materiales. Los nombres comunes incluyen montacargas, patín hidráulico, montacargas de conductor y camión elevador.</p><p>Los PITs pueden ser impulsados por motores eléctricos o motores de combustión interna (propano, gasolina, diésel).</p>" },
-          { heading: "Clasificaciones de Equipo OSHA", content: "<ul><li><strong>Clase I:</strong> Montacargas Eléctricos de Conductor Sentado</li><li><strong>Clase II:</strong> Montacargas Eléctricos de Pasillo Angosto</li><li><strong>Clase III:</strong> Patines y Apiladores Eléctricos</li><li><strong>Clase IV:</strong> Montacargas de Combustión Interna — Llantas de Cojín</li><li><strong>Clase V:</strong> Montacargas de Combustión Interna — Llantas Neumáticas</li><li><strong>Clase VI:</strong> Tractores de Combustión Interna</li><li><strong>Clase VII:</strong> Montacargas para Terreno Difícil</li></ul>" },
-          { heading: "Quién Puede Operar", content: "<p>Solo empleados <strong>capacitados y autorizados</strong> pueden operar un PIT. Debe tener al menos <strong>18 años de edad</strong>. Su certificación es válida por <strong>3 años</strong>, después de lo cual debe ser re-evaluado.</p>" },
-          { heading: "Responsabilidades del Empleador vs. Operador", content: "<ul><li><strong>Empleador:</strong> Debe proporcionar capacitación, asegurar que el equipo esté mantenido, hacer cumplir las reglas de seguridad</li><li><strong>Operador:</strong> Debe seguir todas las reglas de seguridad, realizar inspecciones pre-turno, reportar peligros e incidentes inmediatamente</li></ul>" },
-        ],
-        takeaways: [
-          "Un PIT es cualquier vehículo motorizado usado para mover, levantar o apilar materiales",
-          "Hay 7 clasificaciones de OSHA para camiones industriales motorizados",
-          "Los operadores deben tener 18+ años, estar capacitados y autorizados",
-          "La certificación es válida por 3 años",
-        ],
-      }),
-    },
+    estimatedMinutes: 6,
+    config: blocks([
+      { type: "hero_image", src: photo("forklift-lifting-scene.svg"), alt: "Montacargas elevando una carga en tarima hacia una estantería mientras un ayudante observa" },
+      { type: "heading", level: 2, text: "¿Qué es un Camión Industrial Motorizado (PIT)?" },
+      { type: "heading", level: 3, text: "Definición" },
+      { type: "paragraph", html: "Un <strong>Camión Industrial Motorizado (PIT)</strong> es cualquier vehículo móvil autopropulsado utilizado para transportar, empujar, jalar, levantar, apilar o escalonar materiales. Los nombres comunes incluyen montacargas, patín hidráulico, montacargas de conductor y camión elevador." },
+      { type: "paragraph", html: "Los PITs pueden ser impulsados por motores eléctricos o motores de combustión interna (propano, gasolina, diésel)." },
+      { type: "heading", level: 3, text: "Conozca Su Máquina" },
+      { type: "paragraph", html: "Antes de operar, necesita conocer los componentes clave de la máquina. Toque cada marcador para aprender qué hace." },
+      { type: "hotspot_diagram", src: img("forklift-anatomy.svg"), alt: "Vista lateral de un montacargas de contrapeso",
+        hotspots: [
+          { x: 36, y: 31, label: "Protección Superior", description: "Protege al operador de objetos que caen. No está diseñada para resistir una carga completa cayendo sobre ella — nunca levante más de la capacidad nominal." },
+          { x: 56, y: 35, label: "Mástil", description: "El conjunto vertical que sube y baja la carga. Las cadenas de elevación y los cilindros hidráulicos dentro del mástil hacen el trabajo de elevación." },
+          { x: 61, y: 67, label: "Respaldo de Carga", description: "Evita que la carga se deslice hacia atrás hacia el operador cuando el mástil está inclinado hacia atrás." },
+          { x: 73, y: 86, label: "Horquillas", description: "Llevan la carga. Inspecciónelas diariamente por grietas, dobleces y desgaste del talón. Siempre sepárelas para ajustarse a la tarima e insértelas completamente." },
+          { x: 24, y: 69, label: "Contrapeso", description: "La sección trasera pesada que equilibra la carga en las horquillas. Por esto un montacargas gira desde la parte trasera y por esto la sobrecarga es tan peligrosa." },
+          { x: 46, y: 79, label: "Ruedas Motrices (delanteras)", description: "Las ruedas delanteras cargan la mayor parte del peso e impulsan la máquina. Forman las dos esquinas delanteras del triángulo de estabilidad." },
+          { x: 27, y: 81, label: "Ruedas de Dirección (traseras)", description: "Los montacargas giran con las ruedas TRASERAS — la parte trasera oscila ampliamente en los giros. Siempre verifique el espacio libre de la oscilación trasera." },
+          { x: 46, y: 69, label: "Placa de Datos", description: "Indica la capacidad nominal del camión, el centro de carga, el peso y el tipo de combustible. Léala antes de cada trabajo — es su límite legal de elevación." },
+          { x: 34, y: 53, label: "Asiento del Operador y Cinturón de Seguridad", description: "Su cinturón de seguridad es su protección principal en una volcadura. Abróchelo antes de arrancar el motor, todas las veces." },
+        ] },
+      { type: "heading", level: 3, text: "Clasificaciones de Equipo OSHA" },
+      { type: "paragraph", html: "OSHA agrupa los camiones industriales motorizados en 7 clases. Voltee cada tarjeta para ver qué cubre cada clase." },
+      { type: "flip_cards", title: "Las 7 Clases de OSHA", cards: [
+        { front: "Clase I", back: "Montacargas Eléctricos de Conductor — camiones de contrapeso de conductor sentado impulsados por batería." },
+        { front: "Clase II", back: "Montacargas Eléctricos de Pasillo Angosto — camiones de alcance y recolectores de pedidos diseñados para pasillos estrechos." },
+        { front: "Clase III", back: "Patines y Apiladores Eléctricos — transportadores de tarimas de acompañamiento a pie o de conductor montado." },
+        { front: "Clase IV", back: "Montacargas de Combustión Interna con Llantas de Cojín — para pisos interiores lisos." },
+        { front: "Clase V", back: "Montacargas de Combustión Interna con Llantas Neumáticas — uso interior/exterior en superficies más irregulares." },
+        { front: "Clase VI", back: "Tractores Eléctricos y de Combustión Interna — remolcadores que jalan cargas en lugar de levantarlas." },
+        { front: "Clase VII", back: "Montacargas para Terreno Difícil — camiones de llantas grandes para sitios de construcción y patios." },
+      ] },
+      { type: "heading", level: 3, text: "Quién Puede Operar" },
+      { type: "paragraph", html: "Solo empleados <strong>capacitados y autorizados</strong> pueden operar un PIT. Debe tener al menos <strong>18 años de edad</strong>. Su certificación es válida por <strong>3 años</strong>, después de lo cual debe ser re-evaluado." },
+      { type: "heading", level: 3, text: "Responsabilidades del Empleador vs. Operador" },
+      { type: "list", items: [
+        "<strong>Empleador:</strong> Debe proporcionar capacitación, asegurar que el equipo esté mantenido, hacer cumplir las reglas de seguridad",
+        "<strong>Operador:</strong> Debe seguir todas las reglas de seguridad, realizar inspecciones pre-turno, reportar peligros e incidentes inmediatamente",
+      ] },
+      { type: "key_takeaways", items: [
+        "Un PIT es cualquier vehículo motorizado usado para mover, levantar o apilar materiales",
+        "Hay 7 clasificaciones de OSHA para camiones industriales motorizados",
+        "Los operadores deben tener 18+ años, estar capacitados y autorizados",
+        "La certificación es válida por 3 años",
+      ] },
+    ]),
   },
   {
     module: "Fundamentos y Responsabilidades del Montacargas",
     title: "Autorización y Cultura de Trabajo Seguro",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Autorización y Cultura de Trabajo Seguro",
-        image: img("pedestrian-safety.svg"),
-        sections: [
-          { heading: "Reportar Peligros", content: "<p>Como operador, usted es responsable de reportar inmediatamente cualquier condición insegura: equipo dañado, derrames, obstrucciones, mala iluminación o incidentes cercanos. Nunca asuma que alguien más lo reportará.</p>" },
-          { heading: "Sin Pasajeros — Nunca", content: "<p>Su montacargas está diseñado para transportar de forma segura <strong>solo una persona — el operador</strong>. Nunca permita pasajeros en las horquillas, los lados o cualquier parte del camión a menos que use una plataforma de seguridad aprobada por OSHA con barandillas, tablones de pie y un arnés de protección contra caídas.</p>" },
-          { heading: "Manténgase Alerta", content: "<ul><li>No use el teléfono celular mientras opera</li><li>No use audífonos o auriculares</li><li>No juegue o conduzca de manera imprudente</li><li>Mantenga todo su cuerpo dentro de la jaula protectora en todo momento</li><li>Nunca opere bajo la influencia de drogas o alcohol</li></ul>" },
-          { heading: "Aplicación de OSHA", content: "<p>OSHA puede realizar <strong>inspecciones sin previo aviso</strong>. Las multas por operadores no certificados pueden alcanzar <strong>$7,000 por día por empleado no calificado</strong>, retroactivas a la fecha de contratación. Un solo operador no certificado trabajando por un año podría resultar en casi <strong>$2 millones</strong> en multas.</p>" },
-        ],
-        takeaways: [
-          "Reporte todos los peligros e incidentes inmediatamente",
-          "No lleve pasajeros a menos que use una plataforma de seguridad aprobada",
-          "Manténgase alerta — sin teléfonos, audífonos o juegos",
-          "Las multas de OSHA por incumplimiento son severas",
-        ],
-        warning: "La conducción imprudente y el juego están estrictamente prohibidos y pueden resultar en terminación y violaciones de OSHA.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("operator-at-controls-scene.svg"), alt: "Operador sentado en los controles del montacargas con chaleco de alta visibilidad y cinturón de seguridad" },
+      { type: "heading", level: 2, text: "Autorización y Cultura de Trabajo Seguro" },
+      { type: "heading", level: 3, text: "Reportar Peligros" },
+      { type: "paragraph", html: "Como operador, usted es responsable de reportar inmediatamente cualquier condición insegura: equipo dañado, derrames, obstrucciones, mala iluminación o incidentes cercanos. Nunca asuma que alguien más lo reportará." },
+      { type: "heading", level: 3, text: "Sin Pasajeros — Nunca" },
+      { type: "paragraph", html: "Su montacargas está diseñado para transportar de forma segura <strong>solo una persona — el operador</strong>. Nunca permita pasajeros en las horquillas, los lados o cualquier parte del camión a menos que use una plataforma de seguridad aprobada por OSHA con barandillas, tablones de pie y un arnés de protección contra caídas." },
+      { type: "heading", level: 3, text: "Manténgase Alerta" },
+      { type: "list", items: [
+        "No use el teléfono celular mientras opera",
+        "No use audífonos o auriculares",
+        "No juegue o conduzca de manera imprudente",
+        "Mantenga todo su cuerpo dentro de la jaula protectora en todo momento",
+        "Nunca opere bajo la influencia de drogas o alcohol",
+      ] },
+      { type: "heading", level: 3, text: "Aplicación de OSHA" },
+      { type: "paragraph", html: "OSHA puede realizar <strong>inspecciones sin previo aviso</strong>. Las multas por operadores no certificados pueden alcanzar <strong>$7,000 por día por empleado no calificado</strong>, retroactivas a la fecha de contratación. Un solo operador no certificado trabajando por un año podría resultar en casi <strong>$2 millones</strong> en multas." },
+      { type: "callout", variant: "warning", text: "La conducción imprudente y el juego están estrictamente prohibidos y pueden resultar en terminación y violaciones de OSHA." },
+      { type: "key_takeaways", items: [
+        "Reporte todos los peligros e incidentes inmediatamente",
+        "No lleve pasajeros a menos que use una plataforma de seguridad aprobada",
+        "Manténgase alerta — sin teléfonos, audífonos o juegos",
+        "Las multas de OSHA por incumplimiento son severas",
+      ] },
+    ]),
   },
   {
     module: "Fundamentos y Responsabilidades del Montacargas",
@@ -170,74 +196,105 @@ export const COURSE_STEPS_ES: StepDef[] = [
     module: "Estabilidad y Manejo de Cargas",
     title: "Triángulo de Estabilidad y Centro de Gravedad",
     type: "lesson",
-    estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Triángulo de Estabilidad y Centro de Gravedad",
-        image: img("stability-triangle.svg"),
-        sections: [
-          { heading: "¿Qué es el Triángulo de Estabilidad?", content: "<p>El <strong>triángulo de estabilidad</strong> es la base de tres puntos formada por los dos extremos del eje delantero y el punto de pivote del eje trasero. Mientras el centro de gravedad combinado del camión y su carga se mantenga dentro de este triángulo, el montacargas permanece estable.</p>" },
-          { heading: "Riesgo de Volcadura", content: "<p>Cuando el centro de gravedad se desplaza fuera del triángulo de estabilidad — debido a sobrecarga, giros bruscos u operación en pendientes — el montacargas puede <strong>volcarse</strong>. Las volcaduras son una de las principales causas de fatalidades con montacargas.</p><ul><li>Nunca haga giros bruscos a velocidad</li><li>Reduzca la velocidad antes de girar</li><li>Sea extra precavido en rampas, pendientes y superficies irregulares</li></ul>" },
-          { heading: "Estabilidad Lateral", content: "<p>Girar demasiado rápido desplaza el centro de gravedad lateralmente. Cuanto más alta sea la carga, más inestable se vuelve el camión durante los giros. Siempre <strong>reduzca la velocidad antes de girar</strong>, no durante el giro.</p>" },
-        ],
-        takeaways: [
-          "El triángulo de estabilidad está formado por los extremos del eje delantero y el pivote del eje trasero",
-          "Mantenga el centro de gravedad dentro del triángulo para prevenir volcaduras",
-          "Reduzca la velocidad antes de girar — los giros bruscos causan inestabilidad lateral",
-          "Cargas más altas significan mayor riesgo de volcadura durante los giros",
-        ],
-        warning: "Las volcaduras están entre las principales causas de fatalidades de operadores de montacargas. Siempre respete el triángulo de estabilidad.",
-      }),
-    },
+    estimatedMinutes: 6,
+    config: blocks([
+      { type: "hero_image", src: img("stability-triangle.svg"), alt: "Vista superior de un montacargas mostrando el triángulo de estabilidad" },
+      { type: "heading", level: 2, text: "Triángulo de Estabilidad y Centro de Gravedad" },
+      { type: "heading", level: 3, text: "¿Qué es el Triángulo de Estabilidad?" },
+      { type: "paragraph", html: "El <strong>triángulo de estabilidad</strong> es la base de tres puntos formada por los dos extremos del eje delantero y el punto de pivote del eje trasero. Mientras el centro de gravedad combinado del camión y su carga se mantenga dentro de este triángulo, el montacargas permanece estable." },
+      { type: "hotspot_diagram", src: img("stability-triangle.svg"), alt: "Diagrama del triángulo de estabilidad con eje delantero, pivote trasero y centro de gravedad",
+        caption: "Toque cada punto del triángulo para entender cómo funciona la estabilidad.",
+        hotspots: [
+          { x: 38, y: 47, label: "Eje Delantero (ruedas motrices)", description: "Los dos puntos de contacto de las ruedas delanteras forman la base ancha del triángulo. La mayor parte del peso de la máquina + carga descansa aquí." },
+          { x: 50, y: 73, label: "Pivote del Eje Trasero", description: "El eje trasero pivota sobre un solo punto central — esa es la tercera esquina del triángulo, NO las dos ruedas traseras. Por esto los montacargas se sienten inestables en los giros." },
+          { x: 50, y: 56, label: "Centro de Gravedad", description: "Sin carga, el centro de gravedad se ubica cerca del centro del triángulo. Levantar, inclinar y girar lo mueven. Manténgalo dentro del triángulo o el camión se vuelca." },
+          { x: 50, y: 84, label: "Zona de Volcadura", description: "Si el centro de gravedad combinado cruza fuera del triángulo — por sobrecarga, cargas elevadas, giros bruscos o pendientes — el montacargas se vuelca hacia ese lado." },
+        ] },
+      { type: "heading", level: 3, text: "Véalo en Movimiento" },
+      { type: "image", src: img("stability-triangle-animated.svg"), alt: "Animación del centro de gravedad moviéndose fuera del triángulo de estabilidad", caption: "Observe cómo elevar una carga empuja el centro de gravedad hacia el borde del triángulo." },
+      { type: "heading", level: 3, text: "Riesgo de Volcadura" },
+      { type: "paragraph", html: "Cuando el centro de gravedad se desplaza fuera del triángulo de estabilidad — debido a sobrecarga, giros bruscos u operación en pendientes — el montacargas puede <strong>volcarse</strong>. Las volcaduras son una de las principales causas de fatalidades con montacargas." },
+      { type: "list", items: [
+        "Nunca haga giros bruscos a velocidad",
+        "Reduzca la velocidad antes de girar",
+        "Sea extra precavido en rampas, pendientes y superficies irregulares",
+      ] },
+      { type: "heading", level: 3, text: "Estabilidad Lateral" },
+      { type: "paragraph", html: "Girar demasiado rápido desplaza el centro de gravedad lateralmente. Cuanto más alta sea la carga, más inestable se vuelve el camión durante los giros. Siempre <strong>reduzca la velocidad antes de girar</strong>, no durante el giro." },
+      { type: "callout", variant: "warning", text: "Las volcaduras están entre las principales causas de fatalidades de operadores de montacargas. Siempre respete el triángulo de estabilidad." },
+      { type: "key_takeaways", items: [
+        "El triángulo de estabilidad está formado por los extremos del eje delantero y el pivote del eje trasero",
+        "Mantenga el centro de gravedad dentro del triángulo para prevenir volcaduras",
+        "Reduzca la velocidad antes de girar — los giros bruscos causan inestabilidad lateral",
+        "Cargas más altas significan mayor riesgo de volcadura durante los giros",
+      ] },
+    ]),
   },
   {
     module: "Estabilidad y Manejo de Cargas",
     title: "Capacidad Nominal y Placa de Datos",
     type: "lesson",
-    estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Capacidad Nominal y Placa de Datos",
-        image: img("load-center.svg"),
-        sections: [
-          { heading: "La Placa de Datos", content: "<p>Cada montacargas tiene una <strong>placa de datos</strong> del fabricante que indica la capacidad máxima de elevación a varios centros de carga. Antes de levantar cualquier carga, verifique que su montacargas esté clasificado para manejar su peso.</p>" },
-          { heading: "Centro de Carga", content: "<p>El <strong>centro de carga</strong> es la distancia desde la cara vertical de la horquilla hasta el centro de la carga. La capacidad de un montacargas disminuye a medida que aumenta el centro de carga. Siempre verifique que está usando el equipo correcto para el peso y tamaño de la carga.</p>" },
-          { heading: "Los Accesorios Reducen la Capacidad", content: "<p>Usar accesorios (pinzas, rotadores, extensiones de horquilla) cambia el centro de gravedad del camión y <strong>reduce la capacidad nominal</strong>. Siempre verifique la capacidad ajustada cuando use cualquier accesorio.</p>" },
-          { heading: "Nunca Sobrecargue", content: "<p>Exceder la capacidad nominal aumenta enormemente el riesgo de inestabilidad y volcadura. Muestre los límites de peso claramente en el vehículo. Si una carga parece demasiado pesada o desequilibrada, no intente levantarla — consiga un camión de mayor capacidad.</p>" },
+    estimatedMinutes: 5,
+    config: blocks([
+      { type: "hero_image", src: img("load-center.svg"), alt: "Diagrama de la distancia del centro de carga y la capacidad" },
+      { type: "heading", level: 2, text: "Capacidad Nominal y Placa de Datos" },
+      { type: "heading", level: 3, text: "La Placa de Datos" },
+      { type: "paragraph", html: "Cada montacargas tiene una <strong>placa de datos</strong> del fabricante que indica la capacidad máxima de elevación a varios centros de carga. Antes de levantar cualquier carga, verifique que su montacargas esté clasificado para manejar su peso." },
+      { type: "heading", level: 3, text: "Centro de Carga" },
+      { type: "paragraph", html: "El <strong>centro de carga</strong> es la distancia desde la cara vertical de la horquilla hasta el centro de la carga. La capacidad de un montacargas disminuye a medida que aumenta el centro de carga. Siempre verifique que está usando el equipo correcto para el peso y tamaño de la carga." },
+      { type: "image", src: img("load-center-animated.svg"), alt: "Animación que muestra la capacidad disminuyendo a medida que crece el centro de carga", caption: "A medida que el centro de carga crece de 24 a 36 pulgadas, el mismo camión puede levantar con seguridad mucho menos." },
+      { type: "drag_drop", mode: "matching",
+        prompt: "Relacione cada distancia de centro de carga con la capacidad que este camión puede levantar con seguridad.",
+        items: [
+          { id: "lc24", label: "Centro de carga de 24 pulg", targetId: "cap5000" },
+          { id: "lc30", label: "Centro de carga de 30 pulg", targetId: "cap4000" },
+          { id: "lc36", label: "Centro de carga de 36 pulg", targetId: "cap3300" },
         ],
-        takeaways: [
-          "Siempre verifique la placa de datos para la capacidad nominal antes de levantar",
-          "La capacidad disminuye a medida que aumenta la distancia del centro de carga",
-          "Los accesorios reducen la capacidad nominal del montacargas",
-          "Nunca exceda la capacidad nominal — use un camión más grande si es necesario",
-        ],
-      }),
-    },
+        targets: [
+          { id: "cap5000", label: "5,000 lbs — capacidad nominal completa" },
+          { id: "cap4000", label: "4,000 lbs — capacidad reducida" },
+          { id: "cap3300", label: "3,300 lbs — capacidad más baja" },
+        ] },
+      { type: "heading", level: 3, text: "Los Accesorios Reducen la Capacidad" },
+      { type: "paragraph", html: "Usar accesorios (pinzas, rotadores, extensiones de horquilla) cambia el centro de gravedad del camión y <strong>reduce la capacidad nominal</strong>. Siempre verifique la capacidad ajustada cuando use cualquier accesorio." },
+      { type: "heading", level: 3, text: "Nunca Sobrecargue" },
+      { type: "paragraph", html: "Exceder la capacidad nominal aumenta enormemente el riesgo de inestabilidad y volcadura. Muestre los límites de peso claramente en el vehículo. Si una carga parece demasiado pesada o desequilibrada, no intente levantarla — consiga un camión de mayor capacidad." },
+      { type: "key_takeaways", items: [
+        "Siempre verifique la placa de datos para la capacidad nominal antes de levantar",
+        "La capacidad disminuye a medida que aumenta la distancia del centro de carga",
+        "Los accesorios reducen la capacidad nominal del montacargas",
+        "Nunca exceda la capacidad nominal — use un camión más grande si es necesario",
+      ] },
+    ]),
   },
   {
     module: "Estabilidad y Manejo de Cargas",
     title: "Recoger y Transportar Cargas de Forma Segura",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Recoger y Transportar Cargas de Forma Segura",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Posición de las Horquillas", content: "<p>Lleve las horquillas lo más bajo posible — típicamente <strong>4 a 6 pulgadas</strong> del suelo. Esto baja el centro de gravedad y reduce el riesgo de volcadura.</p>" },
-          { heading: "Inclinación del Mástil", content: "<p>Incline el mástil ligeramente hacia atrás cuando viaje con una carga para estabilizarla. Nunca incline las cargas hacia adelante excepto al depositarlas. La inclinación excesiva hacia adelante puede causar que el camión se vuelque.</p>" },
-          { heading: "Visibilidad", content: "<p>Si una carga bloquea su vista hacia adelante, <strong>conduzca en reversa</strong> para mantener una línea de visión clara. Use ayudantes cuando navegue espacios reducidos o áreas con visibilidad limitada.</p>" },
-          { heading: "Asegurar las Cargas", content: "<p>Antes de transportar cualquier carga, asegúrese de que esté <strong>correctamente asegurada y balanceada</strong>. Puede necesitar película plástica o correas para prevenir el desplazamiento durante el transporte. Nunca mueva una carga no asegurada.</p>" },
-        ],
-        takeaways: [
-          "Lleve las horquillas a 4–6 pulgadas del suelo",
-          "Incline el mástil hacia atrás cuando viaje con una carga",
-          "Conduzca en reversa si la carga bloquea su vista hacia adelante",
-          "Siempre asegure las cargas antes de moverlas",
-        ],
-        tip: "Cuando no pueda ver más allá de la carga, viaje en reversa y use un ayudante para áreas reducidas.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("forklift-lifting-scene.svg"), alt: "Montacargas colocando una tarima en un nivel de estantería" },
+      { type: "heading", level: 2, text: "Recoger y Transportar Cargas de Forma Segura" },
+      { type: "heading", level: 3, text: "Posición de las Horquillas" },
+      { type: "paragraph", html: "Lleve las horquillas lo más bajo posible — típicamente <strong>4 a 6 pulgadas</strong> del suelo. Esto baja el centro de gravedad y reduce el riesgo de volcadura." },
+      { type: "heading", level: 3, text: "Inclinación del Mástil" },
+      { type: "paragraph", html: "Incline el mástil ligeramente hacia atrás cuando viaje con una carga para estabilizarla. Nunca incline las cargas hacia adelante excepto al depositarlas. La inclinación excesiva hacia adelante puede causar que el camión se vuelque." },
+      { type: "heading", level: 3, text: "Visibilidad" },
+      { type: "paragraph", html: "Si una carga bloquea su vista hacia adelante, <strong>conduzca en reversa</strong> para mantener una línea de visión clara. Use ayudantes cuando navegue espacios reducidos o áreas con visibilidad limitada." },
+      { type: "heading", level: 3, text: "Asegurar las Cargas" },
+      { type: "paragraph", html: "Antes de transportar cualquier carga, asegúrese de que esté <strong>correctamente asegurada y balanceada</strong>. Puede necesitar película plástica o correas para prevenir el desplazamiento durante el transporte. Nunca mueva una carga no asegurada." },
+      { type: "embedded_quiz", questions: [
+        { question: "Recoge una tarima envuelta y se da cuenta de que bloquea completamente su vista hacia adelante. ¿Qué hace?", type: "mcq_single", options: ["Inclinarse hacia el lado para ver alrededor de ella", "Elevar la carga más alto para poder ver por debajo", "Viajar en reversa con una línea de visión clara", "Conducir hacia adelante lentamente y tocar la bocina"], correctAnswers: "Viajar en reversa con una línea de visión clara", explanation: "Cuando la carga bloquea su vista hacia adelante, viaje en reversa para poder ver hacia dónde va. Nunca se incline fuera de la jaula ni eleve la carga para ver por debajo." },
+        { question: "Mientras transporta una carga, el mástil debe estar inclinado:", type: "mcq_single", options: ["Completamente hacia adelante", "Ligeramente hacia atrás", "No importa", "Completamente abajo"], correctAnswers: "Ligeramente hacia atrás", explanation: "Una ligera inclinación hacia atrás acomoda la carga contra el respaldo y la mantiene estable durante el viaje." },
+      ] },
+      { type: "callout", variant: "tip", text: "Cuando no pueda ver más allá de la carga, viaje en reversa y use un ayudante para áreas reducidas." },
+      { type: "key_takeaways", items: [
+        "Lleve las horquillas a 4–6 pulgadas del suelo",
+        "Incline el mástil hacia atrás cuando viaje con una carga",
+        "Conduzca en reversa si la carga bloquea su vista hacia adelante",
+        "Siempre asegure las cargas antes de moverlas",
+      ] },
+    ]),
   },
   {
     module: "Estabilidad y Manejo de Cargas",
@@ -258,72 +315,97 @@ export const COURSE_STEPS_ES: StepDef[] = [
     module: "Inspección Pre-Operación y Combustible",
     title: "Lista de Inspección Pre-Turno",
     type: "lesson",
-    estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Lista de Inspección Pre-Turno",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Su Responsabilidad", content: "<p>Como operador, es <strong>su responsabilidad</strong> realizar una inspección de seguridad diaria antes de usar la máquina. Esto debe hacerse al <strong>inicio de cada turno</strong>.</p>" },
-          { heading: "Inspección Visual", content: "<p>Camine alrededor de todo el vehículo, verificando:</p><ul><li><strong>Llantas:</strong> Revise daños, inflado apropiado</li><li><strong>Horquillas:</strong> Inspeccione grietas, dobleces o desgaste excesivo</li><li><strong>Cadenas e hidráulicos:</strong> Revise fugas y daños</li><li><strong>Luces, bocina y alarma de reversa:</strong> Pruebe funcionalidad</li><li><strong>Frenos:</strong> Pruebe tanto los frenos de servicio como los de estacionamiento</li><li><strong>Dirección:</strong> Verifique la respuesta</li><li><strong>Niveles de fluidos:</strong> Revise combustible, aceite, refrigerante, fluido hidráulico</li><li><strong>Cinturón de seguridad:</strong> Asegúrese de que funcione correctamente</li></ul>" },
-          { heading: "Marcar Equipo Inseguro", content: "<p>Si encuentra algún problema de seguridad, <strong>no opere el montacargas</strong>. Reporte el problema a su supervisor o equipo de mantenimiento inmediatamente. Marque el equipo para que nadie más lo use hasta que se completen las reparaciones.</p>" },
-        ],
-        takeaways: [
-          "La inspección pre-turno es requerida antes de cada turno",
-          "Revise llantas, horquillas, cadenas, hidráulicos, luces, bocina, frenos, dirección",
-          "Marque y reporte cualquier equipo inseguro inmediatamente",
-          "Nunca opere un montacargas que no pase la inspección",
-        ],
-        tip: "Siempre abróchese el cinturón de seguridad antes de arrancar el motor — es su protección principal en una volcadura.",
-      }),
-    },
+    estimatedMinutes: 6,
+    config: blocks([
+      { type: "hero_image", src: photo("pre-inspection-scene.svg"), alt: "Operador inspeccionando las horquillas del montacargas con una lista de verificación antes de un turno" },
+      { type: "heading", level: 2, text: "Lista de Inspección Pre-Turno" },
+      { type: "heading", level: 3, text: "Su Responsabilidad" },
+      { type: "paragraph", html: "Como operador, es <strong>su responsabilidad</strong> realizar una inspección de seguridad diaria antes de usar la máquina. Esto debe hacerse al <strong>inicio de cada turno</strong>." },
+      { type: "heading", level: 3, text: "Inspección de Recorrido" },
+      { type: "paragraph", html: "Haga un recorrido completo alrededor del vehículo antes de subirse. Toque cada punto en el montacargas para ver qué revisar." },
+      { type: "hotspot_diagram", src: img("forklift-anatomy.svg"), alt: "Puntos de inspección del recorrido alrededor del montacargas",
+        caption: "Un recorrido completo toma menos de 5 minutos y puede salvar una vida.",
+        hotspots: [
+          { x: 46, y: 79, label: "Llantas y Ruedas", description: "Revise cortes, pedazos faltantes, inflado apropiado (neumáticas) y desechos enredados en los ejes." },
+          { x: 73, y: 86, label: "Horquillas", description: "Busque grietas, dobleces y desgaste del talón. Revise los pasadores de bloqueo de las horquillas. Horquillas dobladas o agrietadas significan que el camión queda fuera de servicio." },
+          { x: 56, y: 35, label: "Mástil y Cadenas de Elevación", description: "Inspeccione las cadenas por torceduras, óxido y eslabones rotos. Verifique que el mástil suba, baje e incline suavemente sin sacudidas." },
+          { x: 40, y: 63, label: "Hidráulicos y Fugas", description: "Busque manchas de fluido fresco debajo del camión. Revise mangueras y cilindros por fugas. Una fuga hidráulica significa NO OPERAR." },
+          { x: 36, y: 31, label: "Protección Superior", description: "Revise postes doblados, grietas o pernos faltantes. La protección superior es su defensa contra cargas que caen." },
+          { x: 46, y: 69, label: "Placa de Datos", description: "Debe estar presente y legible. Si no puede leer la capacidad nominal, no opere el camión." },
+          { x: 34, y: 53, label: "Asiento y Cinturón de Seguridad", description: "Pruebe que el cinturón de seguridad se abroche y se retraiga. Abróchese antes de arrancar el motor — todas y cada una de las veces." },
+          { x: 42, y: 56, label: "Bocina, Luces y Alarma", description: "Pruebe la bocina, los faros, las luces de advertencia y la alarma de reversa. Si los peatones no pueden oírlo venir, el camión no es seguro." },
+        ] },
+      { type: "heading", level: 3, text: "También Revise" },
+      { type: "list", items: [
+        "<strong>Frenos:</strong> Pruebe tanto los frenos de servicio como los de estacionamiento",
+        "<strong>Dirección:</strong> Verifique la respuesta",
+        "<strong>Niveles de fluidos:</strong> Combustible, aceite, refrigerante, fluido hidráulico",
+      ] },
+      { type: "heading", level: 3, text: "Marcar Equipo Inseguro" },
+      { type: "paragraph", html: "Si encuentra algún problema de seguridad, <strong>no opere el montacargas</strong>. Reporte el problema a su supervisor o equipo de mantenimiento inmediatamente. Marque el equipo para que nadie más lo use hasta que se completen las reparaciones." },
+      { type: "embedded_quiz", questions: [
+        { question: "Durante su recorrido encuentra un goteo hidráulico lento debajo del mástil. El camión parece funcionar bien. ¿Ahora qué?", type: "mcq_single", options: ["Operar con cuidado y volver a revisar al almuerzo", "Limpiarlo y seguir trabajando", "Marcar el camión fuera de servicio y reportarlo — no operar", "Agregar fluido hidráulico para compensar"], correctAnswers: "Marcar el camión fuera de servicio y reportarlo — no operar", explanation: "Cualquier fuga hidráulica puede provocar la pérdida repentina del control de la carga. Marque el equipo y repórtelo — nunca opere un camión con fugas." },
+      ] },
+      { type: "callout", variant: "tip", text: "Siempre abróchese el cinturón de seguridad antes de arrancar el motor — es su protección principal en una volcadura." },
+      { type: "key_takeaways", items: [
+        "La inspección pre-turno es requerida antes de cada turno",
+        "Revise llantas, horquillas, cadenas, hidráulicos, luces, bocina, frenos, dirección",
+        "Marque y reporte cualquier equipo inseguro inmediatamente",
+        "Nunca opere un montacargas que no pase la inspección",
+      ] },
+    ]),
   },
   {
     module: "Inspección Pre-Operación y Combustible",
     title: "Mantenimiento y Reparaciones",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Mantenimiento y Reparaciones",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Reparar Antes de Usar", content: "<p>Si se identifica un problema de seguridad durante la inspección, <strong>las reparaciones deben hacerse antes de que se use el equipo</strong>. Nunca opere un montacargas con defectos conocidos.</p>" },
-          { heading: "Fugas de Fluidos", content: "<p>No opere ningún vehículo con <strong>fugas de combustible, aceite o hidráulico</strong>. Las fugas hidráulicas pueden provocar la pérdida repentina del control de la carga, creando una situación extremadamente peligrosa.</p>" },
-          { heading: "Documentar y Reportar", content: "<p>Todos los problemas de mantenimiento deben documentarse y reportarse. Esto crea un registro para el cumplimiento y ayuda a prevenir problemas recurrentes.</p>" },
-        ],
-        takeaways: [
-          "Las reparaciones deben completarse antes de usar el equipo",
-          "Nunca opere un montacargas con fugas de fluidos",
-          "Documente todos los problemas de mantenimiento para el cumplimiento",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Diagrama de puntos de inspección del montacargas" },
+      { type: "heading", level: 2, text: "Mantenimiento y Reparaciones" },
+      { type: "heading", level: 3, text: "Reparar Antes de Usar" },
+      { type: "paragraph", html: "Si se identifica un problema de seguridad durante la inspección, <strong>las reparaciones deben hacerse antes de que se use el equipo</strong>. Nunca opere un montacargas con defectos conocidos." },
+      { type: "heading", level: 3, text: "Fugas de Fluidos" },
+      { type: "paragraph", html: "No opere ningún vehículo con <strong>fugas de combustible, aceite o hidráulico</strong>. Las fugas hidráulicas pueden provocar la pérdida repentina del control de la carga, creando una situación extremadamente peligrosa." },
+      { type: "heading", level: 3, text: "Documentar y Reportar" },
+      { type: "paragraph", html: "Todos los problemas de mantenimiento deben documentarse y reportarse. Esto crea un registro para el cumplimiento y ayuda a prevenir problemas recurrentes." },
+      { type: "key_takeaways", items: [
+        "Las reparaciones deben completarse antes de usar el equipo",
+        "Nunca opere un montacargas con fugas de fluidos",
+        "Documente todos los problemas de mantenimiento para el cumplimiento",
+      ] },
+    ]),
   },
   {
     module: "Inspección Pre-Operación y Combustible",
     title: "Seguridad en Combustible y Carga",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Seguridad en Combustible y Carga (GLP / Eléctrico)",
-        image: img("ppe-gloves.svg"),
-        sections: [
-          { heading: "Solo en Áreas Designadas", content: "<p>El reabastecimiento y la recarga <strong>solo deben ocurrir en áreas designadas</strong> con ventilación adecuada. Nunca reabastezca en áreas de trabajo generales.</p>" },
-          { heading: "Requisitos de EPP", content: "<ul><li>Use <strong>guantes</strong> al manejar tanques de GLP</li><li>Use <strong>protección ocular</strong> según corresponda</li><li>Siga los requisitos específicos de EPP de su instalación</li></ul>" },
-          { heading: "Prohibido Fumar", content: "<p>Los empleados tienen <strong>estrictamente prohibido fumar</strong> o usar cualquier llama abierta mientras operan un montacargas. Las chispas o llamas abiertas deben mantenerse a al menos <strong>50 pies</strong> de las estaciones de reabastecimiento y áreas de recarga de baterías.</p>" },
-          { heading: "Seguridad con GLP", content: "<p>Al cambiar tanques de propano: revise si hay fugas, asegure la conexión correcta y verifique que el tanque esté asegurado. Reporte cualquier olor a gas inmediatamente.</p>" },
-          { heading: "Seguridad de Baterías Eléctricas", content: "<p>Al cargar baterías: apague el cargador antes de conectar/desconectar. Las baterías eléctricas producen gas hidrógeno durante la carga — asegure ventilación adecuada para prevenir riesgo de explosión.</p>" },
-        ],
-        takeaways: [
-          "Reabastezca/recargue solo en áreas designadas y ventiladas",
-          "Use EPP al manejar tanques de GLP y baterías",
-          "Prohibido fumar a 50 pies de estaciones de combustible y recarga",
-          "Asegure ventilación adecuada al cargar baterías eléctricas",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("ppe-gloves.svg"), alt: "EPP requerido para reabastecer: guantes, chaleco, casco, protección ocular" },
+      { type: "heading", level: 2, text: "Seguridad en Combustible y Carga (GLP / Eléctrico)" },
+      { type: "heading", level: 3, text: "Solo en Áreas Designadas" },
+      { type: "paragraph", html: "El reabastecimiento y la recarga <strong>solo deben ocurrir en áreas designadas</strong> con ventilación adecuada. Nunca reabastezca en áreas de trabajo generales." },
+      { type: "heading", level: 3, text: "Requisitos de EPP" },
+      { type: "list", items: [
+        "Use <strong>guantes</strong> al manejar tanques de GLP",
+        "Use <strong>protección ocular</strong> según corresponda",
+        "Siga los requisitos específicos de EPP de su instalación",
+      ] },
+      { type: "heading", level: 3, text: "Prohibido Fumar" },
+      { type: "paragraph", html: "Los empleados tienen <strong>estrictamente prohibido fumar</strong> o usar cualquier llama abierta mientras operan un montacargas. Las chispas o llamas abiertas deben mantenerse a al menos <strong>50 pies</strong> de las estaciones de reabastecimiento y áreas de recarga de baterías." },
+      { type: "flip_cards", title: "GLP vs. Eléctrico — Conozca Su Combustible", cards: [
+        { front: "GLP (Propano)", back: "Use guantes — el propano líquido causa congelación. Revise si hay fugas después de conectar, asegure el tanque y reporte cualquier olor a gas inmediatamente." },
+        { front: "Eléctrico (Batería)", back: "Apague el cargador antes de conectar o desconectar. La carga produce gas hidrógeno explosivo — la ventilación es obligatoria." },
+      ] },
+      { type: "callout", variant: "warning", text: "Prohibido fumar, usar llamas abiertas o generar chispas cerca de las áreas de combustible o recarga. El gas hidrógeno de la carga de baterías es altamente explosivo." },
+      { type: "key_takeaways", items: [
+        "Reabastezca/recargue solo en áreas designadas y ventiladas",
+        "Use guantes al manejar tanques de GLP",
+        "Prohibido fumar a menos de 50 pies de las áreas de combustible/recarga",
+        "Siempre revise si hay fugas después de conectar tanques de GLP",
+      ] },
+    ]),
   },
   {
     module: "Inspección Pre-Operación y Combustible",
@@ -338,99 +420,109 @@ export const COURSE_STEPS_ES: StepDef[] = [
     ],
   },
 
-  // ═══ MÓDULO 4: Conducción Segura + Peatones ═══
+  // ═══ MÓDULO 4: Conducción Segura + Peatones + Intersecciones ═══
   {
     module: "Conducción Segura y Peatones",
-    title: "Velocidad y Control del Vehículo",
+    title: "Velocidad, Espacio y Atención",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Velocidad y Control del Vehículo",
-        image: img("pedestrian-safety.svg"),
-        sections: [
-          { heading: "Límites de Velocidad", content: "<p>La velocidad segura en un almacén es típicamente <strong>5 mph o menos</strong>. Siempre siga los límites de velocidad publicados en su instalación. Factores que requieren velocidades más lentas incluyen:</p><ul><li>Pisos húmedos o resbalosos</li><li>Áreas congestionadas</li><li>Pasillos estrechos</li><li>Intersecciones y esquinas ciegas</li><li>Áreas cerca de peatones</li></ul>" },
-          { heading: "Dirección Trasera", content: "<p>Los montacargas tienen <strong>dirección trasera</strong>, lo que significa que la parte trasera oscila hacia afuera al girar. Esto es lo opuesto a un automóvil. Esté atento al espacio alrededor de la parte trasera del montacargas al girar.</p>" },
-          { heading: "Frenado", content: "<p>Mantenga una distancia de frenado segura. Frene gradualmente — el frenado brusco puede causar deslizamiento de la carga o volcadura. Nunca frene bruscamente a menos que sea una emergencia.</p>" },
-        ],
-        takeaways: [
-          "Velocidad máxima segura en almacén: 5 mph o menos",
-          "Los montacargas tienen dirección trasera — la parte trasera oscila al girar",
-          "Frene gradualmente para evitar deslizamiento de carga",
-          "Reduzca la velocidad en pisos húmedos, áreas congestionadas y cerca de peatones",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("safe-driving.svg"), alt: "Postura de conducción correcta con cinturón de seguridad, carga baja y ojos al frente" },
+      { type: "heading", level: 2, text: "Velocidad, Espacio y Atención" },
+      { type: "heading", level: 3, text: "Límites de Velocidad" },
+      { type: "paragraph", html: "La velocidad máxima segura para operar un montacargas es típicamente de <strong>5 mph</strong>. Los montacargas están diseñados para mover cargas pesadas, no para correr. Concéntrese en trabajar de manera <strong>eficiente, no más rápida</strong>." },
+      { type: "heading", level: 3, text: "Distancia de Frenado" },
+      { type: "paragraph", html: "Mantenga una distancia de frenado adecuada en todo momento. Mantenga al menos <strong>tres longitudes de vehículo</strong> o un <strong>intervalo de 3 segundos</strong> entre vehículos." },
+      { type: "heading", level: 3, text: "Condiciones de la Superficie" },
+      { type: "paragraph", html: "Esté atento a pisos mojados, desechos, derrames de aceite y superficies irregulares. Estas condiciones aumentan significativamente la distancia de frenado y el riesgo de volcadura. Reduzca la velocidad y navegue con cuidado." },
+      { type: "embedded_quiz", questions: [
+        { question: "Otro montacargas está trabajando en el mismo pasillo delante de usted. ¿Cuánto espacio debe mantener?", type: "mcq_single", options: ["Una longitud de vehículo", "Medio pasillo", "Al menos tres longitudes de vehículo", "Lo suficiente para ver sus horquillas"], correctAnswers: "Al menos tres longitudes de vehículo", explanation: "Mantenga al menos tres longitudes de vehículo (aproximadamente un intervalo de 3 segundos) para poder detenerse con seguridad si frenan repentinamente." },
+      ] },
+      { type: "key_takeaways", items: [
+        "La velocidad máxima segura es típicamente 5 mph",
+        "Mantenga al menos 3 longitudes de vehículo entre camiones",
+        "Los pisos mojados y los desechos aumentan la distancia de frenado",
+        "La eficiencia viene de la operación suave, no de la velocidad",
+      ] },
+    ]),
   },
   {
     module: "Conducción Segura y Peatones",
-    title: "Intersecciones y Puntos Ciegos",
-    type: "lesson",
-    estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Intersecciones y Puntos Ciegos",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Protocolo en Intersecciones", content: "<p>En cada intersección, puerta o área donde los peatones puedan estar presentes:</p><ol><li><strong>Deténgase completamente</strong></li><li><strong>Toque la bocina</strong></li><li>Mire en ambas direcciones</li><li>Proceda lentamente solo cuando sea seguro</li></ol>" },
-          { heading: "Esquinas Ciegas", content: "<p>Las esquinas ciegas son especialmente peligrosas. Use espejos, reduzca la velocidad y <strong>siempre toque la bocina</strong> antes de proceder alrededor de cualquier esquina donde no pueda ver lo que viene.</p>" },
-          { heading: "Puertas y Entradas", content: "<p>Al acercarse a puertas, reduzca la velocidad y toque la bocina. Nunca pase rápidamente por una puerta.</p>" },
-        ],
-        takeaways: [
-          "Deténgase, toque la bocina y mire antes de pasar por cualquier intersección",
-          "Use espejos y bocina en esquinas ciegas",
-          "Reduzca la velocidad al acercarse a puertas y entradas",
-          "Los peatones siempre tienen el derecho de paso",
-        ],
-      }),
-    },
-  },
-  {
-    module: "Conducción Segura y Peatones",
-    title: "Seguridad de Peatones",
+    title: "Intersecciones, Puntos Ciegos y Uso de la Bocina",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Seguridad de Peatones",
-        image: img("pedestrian-safety.svg"),
-        sections: [
-          { heading: "Los Peatones Siempre Tienen el Derecho de Paso", content: "<p>Como operador de montacargas, usted <strong>siempre</strong> debe ceder el paso a los peatones. Si un peatón está en su camino, deténgase y espere. Nunca asuma que se moverán.</p>" },
-          { heading: "Zonas de Seguridad para Peatones", content: "<p>Muchos lugares de trabajo tienen carriles peatonales designados y cruces peatonales. Respete estas zonas y nunca conduzca a través de un cruce peatonal mientras los peatones estén presentes.</p>" },
-          { heading: "Contacto Visual", content: "<p>Haga contacto visual con los peatones cuando sea posible. Use la bocina para alertar su presencia. No confíe en que los peatones escuchen o noten su montacargas.</p>" },
-          { heading: "Nunca Levante Personas en las Horquillas", content: "<p>Es <strong>absolutamente prohibido</strong> levantar o transportar una persona en las horquillas vacías o en una tarima sobre las horquillas. Solo se permite elevar personas usando una plataforma de seguridad aprobada por OSHA.</p>" },
-        ],
-        takeaways: [
-          "Los peatones siempre tienen el derecho de paso",
-          "Respete las zonas y cruces peatonales designados",
-          "Haga contacto visual y use la bocina para alertar su presencia",
-          "Nunca levante personas en las horquillas sin una plataforma aprobada",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Pasillo de almacén con zonas de espacio libre" },
+      { type: "heading", level: 2, text: "Intersecciones, Puntos Ciegos y Uso de la Bocina" },
+      { type: "heading", level: 3, text: "Aproxímese con Precaución" },
+      { type: "paragraph", html: "En cada intersección, esquina ciega o área con visibilidad limitada: <strong>reduzca la velocidad, toque la bocina y mire en ambas direcciones</strong> antes de proceder." },
+      { type: "heading", level: 3, text: "Espejos y Visibilidad" },
+      { type: "paragraph", html: "Use los espejos disponibles y mire en la dirección de viaje. Si una carga bloquea su vista hacia adelante, viaje en reversa. Nunca rebase en intersecciones, puntos ciegos o áreas peligrosas." },
+      { type: "heading", level: 3, text: "Protocolo de la Bocina" },
+      { type: "paragraph", html: "La bocina es un <strong>dispositivo de advertencia</strong>, no una exigencia de derecho de paso. Tóquela en intersecciones, esquinas ciegas, puertas y cuando sea que los peatones puedan estar presentes. Úsela para alertar a otros de su presencia." },
+      { type: "key_takeaways", items: [
+        "Reduzca la velocidad, toque la bocina y mire en cada intersección",
+        "Use espejos y conduzca en reversa cuando la vista esté bloqueada",
+        "La bocina advierte a otros — no le da el derecho de paso",
+        "Nunca rebase en intersecciones o puntos ciegos",
+      ] },
+    ]),
   },
   {
     module: "Conducción Segura y Peatones",
-    title: "Conducción en Superficies Difíciles",
+    title: "Derecho de Paso de los Peatones",
+    type: "lesson",
+    estimatedMinutes: 4,
+    config: blocks([
+      { type: "hero_image", src: photo("pedestrian-crossing-scene.svg"), alt: "Montacargas cediendo el paso a un peatón en un carril peatonal marcado" },
+      { type: "heading", level: 2, text: "Derecho de Paso de los Peatones" },
+      { type: "heading", level: 3, text: "Los Peatones Siempre Tienen Prioridad" },
+      { type: "paragraph", html: "Los peatones <strong>siempre tienen el derecho de paso</strong>. Nunca conduzca hacia una persona que esté cerca de un objeto fijo. Siempre asegúrese de que las personas estén fuera del camino antes de moverse." },
+      { type: "image", src: img("pedestrian-safety.svg"), alt: "Diagrama de los puntos ciegos del montacargas y las zonas de separación de peatones", caption: "Los puntos ciegos se extienden detrás del camión y alrededor del mástil — asuma que los peatones no lo ven." },
+      { type: "heading", level: 3, text: "Comunicación" },
+      { type: "list", items: [
+        "Haga <strong>contacto visual</strong> con los peatones antes de proceder",
+        "Toque la bocina como una <strong>advertencia</strong>, no como una exigencia de que se muevan",
+        "Espere a que los peatones lo reconozcan y se muevan a un lugar seguro",
+      ] },
+      { type: "scenario", title: "¿Qué Haría Usted?",
+        prompt: "Está transportando una tarima por el pasillo principal a velocidad de caminata. Veinte pies adelante, un compañero de trabajo sale de entre dos estanterías leyendo una tabla portapapeles. No lo ha visto a usted.",
+        choices: [
+          { text: "Tocar la bocina repetidamente y seguir avanzando — se hará a un lado", correct: false, feedback: "La bocina es una advertencia, no una exigencia de derecho de paso. Un peatón sobresaltado puede moverse en la dirección equivocada. Debe detenerse hasta que esté fuera del camino." },
+          { text: "Detenerse, tocar la bocina una vez y esperar contacto visual antes de proceder", correct: true, feedback: "Exactamente correcto. Los peatones siempre tienen el derecho de paso. Deténgase, advierta, haga contacto visual y solo proceda una vez que estén claramente fuera de su camino." },
+          { text: "Esquivarlo manteniendo su velocidad", correct: false, feedback: "Nunca esquive a un peatón que no lo ha visto — puede moverse hacia su nueva trayectoria, y girar bruscamente con una carga arriesga una volcadura." },
+        ] },
+      { type: "heading", level: 3, text: "Zonas Peatonales" },
+      { type: "paragraph", html: "Esté especialmente alerta en áreas donde los peatones caminan comúnmente: cerca de salas de descanso, baños, oficinas, áreas de envío/recepción y donde sea que los trabajadores crucen las rutas de los montacargas." },
+      { type: "key_takeaways", items: [
+        "Los peatones siempre tienen el derecho de paso",
+        "Haga contacto visual antes de proceder cerca de personas",
+        "Toque la bocina como advertencia, no como exigencia",
+        "Esté extra alerta cerca de salas de descanso, oficinas y áreas de cruce",
+      ] },
+    ]),
+  },
+  {
+    module: "Conducción Segura y Peatones",
+    title: "Cambios de Dirección y Manejo Suave",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Conducción en Superficies Difíciles",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Pisos Mojados o Resbalosos", content: "<p>Reduzca significativamente la velocidad en pisos mojados, aceitosos o resbalosos. La distancia de frenado aumenta dramáticamente en superficies resbalosas.</p>" },
-          { heading: "Superficies Irregulares", content: "<p>Cuando opere en superficies irregulares, reduzca la velocidad y tenga precaución extrema. Los baches, grietas y superficies irregulares pueden desestabilizar la carga o causar una volcadura.</p>" },
-          { heading: "Operación al Aire Libre", content: "<p>Cuando opere al aire libre, tenga en cuenta condiciones climáticas adversas — viento, lluvia, nieve o hielo. El viento puede desestabilizar cargas altas. Lluvia y hielo aumentan la distancia de frenado.</p>" },
-        ],
-        takeaways: [
-          "Reduzca la velocidad significativamente en pisos mojados o resbalosos",
-          "Tenga extrema precaución en superficies irregulares",
-          "Considere las condiciones climáticas al operar al aire libre",
-          "La distancia de frenado aumenta en superficies mojadas",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("safe-driving.svg"), alt: "Postura de conducción segura y manejo suave" },
+      { type: "heading", level: 2, text: "Cambios de Dirección y Manejo Suave" },
+      { type: "heading", level: 3, text: "Detención Completa Antes de Cambiar de Dirección" },
+      { type: "paragraph", html: "Siempre llegue a una <strong>detención completa</strong> antes de cambiar de avance a reversa o viceversa. Los cambios de dirección abruptos pueden causar que las cargas se desplacen o caigan, y aumentan el riesgo de volcadura." },
+      { type: "heading", level: 3, text: "Movimientos Suaves" },
+      { type: "paragraph", html: "La aceleración, el frenado y la dirección suaves previenen desplazamientos de carga, derrames y volcaduras. Los movimientos bruscos son el enemigo de la estabilidad." },
+      { type: "heading", level: 3, text: "No Acelere Mientras Gira" },
+      { type: "paragraph", html: "Acelerar durante un giro aumenta significativamente el riesgo de volcadura. La distribución única de peso de un montacargas, combinada con una carga pesada, hace fácil perder el control si no se maneja con cuidado." },
+      { type: "key_takeaways", items: [
+        "Llegue a una detención completa antes de cambiar de dirección",
+        "La aceleración y el frenado suaves previenen desplazamientos de carga",
+        "Nunca acelere mientras gira",
+        "Los movimientos bruscos aumentan el riesgo de volcadura",
+      ] },
+    ]),
   },
   {
     module: "Conducción Segura y Peatones",
@@ -445,76 +537,106 @@ export const COURSE_STEPS_ES: StepDef[] = [
     ],
   },
 
-  // ═══ MÓDULO 5: Rampas, Muelles y Trabajo Elevado ═══
+  // ═══ MÓDULO 5: Rampas, Muelles, Remolques y Trabajo Elevado ═══
   {
     module: "Rampas, Muelles y Elevación",
     title: "Operación en Rampas y Pendientes",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Operación en Rampas y Pendientes",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Regla de Rampas", content: "<p>La regla es sencilla: <strong>la carga siempre apunta cuesta arriba</strong>.</p><ul><li><strong>Subiendo con carga:</strong> Conduzca hacia adelante (la carga mira cuesta arriba)</li><li><strong>Bajando con carga:</strong> Conduzca en reversa (la carga sigue mirando cuesta arriba)</li><li><strong>Sin carga:</strong> Las horquillas vacías siempre apuntan cuesta abajo</li></ul>" },
-          { heading: "Nunca Gire en una Rampa", content: "<p>Nunca gire o cruce lateralmente una pendiente. El riesgo de volcadura lateral es extremo en rampas.</p>" },
-          { heading: "Velocidad en Rampas", content: "<p>Mantenga una velocidad lenta y controlada. Nunca exceda los límites de velocidad publicados en rampas. No se detenga en una rampa con carga a menos que sea absolutamente necesario.</p>" },
-        ],
-        takeaways: [
-          "La carga siempre apunta cuesta arriba en rampas",
-          "Nunca gire o cruce lateralmente en una pendiente",
-          "Mantenga velocidad lenta y controlada en rampas",
-          "Sin carga: las horquillas apuntan cuesta abajo",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("ramps-slopes.svg"), alt: "Montacargas en una rampa con la carga apuntando cuesta arriba" },
+      { type: "heading", level: 2, text: "Operación en Rampas y Pendientes" },
+      { type: "heading", level: 3, text: "Viaje con Carga en Rampas" },
+      { type: "paragraph", html: "Al viajar en una rampa <strong>con carga</strong>: mantenga la carga apuntando <strong>cuesta arriba</strong>. Esto significa conducir hacia adelante al subir una rampa y en reversa al bajar una rampa cuando está cargado." },
+      { type: "heading", level: 3, text: "Viaje sin Carga en Rampas" },
+      { type: "paragraph", html: "Al viajar en una rampa <strong>sin carga</strong>: las horquillas deben apuntar <strong>cuesta abajo</strong>." },
+      { type: "scenario", title: "Decisión en la Rampa",
+        prompt: "Recogió una tarima llena en el nivel superior y necesita llevarla hacia ABAJO por la rampa hasta el nivel del suelo. ¿Cuál es la forma correcta de descender?",
+        choices: [
+          { text: "Conducir hacia adelante bajando la rampa — se ve mejor", correct: false, feedback: "Con la carga apuntando cuesta abajo, la gravedad jala la tarima fuera de las horquillas y el centro de gravedad combinado se desplaza hacia el eje delantero — una receta para perder la carga o volcarse." },
+          { text: "Bajar la rampa en reversa para que la carga siga apuntando cuesta arriba", correct: true, feedback: "Correcto. Cargado en una rampa = la carga siempre apunta cuesta arriba. Al bajar, eso significa viajar en reversa, lentamente, mirando por encima del hombro o usando un ayudante." },
+          { text: "Dar la vuelta a mitad de la bajada para poner la carga cuesta arriba", correct: false, feedback: "Nunca gire en una rampa. Girar desplaza el centro de gravedad lateralmente en una pendiente — esta es una de las maniobras con mayor riesgo de volcadura que existen." },
+        ] },
+      { type: "heading", level: 3, text: "Reglas de Seguridad en Rampas" },
+      { type: "list", items: [
+        "Suba y baje lentamente",
+        "En pendientes pronunciadas (>10%), viaje con la carga cuesta arriba",
+        "Incline la carga ligeramente hacia atrás para estabilidad",
+        "<strong>Nunca gire en una rampa</strong> — el riesgo de volcadura es extremadamente alto",
+        "Nunca estacione en una rampa a menos que sea absolutamente necesario (calce las ruedas si debe hacerlo)",
+      ] },
+      { type: "callout", variant: "warning", text: "Girar en una rampa aumenta dramáticamente el riesgo de volcadura. Siempre viaje directamente hacia arriba o hacia abajo." },
+      { type: "key_takeaways", items: [
+        "Con carga: mantenga la carga apuntando cuesta arriba",
+        "Sin carga: las horquillas apuntan cuesta abajo",
+        "Nunca gire en una rampa — riesgo extremo de volcadura",
+        "Viaje lentamente e incline la carga ligeramente hacia atrás",
+      ] },
+    ]),
   },
   {
     module: "Rampas, Muelles y Elevación",
     title: "Operaciones en Muelles de Carga",
     type: "lesson",
-    estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Operaciones en Muelles de Carga",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Antes de Entrar a un Remolque", content: "<p>Antes de conducir dentro de cualquier camión o remolque:</p><ul><li>Verifique que el remolque esté <strong>correctamente calzado</strong> (calzas en las ruedas)</li><li>Confirme que los <strong>frenos del remolque estén puestos</strong></li><li>Revise la condición del piso del remolque — busque podredumbre, hoyos o debilidad</li><li>Asegúrese de que una <strong>placa de muelle</strong> esté correctamente posicionada</li></ul>" },
-          { heading: "Placas de Muelle", content: "<p>Nunca intente conducir directamente del muelle al remolque sin una placa de muelle. Esto puede resultar en una carga derramada o un montacargas atascado. Mantenga las horquillas a la altura recomendada de <strong>4–6 pulgadas</strong> al entrar.</p>" },
-          { heading: "Conciencia del Borde", content: "<p>Mantenga al menos <strong>el ancho de una llanta</strong> de distancia de los bordes del muelle o bordes de la plataforma. Los peligros de caída son un riesgo serio en áreas de muelle.</p>" },
-          { heading: "Movimiento del Remolque", content: "<p>La fuerza de frenado de un montacargas puede causar que un remolque sin frenos se aleje del muelle, potencialmente atrapando el montacargas adentro. <strong>Siempre verifique calzas y frenos</strong> antes de entrar.</p>" },
-        ],
-        takeaways: [
-          "Siempre verifique calzas y frenos antes de entrar a un remolque",
-          "Use una placa de muelle — nunca salte el espacio",
-          "Revise la condición del piso del remolque antes de conducir sobre él",
-          "Mantenga al menos el ancho de una llanta del borde del muelle",
-        ],
-      }),
-    },
+    estimatedMinutes: 5,
+    config: blocks([
+      { type: "hero_image", src: photo("dock-loading-scene.svg"), alt: "Montacargas entrando a un remolque sobre una placa de muelle en un muelle de carga" },
+      { type: "heading", level: 2, text: "Operaciones en Muelles de Carga" },
+      { type: "heading", level: 3, text: "Antes de Entrar a un Remolque" },
+      { type: "list", items: [
+        "Verifique que el remolque esté <strong>correctamente calzado</strong> (calzas en las ruedas)",
+        "Confirme que los <strong>frenos del remolque estén puestos</strong>",
+        "Revise la condición del piso del remolque — busque podredumbre, hoyos o debilidad",
+        "Asegúrese de que una <strong>placa de muelle</strong> esté correctamente posicionada",
+      ] },
+      { type: "heading", level: 3, text: "Conozca los Peligros del Muelle" },
+      { type: "paragraph", html: "Las áreas de muelle concentran varios peligros serios en un espacio pequeño. Toque cada marcador para aprender qué revisar." },
+      { type: "hotspot_diagram", src: img("dock-scene.svg"), alt: "Vista transversal de un muelle de carga con remolque, placa de muelle y calzas de ruedas",
+        hotspots: [
+          { x: 54, y: 67, label: "Placa de Muelle", description: "Debe estar clasificada para el peso de su camión, correctamente asentada y asegurada antes de cruzar. Nunca salte el espacio — entre recto y lento, con las horquillas a 4–6 pulgadas." },
+          { x: 31, y: 88, label: "Calzas de Ruedas", description: "Las calzas contra las ruedas del remolque evitan que se aleje del muelle. Verifíquelas usted mismo — no confíe en la palabra de nadie." },
+          { x: 31, y: 62, label: "Piso del Remolque", description: "Revise podredumbre, hoyos y tablas débiles antes de entrar. Confirme el tren de aterrizaje o el soporte delantero del remolque si el tractor está desenganchado." },
+          { x: 61, y: 67, label: "Borde del Muelle", description: "Un muelle abierto es una caída de 4 pies. Manténgase al menos al ancho de una llanta del borde y nunca opere cerca de una puerta de muelle abierta sin protección." },
+          { x: 59, y: 73, label: "Espacio de Deslizamiento del Remolque", description: "Cada entrada del montacargas empuja el remolque ligeramente. Observe el espacio entre el remolque y el muelle — un espacio creciente significa que el remolque se está deslizando y debe ser re-asegurado." },
+        ] },
+      { type: "heading", level: 3, text: "Movimiento del Remolque" },
+      { type: "paragraph", html: "La fuerza de frenado de un montacargas puede causar que un remolque sin frenos se aleje del muelle, potencialmente atrapando el montacargas adentro. <strong>Siempre verifique calzas y frenos</strong> antes de entrar." },
+      { type: "key_takeaways", items: [
+        "Siempre verifique calzas y frenos antes de entrar a un remolque",
+        "Use una placa de muelle — nunca salte el espacio",
+        "Revise la condición del piso del remolque antes de conducir sobre él",
+        "Mantenga al menos el ancho de una llanta del borde del muelle",
+      ] },
+    ]),
   },
   {
     module: "Rampas, Muelles y Elevación",
     title: "Elevación de Personas y Trabajo Elevado",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Elevación de Personas y Trabajo Elevado",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Nunca Eleve Personas en las Horquillas Vacías", content: "<p>Es <strong>nunca aceptable</strong> elevar a una persona en las horquillas sin una plataforma de seguridad aprobada. Esto incluye pararse sobre tarimas, cubetas o cualquier plataforma improvisada.</p>" },
-          { heading: "Plataformas de Seguridad Aprobadas", content: "<p>Una plataforma de seguridad aprobada por OSHA debe incluir:</p><ul><li><strong>Barandillas de 42 pulgadas</strong> en todos los lados</li><li>Barandilla intermedia posicionada a mitad de camino entre la barandilla superior y la plataforma</li><li><strong>Tablones de pie de 4 pulgadas</strong></li><li>Sujeción segura al mástil (cadena o dispositivo de cierre)</li><li><strong>Protección superior de 7 pies</strong> para protección contra aplastamiento</li><li>Protección personal contra caídas (línea de seguridad y arnés)</li></ul>" },
-          { heading: "Responsabilidades del Operador Durante la Elevación", content: "<p>Al elevar a una persona en una plataforma: el motor debe permanecer encendido, el operador debe <strong>permanecer en los controles en todo momento</strong>, y el montacargas no debe ser conducido a otra ubicación con una persona elevada.</p>" },
-        ],
-        takeaways: [
-          "Nunca eleve personas en horquillas vacías o plataformas improvisadas",
-          "Solo use plataformas aprobadas por OSHA con barandillas y protección contra caídas",
-          "El operador debe permanecer en los controles mientras alguien esté elevado",
-          "Nunca mueva el montacargas con una persona elevada en una plataforma",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("aerial-lift-scene.svg"), alt: "Trabajador con arnés en una plataforma elevada con un vigilante en el suelo" },
+      { type: "heading", level: 2, text: "Elevación de Personas y Trabajo Elevado" },
+      { type: "heading", level: 3, text: "Nunca Eleve Personas en las Horquillas Vacías" },
+      { type: "paragraph", html: "<strong>Nunca es aceptable</strong> elevar a una persona en las horquillas sin una plataforma de seguridad aprobada. Esto incluye pararse sobre tarimas, cubetas o cualquier plataforma improvisada." },
+      { type: "heading", level: 3, text: "Plataformas de Seguridad Aprobadas" },
+      { type: "list", items: [
+        "<strong>Barandillas de 42 pulgadas</strong> en todos los lados",
+        "Barandilla intermedia posicionada a mitad de camino entre la barandilla superior y la plataforma",
+        "<strong>Tablones de pie de 4 pulgadas</strong>",
+        "Sujeción segura al mástil (cadena o dispositivo de cierre)",
+        "<strong>Protección superior de 7 pies</strong> para protección contra aplastamiento",
+        "Protección personal contra caídas (línea de seguridad y arnés)",
+      ] },
+      { type: "heading", level: 3, text: "Responsabilidades del Operador Durante la Elevación" },
+      { type: "paragraph", html: "Al elevar a una persona en una plataforma: el motor debe permanecer encendido, el operador debe <strong>permanecer en los controles en todo momento</strong>, y el montacargas no debe ser conducido a otra ubicación con una persona elevada." },
+      { type: "key_takeaways", items: [
+        "Nunca eleve personas en horquillas vacías o plataformas improvisadas",
+        "Solo use plataformas aprobadas por OSHA con barandillas y protección contra caídas",
+        "El operador debe permanecer en los controles mientras alguien esté elevado",
+        "Nunca mueva el montacargas con una persona elevada en una plataforma",
+      ] },
+    ]),
   },
   {
     module: "Rampas, Muelles y Elevación",
@@ -534,47 +656,68 @@ export const COURSE_STEPS_ES: StepDef[] = [
     module: "Estacionamiento y Apagado",
     title: "Estacionamiento y Aseguramiento del Montacargas",
     type: "lesson",
-    estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Estacionamiento y Aseguramiento del Montacargas",
-        image: img("parking-shutdown.svg"),
-        sections: [
-          { heading: "Procedimiento de Estacionamiento", content: "<p>Al estacionar su montacargas:</p><ol><li><strong>Baje las horquillas</strong> completamente planas al suelo</li><li>Incline las horquillas ligeramente hacia adelante</li><li><strong>Ponga el freno de estacionamiento</strong></li><li><strong>Neutralice todos los controles</strong></li><li><strong>Apague el motor/energía</strong></li><li><strong>Retire la llave</strong></li></ol>" },
-          { heading: "Ubicación de Estacionamiento", content: "<p>Estacione solo en <strong>áreas designadas</strong>. Nunca bloquee salidas de incendio, equipo de emergencia o carriles de tráfico. Si estaciona en una pendiente, calce las ruedas.</p>" },
-        ],
-        takeaways: [
-          "Baje horquillas, ponga freno, neutralice controles, apague motor, retire llave",
-          "Estacione solo en áreas designadas",
-          "Nunca bloquee salidas de incendio o equipo de emergencia",
-          "Calce las ruedas si estaciona en una pendiente",
-        ],
-      }),
-    },
+    estimatedMinutes: 4,
+    config: blocks([
+      { type: "hero_image", src: img("parking-shutdown.svg"), alt: "Montacargas estacionado con horquillas bajadas, rueda calzada y pasos de apagado" },
+      { type: "heading", level: 2, text: "Estacionamiento y Aseguramiento del Montacargas" },
+      { type: "heading", level: 3, text: "Procedimiento de Estacionamiento" },
+      { type: "paragraph", html: "Cada apagado sigue la misma secuencia. Ponga los pasos en orden — hará esto al final de cada turno por el resto de su carrera." },
+      { type: "drag_drop", mode: "ordering",
+        prompt: "Ordene los pasos del procedimiento de estacionamiento en la secuencia correcta.",
+        items: [
+          { id: "p1", label: "Baje las horquillas completamente planas al suelo" },
+          { id: "p2", label: "Incline las horquillas ligeramente hacia adelante" },
+          { id: "p3", label: "Ponga el freno de estacionamiento" },
+          { id: "p4", label: "Neutralice todos los controles" },
+          { id: "p5", label: "Apague el motor / la energía" },
+          { id: "p6", label: "Retire la llave" },
+        ] },
+      { type: "heading", level: 3, text: "Ubicación de Estacionamiento" },
+      { type: "paragraph", html: "Estacione solo en <strong>áreas designadas</strong>. Nunca bloquee salidas de incendio, equipo de emergencia o carriles de tráfico. Si estaciona en una pendiente, calce las ruedas." },
+      { type: "key_takeaways", items: [
+        "Baje horquillas, ponga freno, neutralice controles, apague motor, retire llave",
+        "Estacione solo en áreas designadas",
+        "Nunca bloquee salidas de incendio o equipo de emergencia",
+        "Calce las ruedas si estaciona en una pendiente",
+      ] },
+    ]),
   },
   {
     module: "Estacionamiento y Apagado",
     title: "Definición de Montacargas Desatendido",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Montacargas Desatendido: Cuándo y Qué Hacer",
-        image: img("parking-shutdown.svg"),
-        sections: [
-          { heading: "Qué Significa 'Desatendido'", content: "<p>Un montacargas se considera <strong>desatendido</strong> cuando el operador está a <strong>más de 25 pies de distancia</strong> del vehículo Y el vehículo está <strong>fuera de su línea de visión</strong>.</p>" },
-          { heading: "Procedimiento de Desatendido", content: "<p>Al dejar un montacargas desatendido:</p><ul><li>Apague la energía</li><li>Ponga los frenos</li><li>Baje las horquillas completamente</li><li>Regrese el mástil a posición vertical</li><li>Retire la llave para prevenir uso no autorizado</li><li>Calce las ruedas si está en una pendiente</li></ul>" },
-          { heading: "Temporalmente Desmontado (Dentro de 25 Pies)", content: "<p>Si está dentro de 25 pies y tiene el montacargas en su línea de visión:</p><ul><li>Baje las horquillas</li><li>Neutralice los controles</li><li>Ponga los frenos</li></ul><p>No necesita retirar la llave en este caso, pero el montacargas debe estar asegurado.</p>" },
-          { heading: "Reportar Accidentes", content: "<p>Reporte <strong>todos los accidentes</strong>, incluso los menores — incluyendo rasguños menores, casi-accidentes y daños a la propiedad. No reportar puede resultar en acción disciplinaria y oculta problemas de seguridad que necesitan ser abordados.</p>" },
-        ],
-        takeaways: [
-          "Desatendido = 25+ pies de distancia Y fuera de la línea de visión",
-          "Apagado completo requerido cuando desatendido: energía apagada, freno puesto, llave retirada",
-          "Dentro de 25 pies: baje horquillas, neutralice controles, ponga frenos",
-          "Reporte TODOS los accidentes, incluso los menores",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("parking-shutdown.svg"), alt: "Montacargas estacionado y asegurado" },
+      { type: "heading", level: 2, text: "Montacargas Desatendido: Cuándo y Qué Hacer" },
+      { type: "heading", level: 3, text: "Qué Significa 'Desatendido'" },
+      { type: "paragraph", html: "Un montacargas se considera <strong>desatendido</strong> cuando el operador está a <strong>más de 25 pies de distancia</strong> del vehículo Y el vehículo está <strong>fuera de su línea de visión</strong>." },
+      { type: "heading", level: 3, text: "Procedimiento de Desatendido" },
+      { type: "list", items: [
+        "Apague la energía",
+        "Ponga los frenos",
+        "Baje las horquillas completamente",
+        "Regrese el mástil a posición vertical",
+        "Retire la llave para prevenir uso no autorizado",
+        "Calce las ruedas si está en una pendiente",
+      ] },
+      { type: "heading", level: 3, text: "Temporalmente Desmontado (Dentro de 25 Pies)" },
+      { type: "paragraph", html: "Si está dentro de 25 pies y tiene el montacargas en su línea de visión:" },
+      { type: "list", items: [
+        "Baje las horquillas",
+        "Neutralice los controles",
+        "Ponga los frenos",
+      ] },
+      { type: "paragraph", html: "No necesita retirar la llave en este caso, pero el montacargas debe estar asegurado." },
+      { type: "heading", level: 3, text: "Reportar Accidentes" },
+      { type: "paragraph", html: "Reporte <strong>todos los accidentes</strong>, incluso los menores — incluyendo rasguños menores, casi-accidentes y daños a la propiedad. No reportar puede resultar en acción disciplinaria y oculta problemas de seguridad que necesitan ser abordados." },
+      { type: "key_takeaways", items: [
+        "Desatendido = 25+ pies de distancia Y fuera de la línea de visión",
+        "Apagado completo requerido cuando desatendido: energía apagada, freno puesto, llave retirada",
+        "Dentro de 25 pies: baje horquillas, neutralice controles, ponga frenos",
+        "Reporte TODOS los accidentes, incluso los menores",
+      ] },
+    ]),
   },
   {
     module: "Estacionamiento y Apagado",
@@ -593,24 +736,37 @@ export const COURSE_STEPS_ES: StepDef[] = [
     module: "Reglas del Sitio y Paquete del Empleador",
     title: "La Importancia de la Capacitación Específica del Sitio",
     type: "lesson",
-    estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "La Importancia de la Capacitación Específica del Sitio",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Cada Lugar de Trabajo es Diferente", content: "<p>Cada lugar de trabajo tiene peligros únicos: pasillos estrechos, patrones de tráfico peatonal específicos, muelles de carga, configuraciones de estantería, áreas de almacenamiento frío, áreas exteriores y más. Su supervisor debe revisar las <strong>políticas específicas del sitio</strong> con usted antes de operar en cualquier nueva ubicación.</p>" },
-          { heading: "Temas Específicos del Sitio", content: "<ul><li>Límites de velocidad de la instalación y patrones de tráfico</li><li>Áreas designadas de estacionamiento y carga</li><li>Zonas peatonales y cruces</li><li>Procedimientos de emergencia y puntos de reunión</li><li>Protocolos de comunicación (radio, señales)</li><li>Tipos de equipo específicos y accesorios utilizados</li></ul>" },
-          { heading: "Capacitación de Actualización", content: "<p>Se requiere capacitación adicional cuando:</p><ul><li>Opera un nuevo tipo de equipo</li><li>Trabaja en una nueva instalación</li><li>Después de un accidente o casi-accidente</li><li>Cuando se observa operación insegura</li></ul>" },
-        ],
-        takeaways: [
-          "Cada lugar de trabajo tiene peligros únicos que requieren capacitación específica del sitio",
-          "Su supervisor debe revisar las políticas del sitio antes de que usted opere",
-          "Se requiere capacitación adicional para equipo o instalaciones nuevas",
-          "Después de accidentes o comportamiento inseguro observado, se requiere recapacitación",
-        ],
-      }),
-    },
+    estimatedMinutes: 4,
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Pasillo de almacén mostrando espacios libres específicos del sitio" },
+      { type: "heading", level: 2, text: "La Importancia de la Capacitación Específica del Sitio" },
+      { type: "heading", level: 3, text: "Cada Lugar de Trabajo es Diferente" },
+      { type: "paragraph", html: "Cada lugar de trabajo tiene peligros únicos: pasillos estrechos, patrones de tráfico peatonal específicos, muelles de carga, configuraciones de estantería, áreas de almacenamiento frío, áreas exteriores y más. Su supervisor debe revisar las <strong>políticas específicas del sitio</strong> con usted antes de operar en cualquier nueva ubicación." },
+      { type: "heading", level: 3, text: "Temas Específicos del Sitio" },
+      { type: "list", items: [
+        "Límites de velocidad de la instalación y patrones de tráfico",
+        "Áreas designadas de estacionamiento y carga",
+        "Zonas peatonales y cruces",
+        "Procedimientos de emergencia y puntos de reunión",
+        "Protocolos de comunicación (radio, señales)",
+        "Tipos de equipo específicos y accesorios utilizados",
+      ] },
+      { type: "heading", level: 3, text: "Lo Que Su Empleador Le Debe" },
+      { type: "paragraph", html: "OSHA impone deberes específicos a su empleador. Voltee cada tarjeta para ver de qué es responsable." },
+      { type: "flip_cards", title: "Responsabilidades del Empleador", cards: [
+        { front: "Capacitación Práctica", back: "Capacitación práctica en el equipo específico que operará, en el lugar de trabajo real, antes de trabajar solo." },
+        { front: "Evaluación", back: "Un supervisor o instructor calificado debe observarlo operar y aprobar formalmente su competencia." },
+        { front: "Documentación", back: "Formularios de evaluación firmados, permisos y registros de asistencia archivados — OSHA puede solicitarlos durante las inspecciones." },
+        { front: "Capacitación de Actualización", back: "Requerida después de un accidente o casi-accidente, cuando se observa operación insegura, o cuando cambia a un nuevo equipo o una nueva instalación." },
+        { front: "Re-Evaluación", back: "Al menos cada 3 años, su empleador debe re-evaluar su desempeño para mantener su certificación vigente." },
+      ] },
+      { type: "key_takeaways", items: [
+        "Cada lugar de trabajo tiene peligros únicos que requieren capacitación específica del sitio",
+        "Su supervisor debe revisar las políticas del sitio antes de que usted opere",
+        "Se requiere capacitación adicional para equipo o instalaciones nuevas",
+        "Después de accidentes o comportamiento inseguro observado, se requiere recapacitación",
+      ] },
+    ]),
   },
   {
     module: "Reglas del Sitio y Paquete del Empleador",
@@ -698,24 +854,29 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Felicitaciones: ¿Qué Sigue?",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "¡Está Certificado! ¿Qué Sigue?",
-        image: img("forklift-hero.svg"),
-        sections: [
-          { heading: "Su Certificado", content: "<p>¡Felicitaciones por completar la porción de instrucción formal de su certificación de operador de montacargas! Su certificado digital ahora está disponible para descargar. Incluye un número de certificado único y código QR que los empleadores pueden usar para verificación instantánea.</p>" },
-          { heading: "Siguiente Paso: Evaluación Práctica", content: "<p>Recuerde, su empleador aún debe completar la <strong>evaluación práctica en persona</strong> en su lugar de trabajo. Comparta el paquete de documentación del empleador (disponible en el Módulo 7) con su supervisor. Incluye:</p><ul><li>Lista de Evaluación de Desempeño</li><li>Formulario de Permiso / Autorización del Operador</li><li>Hoja de Asistencia del Sitio</li></ul>" },
-          { heading: "Tarjeta de Billetera (Opcional)", content: "<p>¿Desea una tarjeta de identificación de operador profesional tamaño billetera? Ordene su tarjeta física desde su página de certificación. Facilita mostrar prueba de capacitación en el trabajo.</p>" },
-          { heading: "Manténgase Seguro", content: "<p>Su capacitación no termina aquí. Continúe siguiendo los procedimientos de operación segura todos los días. Si alguna vez tiene preguntas o necesita una actualización, puede volver a visitar este curso en cualquier momento. ¡Manténgase seguro!</p>" },
-        ],
-        takeaways: [
-          "Descargue su certificado desde su página de certificación",
-          "Comparta el paquete del empleador con su supervisor para la evaluación práctica",
-          "Considere ordenar una tarjeta de identificación de operador tamaño billetera",
-          "La re-evaluación es requerida al menos cada 3 años",
-        ],
-        tip: "Guarde el enlace de su página de verificación — los empleadores pueden usarlo para verificar instantáneamente su certificación.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("ppe-workers-scene.svg"), alt: "Equipo de trabajadores certificados con EPP frente a un montacargas" },
+      { type: "heading", level: 2, text: "¡Está Certificado! ¿Qué Sigue?" },
+      { type: "heading", level: 3, text: "Su Certificado" },
+      { type: "paragraph", html: "¡Felicitaciones por completar la porción de instrucción formal de su certificación de operador de montacargas! Su certificado digital ahora está disponible para descargar. Incluye un número de certificado único y código QR que los empleadores pueden usar para verificación instantánea." },
+      { type: "heading", level: 3, text: "Siguiente Paso: Evaluación Práctica" },
+      { type: "paragraph", html: "Recuerde, su empleador aún debe completar la <strong>evaluación práctica en persona</strong> en su lugar de trabajo. Comparta el paquete de documentación del empleador (disponible en el Módulo 7) con su supervisor. Incluye:" },
+      { type: "list", items: [
+        "Lista de Evaluación de Desempeño",
+        "Formulario de Permiso / Autorización del Operador",
+        "Hoja de Asistencia del Sitio",
+      ] },
+      { type: "heading", level: 3, text: "Tarjeta de Billetera (Opcional)" },
+      { type: "paragraph", html: "¿Desea una tarjeta de identificación de operador profesional tamaño billetera? Ordene su tarjeta física desde su página de certificación. Facilita mostrar prueba de capacitación en el trabajo." },
+      { type: "heading", level: 3, text: "Manténgase Seguro" },
+      { type: "paragraph", html: "Su capacitación no termina aquí. Continúe siguiendo los procedimientos de operación segura todos los días. Si alguna vez tiene preguntas o necesita una actualización, puede volver a visitar este curso en cualquier momento. ¡Manténgase seguro!" },
+      { type: "callout", variant: "tip", text: "Guarde el enlace de su página de verificación — los empleadores pueden usarlo para verificar instantáneamente su certificación." },
+      { type: "key_takeaways", items: [
+        "Descargue su certificado desde su página de certificación",
+        "Comparta el paquete del empleador con su supervisor para la evaluación práctica",
+        "Considere ordenar una tarjeta de identificación de operador tamaño billetera",
+        "La re-evaluación es requerida al menos cada 3 años",
+      ] },
+    ]),
   },
 ];

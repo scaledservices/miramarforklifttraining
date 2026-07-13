@@ -3,9 +3,6 @@
   <rect x="0" y="400" width="800" height="50" fill="#e8e2d8"/>
   <line x1="0" y1="400" x2="800" y2="400" stroke="#b8ad9c" stroke-width="2"/>
 
-  <text x="30" y="44" font-size="22" font-weight="700" fill="#4f3b3b">Boom Lift Components</text>
-  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
-
   <!-- far wheels -->
   <circle cx="152" cy="368" r="23" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
   <circle cx="294" cy="368" r="23" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
@@ -78,43 +75,4 @@
   <circle cx="694" cy="95" r="2.5" fill="#FFC326"/>
   <circle cx="703" cy="95" r="2.5" fill="#FF7F00"/>
   <circle cx="710" cy="95" r="2.5" fill="#019E7C"/>
-
-  <!-- labels -->
-  <g font-size="15" font-weight="600" fill="#1a1a1a">
-    <line x1="614" y1="105" x2="543" y2="70" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="614" cy="105" r="3.5" fill="#FF7F00"/>
-    <text x="538" y="66" text-anchor="end">Platform &amp; guardrails</text>
-
-    <line x1="700" y1="84" x2="730" y2="58" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="700" cy="84" r="3.5" fill="#FF7F00"/>
-    <text x="788" y="50" text-anchor="end">Platform controls</text>
-
-    <line x1="627" y1="136" x2="660" y2="232" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="627" cy="136" r="3.5" fill="#FF7F00"/>
-    <text x="662" y="252" text-anchor="middle">Harness + lanyard (anchored)</text>
-
-    <line x1="506" y1="138" x2="510" y2="164" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="510" cy="171" r="3.5" fill="#FF7F00"/>
-    <text x="505" y="130" text-anchor="middle">Upper boom</text>
-
-    <line x1="397" y1="204" x2="462" y2="282" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="394" cy="199" r="3.5" fill="#FF7F00"/>
-    <text x="475" y="300" text-anchor="middle">Knuckle</text>
-
-    <line x1="288" y1="236" x2="262" y2="182" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="292" cy="243" r="3.5" fill="#FF7F00"/>
-    <text x="255" y="172" text-anchor="middle">Lower boom</text>
-
-    <line x1="172" y1="292" x2="148" y2="272" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="176" cy="296" r="3.5" fill="#FF7F00"/>
-    <text x="142" y="266" text-anchor="end">Turret (rotates)</text>
-
-    <line x1="264" y1="311" x2="336" y2="320" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="260" cy="311" r="3.5" fill="#FF7F00"/>
-    <text x="342" y="326">Ground controls</text>
-
-    <line x1="98" y1="356" x2="74" y2="420" stroke="#4f3b3b" stroke-width="1.5"/>
-    <circle cx="100" cy="352" r="3.5" fill="#FF7F00"/>
-    <text x="40" y="436">Chassis</text>
-  </g>
 </svg>

@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Roboto, Arial, sans-serif">
+  <!-- background -->
+  <rect width="800" height="450" fill="#faf8f5"/>
+  <rect x="0" y="400" width="800" height="50" fill="#e8e2d8"/>
+  <line x1="0" y1="400" x2="800" y2="400" stroke="#b8ad9c" stroke-width="2"/>
+
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#4f3b3b">Load Center vs. Capacity</text>
+  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
+  <text x="30" y="76" font-size="13" fill="#8a8378">Rated capacity assumes a 24 in load center</text>
+
+  <!-- ===== forklift (side view, facing right) ===== -->
+  <!-- counterweight -->
+  <path d="M70,350 L70,300 Q70,285 85,285 L150,285 L150,350 Z" fill="#e0a800" stroke="#1a1a1a" stroke-width="2.5"/>
+  <!-- body -->
+  <rect x="120" y="290" width="200" height="60" rx="8" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+  <!-- hood / dash console -->
+  <path d="M250,290 L250,255 Q250,248 257,248 L312,248 Q320,248 320,258 L320,290 Z" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+  <!-- steering wheel -->
+  <path d="M260,250 L242,232" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="238" cy="228" r="9" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+  <!-- overhead guard -->
+  <line x1="142" y1="290" x2="148" y2="148" stroke="#3d3d3d" stroke-width="9" stroke-linecap="round"/>
+  <line x1="272" y1="252" x2="262" y2="148" stroke="#3d3d3d" stroke-width="9" stroke-linecap="round"/>
+  <rect x="132" y="136" width="146" height="12" rx="5" fill="#3d3d3d"/>
+  <!-- seat -->
+  <rect x="168" y="238" width="54" height="14" rx="5" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="160" y="196" width="13" height="48" rx="5" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- wheels -->
+  <circle cx="290" cy="352" r="48" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+  <circle cx="290" cy="352" r="22" fill="#8a8378"/>
+  <circle cx="290" cy="352" r="8" fill="#4a4540"/>
+  <circle cx="132" cy="364" r="36" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+  <circle cx="132" cy="364" r="16" fill="#8a8378"/>
+  <circle cx="132" cy="364" r="6" fill="#4a4540"/>
+  <!-- mast carriage link -->
+  <rect x="318" y="300" width="38" height="26" rx="4" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- mast -->
+  <rect x="352" y="118" width="13" height="274" fill="#555" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="375" y="118" width="13" height="274" fill="#6b6b6b" stroke="#1a1a1a" stroke-width="2"/>
+  <g stroke="#1a1a1a" stroke-width="2" fill="#555">
+    <rect x="352" y="150" width="36" height="8"/>
+    <rect x="352" y="230" width="36" height="8"/>
+    <rect x="352" y="310" width="36" height="8"/>
+  </g>
+  <line x1="394" y1="130" x2="394" y2="240" stroke="#8a8378" stroke-width="3" stroke-dasharray="4 3"/>
+  <!-- load backrest -->
+  <g stroke="#1a1a1a" stroke-width="2">
+    <rect x="398" y="228" width="12" height="152" fill="#777"/>
+    <line x1="398" y1="256" x2="410" y2="256"/>
+    <line x1="398" y1="284" x2="410" y2="284"/>
+    <line x1="398" y1="312" x2="410" y2="312"/>
+    <line x1="398" y1="340" x2="410" y2="340"/>
+  </g>
+  <!-- forks -->
+  <path d="M410,262 L422,262 L422,384 L648,384 L648,396 L410,396 Z" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- backrest face reference tick -->
+  <line x1="410" y1="398" x2="410" y2="428" stroke="#4f3b3b" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+  <!-- ===== load cube (animated: slides 24in -> 36in) ===== -->
+  <g>
+    <rect x="424" y="274" width="110" height="110" rx="3" fill="#dcd0ba" stroke="#1a1a1a" stroke-width="2.5"/>
+    <line x1="424" y1="311" x2="534" y2="311" stroke="#b8ad9c" stroke-width="2"/>
+    <line x1="424" y1="348" x2="534" y2="348" stroke="#b8ad9c" stroke-width="2"/>
+    <line x1="461" y1="274" x2="461" y2="384" stroke="#b8ad9c" stroke-width="2"/>
+    <line x1="497" y1="274" x2="497" y2="384" stroke="#b8ad9c" stroke-width="2"/>
+    <!-- load CG marker + drop line to dimension arrow -->
+    <line x1="479" y1="340" x2="479" y2="428" stroke="#FF7F00" stroke-width="2" stroke-dasharray="4 3"/>
+    <circle cx="479" cy="329" r="10" fill="#FF7F00" stroke="#1a1a1a" stroke-width="2.5"/>
+    <text x="479" y="333" font-size="9.5" font-weight="700" fill="#ffffff" text-anchor="middle">CG</text>
+    <!-- moving arrowhead of dimension line -->
+    <polygon points="479,420 468,415 468,425" fill="#4f3b3b"/>
+    <animateTransform attributeName="transform" type="translate" dur="8s" repeatCount="indefinite"
+      values="0 0;0 0;90 0;90 0;0 0;0 0"
+      keyTimes="0;0.16;0.42;0.62;0.88;1"/>
+  </g>
+
+  <!-- ===== dimension arrow (animated x2) ===== -->
+  <line x1="410" y1="420" x2="479" y2="420" stroke="#4f3b3b" stroke-width="2.5">
+    <animate attributeName="x2" dur="8s" repeatCount="indefinite"
+      values="479;479;569;569;479;479"
+      keyTimes="0;0.16;0.42;0.62;0.88;1"/>
+  </line>
+  <text x="500" y="444" font-size="16" font-weight="700" fill="#4f3b3b" text-anchor="middle" opacity="1">
+    Load center: 24 in
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite"
+      values="1;1;0;0;1;1" keyTimes="0;0.16;0.28;0.76;0.88;1"/>
+  </text>
+  <text x="500" y="444" font-size="16" font-weight="700" fill="#FF7F00" text-anchor="middle" opacity="0">
+    Load center: 36 in
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite"
+      values="0;0;1;1;0;0" keyTimes="0;0.28;0.40;0.64;0.76;1"/>
+  </text>
+
+  <!-- ===== capacity gauge ===== -->
+  <text x="710" y="120" font-size="15" font-weight="700" fill="#4f3b3b" text-anchor="middle">Capacity</text>
+  <rect x="690" y="130" width="40" height="254" rx="8" fill="#f5f2ec" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="694" y="134" width="32" height="242" rx="6" fill="#019E7C">
+    <animate attributeName="y" dur="8s" repeatCount="indefinite"
+      values="134;134;216;216;134;134" keyTimes="0;0.16;0.42;0.62;0.88;1"/>
+    <animate attributeName="height" dur="8s" repeatCount="indefinite"
+      values="242;242;160;160;242;242" keyTimes="0;0.16;0.42;0.62;0.88;1"/>
+    <animate attributeName="fill" dur="8s" repeatCount="indefinite"
+      values="#019E7C;#019E7C;#FF7F00;#FF7F00;#019E7C;#019E7C" keyTimes="0;0.16;0.42;0.62;0.88;1"/>
+  </rect>
+  <line x1="680" y1="134" x2="690" y2="134" stroke="#4f3b3b" stroke-width="2"/>
+  <text x="676" y="138" font-size="11" fill="#8a8378" text-anchor="end">5,000</text>
+  <line x1="680" y1="216" x2="690" y2="216" stroke="#4f3b3b" stroke-width="2"/>
+  <text x="676" y="220" font-size="11" fill="#8a8378" text-anchor="end">3,300</text>
+
+  <text x="710" y="414" font-size="18" font-weight="700" fill="#019E7C" text-anchor="middle" opacity="1">
+    5,000 lbs
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite"
+      values="1;1;0;0;1;1" keyTimes="0;0.16;0.35;0.70;0.88;1"/>
+  </text>
+  <text x="710" y="414" font-size="18" font-weight="700" fill="#FF7F00" text-anchor="middle" opacity="0">
+    3,300 lbs
+    <animate attributeName="opacity" dur="8s" repeatCount="indefinite"
+      values="0;0;1;1;0;0" keyTimes="0;0.30;0.42;0.62;0.80;1"/>
+  </text>
+
+  <text x="30" y="437" font-size="14" font-weight="700" fill="#4f3b3b">Longer load center = lower capacity</text>
+</svg>

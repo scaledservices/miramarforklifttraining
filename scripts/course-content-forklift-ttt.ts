@@ -1,3 +1,5 @@
+import type { LessonBlock } from "@shared/lesson-blocks";
+
 export interface StepDef {
   title: string;
   type: "lesson" | "video" | "checkpoint" | "download" | "exam" | "content";
@@ -25,32 +27,7 @@ export const CANONICAL_COURSE = {
 
 const img = (name: string) => `/images/training/${name}`;
 
-function lessonHtml(opts: {
-  title: string;
-  image: string;
-  sections: { heading?: string; content: string }[];
-  takeaways: string[];
-  tip?: string;
-  warning?: string;
-}): string {
-  const tipBlock = opts.tip ? `<div class="callout callout-tip"><strong>💡 Tip:</strong> ${opts.tip}</div>` : "";
-  const warnBlock = opts.warning ? `<div class="callout callout-warning"><strong>⚠️ Warning:</strong> ${opts.warning}</div>` : "";
-  const sectionHtml = opts.sections.map(s =>
-    (s.heading ? `<h3>${s.heading}</h3>` : "") + s.content
-  ).join("\n");
-  const takeawayItems = opts.takeaways.map(t => `<li>${t}</li>`).join("");
-  return `<div class="lesson-content">
-<img src="${opts.image}" alt="${opts.title}" class="lesson-hero-image" />
-<h2>${opts.title}</h2>
-${sectionHtml}
-${tipBlock}
-${warnBlock}
-<div class="key-takeaways">
-<h4>📝 Key Takeaways</h4>
-<ul>${takeawayItems}</ul>
-</div>
-</div>`;
-}
+const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
 export const COURSE_STEPS: StepDef[] = [
   // ═══ MODULE 0: OSHA Regulatory Framework ═══
@@ -59,50 +36,88 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Welcome & OSHA Regulatory Framework",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Welcome & OSHA Regulatory Framework",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "About This Course", content: "<p>Welcome to the Forklift Train the Trainer Certification! This course prepares you to become a <strong>qualified forklift operator trainer</strong> under OSHA 29 CFR 1910.178(l)(2)(iii). The course takes approximately <strong>2-3 hours</strong> to complete.</p>" },
-          { heading: "Trainer Qualifications (1910.178(l)(2)(iii))", content: "<p>OSHA states: <em>\"All operator training and evaluation shall be conducted by persons who have the knowledge, training, and experience to train powered industrial truck operators and evaluate their competence.\"</em></p><p>OSHA does <strong>not</strong> require a specific certification for trainers. Instead, the standard requires three qualifications:</p><ol><li><strong>Knowledge</strong> — of the OSHA standard and the subject matter</li><li><strong>Training</strong> — formal training on the topics they will teach</li><li><strong>Experience</strong> — practical experience operating the equipment</li></ol>" },
-          { heading: "What This Course Covers", content: "<ul><li>Complete review of 29 CFR 1910.178</li><li>Employer responsibilities under the standard</li><li>Documentation and certification requirements (1910.178(l)(6))</li><li>All 22 required training topics (truck-related and workplace-related)</li><li>Adult learning principles and training methodology</li><li>Practical training design and operator evaluation</li><li>Program administration and safety culture</li></ul>" },
-          { heading: "Important Note", content: "<p>This Train the Trainer course qualifies you to <strong>train and evaluate operators</strong>. It does <strong>not</strong> certify you to operate equipment. You must already be a competent forklift operator before taking this course. The trainer must maintain their own operator competence.</p>" },
-        ],
-        takeaways: [
-          "OSHA requires trainers to have knowledge, training, and experience",
-          "No specific trainer certification is required by OSHA",
-          "This course covers the formal training component for trainers",
-          "Train the Trainer does NOT certify you to operate equipment",
-        ],
-        warning: "This course does not certify you to operate a forklift. You must already be a competent operator.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "Welcome & OSHA Regulatory Framework" },
+      { type: "heading", level: 2, text: "Welcome & OSHA Regulatory Framework" },
+      { type: "heading", level: 3, text: "About This Course" },
+      { type: "paragraph", html: "Welcome to the Forklift Train the Trainer Certification! This course prepares you to become a <strong>qualified forklift operator trainer</strong> under OSHA 29 CFR 1910.178(l)(2)(iii). The course takes approximately <strong>2-3 hours</strong> to complete." },
+      { type: "heading", level: 3, text: "Trainer Qualifications (1910.178(l)(2)(iii))" },
+      { type: "paragraph", html: "OSHA states: <em>\"All operator training and evaluation shall be conducted by persons who have the knowledge, training, and experience to train powered industrial truck operators and evaluate their competence.\"</em>" },
+      { type: "paragraph", html: "OSHA does <strong>not</strong> require a specific certification for trainers. Instead, the standard requires three qualifications:" },
+      { type: "list", ordered: true, items: [
+        "<strong>Knowledge</strong> — of the OSHA standard and the subject matter",
+        "<strong>Training</strong> — formal training on the topics they will teach",
+        "<strong>Experience</strong> — practical experience operating the equipment",
+      ] },
+      { type: "flip_cards", title: "The Three Trainer Qualifications", cards: [
+        { front: "Knowledge", back: "You must know the OSHA standard (29 CFR 1910.178) and the subject matter thoroughly — capacity, stability, inspections, and safe operating rules." },
+        { front: "Training", back: "You must have received formal training on the topics you will teach. This course provides that formal trainer training." },
+        { front: "Experience", back: "You must have practical experience operating the equipment. A trainer who cannot demonstrate a skill cannot credibly teach or evaluate it." },
+      ] },
+      { type: "heading", level: 3, text: "What This Course Covers" },
+      { type: "list", items: [
+        "Complete review of 29 CFR 1910.178",
+        "Employer responsibilities under the standard",
+        "Documentation and certification requirements (1910.178(l)(6))",
+        "All 22 required training topics (truck-related and workplace-related)",
+        "Adult learning principles and training methodology",
+        "Practical training design and operator evaluation",
+        "Program administration and safety culture",
+      ] },
+      { type: "heading", level: 3, text: "Important Note" },
+      { type: "paragraph", html: "This Train the Trainer course qualifies you to <strong>train and evaluate operators</strong>. It does <strong>not</strong> certify you to operate equipment. You must already be a competent forklift operator before taking this course. The trainer must maintain their own operator competence." },
+      { type: "callout", variant: "warning", text: "This course does not certify you to operate a forklift. You must already be a competent operator." },
+      { type: "key_takeaways", items: [
+        "OSHA requires trainers to have knowledge, training, and experience",
+        "No specific trainer certification is required by OSHA",
+        "This course covers the formal training component for trainers",
+        "Train the Trainer does NOT certify you to operate equipment",
+      ] },
+    ]),
   },
   {
     module: "OSHA Regulatory Framework",
     title: "Employer Responsibilities & Documentation",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Employer Responsibilities & Documentation",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Employer's Duty (1910.178(l)(1))", content: "<p>The employer is responsible for ensuring that each operator is <strong>trained</strong>, <strong>evaluated</strong>, and <strong>certified</strong> as required. This includes:</p><ul><li>Initial training for new operators</li><li>Evaluation of operator competence in the workplace</li><li>Refresher training when needed (accidents, unsafe operation, new equipment)</li><li>Re-evaluation at least every 3 years</li></ul>" },
-          { heading: "Certification Requirements (1910.178(l)(6))", content: "<p>The employer must certify that each operator has been trained and evaluated. The certification must include:</p><ul><li><strong>Name of the operator</strong></li><li><strong>Date of the training</strong></li><li><strong>Date of the evaluation</strong></li><li><strong>Identity of the person(s)</strong> performing the training or evaluation</li></ul>" },
-          { heading: "Record-Keeping", content: "<p>Training records should be maintained and available for OSHA inspection. While OSHA does not specify a retention period, best practice is to keep records for the duration of employment plus 3 years. Records should include:</p><ul><li>Training curriculum and topics covered</li><li>Evaluation checklists and results</li><li>Operator permits/authorizations</li><li>Refresher training records</li><li>Accident/near-miss reports and subsequent retraining</li></ul>" },
-          { heading: "OSHA Inspection & Enforcement", content: "<p>OSHA can conduct <strong>unannounced inspections</strong>. Fines for non-compliance can reach <strong>$15,625 per violation</strong> (as of 2023) for serious violations, and up to <strong>$156,259</strong> for willful or repeated violations. Having proper training documentation is your first line of defense.</p>" },
-        ],
-        takeaways: [
-          "The employer is ultimately responsible for operator training and evaluation",
-          "Certification must include operator name, training date, eval date, and trainer identity",
-          "Maintain training records for employment duration plus 3 years",
-          "OSHA fines for non-compliance can exceed $15,000 per violation",
-        ],
-        tip: "Create a training file for each operator containing their certification, evaluation forms, and any refresher training records.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Employer Responsibilities & Documentation" },
+      { type: "heading", level: 2, text: "Employer Responsibilities & Documentation" },
+      { type: "heading", level: 3, text: "Employer's Duty (1910.178(l)(1))" },
+      { type: "paragraph", html: "The employer is responsible for ensuring that each operator is <strong>trained</strong>, <strong>evaluated</strong>, and <strong>certified</strong> as required. This includes:" },
+      { type: "list", items: [
+        "Initial training for new operators",
+        "Evaluation of operator competence in the workplace",
+        "Refresher training when needed (accidents, unsafe operation, new equipment)",
+        "Re-evaluation at least every 3 years",
+      ] },
+      { type: "heading", level: 3, text: "Certification Requirements (1910.178(l)(6))" },
+      { type: "paragraph", html: "The employer must certify that each operator has been trained and evaluated. The certification must include:" },
+      { type: "list", items: [
+        "<strong>Name of the operator</strong>",
+        "<strong>Date of the training</strong>",
+        "<strong>Date of the evaluation</strong>",
+        "<strong>Identity of the person(s)</strong> performing the training or evaluation",
+      ] },
+      { type: "heading", level: 3, text: "Record-Keeping" },
+      { type: "paragraph", html: "Training records should be maintained and available for OSHA inspection. While OSHA does not specify a retention period, best practice is to keep records for the duration of employment plus 3 years. Records should include:" },
+      { type: "list", items: [
+        "Training curriculum and topics covered",
+        "Evaluation checklists and results",
+        "Operator permits/authorizations",
+        "Refresher training records",
+        "Accident/near-miss reports and subsequent retraining",
+      ] },
+      { type: "heading", level: 3, text: "OSHA Inspection & Enforcement" },
+      { type: "paragraph", html: "OSHA can conduct <strong>unannounced inspections</strong>. Fines for non-compliance can reach <strong>$15,625 per violation</strong> (as of 2023) for serious violations, and up to <strong>$156,259</strong> for willful or repeated violations. Having proper training documentation is your first line of defense." },
+      { type: "callout", variant: "tip", text: "Create a training file for each operator containing their certification, evaluation forms, and any refresher training records." },
+      { type: "key_takeaways", items: [
+        "The employer is ultimately responsible for operator training and evaluation",
+        "Certification must include operator name, training date, eval date, and trainer identity",
+        "Maintain training records for employment duration plus 3 years",
+        "OSHA fines for non-compliance can exceed $15,000 per violation",
+      ] },
+    ]),
   },
   {
     module: "OSHA Regulatory Framework",
@@ -123,49 +138,101 @@ export const COURSE_STEPS: StepDef[] = [
     title: "How Adults Learn: Andragogy Basics",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "How Adults Learn: Andragogy Basics",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "Adult Learning Theory", content: "<p>Adults learn differently than children. Malcolm Knowles identified key principles of adult learning (<strong>andragogy</strong>):</p><ul><li><strong>Self-directed:</strong> Adults want to take responsibility for their learning</li><li><strong>Experience-based:</strong> Adults bring life experience that is a valuable resource</li><li><strong>Relevance-oriented:</strong> Adults learn best when content is directly relevant to their work</li><li><strong>Problem-centered:</strong> Adults prefer learning that solves real problems</li><li><strong>Motivated internally:</strong> Adults are motivated by factors like self-esteem, better quality of work, etc.</li></ul>" },
-          { heading: "Learning Styles", content: "<p>People learn through different modalities. Include all three in your training:</p><ul><li><strong>Visual:</strong> Diagrams, videos, demonstrations, charts</li><li><strong>Auditory:</strong> Lectures, discussions, verbal explanations</li><li><strong>Kinesthetic:</strong> Hands-on practice, equipment operation, role-playing</li></ul>" },
-          { heading: "Effective Presentation Techniques", content: "<ul><li>Start with the <strong>why</strong> — explain the safety rationale</li><li>Use <strong>real-world examples</strong> from the workplace</li><li>Keep sessions <strong>short</strong> (15-20 minutes per topic)</li><li>Encourage <strong>questions and discussion</strong></li><li>Use <strong>multimedia</strong> — videos, slides, demonstrations</li><li>Check for understanding frequently</li><li>Provide <strong>hands-on practice</strong> immediately after instruction</li></ul>" },
-          { heading: "Managing Group Dynamics", content: "<p>As a trainer, you must manage the group effectively:</p><ul><li>Create a <strong>safe learning environment</strong> where questions are welcomed</li><li>Handle <strong>dominant participants</strong> by redirecting to others</li><li>Draw out <strong>quiet participants</strong> by asking for their input</li><li>Address <strong>safety misconceptions</strong> directly and respectfully</li><li>Keep the training <strong>on schedule</strong></li></ul>" },
-        ],
-        takeaways: [
-          "Adults are self-directed, experience-based, and relevance-oriented learners",
-          "Include visual, auditory, and kinesthetic elements in training",
-          "Start with the 'why' and use real-world examples",
-          "Create a safe learning environment and manage group dynamics",
-        ],
-        tip: "Ask trainees about their experience at the start of training. Their stories make great teaching examples.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "How Adults Learn: Andragogy Basics" },
+      { type: "heading", level: 2, text: "How Adults Learn: Andragogy Basics" },
+      { type: "heading", level: 3, text: "Adult Learning Theory" },
+      { type: "paragraph", html: "Adults learn differently than children. Malcolm Knowles identified key principles of adult learning (<strong>andragogy</strong>):" },
+      { type: "list", items: [
+        "<strong>Self-directed:</strong> Adults want to take responsibility for their learning",
+        "<strong>Experience-based:</strong> Adults bring life experience that is a valuable resource",
+        "<strong>Relevance-oriented:</strong> Adults learn best when content is directly relevant to their work",
+        "<strong>Problem-centered:</strong> Adults prefer learning that solves real problems",
+        "<strong>Motivated internally:</strong> Adults are motivated by factors like self-esteem, better quality of work, etc.",
+      ] },
+      { type: "heading", level: 3, text: "Learning Styles" },
+      { type: "paragraph", html: "People learn through different modalities. Include all three in your training:" },
+      { type: "list", items: [
+        "<strong>Visual:</strong> Diagrams, videos, demonstrations, charts",
+        "<strong>Auditory:</strong> Lectures, discussions, verbal explanations",
+        "<strong>Kinesthetic:</strong> Hands-on practice, equipment operation, role-playing",
+      ] },
+      { type: "heading", level: 3, text: "Effective Presentation Techniques" },
+      { type: "list", items: [
+        "Start with the <strong>why</strong> — explain the safety rationale",
+        "Use <strong>real-world examples</strong> from the workplace",
+        "Keep sessions <strong>short</strong> (15-20 minutes per topic)",
+        "Encourage <strong>questions and discussion</strong>",
+        "Use <strong>multimedia</strong> — videos, slides, demonstrations",
+        "Check for understanding frequently",
+        "Provide <strong>hands-on practice</strong> immediately after instruction",
+      ] },
+      { type: "heading", level: 3, text: "Managing Group Dynamics" },
+      { type: "paragraph", html: "As a trainer, you must manage the group effectively:" },
+      { type: "list", items: [
+        "Create a <strong>safe learning environment</strong> where questions are welcomed",
+        "Handle <strong>dominant participants</strong> by redirecting to others",
+        "Draw out <strong>quiet participants</strong> by asking for their input",
+        "Address <strong>safety misconceptions</strong> directly and respectfully",
+        "Keep the training <strong>on schedule</strong>",
+      ] },
+      { type: "callout", variant: "tip", text: "Ask trainees about their experience at the start of training. Their stories make great teaching examples." },
+      { type: "key_takeaways", items: [
+        "Adults are self-directed, experience-based, and relevance-oriented learners",
+        "Include visual, auditory, and kinesthetic elements in training",
+        "Start with the 'why' and use real-world examples",
+        "Create a safe learning environment and manage group dynamics",
+      ] },
+    ]),
   },
   {
     module: "Adult Learning Principles",
     title: "Assessment Strategies",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Assessment Strategies",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Knowledge Assessment", content: "<p>Test understanding of formal instruction through:</p><ul><li><strong>Written tests</strong> — multiple choice, true/false, short answer</li><li><strong>Oral questioning</strong> — ask trainees to explain concepts</li><li><strong>Quizzes throughout</strong> — not just at the end</li><li><strong>Case studies</strong> — present scenarios and ask for the correct response</li></ul>" },
-          { heading: "Practical Assessment", content: "<p>Evaluate hands-on skills through:</p><ul><li><strong>Demonstration</strong> — have trainees demonstrate each skill</li><li><strong>Observation</strong> — observe operators performing real tasks</li><li><strong>Checklist evaluation</strong> — use standardized checklists</li><li><strong>Progressive evaluation</strong> — start simple, add complexity</li></ul>" },
-          { heading: "Pass/Fail Criteria", content: "<p>Establish clear pass/fail criteria before training begins:</p><ul><li>What score constitutes passing (typically 80%)</li><li>Which practical skills are mandatory</li><li>What constitutes a critical safety failure (automatic fail)</li><li>How many attempts are allowed</li><li>What remediation is provided for failures</li></ul>" },
-          { heading: "Providing Feedback", content: "<p>Give <strong>constructive feedback</strong> that is:</p><ul><li><strong>Specific</strong> — point to exact behaviors</li><li><strong>Timely</strong> — immediately after the observation</li><li><strong> Balanced</strong> — address both strengths and areas for improvement</li><li><strong>Actionable</strong> — tell them what to do differently</li></ul>" },
-        ],
-        takeaways: [
-          "Use both knowledge and practical assessments",
-          "Establish clear pass/fail criteria before training begins",
-          "Use standardized checklists for practical evaluations",
-          "Provide specific, timely, balanced, and actionable feedback",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Assessment Strategies" },
+      { type: "heading", level: 2, text: "Assessment Strategies" },
+      { type: "heading", level: 3, text: "Knowledge Assessment" },
+      { type: "paragraph", html: "Test understanding of formal instruction through:" },
+      { type: "list", items: [
+        "<strong>Written tests</strong> — multiple choice, true/false, short answer",
+        "<strong>Oral questioning</strong> — ask trainees to explain concepts",
+        "<strong>Quizzes throughout</strong> — not just at the end",
+        "<strong>Case studies</strong> — present scenarios and ask for the correct response",
+      ] },
+      { type: "heading", level: 3, text: "Practical Assessment" },
+      { type: "paragraph", html: "Evaluate hands-on skills through:" },
+      { type: "list", items: [
+        "<strong>Demonstration</strong> — have trainees demonstrate each skill",
+        "<strong>Observation</strong> — observe operators performing real tasks",
+        "<strong>Checklist evaluation</strong> — use standardized checklists",
+        "<strong>Progressive evaluation</strong> — start simple, add complexity",
+      ] },
+      { type: "heading", level: 3, text: "Pass/Fail Criteria" },
+      { type: "paragraph", html: "Establish clear pass/fail criteria before training begins:" },
+      { type: "list", items: [
+        "What score constitutes passing (typically 80%)",
+        "Which practical skills are mandatory",
+        "What constitutes a critical safety failure (automatic fail)",
+        "How many attempts are allowed",
+        "What remediation is provided for failures",
+      ] },
+      { type: "heading", level: 3, text: "Providing Feedback" },
+      { type: "paragraph", html: "Give <strong>constructive feedback</strong> that is:" },
+      { type: "list", items: [
+        "<strong>Specific</strong> — point to exact behaviors",
+        "<strong>Timely</strong> — immediately after the observation",
+        "<strong>Balanced</strong> — address both strengths and areas for improvement",
+        "<strong>Actionable</strong> — tell them what to do differently",
+      ] },
+      { type: "key_takeaways", items: [
+        "Use both knowledge and practical assessments",
+        "Establish clear pass/fail criteria before training begins",
+        "Use standardized checklists for practical evaluations",
+        "Provide specific, timely, balanced, and actionable feedback",
+      ] },
+    ]),
   },
   {
     module: "Adult Learning Principles",
@@ -186,49 +253,113 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Designing Your Training Program",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Designing Your Training Program",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "Needs Assessment", content: "<p>Before designing training, identify what your operators need to know:</p><ul><li><strong>Equipment types</strong> in use at your facility</li><li><strong>Workplace conditions</strong> — surfaces, ramps, docks, pedestrian traffic</li><li><strong>Operator experience levels</strong> — new vs. experienced</li><li><strong>Site-specific hazards</strong> and safety incidents</li><li><strong>Regulatory requirements</strong> — OSHA 1910.178(l)(3)</li></ul>" },
-          { heading: "Learning Objectives", content: "<p>Write <strong>measurable learning objectives</strong> using action verbs:</p><ul><li>\"The operator will <strong>demonstrate</strong> a pre-shift inspection...\"</li><li>\"The operator will <strong>identify</strong> the stability triangle...\"</li><li>\"The operator will <strong>perform</strong> a safe load pickup...\"</li></ul><p>Avoid vague objectives like \"understand\" or \"know\" — these can't be measured.</p>" },
-          { heading: "Curriculum Structure", content: "<p>Structure your training in logical modules:</p><ol><li><strong>Formal instruction</strong> (classroom/online) — theory and knowledge</li><li><strong>Practical training</strong> — hands-on demonstrations and guided practice</li><li><strong>Evaluation</strong> — assess both knowledge and skills</li><li><strong>Documentation</strong> — complete certification records</li></ol>" },
-          { heading: "Training Materials", content: "<p>Prepare materials including:</p><ul><li>PowerPoint or slide presentations</li><li>Equipment manuals and OSHA standards</li><li>Pre-operation inspection checklists</li><li>Practical evaluation forms</li><li>Written test and answer key</li><li>Site-specific safety rules</li><li>Visual aids — diagrams of stability triangle, load center, etc.</li></ul>" },
-        ],
-        takeaways: [
-          "Start with a needs assessment of your facility and operators",
-          "Write measurable learning objectives with action verbs",
-          "Structure training: formal instruction, practical, evaluation, documentation",
-          "Prepare all materials before the training session",
-        ],
-        tip: "Customize your training to your specific workplace — generic training misses site-specific hazards.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "Designing Your Training Program" },
+      { type: "heading", level: 2, text: "Designing Your Training Program" },
+      { type: "heading", level: 3, text: "Needs Assessment" },
+      { type: "paragraph", html: "Before designing training, identify what your operators need to know:" },
+      { type: "list", items: [
+        "<strong>Equipment types</strong> in use at your facility",
+        "<strong>Workplace conditions</strong> — surfaces, ramps, docks, pedestrian traffic",
+        "<strong>Operator experience levels</strong> — new vs. experienced",
+        "<strong>Site-specific hazards</strong> and safety incidents",
+        "<strong>Regulatory requirements</strong> — OSHA 1910.178(l)(3)",
+      ] },
+      { type: "heading", level: 3, text: "Learning Objectives" },
+      { type: "paragraph", html: "Write <strong>measurable learning objectives</strong> using action verbs:" },
+      { type: "list", items: [
+        "\"The operator will <strong>demonstrate</strong> a pre-shift inspection...\"",
+        "\"The operator will <strong>identify</strong> the stability triangle...\"",
+        "\"The operator will <strong>perform</strong> a safe load pickup...\"",
+      ] },
+      { type: "paragraph", html: "Avoid vague objectives like \"understand\" or \"know\" — these can't be measured." },
+      { type: "heading", level: 3, text: "Curriculum Structure" },
+      { type: "paragraph", html: "Structure your training in logical modules:" },
+      { type: "list", ordered: true, items: [
+        "<strong>Formal instruction</strong> (classroom/online) — theory and knowledge",
+        "<strong>Practical training</strong> — hands-on demonstrations and guided practice",
+        "<strong>Evaluation</strong> — assess both knowledge and skills",
+        "<strong>Documentation</strong> — complete certification records",
+      ] },
+      { type: "drag_drop", mode: "ordering",
+        prompt: "Arrange the phases of an OSHA-compliant training program in the correct order.",
+        items: [
+          { id: "phase-formal", label: "Formal instruction — theory and knowledge" },
+          { id: "phase-practical", label: "Practical training — demonstrations and guided practice" },
+          { id: "phase-evaluation", label: "Evaluation — assess knowledge and skills" },
+          { id: "phase-documentation", label: "Documentation — complete certification records" },
+        ] },
+      { type: "heading", level: 3, text: "Training Materials" },
+      { type: "paragraph", html: "Prepare materials including:" },
+      { type: "list", items: [
+        "PowerPoint or slide presentations",
+        "Equipment manuals and OSHA standards",
+        "Pre-operation inspection checklists",
+        "Practical evaluation forms",
+        "Written test and answer key",
+        "Site-specific safety rules",
+        "Visual aids — diagrams of stability triangle, load center, etc.",
+      ] },
+      { type: "callout", variant: "tip", text: "Customize your training to your specific workplace — generic training misses site-specific hazards." },
+      { type: "key_takeaways", items: [
+        "Start with a needs assessment of your facility and operators",
+        "Write measurable learning objectives with action verbs",
+        "Structure training: formal instruction, practical, evaluation, documentation",
+        "Prepare all materials before the training session",
+      ] },
+    ]),
   },
   {
     module: "Training Program Design",
     title: "Designing Practical Exercises",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Designing Practical Exercises",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Progressive Skill Building", content: "<p>Design exercises that build skills progressively:</p><ol><li><strong>Basic controls</strong> — starting, steering, stopping</li><li><strong>Simple maneuvers</strong> — forward, reverse, turning</li><li><strong>Load handling</strong> — picking up, carrying, stacking</li><li><strong>Complex operations</strong> — ramps, docks, narrow aisles</li><li><strong>Site-specific tasks</strong> — actual workplace scenarios</li></ol>" },
-          { heading: "Setting Up Practice Courses", content: "<p>Create a designated practice area with:</p><ul><li>Cones or markers for steering courses</li><li>Pallets and loads for handling practice</li><li>Simulated ramp or dock area</li><li>Narrow aisle simulation</li><li>Clear space away from pedestrians and traffic</li></ul>" },
-          { heading: "Guided Practice Technique", content: "<ol><li><strong>Demonstrate</strong> the skill yourself first</li><li><strong>Explain</strong> each step as you perform it</li><li>Have the trainee <strong>practice</strong> with your guidance</li><li>Provide <strong>immediate feedback</strong></li><li>Allow <strong>independent practice</strong> once competent</li><li>Evaluate the final performance</li></ol>" },
-          { heading: "Correcting Unsafe Behaviors", content: "<p>When you observe unsafe behavior during practice:</p><ul><li><strong>Stop</strong> the operation immediately</li><li>Explain <strong>why</strong> the behavior is unsafe</li><li>Demonstrate the <strong>correct</strong> procedure</li><li>Have the trainee <strong>redo</strong> the operation correctly</li><li>Document any <strong>recurring issues</strong></li></ul>" },
-        ],
-        takeaways: [
-          "Build skills progressively from basic controls to complex operations",
-          "Set up a designated practice area away from traffic",
-          "Use demonstrate-explain-practice-feedback cycle",
-          "Stop unsafe behavior immediately and correct it",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Designing Practical Exercises" },
+      { type: "heading", level: 2, text: "Designing Practical Exercises" },
+      { type: "heading", level: 3, text: "Progressive Skill Building" },
+      { type: "paragraph", html: "Design exercises that build skills progressively:" },
+      { type: "list", ordered: true, items: [
+        "<strong>Basic controls</strong> — starting, steering, stopping",
+        "<strong>Simple maneuvers</strong> — forward, reverse, turning",
+        "<strong>Load handling</strong> — picking up, carrying, stacking",
+        "<strong>Complex operations</strong> — ramps, docks, narrow aisles",
+        "<strong>Site-specific tasks</strong> — actual workplace scenarios",
+      ] },
+      { type: "heading", level: 3, text: "Setting Up Practice Courses" },
+      { type: "paragraph", html: "Create a designated practice area with:" },
+      { type: "list", items: [
+        "Cones or markers for steering courses",
+        "Pallets and loads for handling practice",
+        "Simulated ramp or dock area",
+        "Narrow aisle simulation",
+        "Clear space away from pedestrians and traffic",
+      ] },
+      { type: "heading", level: 3, text: "Guided Practice Technique" },
+      { type: "list", ordered: true, items: [
+        "<strong>Demonstrate</strong> the skill yourself first",
+        "<strong>Explain</strong> each step as you perform it",
+        "Have the trainee <strong>practice</strong> with your guidance",
+        "Provide <strong>immediate feedback</strong>",
+        "Allow <strong>independent practice</strong> once competent",
+        "Evaluate the final performance",
+      ] },
+      { type: "heading", level: 3, text: "Correcting Unsafe Behaviors" },
+      { type: "paragraph", html: "When you observe unsafe behavior during practice:" },
+      { type: "list", items: [
+        "<strong>Stop</strong> the operation immediately",
+        "Explain <strong>why</strong> the behavior is unsafe",
+        "Demonstrate the <strong>correct</strong> procedure",
+        "Have the trainee <strong>redo</strong> the operation correctly",
+        "Document any <strong>recurring issues</strong>",
+      ] },
+      { type: "key_takeaways", items: [
+        "Build skills progressively from basic controls to complex operations",
+        "Set up a designated practice area away from traffic",
+        "Use demonstrate-explain-practice-feedback cycle",
+        "Stop unsafe behavior immediately and correct it",
+      ] },
+    ]),
   },
   {
     module: "Training Program Design",
@@ -249,51 +380,97 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Truck-Related Topics (1910.178(l)(3)(i))",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Truck-Related Topics (1910.178(l)(3)(i))",
-        image: img("forklift-hero.svg"),
-        sections: [
-          { heading: "OSHA Requires 13 Truck-Related Topics", content: "<p>OSHA 1910.178(l)(3)(i) requires training on <strong>13 truck-related topics</strong>. As a trainer, you must cover ALL of these in your operator training:</p>" },
-          { heading: "Topics A-E: Operating Knowledge", content: "<ul><li><strong>(A)</strong> Operating instructions, warnings, and precautions for the types of truck</li><li><strong>(B)</strong> Differences between the truck and the automobile</li><li><strong>(C)</strong> Truck controls and instrumentation: location, function, and operation</li><li><strong>(D)</strong> Engine or motor operation</li><li><strong>(E)</strong> Steering and maneuvering</li></ul>" },
-          { heading: "Topics F-I: Visibility and Capacity", content: "<ul><li><strong>(F)</strong> Visibility (including restrictions due to loading)</li><li><strong>(G)</strong> Fork and attachment adaptation, operation, and use limitations</li><li><strong>(H)</strong> Vehicle capacity</li><li><strong>(I)</strong> Vehicle stability (stability triangle)</li></ul>" },
-          { heading: "Topics J-M: Maintenance and Limitations", content: "<ul><li><strong>(J)</strong> Any vehicle inspection and maintenance the operator must perform</li><li><strong>(K)</strong> Refueling and/or charging and recharging of batteries</li><li><strong>(L)</strong> Operating limitations</li><li><strong>(M)</strong> Any other operating instructions, warnings, or precautions from the operator's manual</li></ul>" },
-          { heading: "Teaching Tips for Truck-Related Topics", content: "<ul><li>Use the <strong>actual equipment</strong> for controls and instrumentation</li><li>Have operators <strong>demonstrate</strong> each control function</li><li>Show the <strong>data plate</strong> and explain capacity ratings</li><li>Demonstrate the <strong>stability triangle</strong> visually</li><li>Walk through a complete <strong>pre-shift inspection</strong></li></ul>" },
-        ],
-        takeaways: [
-          "OSHA requires 13 truck-related topics under 1910.178(l)(3)(i)",
-          "Cover controls, steering, visibility, capacity, stability, inspection, and maintenance",
-          "Use the actual equipment for teaching controls and instrumentation",
-          "Demonstrate the stability triangle visually for better understanding",
-        ],
-        tip: "Create a checklist of all 13 topics and check them off as you cover each one during training.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("forklift-hero.svg"), alt: "Truck-Related Topics (1910.178(l)(3)(i))" },
+      { type: "heading", level: 2, text: "Truck-Related Topics (1910.178(l)(3)(i))" },
+      { type: "heading", level: 3, text: "OSHA Requires 13 Truck-Related Topics" },
+      { type: "paragraph", html: "OSHA 1910.178(l)(3)(i) requires training on <strong>13 truck-related topics</strong>. As a trainer, you must cover ALL of these in your operator training:" },
+      { type: "heading", level: 3, text: "Topics A-E: Operating Knowledge" },
+      { type: "list", items: [
+        "<strong>(A)</strong> Operating instructions, warnings, and precautions for the types of truck",
+        "<strong>(B)</strong> Differences between the truck and the automobile",
+        "<strong>(C)</strong> Truck controls and instrumentation: location, function, and operation",
+        "<strong>(D)</strong> Engine or motor operation",
+        "<strong>(E)</strong> Steering and maneuvering",
+      ] },
+      { type: "heading", level: 3, text: "Topics F-I: Visibility and Capacity" },
+      { type: "list", items: [
+        "<strong>(F)</strong> Visibility (including restrictions due to loading)",
+        "<strong>(G)</strong> Fork and attachment adaptation, operation, and use limitations",
+        "<strong>(H)</strong> Vehicle capacity",
+        "<strong>(I)</strong> Vehicle stability (stability triangle)",
+      ] },
+      { type: "heading", level: 3, text: "Topics J-M: Maintenance and Limitations" },
+      { type: "list", items: [
+        "<strong>(J)</strong> Any vehicle inspection and maintenance the operator must perform",
+        "<strong>(K)</strong> Refueling and/or charging and recharging of batteries",
+        "<strong>(L)</strong> Operating limitations",
+        "<strong>(M)</strong> Any other operating instructions, warnings, or precautions from the operator's manual",
+      ] },
+      { type: "heading", level: 3, text: "Teaching Tips for Truck-Related Topics" },
+      { type: "list", items: [
+        "Use the <strong>actual equipment</strong> for controls and instrumentation",
+        "Have operators <strong>demonstrate</strong> each control function",
+        "Show the <strong>data plate</strong> and explain capacity ratings",
+        "Demonstrate the <strong>stability triangle</strong> visually",
+        "Walk through a complete <strong>pre-shift inspection</strong>",
+      ] },
+      { type: "embedded_quiz", questions: [
+        { question: "What is the most effective way to teach truck controls and instrumentation?", type: "mcq_single", options: ["Show photos in a slideshow", "Use the actual equipment operators will use", "Have operators read the manual on their own", "Describe the controls verbally"], correctAnswers: "Use the actual equipment operators will use", explanation: "Controls and instrumentation should be taught on the actual equipment, with operators demonstrating each control function themselves." },
+        { question: "Vehicle stability (the stability triangle) falls under which category of required topics?", type: "mcq_single", options: ["Truck-related topics", "Workplace-related topics", "Optional topics", "Trainer-only topics"], correctAnswers: "Truck-related topics", explanation: "Vehicle stability is topic (I) of the 13 truck-related topics required by 1910.178(l)(3)(i)." },
+      ] },
+      { type: "callout", variant: "tip", text: "Create a checklist of all 13 topics and check them off as you cover each one during training." },
+      { type: "key_takeaways", items: [
+        "OSHA requires 13 truck-related topics under 1910.178(l)(3)(i)",
+        "Cover controls, steering, visibility, capacity, stability, inspection, and maintenance",
+        "Use the actual equipment for teaching controls and instrumentation",
+        "Demonstrate the stability triangle visually for better understanding",
+      ] },
+    ]),
   },
   {
     module: "Required Topics Deep Dive",
     title: "Workplace-Related Topics (1910.178(l)(3)(ii))",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Workplace-Related Topics (1910.178(l)(3)(ii))",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "OSHA Requires 9 Workplace-Related Topics", content: "<p>OSHA 1910.178(l)(3)(ii) requires training on <strong>9 workplace-related topics</strong>. These are site-specific and must be tailored to your facility:</p>" },
-          { heading: "Topics A-C: Surface and Load Conditions", content: "<ul><li><strong>(A)</strong> Surface conditions where the vehicle will be operated</li><li><strong>(B)</strong> Composition of loads to be carried and load stability</li><li><strong>(C)</strong> Load manipulation, stacking, and unstacking</li></ul>" },
-          { heading: "Topics D-F: Traffic and Hazards", content: "<ul><li><strong>(D)</strong> Pedestrian traffic in areas where the vehicle will be operated</li><li><strong>(E)</strong> Narrow aisles and other restricted places</li><li><strong>(F)</strong> Hazardous (classified) locations where the vehicle will be operated</li></ul>" },
-          { heading: "Topics G-I: Ramps, Ventilation, and Conditions", content: "<ul><li><strong>(G)</strong> Ramps and other sloped surfaces that could affect stability</li><li><strong>(H)</strong> Closed environments where insufficient ventilation or poor maintenance could cause buildup of carbon monoxide or diesel exhaust</li><li><strong>(I)</strong> Other unique or potentially hazardous environmental conditions in the workplace</li></ul>" },
-          { heading: "Teaching Tips for Workplace Topics", content: "<ul><li>Walk through the <strong>actual facility</strong> to show site-specific hazards</li><li>Take photos of <strong>specific areas</strong> (ramps, docks, narrow aisles) for training</li><li>Review your facility's <strong>traffic patterns and pedestrian zones</strong></li><li>Discuss <strong>actual loads</strong> handled at your facility</li><li>Address <strong>ventilation</strong> if operating IC engines indoors</li></ul>" },
-        ],
-        takeaways: [
-          "OSHA requires 9 workplace-related topics under 1910.178(l)(3)(ii)",
-          "These topics are site-specific and must be customized to your facility",
-          "Cover surface conditions, loads, pedestrians, narrow aisles, ramps, and ventilation",
-          "Walk through the actual facility during training to show real hazards",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Workplace-Related Topics (1910.178(l)(3)(ii))" },
+      { type: "heading", level: 2, text: "Workplace-Related Topics (1910.178(l)(3)(ii))" },
+      { type: "heading", level: 3, text: "OSHA Requires 9 Workplace-Related Topics" },
+      { type: "paragraph", html: "OSHA 1910.178(l)(3)(ii) requires training on <strong>9 workplace-related topics</strong>. These are site-specific and must be tailored to your facility:" },
+      { type: "heading", level: 3, text: "Topics A-C: Surface and Load Conditions" },
+      { type: "list", items: [
+        "<strong>(A)</strong> Surface conditions where the vehicle will be operated",
+        "<strong>(B)</strong> Composition of loads to be carried and load stability",
+        "<strong>(C)</strong> Load manipulation, stacking, and unstacking",
+      ] },
+      { type: "heading", level: 3, text: "Topics D-F: Traffic and Hazards" },
+      { type: "list", items: [
+        "<strong>(D)</strong> Pedestrian traffic in areas where the vehicle will be operated",
+        "<strong>(E)</strong> Narrow aisles and other restricted places",
+        "<strong>(F)</strong> Hazardous (classified) locations where the vehicle will be operated",
+      ] },
+      { type: "heading", level: 3, text: "Topics G-I: Ramps, Ventilation, and Conditions" },
+      { type: "list", items: [
+        "<strong>(G)</strong> Ramps and other sloped surfaces that could affect stability",
+        "<strong>(H)</strong> Closed environments where insufficient ventilation or poor maintenance could cause buildup of carbon monoxide or diesel exhaust",
+        "<strong>(I)</strong> Other unique or potentially hazardous environmental conditions in the workplace",
+      ] },
+      { type: "heading", level: 3, text: "Teaching Tips for Workplace Topics" },
+      { type: "list", items: [
+        "Walk through the <strong>actual facility</strong> to show site-specific hazards",
+        "Take photos of <strong>specific areas</strong> (ramps, docks, narrow aisles) for training",
+        "Review your facility's <strong>traffic patterns and pedestrian zones</strong>",
+        "Discuss <strong>actual loads</strong> handled at your facility",
+        "Address <strong>ventilation</strong> if operating IC engines indoors",
+      ] },
+      { type: "key_takeaways", items: [
+        "OSHA requires 9 workplace-related topics under 1910.178(l)(3)(ii)",
+        "These topics are site-specific and must be customized to your facility",
+        "Cover surface conditions, loads, pedestrians, narrow aisles, ramps, and ventilation",
+        "Walk through the actual facility during training to show real hazards",
+      ] },
+    ]),
   },
   {
     module: "Required Topics Deep Dive",
@@ -314,25 +491,58 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Conducting Practical Training Sessions",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Conducting Practical Training Sessions",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Setting Up for Success", content: "<p>Before the practical training session:</p><ul><li>Ensure the practice area is <strong>clear of pedestrians and obstacles</strong></li><li>Verify the forklift is in <strong>safe operating condition</strong></li><li>Have all <strong>evaluation checklists</strong> ready</li><li>Brief the trainee on what to expect</li><li>Review <strong>emergency procedures</strong> before starting</li></ul>" },
-          { heading: "The Demonstration-Practice-Evaluation Cycle", content: "<ol><li><strong>Demonstrate</strong> each skill at normal speed, then slowly with explanation</li><li><strong>Guided practice:</strong> trainee performs while you provide step-by-step coaching</li><li><strong>Independent practice:</strong> trainee performs without coaching</li><li><strong>Evaluate:</strong> observe and score against the checklist</li></ol>" },
-          { heading: "Key Skills to Practice", content: "<ul><li><strong>Pre-shift inspection</strong> — complete walkaround and functional tests</li><li><strong>Basic driving</strong> — forward, reverse, turning, stopping</li><li><strong>Load handling</strong> — picking up, traveling with, and depositing loads</li><li><strong>Ramp operation</strong> — ascending and descending with/without loads</li><li><strong>Dock operations</strong> — entering trailers, dock plates</li><li><strong>Parking and shutdown</strong> — proper securing procedures</li></ul>" },
-          { heading: "Safety During Training", content: "<p>As the trainer, you are responsible for safety during training:</p><ul><li>Always maintain a <strong>clear escape route</strong> for yourself</li><li>Never allow the trainee to perform <strong>dangerous maneuvers</strong></li><li>Stop the exercise immediately if <strong>unsafe behavior</strong> occurs</li><li>Keep other personnel <strong>clear of the training area</strong></li><li>Have <strong>emergency contact information</strong> readily available</li></ul>" },
-        ],
-        takeaways: [
-          "Use the demonstrate-practice-evaluate cycle for each skill",
-          "Practice: inspection, driving, load handling, ramps, docks, parking",
-          "Keep the training area clear and maintain emergency readiness",
-          "Stop exercises immediately if unsafe behavior occurs",
-        ],
-        warning: "As the trainer, you are responsible for safety during practical training. Never allow dangerous maneuvers.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Conducting Practical Training Sessions" },
+      { type: "heading", level: 2, text: "Conducting Practical Training Sessions" },
+      { type: "heading", level: 3, text: "Setting Up for Success" },
+      { type: "paragraph", html: "Before the practical training session:" },
+      { type: "list", items: [
+        "Ensure the practice area is <strong>clear of pedestrians and obstacles</strong>",
+        "Verify the forklift is in <strong>safe operating condition</strong>",
+        "Have all <strong>evaluation checklists</strong> ready",
+        "Brief the trainee on what to expect",
+        "Review <strong>emergency procedures</strong> before starting",
+      ] },
+      { type: "heading", level: 3, text: "The Demonstration-Practice-Evaluation Cycle" },
+      { type: "list", ordered: true, items: [
+        "<strong>Demonstrate</strong> each skill at normal speed, then slowly with explanation",
+        "<strong>Guided practice:</strong> trainee performs while you provide step-by-step coaching",
+        "<strong>Independent practice:</strong> trainee performs without coaching",
+        "<strong>Evaluate:</strong> observe and score against the checklist",
+      ] },
+      { type: "heading", level: 3, text: "Key Skills to Practice" },
+      { type: "list", items: [
+        "<strong>Pre-shift inspection</strong> — complete walkaround and functional tests",
+        "<strong>Basic driving</strong> — forward, reverse, turning, stopping",
+        "<strong>Load handling</strong> — picking up, traveling with, and depositing loads",
+        "<strong>Ramp operation</strong> — ascending and descending with/without loads",
+        "<strong>Dock operations</strong> — entering trailers, dock plates",
+        "<strong>Parking and shutdown</strong> — proper securing procedures",
+      ] },
+      { type: "heading", level: 3, text: "Safety During Training" },
+      { type: "paragraph", html: "As the trainer, you are responsible for safety during training:" },
+      { type: "list", items: [
+        "Always maintain a <strong>clear escape route</strong> for yourself",
+        "Never allow the trainee to perform <strong>dangerous maneuvers</strong>",
+        "Stop the exercise immediately if <strong>unsafe behavior</strong> occurs",
+        "Keep other personnel <strong>clear of the training area</strong>",
+        "Have <strong>emergency contact information</strong> readily available",
+      ] },
+      { type: "scenario", title: "Trainer Judgment Call",
+        prompt: "During guided practice, your trainee picks up a pallet and starts turning with the load raised about five feet off the ground, moving quickly. No one else is nearby. What do you do?",
+        choices: [
+          { text: "Let them finish the maneuver, then bring it up during the debrief", correct: false, feedback: "Unsafe behavior must be stopped the moment you see it. A raised load in a fast turn is a classic tip-over setup — waiting for the debrief means waiting for an accident." },
+          { text: "Stop the exercise immediately, explain why it is unsafe, demonstrate the correct technique, and have them redo it", correct: true, feedback: "Correct. Stop the operation immediately, explain why the behavior is unsafe, demonstrate the correct procedure, and have the trainee redo the operation correctly. Document any recurring issues." },
+          { text: "Climb onto the truck and take over the controls to finish the maneuver", correct: false, feedback: "Never approach or mount a moving forklift — that puts you in the danger zone. Signal the trainee to stop, then correct the behavior from a safe position." },
+        ] },
+      { type: "callout", variant: "warning", text: "As the trainer, you are responsible for safety during practical training. Never allow dangerous maneuvers." },
+      { type: "key_takeaways", items: [
+        "Use the demonstrate-practice-evaluate cycle for each skill",
+        "Practice: inspection, driving, load handling, ramps, docks, parking",
+        "Keep the training area clear and maintain emergency readiness",
+        "Stop exercises immediately if unsafe behavior occurs",
+      ] },
+    ]),
   },
   {
     module: "Practical Training Methodology",
@@ -352,26 +562,55 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Conducting the Operator Evaluation",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Conducting the Operator Evaluation",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Evaluation vs. Training", content: "<p>Training and evaluation are <strong>separate activities</strong>. Training is when you teach and coach. Evaluation is when you <strong>observe and assess</strong> without coaching. The evaluation determines whether the operator is competent to operate independently.</p>" },
-          { heading: "Evaluation Checklist Design", content: "<p>Create a standardized evaluation checklist that covers:</p><ul><li><strong>Pre-shift inspection</strong> — completed correctly</li><li><strong>Vehicle startup</strong> — proper sequence and safety checks</li><li><strong>Driving skills</strong> — smooth operation, speed control, turning</li><li><strong>Load handling</strong> — proper pickup, transport, and deposit</li><li><strong>Ramp/dock operations</strong> — safe procedures</li><li><strong>Parking and shutdown</strong> — proper securing</li><li><strong>Safety awareness</strong> — horn use, pedestrian awareness, hazard recognition</li></ul>" },
-          { heading: "Conducting the Evaluation", content: "<ol><li>Brief the operator on what they will be evaluated on</li><li>Explain that this is an <strong>evaluation, not training</strong> — no coaching</li><li>Observe and score each item on the checklist</li><li>Take notes on specific observations</li><li>Debrief after the evaluation — share results</li></ol>" },
-          { heading: "Pass/Fail Decision Making", content: "<p>Establish clear criteria:</p><ul><li><strong>Pass:</strong> All critical items performed safely, no safety violations</li><li><strong>Conditional pass:</strong> Minor issues that can be corrected with coaching</li><li><strong>Fail:</strong> Any critical safety violation, unsafe operation</li><li><strong>Critical failures</strong> (automatic fail): tipping risk, near-miss with pedestrian, exceeding capacity</li></ul>" },
-          { heading: "Handling Unsuccessful Evaluations", content: "<p>If an operator fails the evaluation:</p><ul><li>Explain <strong>specifically</strong> what was unsafe</li><li>Provide <strong>additional training</strong> on the failed areas</li><li>Allow <strong>re-evaluation</strong> after remediation</li><li>Document the failure, remediation, and re-evaluation</li><li>Never allow an operator who failed evaluation to operate independently</li></ul>" },
-        ],
-        takeaways: [
-          "Evaluation is separate from training — observe without coaching",
-          "Use a standardized evaluation checklist for all operators",
-          "Establish clear pass/fail criteria including critical safety failures",
-          "Provide remediation and re-evaluation for operators who fail",
-        ],
-        tip: "Keep evaluation checklists consistent across all operators to ensure fairness and compliance.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Conducting the Operator Evaluation" },
+      { type: "heading", level: 2, text: "Conducting the Operator Evaluation" },
+      { type: "heading", level: 3, text: "Evaluation vs. Training" },
+      { type: "paragraph", html: "Training and evaluation are <strong>separate activities</strong>. Training is when you teach and coach. Evaluation is when you <strong>observe and assess</strong> without coaching. The evaluation determines whether the operator is competent to operate independently." },
+      { type: "heading", level: 3, text: "Evaluation Checklist Design" },
+      { type: "paragraph", html: "Create a standardized evaluation checklist that covers:" },
+      { type: "list", items: [
+        "<strong>Pre-shift inspection</strong> — completed correctly",
+        "<strong>Vehicle startup</strong> — proper sequence and safety checks",
+        "<strong>Driving skills</strong> — smooth operation, speed control, turning",
+        "<strong>Load handling</strong> — proper pickup, transport, and deposit",
+        "<strong>Ramp/dock operations</strong> — safe procedures",
+        "<strong>Parking and shutdown</strong> — proper securing",
+        "<strong>Safety awareness</strong> — horn use, pedestrian awareness, hazard recognition",
+      ] },
+      { type: "heading", level: 3, text: "Conducting the Evaluation" },
+      { type: "list", ordered: true, items: [
+        "Brief the operator on what they will be evaluated on",
+        "Explain that this is an <strong>evaluation, not training</strong> — no coaching",
+        "Observe and score each item on the checklist",
+        "Take notes on specific observations",
+        "Debrief after the evaluation — share results",
+      ] },
+      { type: "heading", level: 3, text: "Pass/Fail Decision Making" },
+      { type: "paragraph", html: "Establish clear criteria:" },
+      { type: "list", items: [
+        "<strong>Pass:</strong> All critical items performed safely, no safety violations",
+        "<strong>Conditional pass:</strong> Minor issues that can be corrected with coaching",
+        "<strong>Fail:</strong> Any critical safety violation, unsafe operation",
+        "<strong>Critical failures</strong> (automatic fail): tipping risk, near-miss with pedestrian, exceeding capacity",
+      ] },
+      { type: "heading", level: 3, text: "Handling Unsuccessful Evaluations" },
+      { type: "paragraph", html: "If an operator fails the evaluation:" },
+      { type: "list", items: [
+        "Explain <strong>specifically</strong> what was unsafe",
+        "Provide <strong>additional training</strong> on the failed areas",
+        "Allow <strong>re-evaluation</strong> after remediation",
+        "Document the failure, remediation, and re-evaluation",
+        "Never allow an operator who failed evaluation to operate independently",
+      ] },
+      { type: "callout", variant: "tip", text: "Keep evaluation checklists consistent across all operators to ensure fairness and compliance." },
+      { type: "key_takeaways", items: [
+        "Evaluation is separate from training — observe without coaching",
+        "Use a standardized evaluation checklist for all operators",
+        "Establish clear pass/fail criteria including critical safety failures",
+        "Provide remediation and re-evaluation for operators who fail",
+      ] },
+    ]),
   },
   {
     module: "Operator Evaluation",
@@ -391,49 +630,106 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Administering Your Training Program",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Administering Your Training Program",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Training Records Management", content: "<p>Maintain organized training records for each operator:</p><ul><li>Training date and curriculum covered</li><li>Evaluation results and checklist</li><li>Certification with trainer identity</li><li>Refresher training records</li><li>Re-evaluation records (3-year cycle)</li><li>Incident/near-miss reports and subsequent retraining</li></ul>" },
-          { heading: "Refresher Training Triggers (1910.178(l)(4))", content: "<p>Refresher training is required when:</p><ul><li>The operator is <strong>observed operating unsafely</strong></li><li>The operator is <strong>involved in an accident or near-miss</strong></li><li>The operator receives an <strong>evaluation revealing unsafe operation</strong></li><li>The operator is <strong>assigned to a different type of truck</strong></li><li>A <strong>workplace condition changes</strong> affecting safe operation</li></ul><p>Plus, evaluation at least every <strong>3 years</strong>.</p>" },
-          { heading: "Managing New Equipment", content: "<p>When new equipment is introduced:</p><ul><li>Provide <strong>equipment-specific training</strong> before allowing operation</li><li>Review the <strong>operator's manual</strong> for the new equipment</li><li>Conduct <strong>familiarization training</strong> on controls and differences</li><li>Evaluate operators on the new equipment before certifying</li><li>Update training records</li></ul>" },
-          { heading: "Continuous Improvement", content: "<p>Regularly review and improve your training program:</p><ul><li>Review <strong>accident and near-miss data</strong> for trends</li><li>Update training materials when <strong>regulations change</strong></li><li>Solicit <strong>feedback from trainees</strong></li><li>Stay current with <strong>OSHA updates and interpretations</strong></li><li>Conduct <strong>self-audits</strong> of your training records</li></ul>" },
+    config: blocks([
+      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Administering Your Training Program" },
+      { type: "heading", level: 2, text: "Administering Your Training Program" },
+      { type: "heading", level: 3, text: "Training Records Management" },
+      { type: "paragraph", html: "Maintain organized training records for each operator:" },
+      { type: "list", items: [
+        "Training date and curriculum covered",
+        "Evaluation results and checklist",
+        "Certification with trainer identity",
+        "Refresher training records",
+        "Re-evaluation records (3-year cycle)",
+        "Incident/near-miss reports and subsequent retraining",
+      ] },
+      { type: "heading", level: 3, text: "Refresher Training Triggers (1910.178(l)(4))" },
+      { type: "paragraph", html: "Refresher training is required when:" },
+      { type: "list", items: [
+        "The operator is <strong>observed operating unsafely</strong>",
+        "The operator is <strong>involved in an accident or near-miss</strong>",
+        "The operator receives an <strong>evaluation revealing unsafe operation</strong>",
+        "The operator is <strong>assigned to a different type of truck</strong>",
+        "A <strong>workplace condition changes</strong> affecting safe operation",
+      ] },
+      { type: "paragraph", html: "Plus, evaluation at least every <strong>3 years</strong>." },
+      { type: "drag_drop", mode: "matching",
+        prompt: "Match each situation to the refresher-training trigger it represents.",
+        items: [
+          { id: "sit-speeding", label: "An operator is seen speeding through a blind intersection without sounding the horn", targetId: "trig-unsafe" },
+          { id: "sit-rack", label: "An operator clips a rack upright while backing out of an aisle", targetId: "trig-accident" },
+          { id: "sit-reach", label: "A sit-down counterbalance operator is assigned to a stand-up reach truck", targetId: "trig-newtruck" },
+          { id: "sit-ramp", label: "A new ramp is installed between the warehouse and the yard", targetId: "trig-workplace" },
         ],
-        takeaways: [
-          "Maintain detailed training records for every operator",
-          "Refresher training is triggered by unsafe operation, accidents, new equipment, or workplace changes",
-          "Provide equipment-specific training when introducing new trucks",
-          "Continuously improve your program based on data and feedback",
-        ],
-      }),
-    },
+        targets: [
+          { id: "trig-unsafe", label: "Observed operating unsafely" },
+          { id: "trig-accident", label: "Accident or near-miss" },
+          { id: "trig-newtruck", label: "Assigned to a different type of truck" },
+          { id: "trig-workplace", label: "Workplace condition change" },
+        ] },
+      { type: "heading", level: 3, text: "Managing New Equipment" },
+      { type: "paragraph", html: "When new equipment is introduced:" },
+      { type: "list", items: [
+        "Provide <strong>equipment-specific training</strong> before allowing operation",
+        "Review the <strong>operator's manual</strong> for the new equipment",
+        "Conduct <strong>familiarization training</strong> on controls and differences",
+        "Evaluate operators on the new equipment before certifying",
+        "Update training records",
+      ] },
+      { type: "heading", level: 3, text: "Continuous Improvement" },
+      { type: "paragraph", html: "Regularly review and improve your training program:" },
+      { type: "list", items: [
+        "Review <strong>accident and near-miss data</strong> for trends",
+        "Update training materials when <strong>regulations change</strong>",
+        "Solicit <strong>feedback from trainees</strong>",
+        "Stay current with <strong>OSHA updates and interpretations</strong>",
+        "Conduct <strong>self-audits</strong> of your training records",
+      ] },
+      { type: "key_takeaways", items: [
+        "Maintain detailed training records for every operator",
+        "Refresher training is triggered by unsafe operation, accidents, new equipment, or workplace changes",
+        "Provide equipment-specific training when introducing new trucks",
+        "Continuously improve your program based on data and feedback",
+      ] },
+    ]),
   },
   {
     module: "Program Administration & Safety Culture",
     title: "Building a Safety Culture",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Building a Safety Culture",
-        image: img("pedestrian-safety.svg"),
-        sections: [
-          { heading: "The Trainer's Role in Safety Culture", content: "<p>As a forklift trainer, you are a <strong>safety leader</strong> in your organization. Your attitude, behavior, and commitment to safety set the tone for all operators. Lead by example — always follow safe practices yourself.</p>" },
-          { heading: "Promoting 'Safety First' Mindset", content: "<ul><li>Encourage operators to <strong>stop work</strong> if they feel unsafe</li><li>Reward <strong>reporting of hazards and near-misses</strong></li><li>Never pressure operators to <strong>rush at the expense of safety</strong></li><li>Make safety a <strong>regular topic</strong> in team meetings</li><li>Recognize and praise <strong>safe behaviors</strong></li></ul>" },
-          { heading: "Management Commitment", content: "<p>A safety culture requires <strong>management commitment</strong>. As a trainer, advocate for:</p><ul><li>Adequate <strong>training time and resources</strong></li><li>Proper <strong>equipment maintenance</strong></li><li>Enforcement of <strong>safety rules</strong> consistently</li><li>Investigation of all <strong>accidents and near-misses</strong></li><li>Regular <strong>safety audits and inspections</strong></li></ul>" },
-          { heading: "Safety as an Ongoing Process", content: "<p>Safety is not a one-time event — it's an <strong>ongoing process</strong>. Regular reinforcement, refresher training, and open communication about safety are essential. A strong safety culture reduces accidents, improves productivity, and protects your most valuable asset: your people.</p>" },
-        ],
-        takeaways: [
-          "The trainer is a safety leader — lead by example",
-          "Encourage a 'stop work' policy for unsafe conditions",
-          "Advocate for management commitment to safety",
-          "Safety is an ongoing process, not a one-time event",
-        ],
-        tip: "Start each shift with a 2-minute safety briefing. It keeps safety top of mind.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pedestrian-safety.svg"), alt: "Building a Safety Culture" },
+      { type: "heading", level: 2, text: "Building a Safety Culture" },
+      { type: "heading", level: 3, text: "The Trainer's Role in Safety Culture" },
+      { type: "paragraph", html: "As a forklift trainer, you are a <strong>safety leader</strong> in your organization. Your attitude, behavior, and commitment to safety set the tone for all operators. Lead by example — always follow safe practices yourself." },
+      { type: "heading", level: 3, text: "Promoting 'Safety First' Mindset" },
+      { type: "list", items: [
+        "Encourage operators to <strong>stop work</strong> if they feel unsafe",
+        "Reward <strong>reporting of hazards and near-misses</strong>",
+        "Never pressure operators to <strong>rush at the expense of safety</strong>",
+        "Make safety a <strong>regular topic</strong> in team meetings",
+        "Recognize and praise <strong>safe behaviors</strong>",
+      ] },
+      { type: "heading", level: 3, text: "Management Commitment" },
+      { type: "paragraph", html: "A safety culture requires <strong>management commitment</strong>. As a trainer, advocate for:" },
+      { type: "list", items: [
+        "Adequate <strong>training time and resources</strong>",
+        "Proper <strong>equipment maintenance</strong>",
+        "Enforcement of <strong>safety rules</strong> consistently",
+        "Investigation of all <strong>accidents and near-misses</strong>",
+        "Regular <strong>safety audits and inspections</strong>",
+      ] },
+      { type: "heading", level: 3, text: "Safety as an Ongoing Process" },
+      { type: "paragraph", html: "Safety is not a one-time event — it's an <strong>ongoing process</strong>. Regular reinforcement, refresher training, and open communication about safety are essential. A strong safety culture reduces accidents, improves productivity, and protects your most valuable asset: your people." },
+      { type: "callout", variant: "tip", text: "Start each shift with a 2-minute safety briefing. It keeps safety top of mind." },
+      { type: "key_takeaways", items: [
+        "The trainer is a safety leader — lead by example",
+        "Encourage a 'stop work' policy for unsafe conditions",
+        "Advocate for management commitment to safety",
+        "Safety is an ongoing process, not a one-time event",
+      ] },
+    ]),
   },
   {
     module: "Program Administration & Safety Culture",
@@ -482,23 +778,28 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Congratulations: You're a Certified Trainer",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "You're a Certified Trainer! What's Next",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "Your Certification", content: "<p>Congratulations on completing the Forklift Train the Trainer Certification! You are now qualified to <strong>train and evaluate forklift operators</strong> at your facility in accordance with OSHA 29 CFR 1910.178(l)(2)(iii).</p>" },
-          { heading: "Next Steps", content: "<ul><li>Download your trainer certificate</li><li>Develop your site-specific training curriculum</li><li>Create practical evaluation checklists</li><li>Schedule your first operator training session</li><li>Maintain your own operator competence</li></ul>" },
-          { heading: "Stay Current", content: "<p>Continue to develop your skills as a trainer. Stay current with OSHA regulations, attend refresher training, and continuously improve your training program based on feedback and incident data.</p>" },
-        ],
-        takeaways: [
-          "You are now qualified to train and evaluate forklift operators",
-          "Develop your site-specific training curriculum and evaluation forms",
-          "Maintain your own operator competence",
-          "Stay current with OSHA regulations and best practices",
-        ],
-        tip: "Start with a pilot training session to refine your curriculum before rolling it out to all operators.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "You're a Certified Trainer! What's Next" },
+      { type: "heading", level: 2, text: "You're a Certified Trainer! What's Next" },
+      { type: "heading", level: 3, text: "Your Certification" },
+      { type: "paragraph", html: "Congratulations on completing the Forklift Train the Trainer Certification! You are now qualified to <strong>train and evaluate forklift operators</strong> at your facility in accordance with OSHA 29 CFR 1910.178(l)(2)(iii)." },
+      { type: "heading", level: 3, text: "Next Steps" },
+      { type: "list", items: [
+        "Download your trainer certificate",
+        "Develop your site-specific training curriculum",
+        "Create practical evaluation checklists",
+        "Schedule your first operator training session",
+        "Maintain your own operator competence",
+      ] },
+      { type: "heading", level: 3, text: "Stay Current" },
+      { type: "paragraph", html: "Continue to develop your skills as a trainer. Stay current with OSHA regulations, attend refresher training, and continuously improve your training program based on feedback and incident data." },
+      { type: "callout", variant: "tip", text: "Start with a pilot training session to refine your curriculum before rolling it out to all operators." },
+      { type: "key_takeaways", items: [
+        "You are now qualified to train and evaluate forklift operators",
+        "Develop your site-specific training curriculum and evaluation forms",
+        "Maintain your own operator competence",
+        "Stay current with OSHA regulations and best practices",
+      ] },
+    ]),
   },
 ];

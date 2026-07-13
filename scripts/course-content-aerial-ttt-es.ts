@@ -1,3 +1,4 @@
+import type { LessonBlock } from "@shared/lesson-blocks";
 import { StepDef, QuestionDef } from "./course-content-aerial-ttt";
 
 export const CANONICAL_COURSE_ES = {
@@ -10,32 +11,7 @@ export const CANONICAL_COURSE_ES = {
 
 const img = (name: string) => `/images/training/${name}`;
 
-function lessonHtml(opts: {
-  title: string;
-  image: string;
-  sections: { heading?: string; content: string }[];
-  takeaways: string[];
-  tip?: string;
-  warning?: string;
-}): string {
-  const tipBlock = opts.tip ? `<div class="callout callout-tip"><strong>💡 Consejo:</strong> ${opts.tip}</div>` : "";
-  const warnBlock = opts.warning ? `<div class="callout callout-warning"><strong>⚠️ Advertencia:</strong> ${opts.warning}</div>` : "";
-  const sectionHtml = opts.sections.map(s =>
-    (s.heading ? `<h3>${s.heading}</h3>` : "") + s.content
-  ).join("\n");
-  const takeawayItems = opts.takeaways.map(t => `<li>${t}</li>`).join("");
-  return `<div class="lesson-content">
-<img src="${opts.image}" alt="${opts.title}" class="lesson-hero-image" />
-<h2>${opts.title}</h2>
-${sectionHtml}
-${tipBlock}
-${warnBlock}
-<div class="key-takeaways">
-<h4>📝 Puntos Clave</h4>
-<ul>${takeawayItems}</ul>
-</div>
-</div>`;
-}
+const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
 export const COURSE_STEPS_ES: StepDef[] = [
   // ═══ MÓDULO 0: Marco Regulatorio OSHA para Elevadores Aéreos ═══
@@ -44,50 +20,63 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Bienvenida y Marco Regulatorio de Elevadores Aéreos",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Bienvenida y Marco Regulatorio de Elevadores Aéreos",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "Acerca de Este Curso", content: "<p>¡Bienvenido a la Certificación Capacitar al Capacitador de Elevadores Aéreos y de Tijera! Este curso lo prepara para convertirse en un <strong>instructor calificado de operadores de elevadores aéreos y de tijera</strong>.</p>" },
-          { heading: "Calificaciones del Instructor", content: "<p>Bajo <strong>29 CFR 1910.178(l)(2)(iii)</strong>, la capacitación y evaluación debe ser conducida por personas con <strong>conocimiento, capacitación y experiencia</strong>.</p>" },
-          { heading: "Marco Regulatorio", content: "<p>La capacitación de elevadores aéreos se rige por: <strong>29 CFR 1926.453</strong> (elevadores aéreos), <strong>29 CFR 1910.178(l)</strong> (camiones industriales), <strong>ANSI A92.20</strong> (diseño), <strong>A92.22</strong> (uso seguro), <strong>A92.24</strong> (capacitación).</p>" },
-          { heading: "Nota Importante", content: "<p>Este curso lo califica para <strong>capacitar y evaluar operadores</strong>. <strong>No</strong> lo certifica para operar equipo.</p>" },
-        ],
-        takeaways: [
-          "Calificaciones: conocimiento, capacitación y experiencia",
-          "Regulado bajo 1926.453, 1910.178 y ANSI A92",
-          "A92.24 cubre requisitos de capacitación de MEWP",
-          "Califica instructores — no operadores",
-        ],
-        warning: "Este curso no lo certifica para operar elevadores aéreos.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Bienvenida y Marco Regulatorio de Elevadores Aéreos" },
+      { type: "heading", level: 2, text: "Bienvenida y Marco Regulatorio de Elevadores Aéreos" },
+      { type: "heading", level: 3, text: "Acerca de Este Curso" },
+      { type: "paragraph", html: "¡Bienvenido a la Certificación Capacitar al Capacitador de Elevadores Aéreos y de Tijera! Este curso lo prepara para convertirse en un <strong>instructor calificado de operadores de elevadores aéreos y de tijera</strong>." },
+      { type: "heading", level: 3, text: "Calificaciones del Instructor" },
+      { type: "paragraph", html: "Bajo <strong>29 CFR 1910.178(l)(2)(iii)</strong>, la capacitación y evaluación debe ser conducida por personas con <strong>conocimiento, capacitación y experiencia</strong>." },
+      { type: "heading", level: 3, text: "Marco Regulatorio" },
+      { type: "paragraph", html: "La capacitación de elevadores aéreos se rige por:" },
+      { type: "list", items: [
+        "<strong>29 CFR 1926.453</strong> — elevadores aéreos",
+        "<strong>29 CFR 1910.178(l)</strong> — camiones industriales",
+        "<strong>ANSI A92.20</strong> — diseño",
+        "<strong>A92.22</strong> — uso seguro",
+        "<strong>A92.24</strong> — capacitación",
+      ] },
+      { type: "heading", level: 3, text: "Nota Importante" },
+      { type: "paragraph", html: "Este curso lo califica para <strong>capacitar y evaluar operadores</strong>. <strong>No</strong> lo certifica para operar equipo." },
+      { type: "callout", variant: "warning", text: "Este curso no lo certifica para operar elevadores aéreos." },
+      { type: "key_takeaways", items: [
+        "Calificaciones: conocimiento, capacitación y experiencia",
+        "Regulado bajo 1926.453, 1910.178 y ANSI A92",
+        "A92.24 cubre requisitos de capacitación de MEWP",
+        "Califica instructores — no operadores",
+      ] },
+    ]),
   },
   {
     module: "Marco Regulatorio OSHA para Elevadores Aéreos",
     title: "Requisitos de Capacitación ANSI A92.24",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Requisitos de Capacitación ANSI A92.24",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Quién Debe Ser Capacitado?", content: "<p>ANSI A92.24 requiere capacitación para: <strong>operadores</strong>, <strong>ocupantes</strong>, <strong>supervisores</strong>, y <strong>personal de servicio</strong>.</p>" },
-          { heading: "Contenido de Capacitación", content: "<p>Debe cubrir: manual del operador, inspección, peligros comunes, protección contra caídas, selección de MEWP, controles, movimiento, apagado.</p>" },
-          { heading: "Familiarización", content: "<p>Antes de operar un MEWP específico, los operadores deben ser <strong>familiarizados</strong> con los controles, diferencias, características especiales, y el manual.</p>" },
-          { heading: "Recapacitación", content: "<p>Requerida cuando: operación insegura, accidente, evaluación fallida, nuevo tipo de MEWP, o cambios en el lugar de trabajo.</p>" },
-        ],
-        takeaways: [
-          "A92.24 requiere capacitación para operadores, ocupantes, supervisores, servicio",
-          "Cubrir inspección, peligros, protección contra caídas, controles",
-          "Familiarización con cada marca/modelo es requerida",
-          "Recapacitación por operación insegura, accidentes, equipo nuevo",
-        ],
-        tip: "Mantenga un registro de familiarización para cada operador y cada marca/modelo de MEWP.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Requisitos de Capacitación ANSI A92.24" },
+      { type: "heading", level: 2, text: "Requisitos de Capacitación ANSI A92.24" },
+      { type: "heading", level: 3, text: "Quién Debe Ser Capacitado?" },
+      { type: "paragraph", html: "ANSI A92.24 requiere capacitación para: <strong>operadores</strong>, <strong>ocupantes</strong>, <strong>supervisores</strong>, y <strong>personal de servicio</strong>." },
+      { type: "flip_cards", title: "¿Quién Necesita Capacitación de MEWP?", cards: [
+        { front: "Operadores", back: "Cualquier persona que controla un MEWP debe completar la capacitación completa de operador más la familiarización con cada marca/modelo específico que operará." },
+        { front: "Ocupantes", back: "Cualquier persona en la plataforma que no es el operador también necesita capacitación sobre protección contra caídas y su rol en el uso seguro del MEWP." },
+        { front: "Supervisores", back: "Cualquier persona que supervisa directamente a operadores de MEWP debe estar capacitada para reconocer la operación segura e insegura y la selección apropiada del MEWP." },
+        { front: "Personal de Servicio", back: "Quienes dan mantenimiento a los MEWPs necesitan capacitación para inspeccionar, dar servicio y trabajar en el equipo de forma segura." },
+      ] },
+      { type: "heading", level: 3, text: "Contenido de Capacitación" },
+      { type: "paragraph", html: "Debe cubrir: manual del operador, inspección, peligros comunes, protección contra caídas, selección de MEWP, controles, movimiento, apagado." },
+      { type: "heading", level: 3, text: "Familiarización" },
+      { type: "paragraph", html: "Antes de operar un MEWP específico, los operadores deben ser <strong>familiarizados</strong> con los controles, diferencias, características especiales, y el manual." },
+      { type: "heading", level: 3, text: "Recapacitación" },
+      { type: "paragraph", html: "Requerida cuando: operación insegura, accidente, evaluación fallida, nuevo tipo de MEWP, o cambios en el lugar de trabajo." },
+      { type: "callout", variant: "tip", text: "Mantenga un registro de familiarización para cada operador y cada marca/modelo de MEWP." },
+      { type: "key_takeaways", items: [
+        "A92.24 requiere capacitación para operadores, ocupantes, supervisores, servicio",
+        "Cubrir inspección, peligros, protección contra caídas, controles",
+        "Familiarización con cada marca/modelo es requerida",
+        "Recapacitación por operación insegura, accidentes, equipo nuevo",
+      ] },
+    ]),
   },
   {
     module: "Marco Regulatorio OSHA para Elevadores Aéreos",
@@ -108,24 +97,37 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Principios de Aprendizaje de Adultos para Elevadores Aéreos",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Principios de Aprendizaje de Adultos para Elevadores Aéreos",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "Principios Clave", content: "<p>Los adultos aprenden mejor cuando la capacitación es <strong>relevante</strong>, <strong>basada en experiencia</strong> y <strong>centrada en problemas</strong>.</p>" },
-          { heading: "Estilos de Aprendizaje", content: "<p>Incluya <strong>visual</strong> (diagramas de estabilidad), <strong>auditivo</strong> (explicaciones), <strong>kinestésico</strong> (práctica con equipo).</p>" },
-          { heading: "Estructura", content: "<ol><li><strong>Instrucción formal</strong> — OSHA/ANSI, tipos de equipo, estabilidad, protección contra caídas</li><li><strong>Capacitación práctica</strong> — inspección, controles, elevación, conducción, emergencias</li><li><strong>Evaluación</strong> — examen y habilidades prácticas</li><li><strong>Familiarización</strong> — orientación específica al equipo</li></ol>" },
-          { heading: "Materiales", content: "<p>Manuales del fabricante, estándares ANSI A92, listas de inspección, equipo de protección contra caídas, formularios de evaluación, plantillas de plan de rescate.</p>" },
-        ],
-        takeaways: [
-          "Haga la capacitación relevante con escenarios reales",
-          "Incluya elementos visuales, auditivos y kinestésicos",
-          "Estructura: instrucción, práctica, evaluación, familiarización",
-          "Prepare manuales del fabricante y estándares ANSI",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "Principios de Aprendizaje de Adultos para Elevadores Aéreos" },
+      { type: "heading", level: 2, text: "Principios de Aprendizaje de Adultos para Elevadores Aéreos" },
+      { type: "heading", level: 3, text: "Principios Clave" },
+      { type: "paragraph", html: "Los adultos aprenden mejor cuando la capacitación es <strong>relevante</strong>, <strong>basada en experiencia</strong> y <strong>centrada en problemas</strong>." },
+      { type: "heading", level: 3, text: "Estilos de Aprendizaje" },
+      { type: "paragraph", html: "Incluya <strong>visual</strong> (diagramas de estabilidad), <strong>auditivo</strong> (explicaciones), <strong>kinestésico</strong> (práctica con equipo)." },
+      { type: "heading", level: 3, text: "Estructura" },
+      { type: "list", ordered: true, items: [
+        "<strong>Instrucción formal</strong> — OSHA/ANSI, tipos de equipo, estabilidad, protección contra caídas",
+        "<strong>Capacitación práctica</strong> — inspección, controles, elevación, conducción, emergencias",
+        "<strong>Evaluación</strong> — examen y habilidades prácticas",
+        "<strong>Familiarización</strong> — orientación específica al equipo",
+      ] },
+      { type: "drag_drop", mode: "ordering",
+        prompt: "Ordene las fases de un programa completo de capacitación de elevadores aéreos en el orden correcto.",
+        items: [
+          { id: "phase-formal", label: "Instrucción formal — requisitos OSHA/ANSI, estabilidad, protección contra caídas" },
+          { id: "phase-practical", label: "Capacitación práctica — inspección, controles, elevación, emergencias" },
+          { id: "phase-evaluation", label: "Evaluación — examen de conocimiento y habilidades prácticas" },
+          { id: "phase-familiarization", label: "Familiarización — orientación específica al equipo" },
+        ] },
+      { type: "heading", level: 3, text: "Materiales" },
+      { type: "paragraph", html: "Manuales del fabricante, estándares ANSI A92, listas de inspección, equipo de protección contra caídas, formularios de evaluación, plantillas de plan de rescate." },
+      { type: "key_takeaways", items: [
+        "Haga la capacitación relevante con escenarios reales",
+        "Incluya elementos visuales, auditivos y kinestésicos",
+        "Estructura: instrucción, práctica, evaluación, familiarización",
+        "Prepare manuales del fabricante y estándares ANSI",
+      ] },
+    ]),
   },
   {
     module: "Aprendizaje de Adultos y Diseño de Capacitación",
@@ -145,43 +147,50 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Temas Relacionados con el Equipo",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Temas Relacionados con el Equipo",
-        image: img("aerial-lift-hero.svg"),
-        sections: [
-          { heading: "Conocimiento del Equipo", content: "<p>Cubra: tipos de MEWPs, operación de tijera y pluma, controles, capacidad, estabilidad, protección contra caídas, inspección, controles de emergencia, estabilizadores.</p>" },
-          { heading: "Consejos de Enseñanza", content: "<p>Use el MEWP real, demuestre la placa de capacidad, muestre el equipo de protección contra caídas, camine por una inspección completa, demuestre el descenso de emergencia.</p>" },
-        ],
-        takeaways: [
-          "Cubra todos los tipos: tijera, pluma, vertical",
-          "Incluya protección contra caídas, estabilidad, capacidad, emergencias",
-          "Use el MEWP real para enseñar controles",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Temas Relacionados con el Equipo" },
+      { type: "heading", level: 2, text: "Temas Relacionados con el Equipo" },
+      { type: "heading", level: 3, text: "Conocimiento del Equipo" },
+      { type: "paragraph", html: "Cubra: tipos de MEWPs, operación de tijera y pluma, controles, capacidad, estabilidad, protección contra caídas, inspección, controles de emergencia, estabilizadores." },
+      { type: "heading", level: 3, text: "Consejos de Enseñanza" },
+      { type: "paragraph", html: "Use el MEWP real, demuestre la placa de capacidad, muestre el equipo de protección contra caídas, camine por una inspección completa, demuestre el descenso de emergencia." },
+      { type: "key_takeaways", items: [
+        "Cubra todos los tipos: tijera, pluma, vertical",
+        "Incluya protección contra caídas, estabilidad, capacidad, emergencias",
+        "Use el MEWP real para enseñar controles",
+      ] },
+    ]),
   },
   {
     module: "Temas Requeridos de Elevadores Aéreos",
     title: "Temas Relacionados con el Lugar de Trabajo",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Temas Relacionados con el Lugar de Trabajo",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Temas Específicos del Sitio", content: "<p>Condiciones de superficie, tráfico de peatones, peligros aéreos, clima, peligros eléctricos, protección contra caídas, atmósferas peligrosas, control de tráfico, rescate.</p>" },
-          { heading: "Seguridad con Líneas de Energía", content: "<p>Distancias mínimas: hasta 50kV: 10 pies, 50kV-200kV: 15 pies, 200kV-350kV: 20 pies, 350kV-500kV: 25 pies.</p>" },
-          { heading: "Planificación de Rescate", content: "<p>ANSI A92.22 requiere un <strong>plan de rescate</strong> antes del uso del MEWP.</p>" },
-        ],
-        takeaways: [
-          "Personalice los temas a los peligros de su instalación",
-          "Enseñe distancias de líneas de energía y procedimientos de emergencia",
-          "ANSI A92.22 requiere un plan de rescate",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Temas Relacionados con el Lugar de Trabajo" },
+      { type: "heading", level: 2, text: "Temas Relacionados con el Lugar de Trabajo" },
+      { type: "heading", level: 3, text: "Temas Específicos del Sitio" },
+      { type: "paragraph", html: "Condiciones de superficie, tráfico de peatones, peligros aéreos, clima, peligros eléctricos, protección contra caídas, atmósferas peligrosas, control de tráfico, rescate." },
+      { type: "heading", level: 3, text: "Seguridad con Líneas de Energía" },
+      { type: "paragraph", html: "Distancias mínimas:" },
+      { type: "list", items: [
+        "Hasta 50kV: 10 pies",
+        "50kV-200kV: 15 pies",
+        "200kV-350kV: 20 pies",
+        "350kV-500kV: 25 pies",
+      ] },
+      { type: "heading", level: 3, text: "Planificación de Rescate" },
+      { type: "paragraph", html: "ANSI A92.22 requiere un <strong>plan de rescate</strong> antes del uso del MEWP." },
+      { type: "embedded_quiz", questions: [
+        { question: "Su equipo trabajará cerca de una línea de distribución de 40kV. ¿Cuál es la distancia mínima que debe mantener el MEWP?", type: "mcq_single", options: ["5 pies", "10 pies", "15 pies", "20 pies"], correctAnswers: "10 pies", explanation: "Para líneas de energía de hasta 50kV, la distancia mínima es 10 pies. Una línea de 40kV cae en ese rango." },
+        { question: "Un trabajador queda varado en una plataforma elevada después de que fallan los controles superiores. ¿Qué debe hacer primero el personal capacitado en tierra?", type: "mcq_single", options: ["Escalar la pluma o las tijeras para alcanzarlo", "Usar los controles inferiores o el sistema de descenso de emergencia", "Sacudir la plataforma para llamar su atención", "Esperar a que llegue el fabricante"], correctAnswers: "Usar los controles inferiores o el sistema de descenso de emergencia", explanation: "El plan de rescate requerido por ANSI A92.22 se basa en los controles inferiores y los sistemas de descenso de emergencia. Nunca escale la pluma ni las tijeras." },
+      ] },
+      { type: "key_takeaways", items: [
+        "Personalice los temas a los peligros de su instalación",
+        "Enseñe distancias de líneas de energía y procedimientos de emergencia",
+        "ANSI A92.22 requiere un plan de rescate",
+      ] },
+    ]),
   },
   {
     module: "Temas Requeridos de Elevadores Aéreos",
@@ -202,44 +211,55 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Metodología de Capacitación Práctica para Elevadores Aéreos",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Metodología de Capacitación Práctica para Elevadores Aéreos",
-        image: img("scissor-lift-hero.svg"),
-        sections: [
-          { heading: "Habilidades a Practicar", content: "<p>Inspección pre-operación, controles, elevación/descenso, conducción, protección contra caídas, estabilizadores, descenso de emergencia, apagado.</p>" },
-          { heading: "Ciclo Demostrar-Practicar-Evaluar", content: "<ol><li><strong>Demostrar</strong></li><li><strong>Práctica guiada</strong></li><li><strong>Práctica independiente</strong></li><li><strong>Evaluar</strong></li></ol>" },
-          { heading: "Seguridad", content: "<p>El instructor es responsable de la seguridad. Mantenga área despejada, detenga comportamientos inseguros.</p>" },
-        ],
-        takeaways: [
-          "Practique: inspección, controles, elevación, protección contra caídas, emergencias",
-          "Use el ciclo demostrar-practicar-evaluar",
-          "La seguridad es responsabilidad del instructor",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("scissor-lift-hero.svg"), alt: "Metodología de Capacitación Práctica para Elevadores Aéreos" },
+      { type: "heading", level: 2, text: "Metodología de Capacitación Práctica para Elevadores Aéreos" },
+      { type: "heading", level: 3, text: "Habilidades a Practicar" },
+      { type: "paragraph", html: "Inspección pre-operación, controles, elevación/descenso, conducción, protección contra caídas, estabilizadores, descenso de emergencia, apagado." },
+      { type: "heading", level: 3, text: "Ciclo Demostrar-Practicar-Evaluar" },
+      { type: "list", ordered: true, items: [
+        "<strong>Demostrar</strong>",
+        "<strong>Práctica guiada</strong>",
+        "<strong>Práctica independiente</strong>",
+        "<strong>Evaluar</strong>",
+      ] },
+      { type: "heading", level: 3, text: "Seguridad" },
+      { type: "paragraph", html: "El instructor es responsable de la seguridad. Mantenga área despejada, detenga comportamientos inseguros." },
+      { type: "key_takeaways", items: [
+        "Practique: inspección, controles, elevación, protección contra caídas, emergencias",
+        "Use el ciclo demostrar-practicar-evaluar",
+        "La seguridad es responsabilidad del instructor",
+      ] },
+    ]),
   },
   {
     module: "Capacitación Práctica y Evaluación",
     title: "Evaluación de Operadores de Elevadores Aéreos",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Evaluación de Operadores de Elevadores Aéreos",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Lista de Evaluación", content: "<p>Inspección, protección contra caídas, controles, elevación, estabilizadores, condiciones de superficie, peligros aéreos, emergencias, apagado.</p>" },
-          { heading: "Fallas Críticas", content: "<p>Sin arnés, operación cerca de líneas sin distancia, exceder capacidad, no desplegar estabilizadores.</p>" },
-          { heading: "Documentación", content: "<p>Certifique con: nombre, fechas, identidad del instructor, tipo de equipo.</p>" },
-        ],
-        takeaways: [
-          "Cree una lista de evaluación para habilidades de elevadores aéreos",
-          "Fallas críticas: sin arnés, violación de líneas de energía, exceder capacidad",
-          "Documente con nombre, fechas, instructor, tipo de equipo",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Evaluación de Operadores de Elevadores Aéreos" },
+      { type: "heading", level: 2, text: "Evaluación de Operadores de Elevadores Aéreos" },
+      { type: "heading", level: 3, text: "Lista de Evaluación" },
+      { type: "paragraph", html: "Inspección, protección contra caídas, controles, elevación, estabilizadores, condiciones de superficie, peligros aéreos, emergencias, apagado." },
+      { type: "heading", level: 3, text: "Fallas Críticas" },
+      { type: "paragraph", html: "Sin arnés, operación cerca de líneas sin distancia, exceder capacidad, no desplegar estabilizadores." },
+      { type: "scenario", title: "Decisión Durante la Evaluación",
+        prompt: "Durante una evaluación en un elevador de pluma, su operador completa una inspección pre-operación impecable, luego entra a la plataforma y comienza a elevarse sin conectar su línea al punto de anclaje designado por el fabricante. ¿Qué hace usted?",
+        choices: [
+          { text: "Detener la evaluación inmediatamente — esto es una falla crítica", correct: true, feedback: "Correcto. No usar o no conectar la protección contra caídas es una falla crítica de seguridad y una reprobación automática. Detenga la evaluación, explique específicamente qué fue inseguro, proporcione capacitación adicional sobre protección contra caídas, re-evalúe después de la remediación y documente todo." },
+          { text: "Dejar que la evaluación continúe y anotar el problema en la lista", correct: false, feedback: "Una línea sin conectar es una falla crítica y un peligro inmediato de expulsión. No puede calificarse como una nota menor — detenga la evaluación de inmediato." },
+          { text: "Indicarle que conecte la línea y seguir calificando hacia una aprobación", correct: false, feedback: "Una evaluación es observación sin coaching, y una falla crítica no puede convertirse en aprobación. Detenga, remedie con capacitación y programe una re-evaluación." },
+        ] },
+      { type: "heading", level: 3, text: "Documentación" },
+      { type: "paragraph", html: "Certifique con: nombre, fechas, identidad del instructor, tipo de equipo." },
+      { type: "callout", variant: "tip", text: "Mantenga los registros de familiarización específicos al equipo separados de los registros generales de capacitación." },
+      { type: "key_takeaways", items: [
+        "Cree una lista de evaluación para habilidades de elevadores aéreos",
+        "Fallas críticas: sin arnés, violación de líneas de energía, exceder capacidad",
+        "Documente con nombre, fechas, instructor, tipo de equipo",
+      ] },
+    ]),
   },
   {
     module: "Capacitación Práctica y Evaluación",
@@ -259,22 +279,21 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Administrando Su Programa de Capacitación de Elevadores Aéreos",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Administrando Su Programa de Capacitación de Elevadores Aéreos",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Gestión de Registros", content: "<p>Mantenga: registros de capacitación, listas de evaluación, registros de familiarización (por marca/modelo), planes de rescate, reportes de incidentes, recapacitación.</p>" },
-          { heading: "Disparadores de Recapacitación", content: "<p>Operación insegura, accidente, evaluación fallida, nuevo MEWP, cambios en el lugar de trabajo, o cada 3 años.</p>" },
-          { heading: "Cultura de Seguridad", content: "<p>Como instructor, es un <strong>líder de seguridad</strong>. Lidere con el ejemplo.</p>" },
-        ],
-        takeaways: [
-          "Mantenga registros de capacitación, evaluación y familiarización",
-          "Recapacitación por operación insegura, accidentes, equipo nuevo",
-          "El instructor es un líder de seguridad",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Administrando Su Programa de Capacitación de Elevadores Aéreos" },
+      { type: "heading", level: 2, text: "Administrando Su Programa de Capacitación de Elevadores Aéreos" },
+      { type: "heading", level: 3, text: "Gestión de Registros" },
+      { type: "paragraph", html: "Mantenga: registros de capacitación, listas de evaluación, registros de familiarización (por marca/modelo), planes de rescate, reportes de incidentes, recapacitación." },
+      { type: "heading", level: 3, text: "Disparadores de Recapacitación" },
+      { type: "paragraph", html: "Operación insegura, accidente, evaluación fallida, nuevo MEWP, cambios en el lugar de trabajo, o cada 3 años." },
+      { type: "heading", level: 3, text: "Cultura de Seguridad" },
+      { type: "paragraph", html: "Como instructor, es un <strong>líder de seguridad</strong>. Lidere con el ejemplo." },
+      { type: "key_takeaways", items: [
+        "Mantenga registros de capacitación, evaluación y familiarización",
+        "Recapacitación por operación insegura, accidentes, equipo nuevo",
+        "El instructor es un líder de seguridad",
+      ] },
+    ]),
   },
   {
     module: "Administración y Cultura de Seguridad",
@@ -323,23 +342,28 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Felicitaciones: Es un Instructor Certificado de Elevadores Aéreos",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "¡Es un Instructor Certificado de Elevadores Aéreos! ¿Qué Sigue?",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "Su Certificación", content: "<p>¡Felicitaciones! Está calificado para <strong>capacitar y evaluar operadores de elevadores aéreos y de tijera</strong> bajo OSHA 29 CFR 1926.453, 1910.178(l)(2)(iii) y ANSI/SAIA A92.</p>" },
-          { heading: "Próximos Pasos", content: "<ul><li>Descargue su certificado</li><li>Desarrolle su currículo específico</li><li>Cree listas de evaluación y planes de rescate</li><li>Programe familiarización para cada MEWP</li><li>Mantenga su competencia como operador</li></ul>" },
-          { heading: "Manténgase Actualizado", content: "<p>Manténgase al día con OSHA y ANSI. Los estándares A92 fueron revisados en 2020.</p>" },
-        ],
-        takeaways: [
-          "Está calificado para capacitar y evaluar operadores de elevadores aéreos",
-          "Desarrolle currículo y planes de rescate específicos",
-          "Programe familiarización para cada MEWP",
-          "Manténgase al día con OSHA y ANSI A92",
-        ],
-        tip: "Comience con una sesión piloto para refinar su currículo.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "¡Es un Instructor Certificado de Elevadores Aéreos! ¿Qué Sigue?" },
+      { type: "heading", level: 2, text: "¡Es un Instructor Certificado de Elevadores Aéreos! ¿Qué Sigue?" },
+      { type: "heading", level: 3, text: "Su Certificación" },
+      { type: "paragraph", html: "¡Felicitaciones! Está calificado para <strong>capacitar y evaluar operadores de elevadores aéreos y de tijera</strong> bajo OSHA 29 CFR 1926.453, 1910.178(l)(2)(iii) y ANSI/SAIA A92." },
+      { type: "heading", level: 3, text: "Próximos Pasos" },
+      { type: "list", items: [
+        "Descargue su certificado",
+        "Desarrolle su currículo específico",
+        "Cree listas de evaluación y planes de rescate",
+        "Programe familiarización para cada MEWP",
+        "Mantenga su competencia como operador",
+      ] },
+      { type: "heading", level: 3, text: "Manténgase Actualizado" },
+      { type: "paragraph", html: "Manténgase al día con OSHA y ANSI. Los estándares A92 fueron revisados en 2020." },
+      { type: "callout", variant: "tip", text: "Comience con una sesión piloto para refinar su currículo." },
+      { type: "key_takeaways", items: [
+        "Está calificado para capacitar y evaluar operadores de elevadores aéreos",
+        "Desarrolle currículo y planes de rescate específicos",
+        "Programe familiarización para cada MEWP",
+        "Manténgase al día con OSHA y ANSI A92",
+      ] },
+    ]),
   },
 ];

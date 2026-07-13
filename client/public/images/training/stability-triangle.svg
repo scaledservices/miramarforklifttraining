@@ -1,12 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Roboto, Arial, sans-serif">
+  <rect width="800" height="450" fill="#faf8f5"/>
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#2e7d32;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1"/>
-    </linearGradient>
+    <pattern id="redHatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="9" height="9" fill="#d64545" opacity="0.10"/>
+      <rect width="4" height="9" fill="#d64545" opacity="0.35"/>
+    </pattern>
+    <marker id="arrOrange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#FF7F00"/>
+    </marker>
   </defs>
-  <rect width="800" height="400" fill="url(#bg)" rx="8"/>
-  <text x="400" y="180" fill="white" font-size="42" font-family="Arial,sans-serif" text-anchor="middle" font-weight="bold">⚖️</text>
-  <text x="400" y="240" fill="white" font-size="24" font-family="Arial,sans-serif" text-anchor="middle">Stability Triangle</text>
-  <text x="400" y="280" fill="rgba(255,255,255,0.6)" font-size="14" font-family="Arial,sans-serif" text-anchor="middle">ForkliftCertified.training</text>
+
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#4f3b3b">The Stability Triangle</text>
+  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
+  <text x="30" y="78" font-size="14" font-weight="600" fill="#7a6a5f">Top-down view of the forklift</text>
+
+  <!-- Forks (pointing up / forward) -->
+  <rect x="352" y="85" width="16" height="92" rx="4" fill="#FFC326" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="432" y="85" width="16" height="92" rx="4" fill="#FFC326" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Carriage -->
+  <rect x="336" y="170" width="128" height="14" rx="3" fill="#e0a800" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Chassis -->
+  <rect x="320" y="178" width="160" height="170" rx="16" fill="#ffd75e" stroke="#1a1a1a" stroke-width="2.5"/>
+  <!-- Counterweight -->
+  <rect x="332" y="302" width="136" height="40" rx="12" fill="#e0a800" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- Front wheels -->
+  <rect x="294" y="186" width="24" height="52" rx="8" fill="#1a1a1a"/>
+  <rect x="482" y="186" width="24" height="52" rx="8" fill="#1a1a1a"/>
+  <!-- Rear axle + pivot -->
+  <rect x="360" y="324" width="80" height="12" rx="6" fill="#4f3b3b"/>
+  <circle cx="400" cy="330" r="7" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- Stability triangle -->
+  <polygon points="306,212 494,212 400,330" fill="#019E7C" fill-opacity="0.25" stroke="#019E7C" stroke-width="2.5"/>
+
+  <!-- Red hatched tip-over zone outside rear corner -->
+  <polygon points="340,352 460,352 490,408 310,408" fill="url(#redHatch)" stroke="#d64545" stroke-width="2" stroke-dasharray="6,4"/>
+  <circle cx="400" cy="378" r="5" fill="#d64545"/>
+
+  <!-- CG loaded dot + dashed arrow forward -->
+  <line x1="400" y1="242" x2="400" y2="224" stroke="#FF7F00" stroke-width="2.5" stroke-dasharray="5,4" marker-end="url(#arrOrange)"/>
+  <circle cx="400" cy="212" r="4.5" fill="#FF7F00" stroke="#1a1a1a" stroke-width="1.5"/>
+  <!-- CG empty dot -->
+  <circle cx="400" cy="250" r="6.5" fill="#FF7F00" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- Label: Front axle (drive wheels) -->
+  <circle cx="294" cy="212" r="3.5" fill="#FF7F00"/>
+  <line x1="294" y1="212" x2="238" y2="190" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="232" y="194" font-size="15" font-weight="600" fill="#1a1a1a" text-anchor="end">Front axle (drive wheels)</text>
+
+  <!-- Label: Stability triangle -->
+  <circle cx="354" cy="272" r="3.5" fill="#FF7F00"/>
+  <line x1="354" y1="272" x2="240" y2="272" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="234" y="276" font-size="15" font-weight="600" fill="#019E7C" text-anchor="end">Stability triangle</text>
+
+  <!-- Label: Rear axle pivot -->
+  <circle cx="360" cy="330" r="3.5" fill="#FF7F00"/>
+  <line x1="360" y1="330" x2="240" y2="334" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="234" y="338" font-size="15" font-weight="600" fill="#1a1a1a" text-anchor="end">Rear axle pivot</text>
+
+  <!-- Label: CG moves forward -->
+  <circle cx="407" cy="212" r="3.5" fill="#FF7F00"/>
+  <line x1="407" y1="212" x2="540" y2="152" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="546" y="148" font-size="15" font-weight="600" fill="#1a1a1a">CG moves forward as</text>
+  <text x="546" y="168" font-size="15" font-weight="600" fill="#1a1a1a">load rises/extends</text>
+
+  <!-- Label: Center of gravity (empty) -->
+  <circle cx="407" cy="250" r="3.5" fill="#FF7F00"/>
+  <line x1="407" y1="250" x2="540" y2="250" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="546" y="254" font-size="15" font-weight="600" fill="#1a1a1a">Center of gravity (empty)</text>
+
+  <!-- Label: Tip-over risk -->
+  <circle cx="465" cy="380" r="3.5" fill="#FF7F00"/>
+  <line x1="465" y1="380" x2="514" y2="390" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="520" y="382" font-size="15" font-weight="600" fill="#d64545">Tip-over risk:</text>
+  <text x="520" y="402" font-size="15" font-weight="600" fill="#d64545">CG outside triangle</text>
 </svg>
