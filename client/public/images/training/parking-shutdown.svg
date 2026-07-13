@@ -1,12 +1,121 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#37474f;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1"/>
-    </linearGradient>
-  </defs>
-  <rect width="800" height="400" fill="url(#bg)" rx="8"/>
-  <text x="400" y="180" fill="white" font-size="42" font-family="Arial,sans-serif" text-anchor="middle" font-weight="bold">🅿️</text>
-  <text x="400" y="240" fill="white" font-size="24" font-family="Arial,sans-serif" text-anchor="middle">Parking &amp; Shutdown</text>
-  <text x="400" y="280" fill="rgba(255,255,255,0.6)" font-size="14" font-family="Arial,sans-serif" text-anchor="middle">ForkliftCertified.training</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Roboto, Arial, sans-serif">
+  <!-- background -->
+  <rect width="800" height="450" fill="#faf8f5"/>
+  <rect x="0" y="400" width="800" height="50" fill="#e8e2d8"/>
+  <line x1="0" y1="400" x2="800" y2="400" stroke="#b8ad9c" stroke-width="2"/>
+
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#4f3b3b">Parking &amp; Shutdown Procedure</text>
+  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
+
+  <!-- ===== forklift, forks lowered, shifted left for steps list ===== -->
+  <g transform="translate(-70,0)">
+    <!-- counterweight -->
+    <path d="M150,350 L150,300 Q150,285 165,285 L230,285 L230,350 Z" fill="#e0a800" stroke="#1a1a1a" stroke-width="2.5"/>
+    <!-- body -->
+    <rect x="200" y="290" width="200" height="60" rx="8" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+    <!-- hood / dash console -->
+    <path d="M330,290 L330,255 Q330,248 337,248 L392,248 Q400,248 400,258 L400,290 Z" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+    <!-- steering wheel -->
+    <path d="M340,250 L322,232" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="318" cy="228" r="9" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+
+    <!-- parking brake indicator on dash -->
+    <circle cx="376" cy="268" r="10" fill="#019E7C" stroke="#1a1a1a" stroke-width="1.5"/>
+    <text x="376" y="273" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">P</text>
+
+    <!-- overhead guard -->
+    <line x1="222" y1="290" x2="228" y2="148" stroke="#3d3d3d" stroke-width="9" stroke-linecap="round"/>
+    <line x1="352" y1="252" x2="342" y2="148" stroke="#3d3d3d" stroke-width="9" stroke-linecap="round"/>
+    <rect x="212" y="136" width="146" height="12" rx="5" fill="#3d3d3d"/>
+    <g stroke="#3d3d3d" stroke-width="4">
+      <line x1="242" y1="140" x2="242" y2="147"/>
+      <line x1="268" y1="140" x2="268" y2="147"/>
+      <line x1="294" y1="140" x2="294" y2="147"/>
+      <line x1="320" y1="140" x2="320" y2="147"/>
+    </g>
+
+    <!-- seat -->
+    <rect x="248" y="238" width="54" height="14" rx="5" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="240" y="196" width="13" height="48" rx="5" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+
+    <!-- wheels -->
+    <circle cx="370" cy="352" r="48" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="370" cy="352" r="22" fill="#8a8378"/>
+    <circle cx="370" cy="352" r="8" fill="#4a4540"/>
+    <circle cx="212" cy="364" r="36" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="212" cy="364" r="16" fill="#8a8378"/>
+    <circle cx="212" cy="364" r="6" fill="#4a4540"/>
+
+    <!-- wheel chock against drive wheel -->
+    <path d="M334,368 L334,400 L296,400 Z" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="2"/>
+
+    <!-- mast carriage link to chassis -->
+    <rect x="398" y="300" width="38" height="26" rx="4" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- mast -->
+    <rect x="432" y="118" width="13" height="274" fill="#555" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="455" y="118" width="13" height="274" fill="#6b6b6b" stroke="#1a1a1a" stroke-width="2"/>
+    <g stroke="#1a1a1a" stroke-width="2" fill="#555">
+      <rect x="432" y="150" width="36" height="8"/>
+      <rect x="432" y="230" width="36" height="8"/>
+      <rect x="432" y="310" width="36" height="8"/>
+    </g>
+    <!-- lift chain hint -->
+    <line x1="474" y1="130" x2="474" y2="240" stroke="#8a8378" stroke-width="3" stroke-dasharray="4 3"/>
+
+    <!-- load backrest, lowered -->
+    <g stroke="#1a1a1a" stroke-width="2">
+      <rect x="478" y="248" width="12" height="152" fill="#777"/>
+      <line x1="478" y1="276" x2="490" y2="276"/>
+      <line x1="478" y1="304" x2="490" y2="304"/>
+      <line x1="478" y1="332" x2="490" y2="332"/>
+      <line x1="478" y1="360" x2="490" y2="360"/>
+    </g>
+
+    <!-- forks lowered flat on the ground -->
+    <path d="M490,282 L502,282 L502,388 L664,388 L664,400 L490,400 Z" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+
+    <!-- key with tag, leader to ignition on dash -->
+    <line x1="404" y1="196" x2="388" y2="252" stroke="#4f3b3b" stroke-width="1.5"/>
+    <circle cx="388" cy="254" r="3.5" fill="#FF7F00"/>
+    <g stroke="#1a1a1a" stroke-width="2">
+      <circle cx="400" cy="176" r="9" fill="#8a8378"/>
+      <circle cx="400" cy="176" r="3" fill="#faf8f5"/>
+      <rect x="396" y="184" width="8" height="18" rx="2" fill="#8a8378"/>
+      <line x1="404" y1="192" x2="408" y2="192"/>
+      <line x1="404" y1="198" x2="408" y2="198"/>
+    </g>
+    <rect x="384" y="140" width="32" height="20" rx="3" fill="#FFC326" stroke="#1a1a1a" stroke-width="2"/>
+    <line x1="400" y1="160" x2="400" y2="167" stroke="#1a1a1a" stroke-width="2"/>
+  </g>
+
+  <!-- ===== shutdown steps ===== -->
+  <g>
+    <rect x="608" y="96" width="182" height="272" rx="10" fill="#ffffff" stroke="#b8ad9c" stroke-width="1.5"/>
+    <text x="626" y="126" font-size="14" font-weight="700" fill="#4f3b3b">Shutdown steps</text>
+    <line x1="626" y1="136" x2="772" y2="136" stroke="#e8e2d8" stroke-width="2"/>
+    <g font-size="13" font-weight="600" fill="#1a1a1a">
+      <circle cx="638" cy="160" r="11" fill="#019E7C"/>
+      <text x="638" y="164" text-anchor="middle" fill="#ffffff" font-weight="700">1</text>
+      <text x="656" y="158">Lower forks fully</text>
+      <text x="656" y="173" font-weight="400">to the floor</text>
+
+      <circle cx="638" cy="200" r="11" fill="#019E7C"/>
+      <text x="638" y="204" text-anchor="middle" fill="#ffffff" font-weight="700">2</text>
+      <text x="656" y="204">Shift to neutral</text>
+
+      <circle cx="638" cy="240" r="11" fill="#019E7C"/>
+      <text x="638" y="244" text-anchor="middle" fill="#ffffff" font-weight="700">3</text>
+      <text x="656" y="244">Set parking brake</text>
+
+      <circle cx="638" cy="280" r="11" fill="#019E7C"/>
+      <text x="638" y="284" text-anchor="middle" fill="#ffffff" font-weight="700">4</text>
+      <text x="656" y="278">Turn off &amp; remove</text>
+      <text x="656" y="293" font-weight="400">the key</text>
+
+      <circle cx="638" cy="330" r="11" fill="#019E7C"/>
+      <text x="638" y="334" text-anchor="middle" fill="#ffffff" font-weight="700">5</text>
+      <text x="656" y="328">Chock wheels</text>
+      <text x="656" y="343" font-weight="400">on inclines</text>
+    </g>
+  </g>
 </svg>

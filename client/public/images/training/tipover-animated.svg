@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Roboto, Arial, sans-serif">
+  <!-- background -->
+  <rect width="800" height="450" fill="#faf8f5"/>
+  <rect x="0" y="400" width="800" height="50" fill="#e8e2d8"/>
+  <line x1="0" y1="400" x2="800" y2="400" stroke="#b8ad9c" stroke-width="2"/>
+
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#4f3b3b">Why Forklifts Tip Over</text>
+  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
+
+  <!-- static inset note -->
+  <rect x="30" y="66" width="302" height="48" rx="8" fill="#f5f2ec" stroke="#b8ad9c" stroke-width="1.5"/>
+  <text x="44" y="86" font-size="13.5" fill="#4f3b3b">High loads move the center of gravity</text>
+  <text x="44" y="104" font-size="13.5" fill="#4f3b3b">forward and up</text>
+
+  <!-- ===== forklift group (rotates about front wheel contact point 370,400) ===== -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate" dur="9s" repeatCount="indefinite"
+      values="0 370 400;0 370 400;8 370 400;8 370 400;0 370 400;0 370 400"
+      keyTimes="0;0.12;0.30;0.50;0.62;1"/>
+
+    <!-- counterweight -->
+    <path d="M150,350 L150,300 Q150,285 165,285 L230,285 L230,350 Z" fill="#e0a800" stroke="#1a1a1a" stroke-width="2.5"/>
+    <!-- body -->
+    <rect x="200" y="290" width="200" height="60" rx="8" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+    <!-- hood / dash console -->
+    <path d="M330,290 L330,255 Q330,248 337,248 L392,248 Q400,248 400,258 L400,290 Z" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+    <!-- steering wheel -->
+    <path d="M340,250 L322,232" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="318" cy="228" r="9" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+    <!-- overhead guard -->
+    <line x1="222" y1="290" x2="228" y2="148" stroke="#3d3d3d" stroke-width="9" stroke-linecap="round"/>
+    <line x1="352" y1="252" x2="342" y2="148" stroke="#3d3d3d" stroke-width="9" stroke-linecap="round"/>
+    <rect x="212" y="136" width="146" height="12" rx="5" fill="#3d3d3d"/>
+    <!-- seat -->
+    <rect x="248" y="238" width="54" height="14" rx="5" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="240" y="196" width="13" height="48" rx="5" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- wheels -->
+    <circle cx="370" cy="352" r="48" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="370" cy="352" r="22" fill="#8a8378"/>
+    <circle cx="370" cy="352" r="8" fill="#4a4540"/>
+    <circle cx="212" cy="364" r="36" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="212" cy="364" r="16" fill="#8a8378"/>
+    <circle cx="212" cy="364" r="6" fill="#4a4540"/>
+    <!-- mast carriage link -->
+    <rect x="398" y="300" width="38" height="26" rx="4" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- tall elevated mast -->
+    <rect x="432" y="64" width="13" height="328" fill="#555" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="455" y="64" width="13" height="328" fill="#6b6b6b" stroke="#1a1a1a" stroke-width="2"/>
+    <g stroke="#1a1a1a" stroke-width="2" fill="#555">
+      <rect x="432" y="80" width="36" height="8"/>
+      <rect x="432" y="200" width="36" height="8"/>
+      <rect x="432" y="320" width="36" height="8"/>
+    </g>
+    <line x1="474" y1="76" x2="474" y2="200" stroke="#8a8378" stroke-width="3" stroke-dasharray="4 3"/>
+
+    <!-- ===== carriage + load (lowers at end of loop) ===== -->
+    <g>
+      <animateTransform attributeName="transform" type="translate" dur="9s" repeatCount="indefinite"
+        values="0 0;0 0;0 170;0 170;0 0"
+        keyTimes="0;0.66;0.78;0.96;1"/>
+      <!-- load backrest -->
+      <g stroke="#1a1a1a" stroke-width="2">
+        <rect x="478" y="64" width="12" height="140" fill="#777"/>
+        <line x1="478" y1="92" x2="490" y2="92"/>
+        <line x1="478" y1="120" x2="490" y2="120"/>
+        <line x1="478" y1="148" x2="490" y2="148"/>
+        <line x1="478" y1="176" x2="490" y2="176"/>
+      </g>
+      <!-- forks -->
+      <path d="M490,98 L502,98 L502,204 L620,204 L620,216 L490,216 Z" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+      <!-- load cube -->
+      <rect x="505" y="107" width="96" height="97" rx="3" fill="#dcd0ba" stroke="#1a1a1a" stroke-width="2.5"/>
+      <line x1="505" y1="139" x2="601" y2="139" stroke="#b8ad9c" stroke-width="2"/>
+      <line x1="505" y1="171" x2="601" y2="171" stroke="#b8ad9c" stroke-width="2"/>
+      <line x1="537" y1="107" x2="537" y2="204" stroke="#b8ad9c" stroke-width="2"/>
+      <line x1="569" y1="107" x2="569" y2="204" stroke="#b8ad9c" stroke-width="2"/>
+    </g>
+
+    <!-- combined CG marker (moves down as load lowers) -->
+    <g>
+      <animateTransform attributeName="transform" type="translate" dur="9s" repeatCount="indefinite"
+        values="0 0;0 0;-15 105;-15 105;0 0"
+        keyTimes="0;0.66;0.78;0.96;1"/>
+      <circle cx="425" cy="205" r="11" fill="#FF7F00" stroke="#1a1a1a" stroke-width="2.5"/>
+      <text x="425" y="209.5" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">CG</text>
+    </g>
+  </g>
+
+  <!-- pivot point marker (static) -->
+  <circle cx="370" cy="400" r="5" fill="#FF7F00" stroke="#1a1a1a" stroke-width="2"/>
+  <text x="370" y="432" font-size="13" font-weight="600" fill="#4f3b3b" text-anchor="middle">Front axle = pivot point</text>
+
+  <!-- red warning arc (tipping direction) -->
+  <g opacity="0">
+    <path d="M672,250 A 80,80 0 0 1 706,345" fill="none" stroke="#d64545" stroke-width="5" stroke-linecap="round"/>
+    <polygon points="706,362 696,340 716,342" fill="#d64545"/>
+    <animate attributeName="opacity" dur="9s" repeatCount="indefinite"
+      values="0;0;1;1;0;0" keyTimes="0;0.13;0.22;0.50;0.58;1"/>
+  </g>
+
+  <!-- green lower-the-load arrow -->
+  <g opacity="0">
+    <line x1="650" y1="240" x2="650" y2="320" stroke="#019E7C" stroke-width="5" stroke-linecap="round"/>
+    <polygon points="650,338 639,316 661,316" fill="#019E7C"/>
+    <animate attributeName="opacity" dur="9s" repeatCount="indefinite"
+      values="0;0;1;1;0;0" keyTimes="0;0.66;0.72;0.82;0.88;1"/>
+  </g>
+
+  <!-- status labels -->
+  <text x="655" y="95" font-size="20" font-weight="700" fill="#d64545" text-anchor="middle" opacity="0">
+    CG past front axle!
+    <animate attributeName="opacity" dur="9s" repeatCount="indefinite"
+      values="0;0;1;1;0;0" keyTimes="0;0.16;0.26;0.50;0.58;1"/>
+  </text>
+  <text x="655" y="95" font-size="20" font-weight="700" fill="#019E7C" text-anchor="middle" opacity="0">
+    Keep the load low
+    <animate attributeName="opacity" dur="9s" repeatCount="indefinite"
+      values="0;0;1;1;0;0" keyTimes="0;0.66;0.76;0.93;0.97;1"/>
+  </text>
+</svg>

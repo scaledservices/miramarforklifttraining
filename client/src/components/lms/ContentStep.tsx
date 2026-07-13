@@ -4,6 +4,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import InteractiveLesson from "./InteractiveLesson";
+import type { LessonBlock } from "@shared/lesson-blocks";
 
 interface ContentStepProps {
   step: {
@@ -22,6 +24,8 @@ export default function ContentStep({ step, enrollmentId, onComplete }: ContentS
   const { t } = useTranslation();
   const [marked, setMarked] = useState(step.progress.status === "completed");
   const config = step.config as any;
+  const blocks: LessonBlock[] | null =
+    Array.isArray(config?.blocks) && config.blocks.length > 0 ? config.blocks : null;
   const htmlContent = config?.html_content || config?.htmlContent || config?.content || "";
 
   const markComplete = useMutation({
@@ -45,7 +49,9 @@ export default function ContentStep({ step, enrollmentId, onComplete }: ContentS
         </div>
       )}
 
-      {htmlContent ? (
+      {blocks ? (
+        <InteractiveLesson blocks={blocks} />
+      ) : htmlContent ? (
         <div
           className="lesson-renderer prose prose-sm md:prose-base max-w-none dark:prose-invert"
           dangerouslySetInnerHTML={{ __html: htmlContent }}

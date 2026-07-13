@@ -1,12 +1,63 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Roboto, Arial, sans-serif">
   <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#795548;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1"/>
-    </linearGradient>
+    <!-- simplified loaded forklift, facing right, ground line at local y=0 -->
+    <g id="lift">
+      <path d="M-72,-4 L-72,-34 Q-72,-42 -64,-42 L-42,-42 L-42,-4 Z" fill="#e0a800" stroke="#1a1a1a" stroke-width="2"/>
+      <rect x="-50" y="-46" width="66" height="30" rx="5" fill="#FFC326" stroke="#1a1a1a" stroke-width="2"/>
+      <line x1="-40" y1="-46" x2="-38" y2="-80" stroke="#3d3d3d" stroke-width="4"/>
+      <line x1="4" y1="-46" x2="2" y2="-80" stroke="#3d3d3d" stroke-width="4"/>
+      <rect x="-46" y="-84" width="54" height="6" rx="3" fill="#3d3d3d"/>
+      <circle cx="-38" cy="-13" r="13" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="2"/>
+      <circle cx="-38" cy="-13" r="5" fill="#8a8378"/>
+      <circle cx="8" cy="-14" r="14" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="2"/>
+      <circle cx="8" cy="-14" r="5.5" fill="#8a8378"/>
+      <rect x="22" y="-94" width="5" height="90" fill="#555" stroke="#1a1a1a" stroke-width="1.5"/>
+      <rect x="29" y="-94" width="5" height="90" fill="#6b6b6b" stroke="#1a1a1a" stroke-width="1.5"/>
+      <rect x="34" y="-62" width="4" height="48" fill="#777" stroke="#1a1a1a" stroke-width="1.5"/>
+      <path d="M38,-14 L42,-14 L42,-6 L80,-6 L80,-1 L38,-1 Z" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="1.5"/>
+      <rect x="40" y="-48" width="38" height="42" fill="#d9c7a8" stroke="#1a1a1a" stroke-width="2"/>
+      <line x1="40" y1="-27" x2="78" y2="-27" stroke="#b89d74" stroke-width="1.5"/>
+    </g>
   </defs>
-  <rect width="800" height="400" fill="url(#bg)" rx="8"/>
-  <text x="400" y="180" fill="white" font-size="42" font-family="Arial,sans-serif" text-anchor="middle" font-weight="bold">⛰️</text>
-  <text x="400" y="240" fill="white" font-size="24" font-family="Arial,sans-serif" text-anchor="middle">Ramps &amp; Slopes</text>
-  <text x="400" y="280" fill="rgba(255,255,255,0.6)" font-size="14" font-family="Arial,sans-serif" text-anchor="middle">ForkliftCertified.training</text>
+
+  <!-- background -->
+  <rect width="800" height="450" fill="#faf8f5"/>
+  <rect x="0" y="400" width="800" height="50" fill="#e8e2d8"/>
+  <line x1="0" y1="400" x2="800" y2="400" stroke="#b8ad9c" stroke-width="2"/>
+
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#4f3b3b">Ramps: Load Points Upgrade</text>
+  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
+
+  <!-- raised platform -->
+  <rect x="560" y="260" width="240" height="140" fill="#cfc8ba" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- ramp -->
+  <polygon points="100,400 560,260 560,400" fill="#ded6c6" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- grade arrow along ramp -->
+  <line x1="260" y1="392" x2="455" y2="332.6" stroke="#4f3b3b" stroke-width="2.5"/>
+  <polygon points="467,329 456.9,337.1 454,327.6" fill="#4f3b3b"/>
+  <text transform="translate(330,381) rotate(-16.93)" font-size="14" font-weight="600" fill="#4f3b3b">Grade</text>
+
+  <!-- (b) WRONG: loaded forklift pointing downhill (ghost) -->
+  <g opacity="0.78">
+    <use href="#lift" transform="translate(229,361) rotate(-16.93) scale(-0.75,0.75)"/>
+  </g>
+  <circle cx="145" cy="298" r="16" fill="#d64545" stroke="#1a1a1a" stroke-width="2"/>
+  <line x1="138" y1="291" x2="152" y2="305" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="152" y1="291" x2="138" y2="305" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- (a) CORRECT: loaded forklift driving forward up the ramp -->
+  <use href="#lift" transform="translate(445,295) rotate(-16.93) scale(0.75)"/>
+  <circle cx="512" cy="228" r="16" fill="#019E7C" stroke="#1a1a1a" stroke-width="2"/>
+  <path d="M504,229 l6,7 l11,-14" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- captions -->
+  <text x="248" y="118" font-size="15" font-weight="600" fill="#1a1a1a">Ascending: drive forward, load upgrade</text>
+  <line x1="430" y1="126" x2="444" y2="212" stroke="#4f3b3b" stroke-width="1.5"/>
+  <circle cx="444.5" cy="217" r="3.5" fill="#FF7F00"/>
+
+  <text x="30" y="438" font-size="15" font-weight="600" fill="#1a1a1a">Never point the load downhill when loaded</text>
+  <line x1="185" y1="422" x2="174" y2="382" stroke="#4f3b3b" stroke-width="1.5"/>
+  <circle cx="173" cy="378" r="3.5" fill="#FF7F00"/>
 </svg>

@@ -1,3 +1,5 @@
+import type { LessonBlock } from "@shared/lesson-blocks";
+
 export interface StepDef {
   title: string;
   type: "lesson" | "video" | "checkpoint" | "download" | "exam" | "content";
@@ -25,32 +27,7 @@ export const CANONICAL_COURSE = {
 
 const img = (name: string) => `/images/training/${name}`;
 
-function lessonHtml(opts: {
-  title: string;
-  image: string;
-  sections: { heading?: string; content: string }[];
-  takeaways: string[];
-  tip?: string;
-  warning?: string;
-}): string {
-  const tipBlock = opts.tip ? `<div class="callout callout-tip"><strong>💡 Tip:</strong> ${opts.tip}</div>` : "";
-  const warnBlock = opts.warning ? `<div class="callout callout-warning"><strong>⚠️ Warning:</strong> ${opts.warning}</div>` : "";
-  const sectionHtml = opts.sections.map(s =>
-    (s.heading ? `<h3>${s.heading}</h3>` : "") + s.content
-  ).join("\n");
-  const takeawayItems = opts.takeaways.map(t => `<li>${t}</li>`).join("");
-  return `<div class="lesson-content">
-<img src="${opts.image}" alt="${opts.title}" class="lesson-hero-image" />
-<h2>${opts.title}</h2>
-${sectionHtml}
-${tipBlock}
-${warnBlock}
-<div class="key-takeaways">
-<h4>📝 Key Takeaways</h4>
-<ul>${takeawayItems}</ul>
-</div>
-</div>`;
-}
+const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
 export const COURSE_STEPS: StepDef[] = [
   // ═══ MODULE 0: OSHA Regulatory Framework for Aerial Lifts ═══
@@ -59,50 +36,94 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Welcome & Aerial Lift Regulatory Framework",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Welcome & Aerial Lift Regulatory Framework",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "About This Course", content: "<p>Welcome to the Aerial & Scissor Lift Train the Trainer Certification! This course prepares you to become a <strong>qualified aerial lift and scissor lift operator trainer</strong>. It combines adult learning principles and training methodology with aerial lift-specific regulatory content.</p>" },
-          { heading: "Trainer Qualifications", content: "<p>Under <strong>29 CFR 1910.178(l)(2)(iii)</strong>, all operator training and evaluation shall be conducted by persons who have the <strong>knowledge, training, and experience</strong> to train operators and evaluate their competence. This applies to aerial lift trainers as well.</p>" },
-          { heading: "Regulatory Framework", content: "<p>Aerial lift training is governed by multiple standards:</p><ul><li><strong>29 CFR 1926.453</strong> — OSHA Aerial Lift standard</li><li><strong>29 CFR 1910.178(l)</strong> — PIT operator training (applied to scissor lifts)</li><li><strong>ANSI/SAIA A92.20</strong> — MEWP Design, Safety, and Verification</li><li><strong>ANSI/SAIA A92.22</strong> — Safe Use of MEWPs (includes rescue planning)</li><li><strong>ANSI/SAIA A92.24</strong> — Training Requirements for MEWP operators</li></ul>" },
-          { heading: "Important Note", content: "<p>This course qualifies you to <strong>train and evaluate aerial lift operators</strong>. It does <strong>not</strong> certify you to operate equipment. You must already be a competent aerial lift operator.</p>" },
-        ],
-        takeaways: [
-          "Trainer qualifications: knowledge, training, and experience (1910.178(l)(2)(iii))",
-          "Aerial lifts are regulated under 1926.453, 1910.178, and ANSI A92 series",
-          "ANSI A92.24 specifically covers MEWP training requirements",
-          "This course qualifies trainers — not operators",
-        ],
-        warning: "This course does not certify you to operate aerial lifts. You must already be a competent operator.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Welcome & Aerial Lift Regulatory Framework" },
+      { type: "heading", level: 2, text: "Welcome & Aerial Lift Regulatory Framework" },
+      { type: "heading", level: 3, text: "About This Course" },
+      { type: "paragraph", html: "Welcome to the Aerial & Scissor Lift Train the Trainer Certification! This course prepares you to become a <strong>qualified aerial lift and scissor lift operator trainer</strong>. It combines adult learning principles and training methodology with aerial lift-specific regulatory content." },
+      { type: "heading", level: 3, text: "Trainer Qualifications" },
+      { type: "paragraph", html: "Under <strong>29 CFR 1910.178(l)(2)(iii)</strong>, all operator training and evaluation shall be conducted by persons who have the <strong>knowledge, training, and experience</strong> to train operators and evaluate their competence. This applies to aerial lift trainers as well." },
+      { type: "heading", level: 3, text: "Regulatory Framework" },
+      { type: "paragraph", html: "Aerial lift training is governed by multiple standards:" },
+      { type: "list", items: [
+        "<strong>29 CFR 1926.453</strong> — OSHA Aerial Lift standard",
+        "<strong>29 CFR 1910.178(l)</strong> — PIT operator training (applied to scissor lifts)",
+        "<strong>ANSI/SAIA A92.20</strong> — MEWP Design, Safety, and Verification",
+        "<strong>ANSI/SAIA A92.22</strong> — Safe Use of MEWPs (includes rescue planning)",
+        "<strong>ANSI/SAIA A92.24</strong> — Training Requirements for MEWP operators",
+      ] },
+      { type: "heading", level: 3, text: "Important Note" },
+      { type: "paragraph", html: "This course qualifies you to <strong>train and evaluate aerial lift operators</strong>. It does <strong>not</strong> certify you to operate equipment. You must already be a competent aerial lift operator." },
+      { type: "callout", variant: "warning", text: "This course does not certify you to operate aerial lifts. You must already be a competent operator." },
+      { type: "key_takeaways", items: [
+        "Trainer qualifications: knowledge, training, and experience (1910.178(l)(2)(iii))",
+        "Aerial lifts are regulated under 1926.453, 1910.178, and ANSI A92 series",
+        "ANSI A92.24 specifically covers MEWP training requirements",
+        "This course qualifies trainers — not operators",
+      ] },
+    ]),
   },
   {
     module: "OSHA Regulatory Framework for Aerial Lifts",
     title: "ANSI A92.24 Training Requirements",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "ANSI A92.24 Training Requirements",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Who Must Be Trained?", content: "<p>ANSI A92.24 requires training for:</p><ul><li><strong>Operators</strong> — anyone who controls a MEWP</li><li><strong>Occupants</strong> — anyone in the platform who is not the operator</li><li><strong>Supervisors</strong> — anyone who directly supervises MEWP operators</li><li><strong>Service personnel</strong> — those who maintain MEWPs</li></ul>" },
-          { heading: "Training Content Requirements", content: "<p>ANSI A92.24 training must cover:</p><ul><li>Purpose and use of the operator's manual</li><li>Proper inspection of the MEWP</li><li>Recognition and avoidance of common hazards</li><li>Proper use of personal fall protection</li><li>Proper selection and use of MEWPs</li><li>Manufacturer's operating requirements</li><li>Proper use of MEWP controls (upper and lower)</li><li>Proper movement of the MEWP</li><li>Proper shutdown and securing</li></ul>" },
-          { heading: "Familiarization Requirement", content: "<p>Before operating a specific MEWP, operators must be <strong>familiarized</strong> with:</p><ul><li>The specific controls and instruments</li><li>Differences from previously operated MEWPs</li><li>Any special features or devices</li><li>The manufacturer's operating manual</li></ul><p>Familiarization is separate from formal training and is specific to each make/model.</p>" },
-          { heading: "Retraining Requirements", content: "<p>ANSI A92.24 requires retraining when:</p><ul><li>An operator is observed operating unsafely</li><li>After an accident or near-miss</li><li>An evaluation reveals unsafe operation</li><li>Assigned to a different type of MEWP</li><li>Workplace conditions change</li></ul>" },
-        ],
-        takeaways: [
-          "ANSI A92.24 requires training for operators, occupants, supervisors, and service personnel",
-          "Training must cover inspection, hazards, fall protection, controls, and movement",
-          "Familiarization with each specific make/model is required before operation",
-          "Retraining is required after unsafe operation, accidents, or new equipment",
-        ],
-        tip: "Keep a familiarization log for each operator and each MEWP make/model they are authorized to operate.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("osha-compliance.svg"), alt: "ANSI A92.24 Training Requirements" },
+      { type: "heading", level: 2, text: "ANSI A92.24 Training Requirements" },
+      { type: "heading", level: 3, text: "Who Must Be Trained?" },
+      { type: "paragraph", html: "ANSI A92.24 requires training for:" },
+      { type: "list", items: [
+        "<strong>Operators</strong> — anyone who controls a MEWP",
+        "<strong>Occupants</strong> — anyone in the platform who is not the operator",
+        "<strong>Supervisors</strong> — anyone who directly supervises MEWP operators",
+        "<strong>Service personnel</strong> — those who maintain MEWPs",
+      ] },
+      { type: "flip_cards", title: "Who Needs MEWP Training?", cards: [
+        { front: "Operators", back: "Anyone who controls a MEWP must complete full operator training plus familiarization with each specific make/model they will operate." },
+        { front: "Occupants", back: "Anyone in the platform who is not the operator still needs training on fall protection and their role in safe use of the MEWP." },
+        { front: "Supervisors", back: "Anyone who directly supervises MEWP operators must be trained to recognize safe and unsafe operation and proper MEWP selection." },
+        { front: "Service Personnel", back: "Those who maintain MEWPs need training to inspect, service, and work on the equipment safely." },
+      ] },
+      { type: "heading", level: 3, text: "Training Content Requirements" },
+      { type: "paragraph", html: "ANSI A92.24 training must cover:" },
+      { type: "list", items: [
+        "Purpose and use of the operator's manual",
+        "Proper inspection of the MEWP",
+        "Recognition and avoidance of common hazards",
+        "Proper use of personal fall protection",
+        "Proper selection and use of MEWPs",
+        "Manufacturer's operating requirements",
+        "Proper use of MEWP controls (upper and lower)",
+        "Proper movement of the MEWP",
+        "Proper shutdown and securing",
+      ] },
+      { type: "heading", level: 3, text: "Familiarization Requirement" },
+      { type: "paragraph", html: "Before operating a specific MEWP, operators must be <strong>familiarized</strong> with:" },
+      { type: "list", items: [
+        "The specific controls and instruments",
+        "Differences from previously operated MEWPs",
+        "Any special features or devices",
+        "The manufacturer's operating manual",
+      ] },
+      { type: "paragraph", html: "Familiarization is separate from formal training and is specific to each make/model." },
+      { type: "heading", level: 3, text: "Retraining Requirements" },
+      { type: "paragraph", html: "ANSI A92.24 requires retraining when:" },
+      { type: "list", items: [
+        "An operator is observed operating unsafely",
+        "After an accident or near-miss",
+        "An evaluation reveals unsafe operation",
+        "Assigned to a different type of MEWP",
+        "Workplace conditions change",
+      ] },
+      { type: "callout", variant: "tip", text: "Keep a familiarization log for each operator and each MEWP make/model they are authorized to operate." },
+      { type: "key_takeaways", items: [
+        "ANSI A92.24 requires training for operators, occupants, supervisors, and service personnel",
+        "Training must cover inspection, hazards, fall protection, controls, and movement",
+        "Familiarization with each specific make/model is required before operation",
+        "Retraining is required after unsafe operation, accidents, or new equipment",
+      ] },
+    ]),
   },
   {
     module: "OSHA Regulatory Framework for Aerial Lifts",
@@ -123,24 +144,37 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Adult Learning Principles for Aerial Lift Training",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Adult Learning Principles for Aerial Lift Training",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "Key Principles", content: "<p>Adults learn best when training is <strong>relevant</strong>, <strong>experience-based</strong>, and <strong>problem-centered</strong>. Use real workplace scenarios from your aerial lift operations.</p>" },
-          { heading: "Learning Styles", content: "<p>Include <strong>visual</strong> (diagrams of stability, fall protection), <strong>auditory</strong> (explanations, discussions), and <strong>kinesthetic</strong> (hands-on equipment practice) elements.</p>" },
-          { heading: "Structuring Aerial Lift Training", content: "<ol><li><strong>Formal instruction</strong> — OSHA/ANSI requirements, equipment types, stability, fall protection</li><li><strong>Practical training</strong> — pre-op inspection, controls, elevation, driving, emergency procedures</li><li><strong>Evaluation</strong> — knowledge test and practical skills assessment</li><li><strong>Familiarization</strong> — equipment-specific orientation</li></ol>" },
-          { heading: "Training Materials", content: "<p>Prepare: manufacturer's operating manuals, ANSI A92 standards, pre-op inspection checklists, fall protection equipment, evaluation forms, rescue plan templates.</p>" },
-        ],
-        takeaways: [
-          "Make training relevant with real workplace scenarios",
-          "Include visual, auditory, and kinesthetic elements",
-          "Structure: formal instruction, practical, evaluation, familiarization",
-          "Prepare manufacturer manuals and ANSI standards as materials",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "Adult Learning Principles for Aerial Lift Training" },
+      { type: "heading", level: 2, text: "Adult Learning Principles for Aerial Lift Training" },
+      { type: "heading", level: 3, text: "Key Principles" },
+      { type: "paragraph", html: "Adults learn best when training is <strong>relevant</strong>, <strong>experience-based</strong>, and <strong>problem-centered</strong>. Use real workplace scenarios from your aerial lift operations." },
+      { type: "heading", level: 3, text: "Learning Styles" },
+      { type: "paragraph", html: "Include <strong>visual</strong> (diagrams of stability, fall protection), <strong>auditory</strong> (explanations, discussions), and <strong>kinesthetic</strong> (hands-on equipment practice) elements." },
+      { type: "heading", level: 3, text: "Structuring Aerial Lift Training" },
+      { type: "list", ordered: true, items: [
+        "<strong>Formal instruction</strong> — OSHA/ANSI requirements, equipment types, stability, fall protection",
+        "<strong>Practical training</strong> — pre-op inspection, controls, elevation, driving, emergency procedures",
+        "<strong>Evaluation</strong> — knowledge test and practical skills assessment",
+        "<strong>Familiarization</strong> — equipment-specific orientation",
+      ] },
+      { type: "drag_drop", mode: "ordering",
+        prompt: "Arrange the phases of a complete aerial lift training program in the correct order.",
+        items: [
+          { id: "phase-formal", label: "Formal instruction — OSHA/ANSI requirements, stability, fall protection" },
+          { id: "phase-practical", label: "Practical training — inspection, controls, elevation, emergencies" },
+          { id: "phase-evaluation", label: "Evaluation — knowledge test and practical skills assessment" },
+          { id: "phase-familiarization", label: "Familiarization — equipment-specific orientation" },
+        ] },
+      { type: "heading", level: 3, text: "Training Materials" },
+      { type: "paragraph", html: "Prepare: manufacturer's operating manuals, ANSI A92 standards, pre-op inspection checklists, fall protection equipment, evaluation forms, rescue plan templates." },
+      { type: "key_takeaways", items: [
+        "Make training relevant with real workplace scenarios",
+        "Include visual, auditory, and kinesthetic elements",
+        "Structure: formal instruction, practical, evaluation, familiarization",
+        "Prepare manufacturer manuals and ANSI standards as materials",
+      ] },
+    ]),
   },
   {
     module: "Adult Learning & Training Design",
@@ -160,45 +194,92 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Equipment-Related Training Topics",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Equipment-Related Training Topics",
-        image: img("aerial-lift-hero.svg"),
-        sections: [
-          { heading: "Equipment Knowledge", content: "<p>As a trainer, you must cover all equipment-related topics:</p><ul><li>Types of MEWPs and their classifications (Group A/B, Types 1-3)</li><li>Scissor lift operation, controls, and instrumentation</li><li>Boom lift operation (articulating and telescopic)</li><li>Engine or motor operation (electric vs. IC)</li><li>Steering, driving, and positioning</li><li>Platform elevation and descent</li><li>Platform capacity and load limits</li><li>Stability factors and tip-over hazards</li><li>Fall protection requirements (harness, lanyard, anchor points)</li><li>Pre-operation inspection requirements</li><li>Daily functional testing of controls</li><li>Emergency controls and lower control override</li><li>Outrigger and stabilizer use</li></ul>" },
-          { heading: "Teaching Tips", content: "<ul><li>Use the <strong>actual MEWP</strong> for teaching controls</li><li>Demonstrate the <strong>capacity plate</strong> and load calculations</li><li>Show <strong>fall protection</strong> equipment and proper attachment</li><li>Walk through a complete <strong>pre-op inspection</strong></li><li>Demonstrate <strong>emergency lowering</strong> from lower controls</li></ul>" },
-        ],
-        takeaways: [
-          "Cover all equipment types: scissor lifts, boom lifts, vertical lifts",
-          "Include fall protection, stability, capacity, and emergency controls",
-          "Use the actual MEWP for teaching controls and inspection",
-          "Demonstrate emergency lowering procedures",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Equipment-Related Training Topics" },
+      { type: "heading", level: 2, text: "Equipment-Related Training Topics" },
+      { type: "heading", level: 3, text: "Equipment Knowledge" },
+      { type: "paragraph", html: "As a trainer, you must cover all equipment-related topics:" },
+      { type: "list", items: [
+        "Types of MEWPs and their classifications (Group A/B, Types 1-3)",
+        "Scissor lift operation, controls, and instrumentation",
+        "Boom lift operation (articulating and telescopic)",
+        "Engine or motor operation (electric vs. IC)",
+        "Steering, driving, and positioning",
+        "Platform elevation and descent",
+        "Platform capacity and load limits",
+        "Stability factors and tip-over hazards",
+        "Fall protection requirements (harness, lanyard, anchor points)",
+        "Pre-operation inspection requirements",
+        "Daily functional testing of controls",
+        "Emergency controls and lower control override",
+        "Outrigger and stabilizer use",
+      ] },
+      { type: "heading", level: 3, text: "Teaching Tips" },
+      { type: "list", items: [
+        "Use the <strong>actual MEWP</strong> for teaching controls",
+        "Demonstrate the <strong>capacity plate</strong> and load calculations",
+        "Show <strong>fall protection</strong> equipment and proper attachment",
+        "Walk through a complete <strong>pre-op inspection</strong>",
+        "Demonstrate <strong>emergency lowering</strong> from lower controls",
+      ] },
+      { type: "key_takeaways", items: [
+        "Cover all equipment types: scissor lifts, boom lifts, vertical lifts",
+        "Include fall protection, stability, capacity, and emergency controls",
+        "Use the actual MEWP for teaching controls and inspection",
+        "Demonstrate emergency lowering procedures",
+      ] },
+    ]),
   },
   {
     module: "Aerial Lift Required Topics Deep Dive",
     title: "Workplace-Related Training Topics",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Workplace-Related Training Topics",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Site-Specific Topics", content: "<p>Customize these to your facility:</p><ul><li><strong>Surface conditions</strong> and ground bearing capacity</li><li><strong>Pedestrian traffic</strong> and barricading</li><li><strong>Overhead hazards</strong> (power lines, structures, ceilings)</li><li><strong>Weather conditions</strong> (wind, rain, ice, lightning)</li><li><strong>Working near electrical hazards</strong></li><li><strong>Fall protection</strong> in elevated work</li><li><strong>Falling object protection</strong> (toe boards, screens)</li><li><strong>Hazardous atmospheres</strong> and confined spaces</li><li><strong>Traffic control</strong> and work zone setup</li><li><strong>Emergency rescue procedures</strong></li></ul>" },
-          { heading: "Power Line Safety Training", content: "<p>Teach operators the minimum clearance distances:</p><ul><li>Up to 50kV: 10 feet</li><li>50kV-200kV: 15 feet</li><li>200kV-350kV: 20 feet</li><li>350kV-500kV: 25 feet</li></ul><p>Include procedures for power line contact emergencies.</p>" },
-          { heading: "Rescue Planning", content: "<p>ANSI A92.22 requires a <strong>rescue plan</strong> before MEWP use. Teach operators:</p><ul><li>How to use lower controls for rescue</li><li>Location of emergency lowering systems</li><li>When to call 911</li><li>Never climb the boom or scissors</li></ul>" },
-        ],
-        takeaways: [
-          "Customize workplace topics to your facility's specific hazards",
-          "Teach power line clearance distances and emergency procedures",
-          "ANSI A92.22 requires a rescue plan before MEWP use",
-          "Cover weather, surface, overhead, and electrical hazards",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Workplace-Related Training Topics" },
+      { type: "heading", level: 2, text: "Workplace-Related Training Topics" },
+      { type: "heading", level: 3, text: "Site-Specific Topics" },
+      { type: "paragraph", html: "Customize these to your facility:" },
+      { type: "list", items: [
+        "<strong>Surface conditions</strong> and ground bearing capacity",
+        "<strong>Pedestrian traffic</strong> and barricading",
+        "<strong>Overhead hazards</strong> (power lines, structures, ceilings)",
+        "<strong>Weather conditions</strong> (wind, rain, ice, lightning)",
+        "<strong>Working near electrical hazards</strong>",
+        "<strong>Fall protection</strong> in elevated work",
+        "<strong>Falling object protection</strong> (toe boards, screens)",
+        "<strong>Hazardous atmospheres</strong> and confined spaces",
+        "<strong>Traffic control</strong> and work zone setup",
+        "<strong>Emergency rescue procedures</strong>",
+      ] },
+      { type: "heading", level: 3, text: "Power Line Safety Training" },
+      { type: "paragraph", html: "Teach operators the minimum clearance distances:" },
+      { type: "list", items: [
+        "Up to 50kV: 10 feet",
+        "50kV-200kV: 15 feet",
+        "200kV-350kV: 20 feet",
+        "350kV-500kV: 25 feet",
+      ] },
+      { type: "paragraph", html: "Include procedures for power line contact emergencies." },
+      { type: "heading", level: 3, text: "Rescue Planning" },
+      { type: "paragraph", html: "ANSI A92.22 requires a <strong>rescue plan</strong> before MEWP use. Teach operators:" },
+      { type: "list", items: [
+        "How to use lower controls for rescue",
+        "Location of emergency lowering systems",
+        "When to call 911",
+        "Never climb the boom or scissors",
+      ] },
+      { type: "embedded_quiz", questions: [
+        { question: "Your crew will be working near a 40kV distribution line. What is the minimum clearance the MEWP must keep?", type: "mcq_single", options: ["5 feet", "10 feet", "15 feet", "20 feet"], correctAnswers: "10 feet", explanation: "For power lines up to 50kV, the minimum clearance is 10 feet. A 40kV line falls in that range." },
+        { question: "A worker is stranded in a raised platform after the upper controls fail. What should trained ground personnel do first?", type: "mcq_single", options: ["Climb the boom or scissors to reach them", "Use the lower controls or emergency lowering system", "Shake the platform to get their attention", "Wait for the manufacturer to arrive"], correctAnswers: "Use the lower controls or emergency lowering system", explanation: "The rescue plan required by ANSI A92.22 relies on the lower controls and emergency lowering systems. Never climb the boom or scissors." },
+      ] },
+      { type: "key_takeaways", items: [
+        "Customize workplace topics to your facility's specific hazards",
+        "Teach power line clearance distances and emergency procedures",
+        "ANSI A92.22 requires a rescue plan before MEWP use",
+        "Cover weather, surface, overhead, and electrical hazards",
+      ] },
+    ]),
   },
   {
     module: "Aerial Lift Required Topics Deep Dive",
@@ -219,45 +300,75 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Practical Training Methodology for Aerial Lifts",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Practical Training Methodology for Aerial Lifts",
-        image: img("scissor-lift-hero.svg"),
-        sections: [
-          { heading: "Skills to Practice", content: "<ul><li><strong>Pre-operation inspection</strong> — visual and functional</li><li><strong>Controls operation</strong> — upper and lower</li><li><strong>Platform elevation/descent</strong></li><li><strong>Driving and positioning</strong></li><li><strong>Fall protection</strong> — harness, lanyard, anchor point</li><li><strong>Outrigger deployment</strong> (if applicable)</li><li><strong>Emergency lowering</strong></li><li><strong>Shutdown and securing</strong></li></ul>" },
-          { heading: "Demonstration-Practice-Evaluate Cycle", content: "<ol><li><strong>Demonstrate</strong> each skill</li><li><strong>Guided practice</strong> with coaching</li><li><strong>Independent practice</strong></li><li><strong>Evaluate</strong> against checklist</li></ol>" },
-          { heading: "Safety During Training", content: "<p>As the trainer, maintain safety: keep area clear, stop unsafe behavior, maintain escape route, have emergency procedures ready.</p>" },
-        ],
-        takeaways: [
-          "Practice: inspection, controls, elevation, driving, fall protection, emergencies",
-          "Use demonstrate-practice-evaluate cycle",
-          "Maintain safety as the trainer's responsibility",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("scissor-lift-hero.svg"), alt: "Practical Training Methodology for Aerial Lifts" },
+      { type: "heading", level: 2, text: "Practical Training Methodology for Aerial Lifts" },
+      { type: "heading", level: 3, text: "Skills to Practice" },
+      { type: "list", items: [
+        "<strong>Pre-operation inspection</strong> — visual and functional",
+        "<strong>Controls operation</strong> — upper and lower",
+        "<strong>Platform elevation/descent</strong>",
+        "<strong>Driving and positioning</strong>",
+        "<strong>Fall protection</strong> — harness, lanyard, anchor point",
+        "<strong>Outrigger deployment</strong> (if applicable)",
+        "<strong>Emergency lowering</strong>",
+        "<strong>Shutdown and securing</strong>",
+      ] },
+      { type: "heading", level: 3, text: "Demonstration-Practice-Evaluate Cycle" },
+      { type: "list", ordered: true, items: [
+        "<strong>Demonstrate</strong> each skill",
+        "<strong>Guided practice</strong> with coaching",
+        "<strong>Independent practice</strong>",
+        "<strong>Evaluate</strong> against checklist",
+      ] },
+      { type: "heading", level: 3, text: "Safety During Training" },
+      { type: "paragraph", html: "As the trainer, maintain safety: keep area clear, stop unsafe behavior, maintain escape route, have emergency procedures ready." },
+      { type: "key_takeaways", items: [
+        "Practice: inspection, controls, elevation, driving, fall protection, emergencies",
+        "Use demonstrate-practice-evaluate cycle",
+        "Maintain safety as the trainer's responsibility",
+      ] },
+    ]),
   },
   {
     module: "Practical Training & Evaluation",
     title: "Operator Evaluation for Aerial Lifts",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Operator Evaluation for Aerial Lifts",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Evaluation Checklist", content: "<p>Create a checklist covering:</p><ul><li>Pre-op inspection completed correctly</li><li>Fall protection properly worn and attached</li><li>Controls operated smoothly</li><li>Platform elevated/descended safely</li><li>Outriggers deployed correctly (if required)</li><li>Surface conditions assessed</li><li>Overhead hazards checked</li><li>Emergency controls demonstrated</li><li>Safe shutdown procedure</li></ul>" },
-          { heading: "Pass/Fail Criteria", content: "<p><strong>Critical failures</strong> (automatic fail): not wearing harness, operating near power lines without clearance, exceeding capacity, not deploying outriggers when required.</p>" },
-          { heading: "Documentation", content: "<p>Certify with: operator name, training date, evaluation date, trainer identity, equipment type trained on. Maintain for OSHA inspection.</p>" },
-        ],
-        takeaways: [
-          "Create an evaluation checklist for aerial lift skills",
-          "Critical failures include no harness, power line violations, capacity exceedance",
-          "Document with operator name, dates, trainer identity, equipment type",
-        ],
-        tip: "Keep equipment-specific familiarization logs separate from general training records.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Operator Evaluation for Aerial Lifts" },
+      { type: "heading", level: 2, text: "Operator Evaluation for Aerial Lifts" },
+      { type: "heading", level: 3, text: "Evaluation Checklist" },
+      { type: "paragraph", html: "Create a checklist covering:" },
+      { type: "list", items: [
+        "Pre-op inspection completed correctly",
+        "Fall protection properly worn and attached",
+        "Controls operated smoothly",
+        "Platform elevated/descended safely",
+        "Outriggers deployed correctly (if required)",
+        "Surface conditions assessed",
+        "Overhead hazards checked",
+        "Emergency controls demonstrated",
+        "Safe shutdown procedure",
+      ] },
+      { type: "heading", level: 3, text: "Pass/Fail Criteria" },
+      { type: "paragraph", html: "<strong>Critical failures</strong> (automatic fail): not wearing harness, operating near power lines without clearance, exceeding capacity, not deploying outriggers when required." },
+      { type: "scenario", title: "Evaluation Judgment Call",
+        prompt: "During a boom lift evaluation, your operator completes a flawless pre-operation inspection, then enters the platform and begins elevating without attaching their lanyard to the manufacturer-designated anchor point. What do you do?",
+        choices: [
+          { text: "Stop the evaluation immediately — this is a critical failure", correct: true, feedback: "Correct. Not wearing or attaching fall protection is a critical safety failure and an automatic fail. Stop the evaluation, explain specifically what was unsafe, provide additional training on fall protection, then re-evaluate after remediation and document everything." },
+          { text: "Let the evaluation continue and note the issue on the checklist", correct: false, feedback: "A missing lanyard connection is a critical failure and an immediate ejection hazard. It cannot be scored as a minor note — stop the evaluation at once." },
+          { text: "Coach them to attach the lanyard and continue scoring toward a pass", correct: false, feedback: "An evaluation is observation without coaching, and a critical failure cannot become a pass. Stop, remediate with training, and schedule a re-evaluation." },
+        ] },
+      { type: "heading", level: 3, text: "Documentation" },
+      { type: "paragraph", html: "Certify with: operator name, training date, evaluation date, trainer identity, equipment type trained on. Maintain for OSHA inspection." },
+      { type: "callout", variant: "tip", text: "Keep equipment-specific familiarization logs separate from general training records." },
+      { type: "key_takeaways", items: [
+        "Create an evaluation checklist for aerial lift skills",
+        "Critical failures include no harness, power line violations, capacity exceedance",
+        "Document with operator name, dates, trainer identity, equipment type",
+      ] },
+    ]),
   },
   {
     module: "Practical Training & Evaluation",
@@ -277,22 +388,21 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Administering Your Aerial Lift Training Program",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Administering Your Aerial Lift Training Program",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Records Management", content: "<p>Maintain: training records, evaluation checklists, familiarization logs (per make/model), rescue plans, incident reports, refresher training.</p>" },
-          { heading: "Refresher Training Triggers", content: "<p>Required when: unsafe operation observed, accident/near-miss, failed evaluation, new MEWP type, workplace changes, or at least every 3 years.</p>" },
-          { heading: "Safety Culture", content: "<p>As a trainer, you are a <strong>safety leader</strong>. Lead by example, promote 'stop work' authority, reward hazard reporting, advocate for management commitment.</p>" },
-        ],
-        takeaways: [
-          "Maintain training, evaluation, and familiarization records",
-          "Refresher training triggered by unsafe operation, accidents, new equipment",
-          "The trainer is a safety leader — lead by example",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Administering Your Aerial Lift Training Program" },
+      { type: "heading", level: 2, text: "Administering Your Aerial Lift Training Program" },
+      { type: "heading", level: 3, text: "Records Management" },
+      { type: "paragraph", html: "Maintain: training records, evaluation checklists, familiarization logs (per make/model), rescue plans, incident reports, refresher training." },
+      { type: "heading", level: 3, text: "Refresher Training Triggers" },
+      { type: "paragraph", html: "Required when: unsafe operation observed, accident/near-miss, failed evaluation, new MEWP type, workplace changes, or at least every 3 years." },
+      { type: "heading", level: 3, text: "Safety Culture" },
+      { type: "paragraph", html: "As a trainer, you are a <strong>safety leader</strong>. Lead by example, promote 'stop work' authority, reward hazard reporting, advocate for management commitment." },
+      { type: "key_takeaways", items: [
+        "Maintain training, evaluation, and familiarization records",
+        "Refresher training triggered by unsafe operation, accidents, new equipment",
+        "The trainer is a safety leader — lead by example",
+      ] },
+    ]),
   },
   {
     module: "Program Administration & Safety Culture",
@@ -341,23 +451,28 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Congratulations: You're a Certified Aerial Lift Trainer",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "You're a Certified Aerial Lift Trainer! What's Next",
-        image: img("train-the-trainer-hero.svg"),
-        sections: [
-          { heading: "Your Certification", content: "<p>Congratulations! You are now qualified to <strong>train and evaluate aerial lift and scissor lift operators</strong> at your facility in accordance with OSHA 29 CFR 1926.453, 1910.178(l)(2)(iii), and ANSI/SAIA A92 standards.</p>" },
-          { heading: "Next Steps", content: "<ul><li>Download your trainer certificate</li><li>Develop your site-specific aerial lift training curriculum</li><li>Create evaluation checklists and rescue plans</li><li>Schedule familiarization sessions for each MEWP make/model</li><li>Maintain your own operator competence</li></ul>" },
-          { heading: "Stay Current", content: "<p>Stay current with OSHA and ANSI updates. The A92 standards were significantly revised in 2020 — be aware of future updates.</p>" },
-        ],
-        takeaways: [
-          "You are qualified to train and evaluate aerial lift operators",
-          "Develop site-specific curriculum and rescue plans",
-          "Schedule familiarization for each MEWP make/model",
-          "Stay current with OSHA and ANSI A92 updates",
-        ],
-        tip: "Start with a pilot training session to refine your curriculum before rolling it out to all operators.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "You're a Certified Aerial Lift Trainer! What's Next" },
+      { type: "heading", level: 2, text: "You're a Certified Aerial Lift Trainer! What's Next" },
+      { type: "heading", level: 3, text: "Your Certification" },
+      { type: "paragraph", html: "Congratulations! You are now qualified to <strong>train and evaluate aerial lift and scissor lift operators</strong> at your facility in accordance with OSHA 29 CFR 1926.453, 1910.178(l)(2)(iii), and ANSI/SAIA A92 standards." },
+      { type: "heading", level: 3, text: "Next Steps" },
+      { type: "list", items: [
+        "Download your trainer certificate",
+        "Develop your site-specific aerial lift training curriculum",
+        "Create evaluation checklists and rescue plans",
+        "Schedule familiarization sessions for each MEWP make/model",
+        "Maintain your own operator competence",
+      ] },
+      { type: "heading", level: 3, text: "Stay Current" },
+      { type: "paragraph", html: "Stay current with OSHA and ANSI updates. The A92 standards were significantly revised in 2020 — be aware of future updates." },
+      { type: "callout", variant: "tip", text: "Start with a pilot training session to refine your curriculum before rolling it out to all operators." },
+      { type: "key_takeaways", items: [
+        "You are qualified to train and evaluate aerial lift operators",
+        "Develop site-specific curriculum and rescue plans",
+        "Schedule familiarization for each MEWP make/model",
+        "Stay current with OSHA and ANSI A92 updates",
+      ] },
+    ]),
   },
 ];

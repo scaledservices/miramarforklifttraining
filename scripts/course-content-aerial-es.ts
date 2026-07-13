@@ -1,4 +1,5 @@
-import { StepDef, QuestionDef } from "./course-content-aerial";
+import type { LessonBlock } from "@shared/lesson-blocks";
+import { StepDef } from "./course-content-aerial";
 
 export const CANONICAL_COURSE_ES = {
   title: "Certificación en Línea para Operador de Elevadores Aéreos y de Tijera",
@@ -10,33 +11,7 @@ export const CANONICAL_COURSE_ES = {
 
 const img = (name: string) => `/images/training/${name}`;
 
-function lessonHtml(opts: {
-  title: string;
-  image: string;
-  sections: { heading?: string; content: string }[];
-  takeaways: string[];
-  tip?: string;
-  warning?: string;
-}): string {
-  const tipBlock = opts.tip ? `<div class="callout callout-tip"><strong>💡 Consejo:</strong> ${opts.tip}</div>` : "";
-  const warnBlock = opts.warning ? `<div class="callout callout-warning"><strong>⚠️ Advertencia:</strong> ${opts.warning}</div>` : "";
-  const sectionHtml = opts.sections.map(s =>
-    (s.heading ? `<h3>${s.heading}</h3>` : "") + s.content
-  ).join("\n");
-  const takeawayItems = opts.takeaways.map(t => `<li>${t}</li>`).join("");
-
-  return `<div class="lesson-content">
-<img src="${opts.image}" alt="${opts.title}" class="lesson-hero-image" />
-<h2>${opts.title}</h2>
-${sectionHtml}
-${tipBlock}
-${warnBlock}
-<div class="key-takeaways">
-<h4>📝 Puntos Clave</h4>
-<ul>${takeawayItems}</ul>
-</div>
-</div>`;
-}
+const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
 export const COURSE_STEPS_ES: StepDef[] = [
   // ═══ MÓDULO 0: Bienvenida + Cumplimiento OSHA/ANSI ═══
@@ -45,49 +20,79 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera",
-        image: img("aerial-lift-hero.svg"),
-        sections: [
-          { heading: "Acerca de Este Curso", content: "<p>¡Bienvenido! Este curso en línea proporciona la porción de <strong>instrucción formal</strong> de la certificación de operador de elevadores aéreos y de tijera en cumplimiento con OSHA. El curso toma aproximadamente <strong>60-90 minutos</strong> para completar.</p>" },
-          { heading: "Qué Incluye", content: "<ul><li>Módulos de capacitación interactivos que cubren todos los temas requeridos por OSHA y ANSI</li><li>Cuestionarios de verificación de conocimiento</li><li>Examen final de certificación (80% para aprobar)</li><li>Certificado digital con credencial verificada por código QR</li><li>Paquete de documentación del empleador para evaluación práctica</li></ul>" },
-          { heading: "Qué NO Incluye", content: "<p>OSHA y ANSI requieren <strong>múltiples componentes</strong> para la certificación completa: (1) instrucción formal (este curso), (2) capacitación práctica en el equipo específico, y (3) una evaluación del desempeño del operador. Su empleador debe realizar la parte práctica en su lugar de trabajo.</p>" },
-          { heading: "Cómo Navegar", content: "<p>Complete cada paso en orden. Puede seguir su progreso usando la barra lateral. Si necesita detenerse, su progreso se guarda automáticamente. Puede retomar el examen final hasta 3 veces.</p>" },
-        ],
-        takeaways: [
-          "Este curso cubre el requisito de instrucción formal",
-          "Su empleador también debe realizar capacitación práctica y evaluación",
-          "Complete todos los módulos y apruebe el examen final con 80% o más",
-          "Su progreso se guarda automáticamente — reanude en cualquier momento",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera" },
+      { type: "heading", level: 2, text: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera" },
+      { type: "heading", level: 3, text: "Acerca de Este Curso" },
+      { type: "paragraph", html: "¡Bienvenido! Este curso en línea proporciona la porción de <strong>instrucción formal</strong> de la certificación de operador de elevadores aéreos y de tijera en cumplimiento con OSHA. El curso toma aproximadamente <strong>60-90 minutos</strong> para completar." },
+      { type: "heading", level: 3, text: "Qué Incluye" },
+      { type: "list", items: [
+        "Módulos de capacitación interactivos que cubren todos los temas requeridos por OSHA y ANSI",
+        "Cuestionarios de verificación de conocimiento",
+        "Examen final de certificación (80% para aprobar)",
+        "Certificado digital con credencial verificada por código QR",
+        "Paquete de documentación del empleador para evaluación práctica",
+      ] },
+      { type: "heading", level: 3, text: "Qué NO Incluye" },
+      { type: "paragraph", html: "OSHA y ANSI requieren <strong>múltiples componentes</strong> para la certificación completa: (1) instrucción formal (este curso), (2) capacitación práctica en el equipo específico, y (3) una evaluación del desempeño del operador. Su empleador debe realizar la parte práctica en su lugar de trabajo." },
+      { type: "heading", level: 3, text: "Cómo Navegar" },
+      { type: "paragraph", html: "Complete cada paso en orden. Puede seguir su progreso usando la barra lateral. Si necesita detenerse, su progreso se guarda automáticamente. Puede retomar el examen final hasta 3 veces." },
+      { type: "callout", variant: "tip", text: "Esté atento a los diagramas interactivos, tarjetas y escenarios a lo largo del curso — son la forma más rápida de afianzar lo que aprende." },
+      { type: "key_takeaways", items: [
+        "Este curso cubre el requisito de instrucción formal",
+        "Su empleador también debe realizar capacitación práctica y evaluación",
+        "Complete todos los módulos y apruebe el examen final con 80% o más",
+        "Su progreso se guarda automáticamente — reanude en cualquier momento",
+      ] },
+    ]),
   },
   {
     module: "Bienvenida y Cumplimiento OSHA/ANSI",
     title: "Cumplimiento OSHA y ANSI: Lo Que Cubre Este Curso",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Cumplimiento OSHA y ANSI: Lo Que Cubre Este Curso",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Regulaciones de OSHA", content: "<p>Los elevadores aéreos están regulados bajo <strong>29 CFR 1926.453</strong> (elevadores aéreos en construcción) y <strong>29 CFR 1910.178</strong> (camiones industriales motorizados, que incluye elevadores de tijera bajo la aplicación de OSHA). OSHA requiere que los operadores reciban:</p><ol><li><strong>Instrucción formal</strong> — capacitación en aula o en línea (este curso)</li><li><strong>Capacitación práctica</strong> — experiencia práctica en el equipo específico</li><li><strong>Evaluación</strong> — una persona calificada debe evaluar la competencia del operador</li></ol>" },
-          { heading: "Estándares ANSI/SAIA A92", content: "<p>El <strong>Instituto Nacional Estadounidense de Estándares (ANSI)</strong> y la <strong>Asociación de la Industria de Andamios y Acceso (SAIA)</strong> mantienen la serie A92 para Plataformas de Trabajo Móvil Elevadora (MEWPs):</p><ul><li><strong>A92.20</strong> — Diseño, Seguridad y Verificación</li><li><strong>A92.22</strong> — Uso Seguro de MEWPs</li><li><strong>A92.24</strong> — Requisitos de Capacitación</li></ul><p>La revisión de 2020 reestructuró estos estándares y reemplazó el término 'plataforma de trabajo aéreo' con 'MEWP'.</p>" },
-          { heading: "Lo Que Proporcionamos", content: "<ul><li>Instrucción formal completa cubriendo todos los temas requeridos por OSHA y ANSI</li><li>Evaluación de conocimiento mediante examen final</li><li>Certificado de finalización para la porción de instrucción formal</li><li>Paquete de documentación del empleador incluyendo listas de evaluación</li></ul>" },
-          { heading: "Lo Que Su Empleador Debe Hacer", content: "<p>Después de completar este curso, su empleador debe:</p><ul><li>Proporcionar capacitación práctica específica al equipo</li><li>Evaluar su desempeño en el lugar de trabajo real</li><li>Completar y mantener la documentación requerida</li><li>Asegurar la familiarización con la marca/modelo específico que operará</li><li>Re-evaluar a los operadores al menos cada 3 años</li></ul>" },
-        ],
-        takeaways: [
-          "Los elevadores aéreos están regulados bajo 29 CFR 1926.453 y 1910.178",
-          "Los estándares ANSI/SAIA A92 cubren diseño, uso y capacitación de MEWPs",
-          "Este curso cubre solo la instrucción formal — también se requiere capacitación práctica",
-          "Los operadores deben familiarizarse con el equipo específico que operarán",
-        ],
-        warning: "No opere un elevador aéreo o de tijera hasta que su empleador haya completado su capacitación práctica y evaluación en el equipo específico.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Cumplimiento OSHA y ANSI: Lo Que Cubre Este Curso" },
+      { type: "heading", level: 2, text: "Cumplimiento OSHA y ANSI: Lo Que Cubre Este Curso" },
+      { type: "heading", level: 3, text: "Regulaciones de OSHA" },
+      { type: "paragraph", html: "Los elevadores aéreos están regulados bajo <strong>29 CFR 1926.453</strong> (elevadores aéreos en construcción) y <strong>29 CFR 1910.178</strong> (camiones industriales motorizados, que incluye elevadores de tijera bajo la aplicación de OSHA). OSHA requiere que los operadores reciban:" },
+      { type: "list", ordered: true, items: [
+        "<strong>Instrucción formal</strong> — capacitación en aula o en línea (este curso)",
+        "<strong>Capacitación práctica</strong> — experiencia práctica en el equipo específico",
+        "<strong>Evaluación</strong> — una persona calificada debe evaluar la competencia del operador",
+      ] },
+      { type: "heading", level: 3, text: "Estándares ANSI/SAIA A92" },
+      { type: "paragraph", html: "El <strong>Instituto Nacional Estadounidense de Estándares (ANSI)</strong> y la <strong>Asociación de la Industria de Andamios y Acceso (SAIA)</strong> mantienen la serie A92 para Plataformas de Trabajo Móvil Elevadora (MEWPs):" },
+      { type: "list", items: [
+        "<strong>A92.20</strong> — Diseño, Seguridad y Verificación",
+        "<strong>A92.22</strong> — Uso Seguro de MEWPs",
+        "<strong>A92.24</strong> — Requisitos de Capacitación",
+      ] },
+      { type: "paragraph", html: "La revisión de 2020 reestructuró estos estándares y reemplazó el término 'plataforma de trabajo aéreo' con 'MEWP'." },
+      { type: "heading", level: 3, text: "Lo Que Proporcionamos" },
+      { type: "list", items: [
+        "Instrucción formal completa cubriendo todos los temas requeridos por OSHA y ANSI",
+        "Evaluación de conocimiento mediante examen final",
+        "Certificado de finalización para la porción de instrucción formal",
+        "Paquete de documentación del empleador incluyendo listas de evaluación",
+      ] },
+      { type: "heading", level: 3, text: "Lo Que Su Empleador Debe Hacer" },
+      { type: "paragraph", html: "Después de completar este curso, su empleador debe:" },
+      { type: "list", items: [
+        "Proporcionar capacitación práctica específica al equipo",
+        "Evaluar su desempeño en el lugar de trabajo real",
+        "Completar y mantener la documentación requerida",
+        "Asegurar la familiarización con la marca/modelo específico que operará",
+        "Re-evaluar a los operadores al menos cada 3 años",
+      ] },
+      { type: "callout", variant: "warning", text: "No opere un elevador aéreo o de tijera hasta que su empleador haya completado su capacitación práctica y evaluación en el equipo específico." },
+      { type: "key_takeaways", items: [
+        "Los elevadores aéreos están regulados bajo 29 CFR 1926.453 y 1910.178",
+        "Los estándares ANSI/SAIA A92 cubren diseño, uso y capacitación de MEWPs",
+        "Este curso cubre solo la instrucción formal — también se requiere capacitación práctica",
+        "Los operadores deben familiarizarse con el equipo específico que operarán",
+      ] },
+    ]),
   },
   {
     module: "Bienvenida y Cumplimiento OSHA/ANSI",
@@ -108,72 +113,110 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?",
-        image: img("aerial-lift-hero.svg"),
-        sections: [
-          { heading: "Definición", content: "<p>Una <strong>Plataforma de Trabajo Móvil Elevadora (MEWP)</strong> es una máquina utilizada para posicionar personal, herramientas y materiales en ubicaciones de trabajo elevadas. Los MEWPs incluyen elevadores aéreos, elevadores de tijera, elevadores de pluma y torres verticales. El término MEWP fue adoptado por ANSI en la revisión de 2020 de los estándares A92.</p>" },
-          { heading: "Grupos de MEWPs (ANSI A92.20)", content: "<p>ANSI clasifica los MEWPs en dos grupos según cómo se posiciona la plataforma:</p><ul><li><strong>Grupo A:</strong> Plataformas que solo se pueden elevar verticalmente — la plataforma permanece dentro de las líneas de volcadura (ej. elevadores de tijera, elevadores verticales)</li><li><strong>Grupo B:</strong> Plataformas que pueden posicionarse más allá de las líneas de volcadura — la pluma permite que la plataforma se extienda horizontalmente (ej. elevadores de pluma articulados, elevadores de pluma telescópicos)</li></ul>" },
-          { heading: "Tipos de MEWPs", content: "<p>Dentro de cada grupo, los MEWPs se clasifican además por tipo:</p><ul><li><strong>Tipo 1:</strong> La conducción solo se permite en posición plegada (no elevada)</li><li><strong>Tipo 2:</strong> La conducción se permite con la plataforma en posición elevada</li><li><strong>Tipo 3:</strong> La conducción se permite con la plataforma elevada, pero se controla desde la plataforma</li></ul>" },
-          { heading: "Tipos Comunes de Equipo", content: "<ul><li><strong>Elevadores de tijera</strong> (Grupo A) — solo elevación vertical, gran área de plataforma</li><li><strong>Elevadores de pluma articulados</strong> (Grupo B) — brazo articulado proporciona alcance arriba y sobre</li><li><strong>Elevadores de pluma telescópicos</strong> (Grupo B) — brazo recto para máximo alcance horizontal</li><li><strong>Elevadores verticales de personal</strong> (Grupo A) — plataformas pequeñas para acceso vertical de una persona</li></ul>" },
-        ],
-        takeaways: [
-          "Los MEWPs se clasifican en Grupo A (solo vertical) y Grupo B (puede extenderse más allá de las líneas de volcadura)",
-          "Los elevadores de tijera son Grupo A; los elevadores de pluma son Grupo B",
-          "Los Tipos 1, 2 y 3 definen cuándo y desde dónde se permite conducir",
-          "El término MEWP reemplazó a 'plataforma de trabajo aéreo' en la revisión ANSI de 2020",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?" },
+      { type: "heading", level: 2, text: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?" },
+      { type: "heading", level: 3, text: "Definición" },
+      { type: "paragraph", html: "Una <strong>Plataforma de Trabajo Móvil Elevadora (MEWP)</strong> es una máquina utilizada para posicionar personal, herramientas y materiales en ubicaciones de trabajo elevadas. Los MEWPs incluyen elevadores aéreos, elevadores de tijera, elevadores de pluma y torres verticales. El término MEWP fue adoptado por ANSI en la revisión de 2020 de los estándares A92." },
+      { type: "heading", level: 3, text: "Grupos de MEWPs (ANSI A92.20)" },
+      { type: "paragraph", html: "ANSI clasifica los MEWPs en dos grupos según cómo se posiciona la plataforma:" },
+      { type: "list", items: [
+        "<strong>Grupo A:</strong> Plataformas que solo se pueden elevar verticalmente — la plataforma permanece dentro de las líneas de volcadura (ej. elevadores de tijera, elevadores verticales)",
+        "<strong>Grupo B:</strong> Plataformas que pueden posicionarse más allá de las líneas de volcadura — la pluma permite que la plataforma se extienda horizontalmente (ej. elevadores de pluma articulados, elevadores de pluma telescópicos)",
+      ] },
+      { type: "heading", level: 3, text: "Tipos de MEWPs" },
+      { type: "paragraph", html: "Dentro de cada grupo, los MEWPs se clasifican además por tipo:" },
+      { type: "list", items: [
+        "<strong>Tipo 1:</strong> La conducción solo se permite en posición plegada (no elevada)",
+        "<strong>Tipo 2:</strong> La conducción se permite con la plataforma en posición elevada",
+        "<strong>Tipo 3:</strong> La conducción se permite con la plataforma elevada, pero se controla desde la plataforma",
+      ] },
+      { type: "heading", level: 3, text: "Tipos Comunes de Equipo" },
+      { type: "list", items: [
+        "<strong>Elevadores de tijera</strong> (Grupo A) — solo elevación vertical, gran área de plataforma",
+        "<strong>Elevadores de pluma articulados</strong> (Grupo B) — brazo articulado proporciona alcance arriba y sobre",
+        "<strong>Elevadores de pluma telescópicos</strong> (Grupo B) — brazo recto para máximo alcance horizontal",
+        "<strong>Elevadores verticales de personal</strong> (Grupo A) — plataformas pequeñas para acceso vertical de una persona",
+      ] },
+      { type: "key_takeaways", items: [
+        "Los MEWPs se clasifican en Grupo A (solo vertical) y Grupo B (puede extenderse más allá de las líneas de volcadura)",
+        "Los elevadores de tijera son Grupo A; los elevadores de pluma son Grupo B",
+        "Los Tipos 1, 2 y 3 definen cuándo y desde dónde se permite conducir",
+        "El término MEWP reemplazó a 'plataforma de trabajo aéreo' en la revisión ANSI de 2020",
+      ] },
+    ]),
   },
   {
     module: "Fundamentos de Elevadores Aéreos y Clasificaciones",
     title: "Elevadores de Tijera: Operación y Componentes",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Elevadores de Tijera: Operación y Componentes",
-        image: img("scissor-lift-hero.svg"),
-        sections: [
-          { heading: "¿Qué es un Elevador de Tijera?", content: "<p>Un <strong>elevador de tijera</strong> es un MEWP del Grupo A que utiliza soportes tubulares cruzados (mecanismo de pantógrafo) para subir y bajar la plataforma verticalmente. Los elevadores de tijera proporcionan una plataforma de trabajo grande y estable ideal para tareas que requieren múltiples trabajadores y materiales a alturas moderadas.</p>" },
-          { heading: "Componentes Principales", content: "<ul><li><strong>Plataforma:</strong> El área de trabajo con barandillas y puerta de entrada</li><li><strong>Mecanismo de tijera:</strong> Soportes cruzados que se extienden/contraen</li><li><strong>Chasis/base:</strong> La unidad de conducción con ruedas u orugas</li><li><strong>Controles:</strong> Paneles de control superior (plataforma) e inferior (tierra)</li><li><strong>Fuente de energía:</strong> Batería eléctrica o combustión interna (diésel, gasolina, GLP)</li></ul>" },
-          { heading: "Controles de Operación", content: "<p>Los elevadores de tijera tienen <strong>controles superiores e inferiores</strong>. Los controles superiores están en la plataforma y son usados por el operador durante la elevación. Los controles inferiores están a nivel del suelo. Según OSHA, los controles inferiores deben poder anular los superiores en una emergencia, pero no deben usarse para operación normal cuando hay un operador en la plataforma.</p>" },
-          { heading: "Capacidad de Conducción", content: "<p>La mayoría de los elevadores de tijera modernos son <strong>Tipo 3</strong> — pueden ser conducidos desde los controles de la plataforma mientras están elevados. Sin embargo, conducir mientras está elevado debe hacerse con precaución y solo en superficies adecuadas.</p>" },
-        ],
-        takeaways: [
-          "Los elevadores de tijera son MEWPs del Grupo A con elevación solo vertical",
-          "Tienen controles superiores (plataforma) e inferiores (tierra)",
-          "Los controles inferiores pueden anular los superiores en emergencias",
-          "La mayoría de los elevadores de tijera modernos pueden conducirse desde la plataforma",
-        ],
-        tip: "Siempre lea el manual de operación del fabricante para la marca y modelo específico antes de operar cualquier MEWP.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("scissor-lift-hero.svg"), alt: "Elevadores de Tijera: Operación y Componentes" },
+      { type: "heading", level: 2, text: "Elevadores de Tijera: Operación y Componentes" },
+      { type: "heading", level: 3, text: "¿Qué es un Elevador de Tijera?" },
+      { type: "paragraph", html: "Un <strong>elevador de tijera</strong> es un MEWP del Grupo A que utiliza soportes tubulares cruzados (mecanismo de pantógrafo) para subir y bajar la plataforma verticalmente. Los elevadores de tijera proporcionan una plataforma de trabajo grande y estable ideal para tareas que requieren múltiples trabajadores y materiales a alturas moderadas." },
+      { type: "heading", level: 3, text: "Componentes Principales" },
+      { type: "list", items: [
+        "<strong>Plataforma:</strong> El área de trabajo con barandillas y puerta de entrada",
+        "<strong>Mecanismo de tijera:</strong> Soportes cruzados que se extienden/contraen",
+        "<strong>Chasis/base:</strong> La unidad de conducción con ruedas u orugas",
+        "<strong>Controles:</strong> Paneles de control superior (plataforma) e inferior (tierra)",
+        "<strong>Fuente de energía:</strong> Batería eléctrica o combustión interna (diésel, gasolina, GLP)",
+      ] },
+      { type: "heading", level: 3, text: "Controles de Operación" },
+      { type: "paragraph", html: "Los elevadores de tijera tienen <strong>controles superiores e inferiores</strong>. Los controles superiores están en la plataforma y son usados por el operador durante la elevación. Los controles inferiores están a nivel del suelo. Según OSHA, los controles inferiores deben poder anular los superiores en una emergencia, pero no deben usarse para operación normal cuando hay un operador en la plataforma." },
+      { type: "heading", level: 3, text: "Capacidad de Conducción" },
+      { type: "paragraph", html: "La mayoría de los elevadores de tijera modernos son <strong>Tipo 3</strong> — pueden ser conducidos desde los controles de la plataforma mientras están elevados. Sin embargo, conducir mientras está elevado debe hacerse con precaución y solo en superficies adecuadas." },
+      { type: "callout", variant: "tip", text: "Siempre lea el manual de operación del fabricante para la marca y modelo específico antes de operar cualquier MEWP." },
+      { type: "key_takeaways", items: [
+        "Los elevadores de tijera son MEWPs del Grupo A con elevación solo vertical",
+        "Tienen controles superiores (plataforma) e inferiores (tierra)",
+        "Los controles inferiores pueden anular los superiores en emergencias",
+        "La mayoría de los elevadores de tijera modernos pueden conducirse desde la plataforma",
+      ] },
+    ]),
   },
   {
     module: "Fundamentos de Elevadores Aéreos y Clasificaciones",
     title: "Elevadores de Pluma: Articulados y Telescópicos",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Elevadores de Pluma: Articulados y Telescópicos",
-        image: img("aerial-lift-hero.svg"),
-        sections: [
-          { heading: "Elevadores de Pluma Articulados", content: "<p>Los <strong>elevadores de pluma articulados</strong> (plumas articuladas) tienen múltiples secciones articuladas que permiten que la plataforma alcance por encima y sobre obstáculos. El brazo articulado proporciona excelente maniobrabilidad. Clasificados como <strong>Grupo B</strong> porque la plataforma puede extenderse más allá de las líneas de volcadura.</p>" },
-          { heading: "Elevadores de Pluma Telescópicos", content: "<p>Los <strong>elevadores de pluma telescópicos</strong> usan secciones rectas extensibles para máximo alcance horizontal y vertical. Ofrecen las capacidades de alcance más altas pero no pueden alcanzar sobre obstáculos. También clasificados como <strong>Grupo B</strong>.</p>" },
-          { heading: "Diferencias Clave de los Elevadores de Tijera", content: "<ul><li>Los elevadores de pluma pueden posicionar la plataforma <strong>más allá de la huella del chasis</strong></li><li>Tienen <strong>mayor alcance</strong> pero típicamente plataformas más pequeñas</li><li>Los MEWPs del Grupo B requieren consideraciones adicionales de <strong>protección contra caídas</strong></li><li>Los estabilizadores generalmente son requeridos para la operación</li></ul>" },
-        ],
-        takeaways: [
-          "Las plumas articuladas tienen brazos articulados para alcance arriba y sobre",
-          "Las plumas telescópicas usan extensión recta para máximo alcance",
-          "Ambos son MEWPs del Grupo B — la plataforma se extiende más allá de las líneas de volcadura",
-          "Los estabilizadores generalmente son requeridos para operación de pluma",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Elevadores de Pluma: Articulados y Telescópicos" },
+      { type: "heading", level: 2, text: "Elevadores de Pluma: Articulados y Telescópicos" },
+      { type: "heading", level: 3, text: "Elevadores de Pluma Articulados" },
+      { type: "paragraph", html: "Los <strong>elevadores de pluma articulados</strong> (plumas articuladas) tienen múltiples secciones articuladas que permiten que la plataforma alcance por encima y sobre obstáculos. El brazo articulado proporciona excelente maniobrabilidad. Clasificados como <strong>Grupo B</strong> porque la plataforma puede extenderse más allá de las líneas de volcadura." },
+      { type: "heading", level: 3, text: "Elevadores de Pluma Telescópicos" },
+      { type: "paragraph", html: "Los <strong>elevadores de pluma telescópicos</strong> usan secciones rectas extensibles para máximo alcance horizontal y vertical. Ofrecen las capacidades de alcance más altas pero no pueden alcanzar sobre obstáculos. También clasificados como <strong>Grupo B</strong>." },
+      { type: "heading", level: 3, text: "Conozca Su Elevador de Pluma" },
+      { type: "paragraph", html: "Antes de operar, necesita conocer los componentes clave de la máquina. Toque cada marcador para aprender qué hace." },
+      { type: "hotspot_diagram", src: img("aerial-lift-anatomy.svg"), alt: "Vista lateral de un elevador de pluma articulado con canasta elevada",
+        caption: "Anatomía de un elevador de pluma articulado — toque cada marcador para explorar.",
+        hotspots: [
+          { x: 24, y: 79, label: "Chasis", description: "La base con ruedas que soporta y mueve toda la máquina. Su peso contrapesa la plataforma elevada — siempre posiciónelo sobre terreno firme y nivelado." },
+          { x: 31, y: 69, label: "Torreta y Controles Inferiores", description: "La torreta giratoria sostiene la pluma y aloja el panel de control inferior (tierra). Los controles inferiores deben poder anular los controles de la plataforma en una emergencia." },
+          { x: 36, y: 53, label: "Pluma Inferior", description: "La primera sección de la pluma se eleva desde la torreta. En un elevador articulado trabaja junto con la articulación para llevar la plataforma por encima de obstáculos." },
+          { x: 49, y: 41, label: "Articulación (Nudillo)", description: "La unión articulada entre las secciones de la pluma. Esta articulación es lo que permite que una pluma articulada alcance sobre equipos y estructuras que una pluma telescópica no puede." },
+          { x: 62, y: 37, label: "Pluma Superior", description: "Extiende la plataforma más allá de las líneas de volcadura — por eso los elevadores de pluma son MEWPs del Grupo B y exigen atención adicional a la estabilidad." },
+          { x: 82, y: 37, label: "Canasta y Barandillas", description: "La plataforma de trabajo. Las barandillas son su primera línea de protección contra caídas — nunca se pare sobre ellas ni se incline por encima, y mantenga ambos pies en el piso de la plataforma." },
+          { x: 81, y: 23, label: "Arnés y Línea del Operador", description: "El operador usa un arnés de cuerpo completo con una línea de seguridad sujeta al punto de anclaje designado por el fabricante — requerido en todo momento en la canasta de un elevador de pluma." },
+          { x: 87, y: 21, label: "Controles de la Plataforma", description: "La consola de control superior permite al operador conducir, girar, subir y bajar desde la canasta. Pruebe estos controles cada día antes del uso." },
+        ] },
+      { type: "heading", level: 3, text: "Diferencias Clave de los Elevadores de Tijera" },
+      { type: "list", items: [
+        "Los elevadores de pluma pueden posicionar la plataforma <strong>más allá de la huella del chasis</strong>",
+        "Tienen <strong>mayor alcance</strong> pero típicamente plataformas más pequeñas",
+        "Los MEWPs del Grupo B requieren consideraciones adicionales de <strong>protección contra caídas</strong>",
+        "Los estabilizadores generalmente son requeridos para la operación",
+      ] },
+      { type: "key_takeaways", items: [
+        "Las plumas articuladas tienen brazos articulados para alcance arriba y sobre",
+        "Las plumas telescópicas usan extensión recta para máximo alcance",
+        "Ambos son MEWPs del Grupo B — la plataforma se extiende más allá de las líneas de volcadura",
+        "Los estabilizadores generalmente son requeridos para operación de pluma",
+      ] },
+    ]),
   },
   {
     module: "Fundamentos de Elevadores Aéreos y Clasificaciones",
@@ -194,49 +237,95 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Lista de Inspección Pre-Operación",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Lista de Inspección Pre-Operación",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Requisito de OSHA", content: "<p>Bajo <strong>29 CFR 1926.453(a)(1)</strong>, los controles del elevador deben ser probados cada día antes de su uso para determinar que están en condiciones seguras de funcionamiento. Este es un requisito diario obligatorio.</p>" },
-          { heading: "Inspección Visual", content: "<p>Camine alrededor de todo el MEWP, verificando:</p><ul><li><strong>Plataforma y barandillas:</strong> Revise daños, componentes flojos, barandillas faltantes</li><li><strong>Mangueras y cables:</strong> Busque fugas, abrasión, dobleces o desgaste</li><li><strong>Llantas/ruedas:</strong> Revise daños, inflado apropiado</li><li><strong>Batería/combustible:</strong> Revise nivel de carga, fugas</li><li><strong>Componentes estructurales:</strong> Inspeccione grietas, dobleces, fallas de soldadura</li><li><strong>Estabilizadores:</strong> Revise función apropiada y condición de las almohadillas</li><li><strong>Señales de seguridad:</strong> Asegure que las etiquetas de capacidad y advertencias sean legibles</li></ul>" },
-          { heading: "Prueba Funcional", content: "<p>Después de la inspección visual, realice una <strong>prueba funcional</strong> de todos los controles:</p><ul><li>Pruebe <strong>controles superiores</strong>: subir, bajar, conducir, girar</li><li>Pruebe <strong>controles inferiores</strong>: subir, bajar, parada de emergencia</li><li>Pruebe el <strong>sistema de descenso de emergencia</strong></li><li>Pruebe la <strong>bocina</strong> y <strong>sistemas de alarma</strong></li><li>Pruebe los <strong>frenos</strong> y la <strong>dirección</strong></li><li>Pruebe el <strong>botón de parada de emergencia</strong></li></ul>" },
-          { heading: "Marcar Equipo Inseguro", content: "<p>Si encuentra algún defecto o problema de seguridad, <strong>no opere el MEWP</strong>. Márquelo fuera de servicio inmediatamente y reporte el problema a su supervisor. El equipo debe ser reparado antes de volver a servicio.</p>" },
-        ],
-        takeaways: [
-          "OSHA requiere probar los controles cada día antes del uso (29 CFR 1926.453)",
-          "Realice inspección visual y prueba funcional de todos los controles",
-          "Revise plataforma, barandillas, mangueras, llantas, batería/combustible",
-          "Marque y reporte cualquier equipo inseguro inmediatamente",
-        ],
-        warning: "Nunca opere un MEWP que no pase la inspección. Cualquier defecto debe corregirse antes del uso.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Lista de Inspección Pre-Operación" },
+      { type: "heading", level: 2, text: "Lista de Inspección Pre-Operación" },
+      { type: "heading", level: 3, text: "Requisito de OSHA" },
+      { type: "paragraph", html: "Bajo <strong>29 CFR 1926.453(a)(1)</strong>, los controles del elevador deben ser probados cada día antes de su uso para determinar que están en condiciones seguras de funcionamiento. Este es un requisito diario obligatorio." },
+      { type: "heading", level: 3, text: "Inspección Visual" },
+      { type: "paragraph", html: "Camine alrededor de todo el MEWP, verificando:" },
+      { type: "list", items: [
+        "<strong>Plataforma y barandillas:</strong> Revise daños, componentes flojos, barandillas faltantes",
+        "<strong>Mangueras y cables:</strong> Busque fugas, abrasión, dobleces o desgaste",
+        "<strong>Llantas/ruedas:</strong> Revise daños, inflado apropiado",
+        "<strong>Batería/combustible:</strong> Revise nivel de carga, fugas",
+        "<strong>Componentes estructurales:</strong> Inspeccione grietas, dobleces, fallas de soldadura",
+        "<strong>Estabilizadores:</strong> Revise función apropiada y condición de las almohadillas",
+        "<strong>Señales de seguridad:</strong> Asegure que las etiquetas de capacidad y advertencias sean legibles",
+      ] },
+      { type: "heading", level: 3, text: "Prueba Funcional" },
+      { type: "paragraph", html: "Después de la inspección visual, realice una <strong>prueba funcional</strong> de todos los controles:" },
+      { type: "list", items: [
+        "Pruebe <strong>controles superiores</strong>: subir, bajar, conducir, girar",
+        "Pruebe <strong>controles inferiores</strong>: subir, bajar, parada de emergencia",
+        "Pruebe el <strong>sistema de descenso de emergencia</strong>",
+        "Pruebe la <strong>bocina</strong> y <strong>sistemas de alarma</strong>",
+        "Pruebe los <strong>frenos</strong> y la <strong>dirección</strong>",
+        "Pruebe el <strong>botón de parada de emergencia</strong>",
+      ] },
+      { type: "heading", level: 3, text: "Practique la Secuencia" },
+      { type: "drag_drop", mode: "ordering",
+        prompt: "Ordene los pasos de la inspección diaria pre-operación en la secuencia correcta.",
+        items: [
+          { id: "insp-walk", label: "Camine alrededor del MEWP y complete la inspección visual" },
+          { id: "insp-lower", label: "Pruebe el funcionamiento de los controles inferiores (tierra)" },
+          { id: "insp-upper", label: "Pruebe el funcionamiento de los controles superiores (plataforma)" },
+          { id: "insp-estop", label: "Pruebe la parada de emergencia y el sistema de descenso de emergencia" },
+          { id: "insp-tag", label: "Marque fuera de servicio y reporte el MEWP si encuentra algún defecto" },
+        ] },
+      { type: "heading", level: 3, text: "Marcar Equipo Inseguro" },
+      { type: "paragraph", html: "Si encuentra algún defecto o problema de seguridad, <strong>no opere el MEWP</strong>. Márquelo fuera de servicio inmediatamente y reporte el problema a su supervisor. El equipo debe ser reparado antes de volver a servicio." },
+      { type: "callout", variant: "warning", text: "Nunca opere un MEWP que no pase la inspección. Cualquier defecto debe corregirse antes del uso." },
+      { type: "key_takeaways", items: [
+        "OSHA requiere probar los controles cada día antes del uso (29 CFR 1926.453)",
+        "Realice inspección visual y prueba funcional de todos los controles",
+        "Revise plataforma, barandillas, mangueras, llantas, batería/combustible",
+        "Marque y reporte cualquier equipo inseguro inmediatamente",
+      ] },
+    ]),
   },
   {
     module: "Inspección Pre-Operación",
     title: "Mantenimiento de Batería y Combustible",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Mantenimiento de Batería y Combustible",
-        image: img("ppe-gloves.svg"),
-        sections: [
-          { heading: "MEWPs Eléctricos", content: "<p>Los MEWPs eléctricos usan baterías de ciclo profundo. El mantenimiento adecuado extiende la vida de la batería:</p><ul><li>Cargue baterías solo en <strong>áreas designadas y ventiladas</strong></li><li>Apague el cargador antes de conectar/desconectar</li><li>Las baterías producen <strong>gas hidrógeno</strong> durante la carga — asegure ventilación</li><li>Use <strong>guantes resistentes a químicos y protección ocular</strong></li><li>Nunca fume o use llamas abiertas cerca de baterías en carga</li></ul>" },
-          { heading: "MEWPs de Combustión Interna", content: "<p>MEWPs de diésel, gasolina o GLP requieren seguridad específica:</p><ul><li>Reabastezca solo en <strong>áreas designadas</strong> con ventilación</li><li>Apague el motor antes de reabastecer</li><li>Prohibido fumar o llamas abiertas dentro de <strong>50 pies</strong></li><li>Use guantes al manejar tanques de GLP</li><li>Revise fugas después de conectar tanques de GLP</li></ul>" },
-          { heading: "Mantenimiento Diario", content: "<p>Revise al inicio de cada turno:</p><ul><li>Nivel de carga de batería o combustible suficiente</li><li>Nivel de fluido hidráulico dentro del rango aceptable</li><li>Nivel de aceite del motor (para motores de combustión)</li><li>Sin fugas de ningún tipo</li></ul>" },
-        ],
-        takeaways: [
-          "Cargue baterías solo en áreas designadas y ventiladas",
-          "Las baterías producen gas hidrógeno explosivo durante la carga",
-          "Prohibido fumar a 50 pies de áreas de carga o reabastecimiento",
-          "Revise todos los niveles de fluido al inicio de cada turno",
-        ],
-        warning: "El gas hidrógeno de las baterías en carga es altamente explosivo. Siempre asegure ventilación adecuada.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("ppe-gloves.svg"), alt: "Mantenimiento de Batería y Combustible" },
+      { type: "heading", level: 2, text: "Mantenimiento de Batería y Combustible" },
+      { type: "heading", level: 3, text: "MEWPs Eléctricos" },
+      { type: "paragraph", html: "Los MEWPs eléctricos usan baterías de ciclo profundo. El mantenimiento adecuado extiende la vida de la batería:" },
+      { type: "list", items: [
+        "Cargue baterías solo en <strong>áreas designadas y ventiladas</strong>",
+        "Apague el cargador antes de conectar/desconectar",
+        "Las baterías producen <strong>gas hidrógeno</strong> durante la carga — asegure ventilación",
+        "Use <strong>guantes resistentes a químicos y protección ocular</strong>",
+        "Nunca fume o use llamas abiertas cerca de baterías en carga",
+      ] },
+      { type: "heading", level: 3, text: "MEWPs de Combustión Interna" },
+      { type: "paragraph", html: "MEWPs de diésel, gasolina o GLP requieren seguridad específica:" },
+      { type: "list", items: [
+        "Reabastezca solo en <strong>áreas designadas</strong> con ventilación",
+        "Apague el motor antes de reabastecer",
+        "Prohibido fumar o llamas abiertas dentro de <strong>50 pies</strong>",
+        "Use guantes al manejar tanques de GLP",
+        "Revise fugas después de conectar tanques de GLP",
+      ] },
+      { type: "heading", level: 3, text: "Mantenimiento Diario" },
+      { type: "paragraph", html: "Revise al inicio de cada turno:" },
+      { type: "list", items: [
+        "Nivel de carga de batería o combustible suficiente",
+        "Nivel de fluido hidráulico dentro del rango aceptable",
+        "Nivel de aceite del motor (para motores de combustión)",
+        "Sin fugas de ningún tipo",
+      ] },
+      { type: "callout", variant: "warning", text: "El gas hidrógeno de las baterías en carga es altamente explosivo. Siempre asegure ventilación adecuada." },
+      { type: "key_takeaways", items: [
+        "Cargue baterías solo en áreas designadas y ventiladas",
+        "Las baterías producen gas hidrógeno explosivo durante la carga",
+        "Prohibido fumar a 50 pies de áreas de carga o reabastecimiento",
+        "Revise todos los niveles de fluido al inicio de cada turno",
+      ] },
+    ]),
   },
   {
     module: "Inspección Pre-Operación",
@@ -257,50 +346,57 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Principios de Estabilidad del MEWP",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Principios de Estabilidad del MEWP",
-        image: img("stability-triangle.svg"),
-        sections: [
-          { heading: "Líneas de Volcadura", content: "<p>Cada MEWP tiene <strong>líneas de volcadura</strong> — el eje alrededor del cual el MEWP podría volcarse si el centro de gravedad se desplaza demasiado. Para MEWPs del Grupo A (tijera), las líneas son típicamente las ruedas o estabilizadores. Para el Grupo B (pluma), son las almohadillas de los estabilizadores o las posiciones de las ruedas.</p>" },
-          { heading: "Centro de Gravedad", content: "<p>El <strong>centro de gravedad combinado</strong> incluye el MEWP mismo, la carga de la plataforma (personal, herramientas, materiales) y la posición de la pluma/plataforma. Si el centro de gravedad combinado se mueve fuera de las líneas de volcadura, el MEWP se volcará.</p>" },
-          { heading: "Factores que Afectan la Estabilidad", content: "<ul><li><strong>Altura de plataforma:</strong> Mayor elevación sube el centro de gravedad</li><li><strong>Peso de carga:</strong> Exceder la capacidad desplaza el centro de gravedad</li><li><strong>Extensión de pluma:</strong> La extensión horizontal mueve el centro de gravedad hacia afuera</li><li><strong>Pendiente:</strong> Operar en pendiente desplaza el centro de gravedad cuesta abajo</li><li><strong>Viento:</strong> La fuerza del viento puede desestabilizar el MEWP</li><li><strong>Condiciones de superficie:</strong> Terreno blando, hielo o superficies mojadas</li></ul>" },
-          { heading: "Estabilizadores", content: "<p>Muchos MEWPs, especialmente del Grupo B, requieren <strong>estabilizadores</strong> desplegados antes de la elevación. OSHA requiere que los frenos estén puestos y los estabilizadores posicionados sobre almohadillas o superficie sólida.</p>" },
-        ],
-        takeaways: [
-          "Las líneas de volcadura definen el límite de estabilidad",
-          "Altura, carga, extensión de pluma, pendiente y viento afectan la estabilidad",
-          "Los estabilizadores deben desplegarse sobre almohadillas/superficie sólida",
-          "El centro de gravedad combinado debe mantenerse dentro de las líneas de volcadura",
-        ],
-        warning: "Las volcaduras son una causa principal de fatalidades con MEWPs. Siempre respete los límites de capacidad y estabilidad.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("stability-triangle.svg"), alt: "Principios de Estabilidad del MEWP" },
+      { type: "heading", level: 2, text: "Principios de Estabilidad del MEWP" },
+      { type: "heading", level: 3, text: "Líneas de Volcadura" },
+      { type: "paragraph", html: "Cada MEWP tiene <strong>líneas de volcadura</strong> — el eje alrededor del cual el MEWP podría volcarse si el centro de gravedad se desplaza demasiado. Para MEWPs del Grupo A (tijera), las líneas son típicamente las ruedas o estabilizadores. Para el Grupo B (pluma), son las almohadillas de los estabilizadores o las posiciones de las ruedas." },
+      { type: "heading", level: 3, text: "Centro de Gravedad" },
+      { type: "paragraph", html: "El <strong>centro de gravedad combinado</strong> incluye el MEWP mismo, la carga de la plataforma (personal, herramientas, materiales) y la posición de la pluma/plataforma. Si el centro de gravedad combinado se mueve fuera de las líneas de volcadura, el MEWP se volcará." },
+      { type: "heading", level: 3, text: "Factores que Afectan la Estabilidad" },
+      { type: "list", items: [
+        "<strong>Altura de plataforma:</strong> Mayor elevación sube el centro de gravedad",
+        "<strong>Peso de carga:</strong> Exceder la capacidad desplaza el centro de gravedad",
+        "<strong>Extensión de pluma:</strong> La extensión horizontal mueve el centro de gravedad hacia afuera",
+        "<strong>Pendiente:</strong> Operar en pendiente desplaza el centro de gravedad cuesta abajo",
+        "<strong>Viento:</strong> La fuerza del viento puede desestabilizar el MEWP",
+        "<strong>Condiciones de superficie:</strong> Terreno blando, hielo o superficies mojadas",
+      ] },
+      { type: "heading", level: 3, text: "Estabilizadores" },
+      { type: "paragraph", html: "Muchos MEWPs, especialmente del Grupo B, requieren <strong>estabilizadores</strong> desplegados antes de la elevación. OSHA requiere que los frenos estén puestos y los estabilizadores posicionados sobre almohadillas o superficie sólida." },
+      { type: "callout", variant: "warning", text: "Las volcaduras son una causa principal de fatalidades con MEWPs. Siempre respete los límites de capacidad y estabilidad." },
+      { type: "key_takeaways", items: [
+        "Las líneas de volcadura definen el límite de estabilidad",
+        "Altura, carga, extensión de pluma, pendiente y viento afectan la estabilidad",
+        "Los estabilizadores deben desplegarse sobre almohadillas/superficie sólida",
+        "El centro de gravedad combinado debe mantenerse dentro de las líneas de volcadura",
+      ] },
+    ]),
   },
   {
     module: "Estabilidad y Manejo de Cargas",
     title: "Capacidad Nominal y Límites de Carga",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Capacidad Nominal y Límites de Carga",
-        image: img("load-center.svg"),
-        sections: [
-          { heading: "Placa de Capacidad del Fabricante", content: "<p>Cada MEWP tiene una placa de <strong>capacidad nominal</strong> que especifica la carga máxima que la plataforma puede soportar. Esto incluye el peso combinado de todo el personal, herramientas y materiales. <strong>Nunca exceda esta clasificación.</strong></p>" },
-          { heading: "Consideraciones de Capacidad para Pluma", content: "<p>Para elevadores de pluma del Grupo B, la capacidad puede variar según la posición de la pluma. Algunos tienen <strong>clasificaciones de capacidad variable</strong> que cambian con la extensión y ángulo. Siempre verifique la placa para la configuración específica.</p>" },
-          { heading: "Límites de Personal", content: "<p>La placa también especifica el número máximo de ocupantes permitidos en la plataforma. Nunca exceda este límite.</p>" },
-          { heading: "Distribución de Carga", content: "<p>Distribuya las cargas uniformemente en la plataforma. Concentrar peso en un lado puede desplazar el centro de gravedad. Asegure todas las herramientas y materiales.</p>" },
-        ],
-        takeaways: [
-          "Nunca exceda la capacidad nominal del fabricante",
-          "La capacidad incluye el peso combinado de personal, herramientas y materiales",
-          "La capacidad de pluma puede variar con la posición (capacidad variable)",
-          "Distribuya las cargas uniformemente y asegure todos los materiales",
-        ],
-        warning: "Sobrecargar un MEWP es una de las principales causas de accidentes de volcadura. Siempre verifique la carga total.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("load-center.svg"), alt: "Capacidad Nominal y Límites de Carga" },
+      { type: "heading", level: 2, text: "Capacidad Nominal y Límites de Carga" },
+      { type: "heading", level: 3, text: "Placa de Capacidad del Fabricante" },
+      { type: "paragraph", html: "Cada MEWP tiene una placa de <strong>capacidad nominal</strong> que especifica la carga máxima que la plataforma puede soportar. Esto incluye el peso combinado de todo el personal, herramientas y materiales. <strong>Nunca exceda esta clasificación.</strong>" },
+      { type: "heading", level: 3, text: "Consideraciones de Capacidad para Pluma" },
+      { type: "paragraph", html: "Para elevadores de pluma del Grupo B, la capacidad puede variar según la posición de la pluma. Algunos tienen <strong>clasificaciones de capacidad variable</strong> que cambian con la extensión y ángulo. Siempre verifique la placa para la configuración específica." },
+      { type: "heading", level: 3, text: "Límites de Personal" },
+      { type: "paragraph", html: "La placa también especifica el número máximo de ocupantes permitidos en la plataforma. Nunca exceda este límite." },
+      { type: "heading", level: 3, text: "Distribución de Carga" },
+      { type: "paragraph", html: "Distribuya las cargas uniformemente en la plataforma. Concentrar peso en un lado puede desplazar el centro de gravedad. Asegure todas las herramientas y materiales." },
+      { type: "callout", variant: "warning", text: "Sobrecargar un MEWP es una de las principales causas de accidentes de volcadura. Siempre verifique la carga total." },
+      { type: "key_takeaways", items: [
+        "Nunca exceda la capacidad nominal del fabricante",
+        "La capacidad incluye el peso combinado de personal, herramientas y materiales",
+        "La capacidad de pluma puede variar con la posición (capacidad variable)",
+        "Distribuya las cargas uniformemente y asegure todos los materiales",
+      ] },
+    ]),
   },
   {
     module: "Estabilidad y Manejo de Cargas",
@@ -321,50 +417,80 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Requisitos de Protección contra Caídas",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Requisitos de Protección contra Caídas",
-        image: img("pedestrian-safety.svg"),
-        sections: [
-          { heading: "Norma de Protección contra Caídas de OSHA", content: "<p>Bajo <strong>29 CFR 1926.453</strong>, los empleados siempre deben pararse firmemente en el piso de la canasta. Se debe usar un <strong>cinturón corporal</strong> y un <strong>arnés de seguridad</strong> adjunto a la pluma o canasta. Sin embargo, desde el 1 de enero de 1998, los cinturones corporales <strong>NO son aceptables</strong> como parte de un sistema personal de detención de caídas — se debe usar un <strong>arnés de cuerpo completo</strong>.</p>" },
-          { heading: "Sistema Personal de Detención de Caídas", content: "<p>Un sistema completo de protección contra caídas consiste en:</p><ul><li><strong>Arnés de cuerpo completo</strong> — distribuye las fuerzas de caída a través del cuerpo</li><li><strong>Línea de seguridad</strong> — conecta el arnés al punto de anclaje</li><li><strong>Punto de anclaje</strong> — el punto de attachment designado en la pluma o canasta (aprobado por el fabricante)</li></ul>" },
-          { heading: "Puntos de Anclaje", content: "<p>Siempre attache la línea de seguridad al <strong>punto de anclaje designado por el fabricante</strong>. Nunca attache a estructuras cercanas, líneas eléctricas, u otro equipo fuera del MEWP.</p>" },
-          { heading: "Inspección del Arnés", content: "<p>Inspeccione su arnés y línea antes de cada uso: revise cortes, desgarros, costuras dañadas, herrajes (anillos D, hebillas), y etiquetas legibles. Reemplace cualquier equipo dañado inmediatamente.</p>" },
-        ],
-        takeaways: [
-          "Los cinturones corporales NO son aceptables desde 1998 — use arneses de cuerpo completo",
-          "Attache la línea solo al punto de anclaje designado por el fabricante",
-          "Nunca attache a estructuras o equipo fuera del MEWP",
-          "Inspeccione el arnés y la línea antes de cada uso",
-        ],
-        warning: "Desde el 1 de enero de 1998, los cinturones corporales NO son aceptables. Se requieren arneses de cuerpo completo.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pedestrian-safety.svg"), alt: "Requisitos de Protección contra Caídas" },
+      { type: "heading", level: 2, text: "Requisitos de Protección contra Caídas" },
+      { type: "heading", level: 3, text: "Norma de Protección contra Caídas de OSHA" },
+      { type: "paragraph", html: "Bajo <strong>29 CFR 1926.453</strong>, los empleados siempre deben pararse firmemente en el piso de la canasta. Se debe usar un <strong>cinturón corporal</strong> y un <strong>arnés de seguridad</strong> adjunto a la pluma o canasta. Sin embargo, desde el 1 de enero de 1998, los cinturones corporales <strong>NO son aceptables</strong> como parte de un sistema personal de detención de caídas — se debe usar un <strong>arnés de cuerpo completo</strong>." },
+      { type: "heading", level: 3, text: "Sistema Personal de Detención de Caídas" },
+      { type: "paragraph", html: "Un sistema completo de protección contra caídas consiste en:" },
+      { type: "list", items: [
+        "<strong>Arnés de cuerpo completo</strong> — distribuye las fuerzas de caída a través del cuerpo",
+        "<strong>Línea de seguridad</strong> — conecta el arnés al punto de anclaje",
+        "<strong>Punto de anclaje</strong> — el punto de attachment designado en la pluma o canasta (aprobado por el fabricante)",
+      ] },
+      { type: "flip_cards", title: "Equipo de Protección contra Caídas — Conozca Cada Pieza", cards: [
+        { front: "Arnés de Cuerpo Completo", back: "Distribuye las fuerzas de detención de caída entre muslos, pelvis, pecho y hombros. Requerido desde el 1 de enero de 1998 — los cinturones corporales no son aceptables." },
+        { front: "Línea de Seguridad", back: "Conecta su arnés al punto de anclaje. Inspeccione cortes, deshilachado y ganchos dañados antes de cada uso." },
+        { front: "Punto de Anclaje", back: "El punto de sujeción designado por el fabricante en la plataforma o pluma. Nunca se ancle a estructuras, postes eléctricos ni nada fuera del MEWP." },
+        { front: "Cinturón Corporal", back: "NO es aceptable para detención de caídas desde el 1 de enero de 1998. En una caída, un cinturón concentra toda la fuerza en el abdomen — use un arnés de cuerpo completo." },
+      ] },
+      { type: "heading", level: 3, text: "Puntos de Anclaje" },
+      { type: "paragraph", html: "Siempre attache la línea de seguridad al <strong>punto de anclaje designado por el fabricante</strong>. Nunca attache a estructuras cercanas, líneas eléctricas, u otro equipo fuera del MEWP." },
+      { type: "heading", level: 3, text: "Inspección del Arnés" },
+      { type: "paragraph", html: "Inspeccione su arnés y línea antes de cada uso: revise cortes, desgarros, costuras dañadas, herrajes (anillos D, hebillas), y etiquetas legibles. Reemplace cualquier equipo dañado inmediatamente." },
+      { type: "callout", variant: "warning", text: "Desde el 1 de enero de 1998, los cinturones corporales NO son aceptables. Se requieren arneses de cuerpo completo." },
+      { type: "key_takeaways", items: [
+        "Los cinturones corporales NO son aceptables desde 1998 — use arneses de cuerpo completo",
+        "Attache la línea solo al punto de anclaje designado por el fabricante",
+        "Nunca attache a estructuras o equipo fuera del MEWP",
+        "Inspeccione el arnés y la línea antes de cada uso",
+      ] },
+    ]),
   },
   {
     module: "Operación Segura y Protección contra Caídas",
     title: "Procedimientos de Operación Segura",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Procedimientos de Operación Segura",
-        image: img("safe-driving.svg"),
-        sections: [
-          { heading: "Antes de Elevar", content: "<p>Antes de subir la plataforma:</p><ul><li>Verifique que la superficie sea <strong>nivelada y capaz de soportar la carga</strong></li><li>Despliegue estabilizadores si lo requiere el fabricante</li><li>Ponga calzas en las ruedas si está en una pendiente</li><li>Revise <strong>peligros aéreos</strong> (líneas eléctricas, estructuras)</li><li>Asegure que el área esté libre de peatones y obstrucciones</li></ul>" },
-          { heading: "Mientras Está Elevado", content: "<p>Cuando la plataforma está elevada:</p><ul><li><strong>Siempre use su arnés y attache la línea</strong></li><li>Mantenga ambos pies firmemente en el piso de la plataforma</li><li>Nunca se pare en barandillas o escaleras</li><li>No exceda la capacidad nominal o el límite de personal</li></ul>" },
-          { heading: "Conducir Mientras Está Elevado", content: "<p>Si conducir mientras está elevado es permitido por el fabricante:</p><ul><li>Conduzca a <strong>muy baja velocidad</strong></li><li>Vigile peligros de superficie y obstáculos</li><li>Evite arranques, paradas o giros repentinos</li><li>Nunca conduzca cerca de bordes abiertos</li></ul>" },
-          { heading: "Bajar la Plataforma", content: "<p>Antes de bajar: asegure que el área debajo esté libre, verifique que el camino esté libre de obstrucciones, baje lentamente y bajo control.</p>" },
-        ],
-        takeaways: [
-          "Siempre use arnés y attache al punto de anclaje designado",
-          "Revise peligros aéreos antes de elevar",
-          "Nunca exceda la capacidad o los límites de personal",
-          "Baje lentamente y asegure que el área esté libre",
-        ],
-        tip: "Antes de elevar, siempre mire hacia arriba y alrededor para peligros aéreos como líneas eléctricas y estructuras.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("safe-driving.svg"), alt: "Procedimientos de Operación Segura" },
+      { type: "heading", level: 2, text: "Procedimientos de Operación Segura" },
+      { type: "heading", level: 3, text: "Antes de Elevar" },
+      { type: "paragraph", html: "Antes de subir la plataforma:" },
+      { type: "list", items: [
+        "Verifique que la superficie sea <strong>nivelada y capaz de soportar la carga</strong>",
+        "Despliegue estabilizadores si lo requiere el fabricante",
+        "Ponga calzas en las ruedas si está en una pendiente",
+        "Revise <strong>peligros aéreos</strong> (líneas eléctricas, estructuras)",
+        "Asegure que el área esté libre de peatones y obstrucciones",
+      ] },
+      { type: "heading", level: 3, text: "Mientras Está Elevado" },
+      { type: "paragraph", html: "Cuando la plataforma está elevada:" },
+      { type: "list", items: [
+        "<strong>Siempre use su arnés y attache la línea</strong>",
+        "Mantenga ambos pies firmemente en el piso de la plataforma",
+        "Nunca se pare en barandillas o escaleras",
+        "No exceda la capacidad nominal o el límite de personal",
+      ] },
+      { type: "heading", level: 3, text: "Conducir Mientras Está Elevado" },
+      { type: "paragraph", html: "Si conducir mientras está elevado es permitido por el fabricante:" },
+      { type: "list", items: [
+        "Conduzca a <strong>muy baja velocidad</strong>",
+        "Vigile peligros de superficie y obstáculos",
+        "Evite arranques, paradas o giros repentinos",
+        "Nunca conduzca cerca de bordes abiertos",
+      ] },
+      { type: "heading", level: 3, text: "Bajar la Plataforma" },
+      { type: "paragraph", html: "Antes de bajar: asegure que el área debajo esté libre, verifique que el camino esté libre de obstrucciones, baje lentamente y bajo control." },
+      { type: "callout", variant: "tip", text: "Antes de elevar, siempre mire hacia arriba y alrededor para peligros aéreos como líneas eléctricas y estructuras." },
+      { type: "key_takeaways", items: [
+        "Siempre use arnés y attache al punto de anclaje designado",
+        "Revise peligros aéreos antes de elevar",
+        "Nunca exceda la capacidad o los límites de personal",
+        "Baje lentamente y asegure que el área esté libre",
+      ] },
+    ]),
   },
   {
     module: "Operación Segura y Protección contra Caídas",
@@ -385,50 +511,79 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Peligros Eléctricos y Líneas de Energía",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Peligros Eléctricos y Líneas de Energía",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "Distancia Mínima de Líneas de Energía", content: "<p>OSHA requiere distancias mínimas de líneas de energía:</p><ul><li><strong>Hasta 50kV:</strong> Mínimo 10 pies</li><li><strong>50kV a 200kV:</strong> Mínimo 15 pies</li><li><strong>200kV a 350kV:</strong> Mínimo 20 pies</li><li><strong>350kV a 500kV:</strong> Mínimo 25 pies</li></ul>" },
-          { heading: "Reglas de Seguridad con Líneas de Energía", content: "<p>Trate siempre las líneas de energía como <strong>energizadas y peligrosas</strong>. No confíe en el aislamiento. Use un <strong>vigilante</strong> si la pluma podría girar hacia las líneas. Tenga en cuenta el <strong>viento</strong>.</p>" },
-          { heading: "Si Ocurre Contacto", content: "<p>Si el MEWP contacta una línea de energía:</p><ol><li><strong>Quédese en la plataforma</strong> — no intente saltar</li><li>Advierta a otros que se alejen</li><li>Llame a emergencias (911) y a la compañía eléctrica</li><li>Intente romper el contacto moviendo la pluma</li><li>No salga de la plataforma hasta que la línea sea desenergizada</li></ol>" },
-          { heading: "Seguridad del Personal en Tierra", content: "<p>Si el MEWP está en contacto con una línea, el personal en tierra está en riesgo de electrocución por <strong>potencial de paso</strong>. Deben permanecer a al menos <strong>35 pies</strong> de distancia.</p>" },
-        ],
-        takeaways: [
-          "Mínimo 10 pies de distancia de líneas hasta 50kV",
-          "Trate siempre las líneas como energizadas y peligrosas",
-          "Si ocurre contacto: quédese en la plataforma, llame al 911",
-          "El personal en tierra debe permanecer a 35+ pies de distancia",
-        ],
-        warning: "El contacto con líneas de energía es frecuentemente fatal. Mantenga distancias mínimas en todo momento.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Peligros Eléctricos y Líneas de Energía" },
+      { type: "heading", level: 2, text: "Peligros Eléctricos y Líneas de Energía" },
+      { type: "heading", level: 3, text: "Distancia Mínima de Líneas de Energía" },
+      { type: "paragraph", html: "OSHA requiere distancias mínimas de líneas de energía:" },
+      { type: "list", items: [
+        "<strong>Hasta 50kV:</strong> Mínimo 10 pies",
+        "<strong>50kV a 200kV:</strong> Mínimo 15 pies",
+        "<strong>200kV a 350kV:</strong> Mínimo 20 pies",
+        "<strong>350kV a 500kV:</strong> Mínimo 25 pies",
+      ] },
+      { type: "heading", level: 3, text: "Reglas de Seguridad con Líneas de Energía" },
+      { type: "paragraph", html: "Trate siempre las líneas de energía como <strong>energizadas y peligrosas</strong>. No confíe en el aislamiento. Use un <strong>vigilante</strong> si la pluma podría girar hacia las líneas. Tenga en cuenta el <strong>viento</strong>." },
+      { type: "scenario", title: "Decisión con Líneas de Energía",
+        prompt: "Le asignan reparar un letrero en la fachada de un edificio. Una línea de distribución de 25kV pasa a unos 12 pies del área de trabajo, y un viento con ráfagas está aumentando. ¿Qué hace?",
+        choices: [
+          { text: "Proceder con cuidado — 12 pies es más que el mínimo de 10 pies", correct: false, feedback: "El mínimo de 10 pies es un límite absoluto, no una meta. Con ráfagas empujando la plataforma y la posible deriva de la pluma, no puede garantizar la distancia. Deténgase y reevalúe con su supervisor." },
+          { text: "Detenerse y coordinar que la línea sea desenergizada, o reposicionarse para que la pluma no pueda alcanzar dentro de 10 pies — y usar un vigilante", correct: true, feedback: "Correcto. Trate cada línea como energizada. Con ráfagas de viento, elimine el peligro mediante la compañía eléctrica o posiciónese de modo que la plataforma físicamente no pueda entrar en la distancia mínima, con un vigilante observando." },
+          { text: "Amarrar la plataforma al edificio para que el viento no lo empuje hacia la línea", correct: false, feedback: "Nunca sujete la plataforma ni su línea de seguridad a nada fuera del MEWP. Eso crea un peligro de volcadura y caída — y no hace segura la distancia." },
+        ] },
+      { type: "heading", level: 3, text: "Si Ocurre Contacto" },
+      { type: "paragraph", html: "Si el MEWP contacta una línea de energía:" },
+      { type: "list", ordered: true, items: [
+        "<strong>Quédese en la plataforma</strong> — no intente saltar",
+        "Advierta a otros que se alejen",
+        "Llame a emergencias (911) y a la compañía eléctrica",
+        "Intente romper el contacto moviendo la pluma",
+        "No salga de la plataforma hasta que la línea sea desenergizada",
+      ] },
+      { type: "heading", level: 3, text: "Seguridad del Personal en Tierra" },
+      { type: "paragraph", html: "Si el MEWP está en contacto con una línea, el personal en tierra está en riesgo de electrocución por <strong>potencial de paso</strong>. Deben permanecer a al menos <strong>35 pies</strong> de distancia." },
+      { type: "callout", variant: "warning", text: "El contacto con líneas de energía es frecuentemente fatal. Mantenga distancias mínimas en todo momento." },
+      { type: "key_takeaways", items: [
+        "Mínimo 10 pies de distancia de líneas hasta 50kV",
+        "Trate siempre las líneas como energizadas y peligrosas",
+        "Si ocurre contacto: quédese en la plataforma, llame al 911",
+        "El personal en tierra debe permanecer a 35+ pies de distancia",
+      ] },
+    ]),
   },
   {
     module: "Peligros del Lugar de Trabajo y Seguridad Eléctrica",
     title: "Peligros Ambientales y del Lugar de Trabajo",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Peligros Ambientales y del Lugar de Trabajo",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Condiciones Climáticas", content: "<ul><li><strong>Viento:</strong> La mayoría de los MEWPs tienen una clasificación máxima de velocidad del viento (típicamente 28 mph). Nunca la exceda.</li><li><strong>Lluvia y hielo:</strong> Hacen las superficies resbalosas.</li><li><strong>Relámpagos:</strong> Nunca opere un MEWP durante una tormenta — la pluma actúa como pararrayos.</li><li><strong>Nieve y hielo:</strong> Añaden peso, reducen tracción.</li></ul>" },
-          { heading: "Condiciones de Superficie", content: "<p>Antes de operar, verifique: terreno blando, barro, capacidad del piso, hoyos cubiertos, pendientes, superficies mojadas.</p>" },
-          { heading: "Peligros Aéreos", content: "<p>Revise siempre peligros aéreos: líneas eléctricas, estructuras de edificios, puertas aéreas, ramas de árboles, objetos que caen.</p>" },
-          { heading: "Tráfico de Peatones", content: "<p>Use <strong>barricadas o cinta de precaución</strong>, publique <strong>señales de advertencia</strong>, use un <strong>vigilante</strong> en áreas de alto tráfico, toque la <strong>bocina</strong> al bajar o mover.</p>" },
-        ],
-        takeaways: [
-          "Nunca exceda la clasificación máxima de velocidad del viento del fabricante",
-          "Nunca opere un MEWP durante tormentas eléctricas",
-          "Revise condiciones de superficie para terreno blando y pendientes",
-          "Use barricadas y vigilantes para proteger peatones",
-        ],
-        warning: "Relámpagos + MEWP = peligro extremo. La pluma actúa como pararrayos. Nunca opere durante tormentas.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Peligros Ambientales y del Lugar de Trabajo" },
+      { type: "heading", level: 2, text: "Peligros Ambientales y del Lugar de Trabajo" },
+      { type: "heading", level: 3, text: "Condiciones Climáticas" },
+      { type: "list", items: [
+        "<strong>Viento:</strong> La mayoría de los MEWPs tienen una clasificación máxima de velocidad del viento (típicamente 28 mph). Nunca la exceda.",
+        "<strong>Lluvia y hielo:</strong> Hacen las superficies resbalosas.",
+        "<strong>Relámpagos:</strong> Nunca opere un MEWP durante una tormenta — la pluma actúa como pararrayos.",
+        "<strong>Nieve y hielo:</strong> Añaden peso, reducen tracción.",
+      ] },
+      { type: "embedded_quiz", title: "Verificación del Clima", questions: [
+        { question: "El viento en el sitio aumenta a 30 mph. La clasificación máxima de viento de su MEWP es 28 mph. ¿Qué debe hacer?", type: "mcq_single", options: ["Continuar — 2 mph sobre el límite es insignificante", "Bajar la plataforma y detener el trabajo elevado hasta que baje el viento", "Subir la plataforma más lento de lo normal", "Agregar peso a la plataforma para estabilidad"], correctAnswers: "Bajar la plataforma y detener el trabajo elevado hasta que baje el viento", explanation: "Nunca exceda la clasificación de viento del fabricante. La fuerza del viento aumenta con la altura — baje la plataforma y espere a que mejoren las condiciones." },
+        { question: "Una tormenta eléctrica se acerca a su sitio de trabajo exterior. Usted debe:", type: "mcq_single", options: ["Seguir trabajando hasta que empiece la lluvia", "Bajar la plataforma, detener el trabajo y buscar refugio", "Trabajar más rápido para terminar la tarea", "Elevarse por encima de los árboles para ver mejor"], correctAnswers: "Bajar la plataforma, detener el trabajo y buscar refugio", explanation: "Nunca opere un MEWP durante relámpagos — la pluma puede actuar como pararrayos. Detenga el trabajo antes de que llegue la tormenta." },
+      ] },
+      { type: "heading", level: 3, text: "Condiciones de Superficie" },
+      { type: "paragraph", html: "Antes de operar, verifique: terreno blando, barro, capacidad del piso, hoyos cubiertos, pendientes, superficies mojadas." },
+      { type: "heading", level: 3, text: "Peligros Aéreos" },
+      { type: "paragraph", html: "Revise siempre peligros aéreos: líneas eléctricas, estructuras de edificios, puertas aéreas, ramas de árboles, objetos que caen." },
+      { type: "heading", level: 3, text: "Tráfico de Peatones" },
+      { type: "paragraph", html: "Use <strong>barricadas o cinta de precaución</strong>, publique <strong>señales de advertencia</strong>, use un <strong>vigilante</strong> en áreas de alto tráfico, toque la <strong>bocina</strong> al bajar o mover." },
+      { type: "callout", variant: "warning", text: "Relámpagos + MEWP = peligro extremo. La pluma actúa como pararrayos. Nunca opere durante tormentas." },
+      { type: "key_takeaways", items: [
+        "Nunca exceda la clasificación máxima de velocidad del viento del fabricante",
+        "Nunca opere un MEWP durante tormentas eléctricas",
+        "Revise condiciones de superficie para terreno blando y pendientes",
+        "Use barricadas y vigilantes para proteger peatones",
+      ] },
+    ]),
   },
   {
     module: "Peligros del Lugar de Trabajo y Seguridad Eléctrica",
@@ -449,50 +604,50 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Controles de Emergencia y Descenso",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Controles de Emergencia y Descenso",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Sistema de Descenso de Emergencia", content: "<p>Todos los MEWPs están equipados con <strong>sistemas de descenso de emergencia</strong> que permiten bajar la plataforma desde el suelo si el operador está incapacitado o los controles superiores fallan. Conozca dónde están estos controles antes de operar.</p>" },
-          { heading: "Anulación de Controles Inferiores", content: "<p>Según OSHA 1926.453(b)(2)(iii), los controles inferiores deben poder <strong>anular los controles superiores</strong>. Esto permite que una persona en el suelo baje la plataforma en una emergencia.</p>" },
-          { heading: "Parada de Emergencia", content: "<p>Todos los MEWPs tienen <strong>botones de parada de emergencia</strong> en ambas estaciones de control. Presionar el botón detiene inmediatamente todas las funciones. Debe restablecerse manualmente.</p>" },
-          { heading: "Falla de Energía", content: "<p>Si se pierde energía mientras la plataforma está elevada: no entre en pánico, use la <strong>válvula manual de descenso</strong>, llame para asistencia si no puede bajar.</p>" },
-        ],
-        takeaways: [
-          "Conozca la ubicación de los controles de descenso de emergencia",
-          "Los controles inferiores pueden anular los superiores",
-          "Los botones de parada están en ambas estaciones",
-          "Si falla la energía, use sistemas de descenso manual",
-        ],
-        tip: "Antes de operar, localice y pruebe todos los controles de emergencia.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Controles de Emergencia y Descenso" },
+      { type: "heading", level: 2, text: "Controles de Emergencia y Descenso" },
+      { type: "heading", level: 3, text: "Sistema de Descenso de Emergencia" },
+      { type: "paragraph", html: "Todos los MEWPs están equipados con <strong>sistemas de descenso de emergencia</strong> que permiten bajar la plataforma desde el suelo si el operador está incapacitado o los controles superiores fallan. Conozca dónde están estos controles antes de operar." },
+      { type: "heading", level: 3, text: "Anulación de Controles Inferiores" },
+      { type: "paragraph", html: "Según OSHA 1926.453(b)(2)(iii), los controles inferiores deben poder <strong>anular los controles superiores</strong>. Esto permite que una persona en el suelo baje la plataforma en una emergencia." },
+      { type: "heading", level: 3, text: "Parada de Emergencia" },
+      { type: "paragraph", html: "Todos los MEWPs tienen <strong>botones de parada de emergencia</strong> en ambas estaciones de control. Presionar el botón detiene inmediatamente todas las funciones. Debe restablecerse manualmente." },
+      { type: "heading", level: 3, text: "Falla de Energía" },
+      { type: "paragraph", html: "Si se pierde energía mientras la plataforma está elevada: no entre en pánico, use la <strong>válvula manual de descenso</strong>, llame para asistencia si no puede bajar." },
+      { type: "callout", variant: "tip", text: "Antes de operar, localice y pruebe todos los controles de emergencia." },
+      { type: "key_takeaways", items: [
+        "Conozca la ubicación de los controles de descenso de emergencia",
+        "Los controles inferiores pueden anular los superiores",
+        "Los botones de parada están en ambas estaciones",
+        "Si falla la energía, use sistemas de descenso manual",
+      ] },
+    ]),
   },
   {
     module: "Procedimientos de Emergencia y Rescate",
     title: "Planificación y Procedimientos de Rescate",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Planificación y Procedimientos de Rescate",
-        image: img("pedestrian-safety.svg"),
-        sections: [
-          { heading: "Requisitos de Rescate ANSI A92.22", content: "<p>ANSI A92.22 requiere que se desarrolle un <strong>plan de rescate</strong> antes del uso del MEWP. Debe abordar cómo se recuperará a un operador si no puede operar los controles.</p>" },
-          { heading: "Componentes del Plan", content: "<p>Identificación de <strong>personal de rescate capacitado</strong>, ubicación de controles inferiores, acceso a un <strong>MEWP secundario</strong>, números de contacto de emergencia.</p>" },
-          { heading: "Si el Operador Está Incapacitado", content: "<p>Use los <strong>controles inferiores</strong> para bajar la plataforma. Si fallan, use la <strong>válvula de descenso de emergencia</strong>. Si no puede bajar, use un <strong>MEWP secundario</strong>. Llame al <strong>911</strong>.</p>" },
-          { heading: "Respuesta a Volcadura", content: "<p><strong>Quédese en la plataforma</strong> — no salte. Brácese y sujete las barandillas. Pida ayuda. Busque evaluación médica.</p>" },
-        ],
-        takeaways: [
-          "ANSI A92.22 requiere un plan de rescate antes del uso del MEWP",
-          "Identifique personal de rescate capacitado antes de comenzar",
-          "Use controles inferiores o descenso de emergencia para rescatar",
-          "En una volcadura, quédese en la plataforma y no salte",
-        ],
-        warning: "Nunca intente escalar la pluma o el mecanismo de tijera para rescatar a alguien.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pedestrian-safety.svg"), alt: "Planificación y Procedimientos de Rescate" },
+      { type: "heading", level: 2, text: "Planificación y Procedimientos de Rescate" },
+      { type: "heading", level: 3, text: "Requisitos de Rescate ANSI A92.22" },
+      { type: "paragraph", html: "ANSI A92.22 requiere que se desarrolle un <strong>plan de rescate</strong> antes del uso del MEWP. Debe abordar cómo se recuperará a un operador si no puede operar los controles." },
+      { type: "heading", level: 3, text: "Componentes del Plan" },
+      { type: "paragraph", html: "Identificación de <strong>personal de rescate capacitado</strong>, ubicación de controles inferiores, acceso a un <strong>MEWP secundario</strong>, números de contacto de emergencia." },
+      { type: "heading", level: 3, text: "Si el Operador Está Incapacitado" },
+      { type: "paragraph", html: "Use los <strong>controles inferiores</strong> para bajar la plataforma. Si fallan, use la <strong>válvula de descenso de emergencia</strong>. Si no puede bajar, use un <strong>MEWP secundario</strong>. Llame al <strong>911</strong>." },
+      { type: "heading", level: 3, text: "Respuesta a Volcadura" },
+      { type: "paragraph", html: "<strong>Quédese en la plataforma</strong> — no salte. Brácese y sujete las barandillas. Pida ayuda. Busque evaluación médica." },
+      { type: "callout", variant: "warning", text: "Nunca intente escalar la pluma o el mecanismo de tijera para rescatar a alguien." },
+      { type: "key_takeaways", items: [
+        "ANSI A92.22 requiere un plan de rescate antes del uso del MEWP",
+        "Identifique personal de rescate capacitado antes de comenzar",
+        "Use controles inferiores o descenso de emergencia para rescatar",
+        "En una volcadura, quédese en la plataforma y no salte",
+      ] },
+    ]),
   },
   {
     module: "Procedimientos de Emergencia y Rescate",
@@ -544,23 +699,22 @@ export const COURSE_STEPS_ES: StepDef[] = [
     title: "Felicitaciones: ¿Qué Sigue?",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "¡Está Certificado! ¿Qué Sigue?",
-        image: img("aerial-lift-hero.svg"),
-        sections: [
-          { heading: "Su Certificado", content: "<p>¡Felicitaciones por completar la porción de instrucción formal de su certificación de operador de elevadores aéreos y de tijera! Su certificado digital está disponible para descargar con número único y código QR.</p>" },
-          { heading: "Siguiente Paso: Evaluación Práctica", content: "<p>Su empleador debe completar la <strong>capacitación práctica y evaluación</strong> en el equipo específico. Comparta el paquete de documentación con su supervisor.</p>" },
-          { heading: "Manténgase Seguro", content: "<p>Continúe siguiendo procedimientos de operación segura. Si necesita repaso, puede volver a este curso en cualquier momento.</p>" },
-        ],
-        takeaways: [
-          "Descargue su certificado",
-          "Comparta el paquete del empleador para evaluación práctica",
-          "Su empleador debe proporcionar capacitación específica al equipo",
-          "La re-evaluación es requerida al menos cada 3 años",
-        ],
-        tip: "Guarde el enlace de su página de verificación para verificación instantánea.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "¡Está Certificado! ¿Qué Sigue?" },
+      { type: "heading", level: 2, text: "¡Está Certificado! ¿Qué Sigue?" },
+      { type: "heading", level: 3, text: "Su Certificado" },
+      { type: "paragraph", html: "¡Felicitaciones por completar la porción de instrucción formal de su certificación de operador de elevadores aéreos y de tijera! Su certificado digital está disponible para descargar con número único y código QR." },
+      { type: "heading", level: 3, text: "Siguiente Paso: Evaluación Práctica" },
+      { type: "paragraph", html: "Su empleador debe completar la <strong>capacitación práctica y evaluación</strong> en el equipo específico. Comparta el paquete de documentación con su supervisor." },
+      { type: "heading", level: 3, text: "Manténgase Seguro" },
+      { type: "paragraph", html: "Continúe siguiendo procedimientos de operación segura. Si necesita repaso, puede volver a este curso en cualquier momento." },
+      { type: "callout", variant: "tip", text: "Guarde el enlace de su página de verificación para verificación instantánea." },
+      { type: "key_takeaways", items: [
+        "Descargue su certificado",
+        "Comparta el paquete del empleador para evaluación práctica",
+        "Su empleador debe proporcionar capacitación específica al equipo",
+        "La re-evaluación es requerida al menos cada 3 años",
+      ] },
+    ]),
   },
 ];

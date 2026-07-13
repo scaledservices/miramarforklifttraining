@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <!-- back wall -->
+  <rect width="800" height="450" fill="#ece6dc"/>
+  <rect x="0" y="0" width="800" height="24" fill="#ded6c7"/>
+  <g stroke="#dfd8cb" stroke-width="3">
+    <line x1="120" y1="24" x2="120" y2="340"/>
+    <line x1="300" y1="24" x2="300" y2="340"/>
+    <line x1="460" y1="24" x2="460" y2="340"/>
+  </g>
+  <!-- faint racking on back wall, left -->
+  <g>
+    <rect x="30" y="120" width="10" height="220" fill="#d3c9b8"/>
+    <rect x="150" y="120" width="10" height="220" fill="#d3c9b8"/>
+    <rect x="270" y="120" width="10" height="220" fill="#d3c9b8"/>
+    <rect x="30" y="200" width="250" height="8" fill="#cfc5b3"/>
+    <rect x="30" y="290" width="250" height="8" fill="#cfc5b3"/>
+    <rect x="44" y="228" width="44" height="62" fill="#e4d6bd"/>
+    <rect x="94" y="242" width="40" height="48" fill="#ddccae"/>
+    <rect x="170" y="234" width="44" height="56" fill="#e4d6bd"/>
+    <rect x="220" y="246" width="38" height="44" fill="#ddccae"/>
+    <rect x="46" y="132" width="42" height="60" fill="#e4d6bd"/>
+    <rect x="176" y="140" width="40" height="52" fill="#ddccae"/>
+  </g>
+  <!-- ceiling lights -->
+  <g>
+    <line x1="180" y1="0" x2="180" y2="16" stroke="#b8ad9c" stroke-width="3"/>
+    <rect x="130" y="16" width="100" height="12" rx="3" fill="#efe9dd" stroke="#b8ad9c" stroke-width="2"/>
+    <rect x="134" y="24" width="92" height="4" fill="#ffe9a8"/>
+    <line x1="430" y1="0" x2="430" y2="16" stroke="#b8ad9c" stroke-width="3"/>
+    <rect x="380" y="16" width="100" height="12" rx="3" fill="#efe9dd" stroke="#b8ad9c" stroke-width="2"/>
+    <rect x="384" y="24" width="92" height="4" fill="#ffe9a8"/>
+  </g>
+
+  <!-- corner wall (right, protruding) -->
+  <rect x="586" y="0" width="214" height="340" fill="#dfd8cb"/>
+  <rect x="586" y="0" width="10" height="340" fill="#c9c0ae"/>
+  <line x1="586" y1="0" x2="586" y2="340" stroke="#b8ad9c" stroke-width="2.5"/>
+  <rect x="586" y="0" width="214" height="22" fill="#cfc5b3"/>
+  <!-- doorway in corner wall where walkway leads -->
+  <rect x="640" y="120" width="96" height="220" fill="#c4bbaa"/>
+  <rect x="648" y="128" width="80" height="212" fill="#b3a894"/>
+
+  <!-- floor -->
+  <rect x="0" y="340" width="800" height="110" fill="#d8d2c6"/>
+  <line x1="0" y1="340" x2="800" y2="340" stroke="#c2bbad" stroke-width="2"/>
+  <line x1="0" y1="392" x2="800" y2="392" stroke="#c9c2b4" stroke-width="1.5"/>
+  <line x1="80" y1="340" x2="60" y2="450" stroke="#c9c2b4" stroke-width="1.5"/>
+  <line x1="330" y1="340" x2="316" y2="450" stroke="#c9c2b4" stroke-width="1.5"/>
+
+  <!-- pedestrian walkway with green stripes -->
+  <polygon points="646,340 730,340 790,450 600,450" fill="#e3ddd0"/>
+  <polygon points="646,340 657,340 623,450 600,450" fill="#019E7C"/>
+  <polygon points="719,340 730,340 790,450 766,450" fill="#019E7C"/>
+  <g fill="#2aab8c">
+    <polygon points="641,352 736,352 744,366 635,366"/>
+    <polygon points="628,384 754,384 763,400 621,400"/>
+    <polygon points="613,420 774,420 783,438 605,438"/>
+  </g>
+
+  <!-- stop line before crossing -->
+  <polygon points="524,396 538,396 560,450 546,450" fill="#e6b800"/>
+
+  <!-- convex safety mirror on the corner -->
+  <rect x="586" y="66" width="12" height="26" rx="2" fill="#2b2b2b"/>
+  <path d="M590,78 L562,94" stroke="#3d3d3d" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="550" cy="100" r="31" fill="#FF7F00" stroke="#1a1a1a" stroke-width="2.5"/>
+  <circle cx="550" cy="100" r="24" fill="#cfd8dc" stroke="#1a1a1a" stroke-width="1.5"/>
+  <path d="M534,92 Q542,80 556,82" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+  <rect x="538" y="104" width="14" height="7" rx="2" fill="#FFC326"/>
+  <path d="M562,102 L562,112" stroke="#FF7F00" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="562" cy="97" r="4" fill="#e8b06a"/>
+
+  <!-- ================= FORKLIFT (stopped, yielding) ================= -->
+  <g transform="translate(48,152) scale(0.62)">
+    <ellipse cx="400" cy="404" rx="270" ry="16" fill="rgba(0,0,0,0.12)"/>
+    <path d="M150,350 L150,300 Q150,285 165,285 L230,285 L230,350 Z" fill="#e0a800" stroke="#1a1a1a" stroke-width="2.5"/>
+    <rect x="200" y="290" width="200" height="60" rx="8" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+    <rect x="240" y="196" width="13" height="48" rx="5" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="248" y="238" width="54" height="14" rx="5" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- operator -->
+    <path d="M270,244 L318,250 L330,280" fill="none" stroke="#3f4652" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M254,244 Q250,196 280,184 L302,188 Q312,216 306,246 Z" fill="#FF7F00" stroke="#1a1a1a" stroke-width="2"/>
+    <path d="M266,240 Q264,204 282,190" fill="none" stroke="#ffe14d" stroke-width="5"/>
+    <path d="M300,196 L296,242" stroke="#2b2b2b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M296,202 L318,226" stroke="#e06f00" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="320" cy="228" r="5" fill="#f1c27d"/>
+    <circle cx="290" cy="166" r="12" fill="#f1c27d"/>
+    <path d="M277,164 Q277,148 290,148 Q304,148 304,164 Z" fill="#FFC326" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="273" y="161" width="35" height="5" rx="2" fill="#e0a800" stroke="#1a1a1a" stroke-width="1.5"/>
+    <!-- hood -->
+    <path d="M330,290 L330,255 Q330,248 337,248 L392,248 Q400,248 400,258 L400,290 Z" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+    <path d="M340,250 L322,232" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="318" cy="228" r="9" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+    <!-- wheels -->
+    <circle cx="370" cy="352" r="48" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="370" cy="352" r="22" fill="#8a8378"/>
+    <circle cx="370" cy="352" r="8" fill="#4a4540"/>
+    <circle cx="212" cy="364" r="36" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="212" cy="364" r="16" fill="#8a8378"/>
+    <circle cx="212" cy="364" r="6" fill="#4a4540"/>
+    <!-- guard -->
+    <line x1="222" y1="290" x2="228" y2="148" stroke="#3d3d3d" stroke-width="9" stroke-linecap="round"/>
+    <line x1="352" y1="252" x2="342" y2="148" stroke="#3d3d3d" stroke-width="9" stroke-linecap="round"/>
+    <rect x="212" y="136" width="146" height="12" rx="5" fill="#3d3d3d"/>
+    <!-- mast + carriage lowered -->
+    <rect x="398" y="300" width="38" height="26" rx="4" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="432" y="118" width="13" height="274" fill="#555" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="455" y="118" width="13" height="274" fill="#6b6b6b" stroke="#1a1a1a" stroke-width="2"/>
+    <g stroke="#1a1a1a" stroke-width="2" fill="#555">
+      <rect x="432" y="150" width="36" height="8"/>
+      <rect x="432" y="230" width="36" height="8"/>
+      <rect x="432" y="310" width="36" height="8"/>
+    </g>
+    <line x1="474" y1="130" x2="474" y2="240" stroke="#8a8378" stroke-width="3" stroke-dasharray="4 3"/>
+    <g stroke="#1a1a1a" stroke-width="2">
+      <rect x="478" y="228" width="12" height="152" fill="#777"/>
+      <line x1="478" y1="256" x2="490" y2="256"/>
+      <line x1="478" y1="284" x2="490" y2="284"/>
+      <line x1="478" y1="312" x2="490" y2="312"/>
+      <line x1="478" y1="340" x2="490" y2="340"/>
+    </g>
+    <path d="M490,262 L502,262 L502,384 L664,384 L664,396 L490,396 Z" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+  </g>
+
+  <!-- ================= PEDESTRIAN in walkway ================= -->
+  <g transform="translate(46,0)">
+    <ellipse cx="644" cy="424" rx="30" ry="6" fill="rgba(0,0,0,0.13)"/>
+    <!-- legs mid-stride (front view) -->
+    <path d="M636,378 L628,418" stroke="#3f4652" stroke-width="12" stroke-linecap="round"/>
+    <path d="M652,378 L660,412" stroke="#333a45" stroke-width="12" stroke-linecap="round"/>
+    <rect x="620" y="414" width="17" height="8" rx="3" fill="#2b2b2b"/>
+    <rect x="654" y="408" width="17" height="8" rx="3" fill="#2b2b2b"/>
+    <!-- torso vest -->
+    <path d="M628,332 L660,332 Q668,356 664,384 L624,384 Q620,356 628,332 Z" fill="#FF7F00" stroke="#1a1a1a" stroke-width="2"/>
+    <line x1="636" y1="334" x2="633" y2="382" stroke="#ffe14d" stroke-width="5"/>
+    <line x1="653" y1="334" x2="656" y2="382" stroke="#ffe14d" stroke-width="5"/>
+    <!-- arms swinging -->
+    <path d="M628,340 L616,372" stroke="#5a6470" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="614" cy="377" r="5.5" fill="#c68642"/>
+    <path d="M660,340 L674,366" stroke="#5a6470" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="676" cy="371" r="5.5" fill="#c68642"/>
+    <!-- head -->
+    <circle cx="644" cy="316" r="13" fill="#c68642"/>
+    <path d="M630,313 Q630,296 644,296 Q659,296 659,313 Z" fill="#ffffff" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="626" y="309" width="37" height="6" rx="3" fill="#e8e4dc" stroke="#1a1a1a" stroke-width="1.5"/>
+  </g>
+</svg>

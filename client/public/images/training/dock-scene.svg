@@ -25,9 +25,6 @@
   <rect x="0" y="400" width="800" height="50" fill="#e8e2d8"/>
   <line x1="0" y1="400" x2="800" y2="400" stroke="#b8ad9c" stroke-width="2"/>
 
-  <text x="30" y="42" font-size="22" font-weight="700" fill="#4f3b3b">Loading Dock Safety</text>
-  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
-
   <!-- ===== warehouse floor slab (right) ===== -->
   <rect x="490" y="300" width="310" height="100" fill="#cfc8ba" stroke="#1a1a1a" stroke-width="2"/>
   <!-- dock bumper on face -->
@@ -73,32 +70,5 @@
     <line x1="464" y1="303.9" x2="458" y2="308.3"/>
     <line x1="478" y1="303.0" x2="472" y2="307.4"/>
     <line x1="492" y1="302.1" x2="486" y2="306.5"/>
-  </g>
-
-  <!-- trailer creep arrow (moving away from dock) -->
-  <line x1="486" y1="352" x2="462" y2="352" stroke="#FF7F00" stroke-width="3.5"/>
-  <polygon points="452,352 464,346 464,358" fill="#FF7F00"/>
-
-  <!-- ===== labels ===== -->
-  <g font-size="15" font-weight="600" fill="#1a1a1a">
-    <!-- dock plate -->
-    <circle cx="460" cy="303" r="3.5" fill="#FF7F00"/>
-    <line x1="460" y1="303" x2="560" y2="228" stroke="#4f3b3b" stroke-width="1.5"/>
-    <text x="566" y="224">Dock plate secured</text>
-
-    <!-- dock edge -->
-    <circle cx="497" cy="300" r="3.5" fill="#FF7F00"/>
-    <line x1="497" y1="300" x2="585" y2="264" stroke="#4f3b3b" stroke-width="1.5"/>
-    <text x="590" y="268">Dock edge — 4 ft drop</text>
-
-    <!-- wheel chocks -->
-    <circle cx="212" cy="392" r="3.5" fill="#FF7F00"/>
-    <line x1="212" y1="392" x2="180" y2="424" stroke="#4f3b3b" stroke-width="1.5"/>
-    <text x="30" y="440">Wheel chocks in place</text>
-
-    <!-- trailer creep gap -->
-    <circle cx="470" cy="366" r="3.5" fill="#FF7F00"/>
-    <line x1="470" y1="366" x2="470" y2="424" stroke="#4f3b3b" stroke-width="1.5"/>
-    <text x="470" y="441" text-anchor="middle">Trailer creep gap</text>
   </g>
 </svg>

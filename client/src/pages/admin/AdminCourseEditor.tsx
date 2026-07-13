@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, GripVertical, ArrowUp, ArrowDown, Save } from "lucide-react";
+import LessonBlocksEditor from "./LessonBlocksEditor";
 
 interface CourseData {
   id?: number;
@@ -31,7 +32,7 @@ interface StepData {
   courseId?: number;
   stepOrder: number;
   title: string;
-  type: "content" | "video" | "exam";
+  type: "content" | "lesson" | "video" | "exam" | "checkpoint" | "download";
   config: any;
   estimatedMinutes: number | null;
 }
@@ -418,7 +419,7 @@ export default function AdminCourseEditor() {
                           >
                             Edit
                           </Button>
-                          {step.type === "exam" && step.id && (
+                          {(step.type === "exam" || step.type === "checkpoint") && step.id && (
                             <Button
                               size="sm"
                               variant="outline"
@@ -498,7 +499,7 @@ export default function AdminCourseEditor() {
       </div>
 
       <Dialog open={stepDialogOpen} onOpenChange={(open) => { if (!open) { setStepDialogOpen(false); setEditingStep(null); } }}>
-        <DialogContent>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingStep?.id ? "Edit Step" : "New Step"}</DialogTitle>
           </DialogHeader>
@@ -516,7 +517,7 @@ export default function AdminCourseEditor() {
                 <Label>Type</Label>
                 <Select
                   value={editingStep.type}
-                  onValueChange={(val: "content" | "video" | "exam") =>
+                  onValueChange={(val: StepData["type"]) =>
                     setEditingStep({ ...editingStep, type: val })
                   }
                 >
@@ -525,7 +526,10 @@ export default function AdminCourseEditor() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="content">Content</SelectItem>
+                    <SelectItem value="lesson">Lesson</SelectItem>
                     <SelectItem value="video">Video</SelectItem>
+                    <SelectItem value="checkpoint">Checkpoint</SelectItem>
+                    <SelectItem value="download">Download</SelectItem>
                     <SelectItem value="exam">Exam</SelectItem>
                   </SelectContent>
                 </Select>
@@ -555,6 +559,12 @@ export default function AdminCourseEditor() {
                   data-testid="input-step-minutes"
                 />
               </div>
+              {(editingStep.type === "content" || editingStep.type === "lesson") && (
+                <LessonBlocksEditor
+                  value={editingStep.config || {}}
+                  onChange={(config) => setEditingStep({ ...editingStep, config })}
+                />
+              )}
             </div>
           )}
           <DialogFooter>

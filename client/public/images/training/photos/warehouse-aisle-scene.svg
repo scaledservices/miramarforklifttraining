@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 450">
+  <!-- backdrop / ceiling -->
+  <rect width="800" height="450" fill="#f2ede4"/>
+
+  <!-- far wall -->
+  <rect x="322" y="158" width="156" height="134" fill="#e6dfd2"/>
+  <line x1="322" y1="158" x2="478" y2="158" stroke="#d4cbbb" stroke-width="2"/>
+
+  <!-- bright loading door at far end -->
+  <rect x="360" y="170" width="80" height="122" fill="#b8ad9c"/>
+  <rect x="364" y="174" width="72" height="118" fill="#fff3d0"/>
+  <rect x="364" y="174" width="72" height="60" fill="#fdf6de"/>
+  <rect x="364" y="252" width="72" height="40" fill="#f3e6c2"/>
+
+  <!-- floor -->
+  <rect x="0" y="290" width="800" height="160" fill="#cfc9bc"/>
+  <polygon points="100,450 370,290 430,290 700,450" fill="#dbd5c8"/>
+  <!-- light spilling from door -->
+  <polygon points="364,292 436,292 520,450 280,450" fill="rgba(255,240,190,0.30)"/>
+  <!-- floor joint lines across aisle -->
+  <g stroke="#c2bbad" stroke-width="2">
+    <line x1="303" y1="330" x2="497" y2="330"/>
+    <line x1="227" y1="375" x2="573" y2="375"/>
+    <line x1="151" y1="420" x2="649" y2="420"/>
+  </g>
+  <!-- yellow lane markings -->
+  <polygon points="143,450 159,450 380,293 375,293" fill="#e6b800"/>
+  <polygon points="641,450 657,450 425,293 420,293" fill="#e6b800"/>
+
+  <!-- ================= LEFT RACKING ================= -->
+  <g id="lracks">
+    <!-- rack C (far) -->
+    <g>
+      <rect x="254" y="308" width="72" height="8" fill="rgba(0,0,0,0.10)"/>
+      <rect x="254" y="162" width="6" height="152" fill="#8b7a6d"/>
+      <rect x="318" y="162" width="6" height="152" fill="#8b7a6d"/>
+      <rect x="254" y="212" width="70" height="6" fill="#96857a"/>
+      <rect x="254" y="262" width="70" height="6" fill="#96857a"/>
+      <rect x="260" y="272" width="26" height="38" fill="#ddc7a8"/>
+      <rect x="290" y="282" width="26" height="28" fill="#d1b18b"/>
+      <rect x="262" y="226" width="28" height="34" fill="#d1b18b"/>
+      <rect x="294" y="234" width="22" height="26" fill="#ddc7a8"/>
+      <rect x="262" y="176" width="24" height="34" fill="#ddc7a8"/>
+      <rect x="290" y="184" width="26" height="26" fill="#d8bd97"/>
+    </g>
+    <!-- rack B (mid) -->
+    <g>
+      <rect x="170" y="356" width="84" height="9" fill="rgba(0,0,0,0.11)"/>
+      <rect x="170" y="118" width="9" height="242" fill="#5f4c43"/>
+      <rect x="244" y="118" width="9" height="242" fill="#5f4c43"/>
+      <rect x="170" y="196" width="83" height="8" fill="#77655a"/>
+      <rect x="170" y="278" width="83" height="8" fill="#77655a"/>
+      <rect x="180" y="346" width="60" height="9" fill="#b98f60"/>
+      <rect x="182" y="300" width="34" height="46" fill="#d6ba93"/>
+      <rect x="219" y="312" width="26" height="34" fill="#c39a70"/>
+      <rect x="180" y="268" width="62" height="9" fill="#b98f60"/>
+      <rect x="182" y="222" width="30" height="46" fill="#c39a70"/>
+      <rect x="215" y="232" width="28" height="36" fill="#d6ba93"/>
+      <rect x="182" y="140" width="32" height="52" fill="#d6ba93"/>
+      <rect x="217" y="152" width="26" height="40" fill="#cdaa80"/>
+    </g>
+    <!-- rack A (near) -->
+    <g>
+      <rect x="-28" y="426" width="210" height="10" fill="rgba(0,0,0,0.12)"/>
+      <rect x="-28" y="58" width="13" height="372" fill="#4f3b3b"/>
+      <rect x="76" y="58" width="13" height="372" fill="#4f3b3b"/>
+      <rect x="158" y="58" width="13" height="372" fill="#4f3b3b"/>
+      <line x1="-15" y1="120" x2="76" y2="200" stroke="#6b5a4e" stroke-width="4"/>
+      <line x1="-15" y1="230" x2="76" y2="310" stroke="#6b5a4e" stroke-width="4"/>
+      <rect x="-28" y="152" width="199" height="11" fill="#6b5a4e"/>
+      <rect x="-28" y="246" width="199" height="11" fill="#6b5a4e"/>
+      <rect x="-28" y="338" width="199" height="11" fill="#6b5a4e"/>
+      <!-- floor level -->
+      <rect x="-12" y="414" width="152" height="13" fill="#a67c4f"/>
+      <rect x="-6" y="356" width="72" height="58" fill="#c9a26b"/>
+      <line x1="30" y1="356" x2="30" y2="414" stroke="#b18a52" stroke-width="3"/>
+      <rect x="72" y="370" width="62" height="44" fill="#b8895a"/>
+      <!-- level 2 -->
+      <rect x="-12" y="326" width="152" height="11" fill="#a67c4f"/>
+      <rect x="-8" y="270" width="66" height="56" fill="#d4b183"/>
+      <line x1="25" y1="270" x2="25" y2="326" stroke="#bd9a68" stroke-width="3"/>
+      <rect x="62" y="282" width="72" height="44" fill="#b8895a"/>
+      <!-- level 3 -->
+      <rect x="-12" y="234" width="152" height="11" fill="#a67c4f"/>
+      <rect x="0" y="180" width="58" height="54" fill="#c9a26b"/>
+      <rect x="62" y="190" width="58" height="44" fill="#cdb08a"/>
+      <!-- level 4 -->
+      <rect x="-8" y="96" width="62" height="54" fill="#c9a26b"/>
+      <rect x="58" y="108" width="54" height="42" fill="#d4b183"/>
+    </g>
+  </g>
+  <!-- ================= RIGHT RACKING (mirror) ================= -->
+  <use href="#lracks" xlink:href="#lracks" transform="translate(800,0) scale(-1,1)"/>
+
+  <!-- pallet on floor near right rack -->
+  <g>
+    <ellipse cx="622" cy="428" rx="52" ry="8" fill="rgba(0,0,0,0.12)"/>
+    <rect x="580" y="414" width="84" height="11" fill="#a67c4f"/>
+    <rect x="586" y="376" width="42" height="38" fill="#c9a26b"/>
+    <rect x="630" y="386" width="30" height="28" fill="#b8895a"/>
+    <line x1="607" y1="376" x2="607" y2="414" stroke="#b18a52" stroke-width="2.5"/>
+  </g>
+
+  <!-- ceiling lights, receding rows -->
+  <g>
+    <line x1="252" y1="0" x2="252" y2="62" stroke="#b8ad9c" stroke-width="4"/>
+    <line x1="548" y1="0" x2="548" y2="62" stroke="#b8ad9c" stroke-width="4"/>
+    <rect x="198" y="62" width="108" height="14" rx="3" fill="#efe9dd" stroke="#b8ad9c" stroke-width="2"/>
+    <rect x="494" y="62" width="108" height="14" rx="3" fill="#efe9dd" stroke="#b8ad9c" stroke-width="2"/>
+    <rect x="202" y="72" width="100" height="5" fill="#ffe9a8"/>
+    <rect x="498" y="72" width="100" height="5" fill="#ffe9a8"/>
+    <line x1="330" y1="0" x2="330" y2="126" stroke="#c4baa9" stroke-width="3"/>
+    <line x1="470" y1="0" x2="470" y2="126" stroke="#c4baa9" stroke-width="3"/>
+    <rect x="298" y="126" width="66" height="10" rx="2" fill="#efe9dd" stroke="#b8ad9c" stroke-width="1.5"/>
+    <rect x="436" y="126" width="66" height="10" rx="2" fill="#efe9dd" stroke="#b8ad9c" stroke-width="1.5"/>
+    <rect x="301" y="133" width="60" height="3.5" fill="#ffe9a8"/>
+    <rect x="439" y="133" width="60" height="3.5" fill="#ffe9a8"/>
+    <rect x="352" y="158" width="38" height="7" rx="2" fill="#efe9dd" stroke="#b8ad9c" stroke-width="1"/>
+    <rect x="410" y="158" width="38" height="7" rx="2" fill="#efe9dd" stroke="#b8ad9c" stroke-width="1"/>
+  </g>
+</svg>

@@ -1,12 +1,70 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#bf360c;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1"/>
-    </linearGradient>
-  </defs>
-  <rect width="800" height="400" fill="url(#bg)" rx="8"/>
-  <text x="400" y="180" fill="white" font-size="42" font-family="Arial,sans-serif" text-anchor="middle" font-weight="bold">🧤</text>
-  <text x="400" y="240" fill="white" font-size="24" font-family="Arial,sans-serif" text-anchor="middle">PPE &amp; Safety Equipment</text>
-  <text x="400" y="280" fill="rgba(255,255,255,0.6)" font-size="14" font-family="Arial,sans-serif" text-anchor="middle">ForkliftCertified.training</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Roboto, Arial, sans-serif">
+  <rect width="800" height="450" fill="#faf8f5"/>
+
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#4f3b3b">Required PPE</text>
+  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
+
+  <!-- ground line -->
+  <line x1="210" y1="376" x2="420" y2="376" stroke="#d8cfc2" stroke-width="3"/>
+
+  <!-- Worker figure -->
+  <g>
+    <!-- arms -->
+    <rect x="232" y="158" width="24" height="88" rx="11" fill="#7d8fa3" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="344" y="158" width="24" height="88" rx="11" fill="#7d8fa3" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- gloves -->
+    <circle cx="244" cy="254" r="12" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+    <circle cx="356" cy="254" r="12" fill="#4f3b3b" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- legs -->
+    <rect x="272" y="256" width="25" height="100" fill="#3f4c5e" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="303" y="256" width="25" height="100" fill="#3f4c5e" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- boots -->
+    <rect x="258" y="352" width="42" height="20" rx="6" fill="#1a1a1a"/>
+    <rect x="300" y="352" width="42" height="20" rx="6" fill="#1a1a1a"/>
+    <path d="M258 362 a6 6 0 0 1 6 -6 h8 v16 h-14 z" fill="#555555"/>
+    <path d="M342 362 a6 6 0 0 0 -6 -6 h-8 v16 h14 z" fill="#555555"/>
+    <!-- neck + head -->
+    <rect x="292" y="144" width="16" height="12" fill="#e8b98a"/>
+    <circle cx="300" cy="122" r="27" fill="#e8b98a" stroke="#1a1a1a" stroke-width="2"/>
+    <path d="M292 136 q8 6 16 0" stroke="#1a1a1a" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <!-- safety glasses -->
+    <rect x="270" y="110" width="60" height="11" rx="5" fill="#1a1a1a"/>
+    <!-- hard hat -->
+    <path d="M270 104 a30 30 0 0 1 60 0 z" fill="#FFC326" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="260" y="100" width="80" height="8" rx="4" fill="#e0a800" stroke="#1a1a1a" stroke-width="2"/>
+    <!-- vest -->
+    <rect x="260" y="154" width="80" height="104" rx="12" fill="#FF7F00" stroke="#1a1a1a" stroke-width="2"/>
+    <rect x="276" y="154" width="11" height="104" fill="#ffe14d"/>
+    <rect x="313" y="154" width="11" height="104" fill="#ffe14d"/>
+    <rect x="260" y="154" width="80" height="104" rx="12" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+  </g>
+
+  <!-- Labels (left side) -->
+  <circle cx="276" cy="86" r="3.5" fill="#FF7F00"/>
+  <line x1="276" y1="86" x2="176" y2="72" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="170" y="76" font-size="15" font-weight="600" fill="#1a1a1a" text-anchor="end">Hard hat</text>
+
+  <circle cx="270" cy="115" r="3.5" fill="#FF7F00"/>
+  <line x1="270" y1="115" x2="176" y2="122" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="170" y="126" font-size="15" font-weight="600" fill="#1a1a1a" text-anchor="end">Eye protection</text>
+
+  <circle cx="260" cy="195" r="3.5" fill="#FF7F00"/>
+  <line x1="260" y1="195" x2="176" y2="190" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="170" y="194" font-size="15" font-weight="600" fill="#1a1a1a" text-anchor="end">High-visibility vest</text>
+
+  <circle cx="233" cy="252" r="3.5" fill="#FF7F00"/>
+  <line x1="233" y1="252" x2="176" y2="262" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="170" y="266" font-size="15" font-weight="600" fill="#1a1a1a" text-anchor="end">Work gloves</text>
+
+  <circle cx="262" cy="362" r="3.5" fill="#FF7F00"/>
+  <line x1="262" y1="362" x2="176" y2="352" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="170" y="356" font-size="15" font-weight="600" fill="#1a1a1a" text-anchor="end">Steel-toe boots</text>
+
+  <!-- Note card -->
+  <rect x="470" y="150" width="300" height="104" rx="10" fill="#ffffff" stroke="#4f3b3b" stroke-width="2"/>
+  <circle cx="505" cy="202" r="16" fill="#019E7C"/>
+  <path d="M497 202 l6 7 l12 -14" stroke="#ffffff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="534" y="186" font-size="15" font-weight="600" fill="#1a1a1a">Wear PPE required by</text>
+  <text x="534" y="208" font-size="15" font-weight="600" fill="#1a1a1a">your site - check your</text>
+  <text x="534" y="230" font-size="15" font-weight="600" fill="#1a1a1a">employer's rules</text>
 </svg>

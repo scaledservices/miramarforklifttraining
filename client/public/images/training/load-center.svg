@@ -1,12 +1,80 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1b5e20;stop-opacity:1"/>
-      <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:1"/>
-    </linearGradient>
-  </defs>
-  <rect width="800" height="400" fill="url(#bg)" rx="8"/>
-  <text x="400" y="180" fill="white" font-size="42" font-family="Arial,sans-serif" text-anchor="middle" font-weight="bold">📊</text>
-  <text x="400" y="240" fill="white" font-size="24" font-family="Arial,sans-serif" text-anchor="middle">Load Center &amp; Capacity</text>
-  <text x="400" y="280" fill="rgba(255,255,255,0.6)" font-size="14" font-family="Arial,sans-serif" text-anchor="middle">ForkliftCertified.training</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" font-family="Roboto, Arial, sans-serif">
+  <!-- background -->
+  <rect width="800" height="450" fill="#faf8f5"/>
+  <rect x="0" y="400" width="800" height="50" fill="#e8e2d8"/>
+  <line x1="0" y1="400" x2="800" y2="400" stroke="#b8ad9c" stroke-width="2"/>
+
+  <text x="30" y="42" font-size="22" font-weight="700" fill="#4f3b3b">Load Center &amp; Capacity</text>
+  <rect x="30" y="52" width="64" height="4" fill="#FFC326"/>
+
+  <!-- ===== front half of forklift, facing right ===== -->
+  <!-- body (partial) -->
+  <rect x="40" y="290" width="200" height="60" rx="8" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+  <!-- hood / dash console -->
+  <path d="M170,290 L170,255 Q170,248 177,248 L232,248 Q240,248 240,258 L240,290 Z" fill="#FFC326" stroke="#1a1a1a" stroke-width="2.5"/>
+  <!-- steering wheel -->
+  <path d="M180,250 L162,232" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="158" cy="228" r="9" fill="none" stroke="#1a1a1a" stroke-width="3.5"/>
+
+  <!-- drive wheel -->
+  <circle cx="210" cy="352" r="48" fill="#2b2b2b" stroke="#1a1a1a" stroke-width="3"/>
+  <circle cx="210" cy="352" r="22" fill="#8a8378"/>
+  <circle cx="210" cy="352" r="8" fill="#4a4540"/>
+
+  <!-- mast carriage link to chassis -->
+  <rect x="238" y="300" width="38" height="26" rx="4" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+  <!-- mast -->
+  <rect x="272" y="118" width="13" height="274" fill="#555" stroke="#1a1a1a" stroke-width="2"/>
+  <rect x="295" y="118" width="13" height="274" fill="#6b6b6b" stroke="#1a1a1a" stroke-width="2"/>
+  <g stroke="#1a1a1a" stroke-width="2" fill="#555">
+    <rect x="272" y="150" width="36" height="8"/>
+    <rect x="272" y="230" width="36" height="8"/>
+    <rect x="272" y="310" width="36" height="8"/>
+  </g>
+  <!-- lift chain hint -->
+  <line x1="314" y1="130" x2="314" y2="240" stroke="#8a8378" stroke-width="3" stroke-dasharray="4 3"/>
+
+  <!-- load backrest -->
+  <g stroke="#1a1a1a" stroke-width="2">
+    <rect x="318" y="228" width="12" height="152" fill="#777"/>
+    <line x1="318" y1="256" x2="330" y2="256"/>
+    <line x1="318" y1="284" x2="330" y2="284"/>
+    <line x1="318" y1="312" x2="330" y2="312"/>
+    <line x1="318" y1="340" x2="330" y2="340"/>
+  </g>
+
+  <!-- forks -->
+  <path d="M330,262 L342,262 L342,384 L560,384 L560,396 L330,396 Z" fill="#3d3d3d" stroke="#1a1a1a" stroke-width="2"/>
+
+  <!-- ===== load cube on forks ===== -->
+  <rect x="344" y="234" width="200" height="150" fill="#d9c7a8" stroke="#1a1a1a" stroke-width="2.5"/>
+  <line x1="344" y1="272" x2="544" y2="272" stroke="#b89d74" stroke-width="1.5"/>
+  <line x1="344" y1="309" x2="544" y2="309" stroke="#b89d74" stroke-width="1.5"/>
+  <line x1="344" y1="346" x2="544" y2="346" stroke="#b89d74" stroke-width="1.5"/>
+
+  <!-- ===== center of gravity ===== -->
+  <line x1="444" y1="204" x2="444" y2="412" stroke="#4f3b3b" stroke-width="2" stroke-dasharray="7 5"/>
+  <circle cx="444" cy="309" r="6.5" fill="#FF7F00" stroke="#1a1a1a" stroke-width="1.5"/>
+  <text x="454" y="330" font-size="14" font-weight="600" fill="#4f3b3b">CG</text>
+
+  <!-- ===== dimension: fork face to CG ===== -->
+  <line x1="342" y1="200" x2="342" y2="260" stroke="#4f3b3b" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="348" y1="212" x2="438" y2="212" stroke="#1a1a1a" stroke-width="2"/>
+  <polygon points="342,212 353,206.5 353,217.5" fill="#1a1a1a"/>
+  <polygon points="444,212 433,206.5 433,217.5" fill="#1a1a1a"/>
+  <text x="393" y="192" font-size="15" font-weight="600" fill="#1a1a1a" text-anchor="middle">24 in load center</text>
+
+  <!-- ===== capacity table inset ===== -->
+  <rect x="575" y="140" width="200" height="196" rx="8" fill="#ffffff" stroke="#4f3b3b" stroke-width="1.5"/>
+  <text x="587" y="168" font-size="15" font-weight="700" fill="#4f3b3b">Longer load center</text>
+  <text x="587" y="188" font-size="15" font-weight="700" fill="#4f3b3b">= less capacity</text>
+
+  <g font-size="14" font-weight="600" fill="#1a1a1a">
+    <text x="587" y="222">24 in — 5,000 lbs</text>
+    <rect x="587" y="230" width="150" height="8" rx="2" fill="#019E7C"/>
+    <text x="587" y="262">30 in — 4,000 lbs</text>
+    <rect x="587" y="270" width="120" height="8" rx="2" fill="#FFC326"/>
+    <text x="587" y="302">36 in — 3,300 lbs</text>
+    <rect x="587" y="310" width="99" height="8" rx="2" fill="#FF7F00"/>
+  </g>
 </svg>

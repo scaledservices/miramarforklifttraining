@@ -1,3 +1,5 @@
+import type { LessonBlock } from "@shared/lesson-blocks";
+
 export interface StepDef {
   title: string;
   type: "lesson" | "video" | "checkpoint" | "download" | "exam" | "content";
@@ -24,34 +26,9 @@ export const CANONICAL_COURSE = {
 };
 
 const img = (name: string) => `/images/training/${name}`;
+const photo = (name: string) => `/images/training/photos/${name}`;
 
-function lessonHtml(opts: {
-  title: string;
-  image: string;
-  sections: { heading?: string; content: string }[];
-  takeaways: string[];
-  tip?: string;
-  warning?: string;
-}): string {
-  const tipBlock = opts.tip ? `<div class="callout callout-tip"><strong>💡 Tip:</strong> ${opts.tip}</div>` : "";
-  const warnBlock = opts.warning ? `<div class="callout callout-warning"><strong>⚠️ Warning:</strong> ${opts.warning}</div>` : "";
-  const sectionHtml = opts.sections.map(s =>
-    (s.heading ? `<h3>${s.heading}</h3>` : "") + s.content
-  ).join("\n");
-  const takeawayItems = opts.takeaways.map(t => `<li>${t}</li>`).join("");
-
-  return `<div class="lesson-content">
-<img src="${opts.image}" alt="${opts.title}" class="lesson-hero-image" />
-<h2>${opts.title}</h2>
-${sectionHtml}
-${tipBlock}
-${warnBlock}
-<div class="key-takeaways">
-<h4>📝 Key Takeaways</h4>
-<ul>${takeawayItems}</ul>
-</div>
-</div>`;
-}
+const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
 export const COURSE_STEPS: StepDef[] = [
   // ═══ MODULE 0: Welcome + OSHA Compliance ═══
@@ -60,49 +37,66 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Welcome to Forklift Operator Certification",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Welcome to Forklift Operator Certification",
-        image: img("forklift-hero.svg"),
-        sections: [
-          { heading: "About This Course", content: "<p>Welcome! This online course provides the <strong>formal instruction</strong> portion of OSHA-compliant powered industrial truck (PIT/forklift) operator certification. The course takes approximately <strong>45–60 minutes</strong> to complete.</p>" },
-          { heading: "What's Included", content: "<ul><li>Interactive training modules covering all OSHA-required topics</li><li>Knowledge check quizzes throughout</li><li>Final certification exam (80% passing score)</li><li>Digital certificate with QR-verified credential</li><li>Employer documentation packet for practical evaluation</li></ul>" },
-          { heading: "What's NOT Included", content: "<p>OSHA requires <strong>three components</strong> for full certification: (1) formal instruction (this course), (2) practical/hands-on training, and (3) an evaluation of operator performance. Your employer must conduct the hands-on portion at your worksite. We provide all the forms they need in Module 7.</p>" },
-          { heading: "How to Navigate", content: "<p>Complete each step in order. You can track your progress using the sidebar. If you need to stop, your progress is saved automatically. You can retake the final exam up to 3 times.</p>" },
-        ],
-        takeaways: [
-          "This course covers the formal instruction requirement",
-          "Your employer must also conduct hands-on training and evaluation",
-          "Complete all modules and pass the final exam at 80% or higher",
-          "Your progress saves automatically — resume anytime",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("warehouse-aisle-scene.svg"), alt: "Warehouse aisle with pallet racking and a loading door" },
+      { type: "heading", level: 2, text: "Welcome to Forklift Operator Certification" },
+      { type: "heading", level: 3, text: "About This Course" },
+      { type: "paragraph", html: "Welcome! This online course provides the <strong>formal instruction</strong> portion of OSHA-compliant powered industrial truck (PIT/forklift) operator certification. The course takes approximately <strong>45–60 minutes</strong> to complete." },
+      { type: "heading", level: 3, text: "What's Included" },
+      { type: "list", items: [
+        "Interactive training modules covering all OSHA-required topics",
+        "Knowledge check quizzes throughout",
+        "Final certification exam (80% passing score)",
+        "Digital certificate with QR-verified credential",
+        "Employer documentation packet for practical evaluation",
+      ] },
+      { type: "heading", level: 3, text: "What's NOT Included" },
+      { type: "paragraph", html: "OSHA requires <strong>three components</strong> for full certification: (1) formal instruction (this course), (2) practical/hands-on training, and (3) an evaluation of operator performance. Your employer must conduct the hands-on portion at your worksite. We provide all the forms they need in Module 7." },
+      { type: "heading", level: 3, text: "How to Navigate" },
+      { type: "paragraph", html: "Complete each step in order. You can track your progress using the sidebar. If you need to stop, your progress is saved automatically. You can retake the final exam up to 3 times." },
+      { type: "callout", variant: "tip", text: "Look out for interactive diagrams, flip cards, and scenarios throughout the course — they are the fastest way to lock in what you learn." },
+      { type: "key_takeaways", items: [
+        "This course covers the formal instruction requirement",
+        "Your employer must also conduct hands-on training and evaluation",
+        "Complete all modules and pass the final exam at 80% or higher",
+        "Your progress saves automatically — resume anytime",
+      ] },
+    ]),
   },
   {
     module: "Welcome & OSHA Compliance",
     title: "OSHA Compliance: What This Course Covers",
     type: "lesson",
     estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "OSHA Compliance: What This Course Covers",
-        image: img("osha-compliance.svg"),
-        sections: [
-          { heading: "OSHA's Three-Part Requirement", content: "<p>Under <strong>29 CFR 1910.178(l)</strong>, OSHA requires all forklift operators to receive:</p><ol><li><strong>Formal instruction</strong> — classroom or online training covering safety topics (this course)</li><li><strong>Practical training</strong> — hands-on experience operating the specific equipment at the worksite</li><li><strong>Evaluation</strong> — a supervisor must observe and evaluate the operator's competence</li></ol>" },
-          { heading: "What We Provide", content: "<ul><li>Complete formal instruction covering all OSHA-required topics</li><li>Knowledge assessment via final exam</li><li>Certificate of completion for the formal instruction portion</li><li>Employer documentation packet including evaluation checklists, permits, and attendance sheets</li></ul>" },
-          { heading: "What Your Employer Must Do", content: "<p>After completing this course, your employer/supervisor must:</p><ul><li>Provide practical, hands-on training on the specific equipment you will operate</li><li>Evaluate your performance in the actual workplace</li><li>Complete and maintain the required documentation (provided in Module 7)</li><li>Re-evaluate operators at least every 3 years</li></ul>" },
-          { content: "<p><em>Important: This online course alone does not fully satisfy OSHA requirements. The practical training and evaluation must be completed by your employer at your worksite.</em></p>" },
-        ],
-        takeaways: [
-          "OSHA requires formal instruction + practical training + evaluation",
-          "This course covers the formal instruction and knowledge assessment",
-          "Your employer must complete hands-on training and evaluation",
-          "Operators must be re-evaluated at least every 3 years",
-        ],
-        warning: "Do not operate a forklift until your employer has completed your hands-on training and evaluation.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("ppe-workers-scene.svg"), alt: "Workers in full PPE standing in front of a forklift" },
+      { type: "heading", level: 2, text: "OSHA Compliance: What This Course Covers" },
+      { type: "heading", level: 3, text: "OSHA's Three-Part Requirement" },
+      { type: "paragraph", html: "Under <strong>29 CFR 1910.178(l)</strong>, OSHA requires all forklift operators to complete three components before operating at work. Explore each one in the diagram below." },
+      { type: "hotspot_diagram", src: img("osha-compliance.svg"), alt: "OSHA three-part training requirement infographic",
+        caption: "OSHA 29 CFR 1910.178(l): all three parts are required.",
+        hotspots: [
+          { x: 17, y: 42, label: "1. Formal Instruction", description: "Classroom or online training covering all OSHA safety topics — that is exactly what this course provides. It ends with a knowledge assessment (your final exam)." },
+          { x: 48, y: 42, label: "2. Practical Training", description: "Hands-on experience operating the specific equipment at your worksite, provided by your employer after you finish this course." },
+          { x: 78, y: 42, label: "3. Evaluation", description: "A supervisor or qualified trainer must observe you operating and sign off on your competence. We include the evaluation forms in Module 7." },
+          { x: 50, y: 80, label: "Certified Operator", description: "Only after all three components are complete are you a fully certified operator. Re-evaluation is required at least every 3 years." },
+        ] },
+      { type: "heading", level: 3, text: "What Your Employer Must Do" },
+      { type: "list", items: [
+        "Provide practical, hands-on training on the specific equipment you will operate",
+        "Evaluate your performance in the actual workplace",
+        "Complete and maintain the required documentation (provided in Module 7)",
+        "Re-evaluate operators at least every 3 years",
+      ] },
+      { type: "paragraph", html: "<em>Important: This online course alone does not fully satisfy OSHA requirements. The practical training and evaluation must be completed by your employer at your worksite.</em>" },
+      { type: "callout", variant: "warning", text: "Do not operate a forklift until your employer has completed your hands-on training and evaluation." },
+      { type: "key_takeaways", items: [
+        "OSHA requires formal instruction + practical training + evaluation",
+        "This course covers the formal instruction and knowledge assessment",
+        "Your employer must complete hands-on training and evaluation",
+        "Operators must be re-evaluated at least every 3 years",
+      ] },
+    ]),
   },
   {
     module: "Welcome & OSHA Compliance",
@@ -122,50 +116,83 @@ export const COURSE_STEPS: StepDef[] = [
     module: "Forklift Basics & Responsibilities",
     title: "What is a Powered Industrial Truck (PIT)?",
     type: "lesson",
-    estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "What is a Powered Industrial Truck (PIT)?",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Definition", content: "<p>A <strong>Powered Industrial Truck (PIT)</strong> is any mobile, self-propelled vehicle used to carry, push, pull, lift, stack, or tier materials. Common names include forklift, pallet jack, rider truck, fork truck, and lift truck.</p><p>PITs may be powered by electric motors or internal combustion engines (propane, gasoline, diesel).</p>" },
-          { heading: "OSHA Equipment Classifications", content: "<ul><li><strong>Class I:</strong> Electric Motor Rider Trucks</li><li><strong>Class II:</strong> Electric Motor Narrow Aisle Trucks</li><li><strong>Class III:</strong> Walkie/Rider Pallet Jacks and Stackers</li><li><strong>Class IV:</strong> Internal Combustion (IC) Rider Trucks — Cushion Tires</li><li><strong>Class V:</strong> IC Engine Trucks — Pneumatic Tires</li><li><strong>Class VI:</strong> IC Engine Tractors</li><li><strong>Class VII:</strong> Rough Terrain Forklift Trucks</li></ul>" },
-          { heading: "Who Can Operate", content: "<p>Only <strong>trained and authorized</strong> employees may operate a PIT. You must be at least <strong>18 years old</strong>. Your certification is valid for <strong>3 years</strong>, after which you must be re-evaluated.</p>" },
-          { heading: "Employer vs. Operator Responsibilities", content: "<ul><li><strong>Employer:</strong> Must provide training, ensure equipment is maintained, enforce safety rules</li><li><strong>Operator:</strong> Must follow all safety rules, perform pre-shift inspections, report hazards and incidents immediately</li></ul>" },
-        ],
-        takeaways: [
-          "A PIT is any powered vehicle used to move, lift, or stack materials",
-          "There are 7 OSHA classifications of powered industrial trucks",
-          "Operators must be 18+ years old, trained, and authorized",
-          "Certification is valid for 3 years",
-        ],
-      }),
-    },
+    estimatedMinutes: 6,
+    config: blocks([
+      { type: "hero_image", src: photo("forklift-lifting-scene.svg"), alt: "Forklift raising a palletized load to a rack while a spotter watches" },
+      { type: "heading", level: 2, text: "What is a Powered Industrial Truck (PIT)?" },
+      { type: "heading", level: 3, text: "Definition" },
+      { type: "paragraph", html: "A <strong>Powered Industrial Truck (PIT)</strong> is any mobile, self-propelled vehicle used to carry, push, pull, lift, stack, or tier materials. Common names include forklift, pallet jack, rider truck, fork truck, and lift truck." },
+      { type: "paragraph", html: "PITs may be powered by electric motors or internal combustion engines (propane, gasoline, diesel)." },
+      { type: "heading", level: 3, text: "Know Your Machine" },
+      { type: "paragraph", html: "Before you operate, you need to know the machine's key components. Tap each marker to learn what it does." },
+      { type: "hotspot_diagram", src: img("forklift-anatomy.svg"), alt: "Side view of a counterbalance forklift",
+        hotspots: [
+          { x: 36, y: 31, label: "Overhead Guard", description: "Protects the operator from falling objects. It is not designed to withstand a full load falling on it — never lift more than rated capacity." },
+          { x: 56, y: 35, label: "Mast", description: "The vertical assembly that raises and lowers the load. Lift chains and hydraulic cylinders inside the mast do the lifting work." },
+          { x: 61, y: 67, label: "Load Backrest", description: "Keeps the load from sliding back toward the operator when the mast is tilted back." },
+          { x: 73, y: 86, label: "Forks", description: "Carry the load. Inspect daily for cracks, bends, and heel wear. Always spread them to fit the pallet and insert fully." },
+          { x: 24, y: 69, label: "Counterweight", description: "The heavy rear section that balances the load on the forks. This is why a forklift steers from the rear and why overloading is so dangerous." },
+          { x: 46, y: 79, label: "Drive Wheels (front)", description: "The front wheels carry most of the weight and drive the machine. They form the front two corners of the stability triangle." },
+          { x: 27, y: 81, label: "Steer Wheels (rear)", description: "Forklifts steer with the REAR wheels — the tail swings wide in turns. Always check your rear swing clearance." },
+          { x: 46, y: 69, label: "Data Plate", description: "Lists the truck's rated capacity, load center, weight, and fuel type. Read it before every job — it is your legal lifting limit." },
+          { x: 34, y: 53, label: "Operator Seat & Seat Belt", description: "Your seat belt is your primary protection in a tip-over. Buckle up before starting the engine, every time." },
+        ] },
+      { type: "heading", level: 3, text: "OSHA Equipment Classifications" },
+      { type: "paragraph", html: "OSHA groups powered industrial trucks into 7 classes. Flip each card to see what the class covers." },
+      { type: "flip_cards", title: "The 7 OSHA Classes", cards: [
+        { front: "Class I", back: "Electric Motor Rider Trucks — sit-down counterbalance trucks powered by battery." },
+        { front: "Class II", back: "Electric Motor Narrow Aisle Trucks — reach trucks and order pickers built for tight aisles." },
+        { front: "Class III", back: "Electric Walkie/Rider Pallet Jacks and Stackers — walk-behind or ride-on pallet movers." },
+        { front: "Class IV", back: "Internal Combustion Rider Trucks with Cushion Tires — for smooth indoor floors." },
+        { front: "Class V", back: "Internal Combustion Trucks with Pneumatic Tires — indoor/outdoor use on rougher surfaces." },
+        { front: "Class VI", back: "Electric and IC Engine Tractors — tuggers that pull loads rather than lift them." },
+        { front: "Class VII", back: "Rough Terrain Forklift Trucks — large-tire trucks for construction sites and yards." },
+      ] },
+      { type: "heading", level: 3, text: "Who Can Operate" },
+      { type: "paragraph", html: "Only <strong>trained and authorized</strong> employees may operate a PIT. You must be at least <strong>18 years old</strong>. Your certification is valid for <strong>3 years</strong>, after which you must be re-evaluated." },
+      { type: "heading", level: 3, text: "Employer vs. Operator Responsibilities" },
+      { type: "list", items: [
+        "<strong>Employer:</strong> Must provide training, ensure equipment is maintained, enforce safety rules",
+        "<strong>Operator:</strong> Must follow all safety rules, perform pre-shift inspections, report hazards and incidents immediately",
+      ] },
+      { type: "key_takeaways", items: [
+        "A PIT is any powered vehicle used to move, lift, or stack materials",
+        "There are 7 OSHA classifications of powered industrial trucks",
+        "Operators must be 18+ years old, trained, and authorized",
+        "Certification is valid for 3 years",
+      ] },
+    ]),
   },
   {
     module: "Forklift Basics & Responsibilities",
     title: "Authorization & Safe Work Culture",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Authorization & Safe Work Culture",
-        image: img("pedestrian-safety.svg"),
-        sections: [
-          { heading: "Reporting Hazards", content: "<p>As an operator, you are responsible for immediately reporting any unsafe conditions: damaged equipment, spills, obstructions, poor lighting, or near-miss incidents. Never assume someone else will report it.</p>" },
-          { heading: "No Passengers — Ever", content: "<p>Your forklift is designed to safely transport <strong>only one person — the operator</strong>. Never allow riders on the forks, sides, or any part of the truck unless using an OSHA-approved safety platform with guardrails, toe boards, and a fall protection harness.</p>" },
-          { heading: "Stay Alert", content: "<ul><li>No cell phone use while operating</li><li>No headphones or earbuds</li><li>No horseplay or stunt driving</li><li>Keep your entire body inside the protective cage at all times</li><li>Never operate under the influence of drugs or alcohol</li></ul>" },
-          { heading: "OSHA Enforcement", content: "<p>OSHA can conduct <strong>unannounced inspections</strong>. Fines for uncertified operators can reach <strong>$7,000 per day per unqualified employee</strong>, retroactive to the hire date. A single uncertified operator working for one year could result in nearly <strong>$2 million</strong> in fines.</p>" },
-        ],
-        takeaways: [
-          "Report all hazards and incidents immediately",
-          "No passengers unless using an approved safety platform",
-          "Stay alert — no phones, headphones, or horseplay",
-          "OSHA fines for non-compliance are severe",
-        ],
-        warning: "Stunt driving and horseplay are strictly prohibited and can result in termination and OSHA violations.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("operator-at-controls-scene.svg"), alt: "Operator seated at forklift controls wearing hi-vis vest and seat belt" },
+      { type: "heading", level: 2, text: "Authorization & Safe Work Culture" },
+      { type: "heading", level: 3, text: "Reporting Hazards" },
+      { type: "paragraph", html: "As an operator, you are responsible for immediately reporting any unsafe conditions: damaged equipment, spills, obstructions, poor lighting, or near-miss incidents. Never assume someone else will report it." },
+      { type: "heading", level: 3, text: "No Passengers — Ever" },
+      { type: "paragraph", html: "Your forklift is designed to safely transport <strong>only one person — the operator</strong>. Never allow riders on the forks, sides, or any part of the truck unless using an OSHA-approved safety platform with guardrails, toe boards, and a fall protection harness." },
+      { type: "heading", level: 3, text: "Stay Alert" },
+      { type: "list", items: [
+        "No cell phone use while operating",
+        "No headphones or earbuds",
+        "No horseplay or stunt driving",
+        "Keep your entire body inside the protective cage at all times",
+        "Never operate under the influence of drugs or alcohol",
+      ] },
+      { type: "heading", level: 3, text: "OSHA Enforcement" },
+      { type: "paragraph", html: "OSHA can conduct <strong>unannounced inspections</strong>. Fines for uncertified operators can reach <strong>$7,000 per day per unqualified employee</strong>, retroactive to the hire date. A single uncertified operator working for one year could result in nearly <strong>$2 million</strong> in fines." },
+      { type: "callout", variant: "warning", text: "Stunt driving and horseplay are strictly prohibited and can result in termination and OSHA violations." },
+      { type: "key_takeaways", items: [
+        "Report all hazards and incidents immediately",
+        "No passengers unless using an approved safety platform",
+        "Stay alert — no phones, headphones, or horseplay",
+        "OSHA fines for non-compliance are severe",
+      ] },
+    ]),
   },
   {
     module: "Forklift Basics & Responsibilities",
@@ -185,74 +212,105 @@ export const COURSE_STEPS: StepDef[] = [
     module: "Stability & Load Handling",
     title: "Stability Triangle and Center of Gravity",
     type: "lesson",
-    estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Stability Triangle and Center of Gravity",
-        image: img("stability-triangle.svg"),
-        sections: [
-          { heading: "What is the Stability Triangle?", content: "<p>The <strong>stability triangle</strong> is the three-point base formed by the two front axle ends and the rear axle pivot point. As long as the combined center of gravity of the truck and its load stays within this triangle, the forklift remains stable.</p>" },
-          { heading: "Tip-Over Risk", content: "<p>When the center of gravity shifts outside the stability triangle — due to overloading, sharp turns, or operating on slopes — the forklift can <strong>tip over</strong>. Tip-overs are one of the leading causes of forklift fatalities.</p><ul><li>Never make sharp turns at speed</li><li>Reduce speed before turning</li><li>Be extra cautious on ramps, slopes, and uneven surfaces</li></ul>" },
-          { heading: "Lateral Stability", content: "<p>Turning too quickly shifts the center of gravity sideways. The higher the load, the more unstable the truck becomes during turns. Always <strong>slow down before turning</strong>, not during the turn.</p>" },
-        ],
-        takeaways: [
-          "The stability triangle is formed by the front axle ends and rear axle pivot",
-          "Keep the center of gravity within the triangle to prevent tip-overs",
-          "Reduce speed before turns — sharp turns cause lateral instability",
-          "Higher loads mean greater tip-over risk during turns",
-        ],
-        warning: "Tip-overs are among the leading causes of forklift operator fatalities. Always respect the stability triangle.",
-      }),
-    },
+    estimatedMinutes: 6,
+    config: blocks([
+      { type: "hero_image", src: img("stability-triangle.svg"), alt: "Top-down view of a forklift showing the stability triangle" },
+      { type: "heading", level: 2, text: "Stability Triangle and Center of Gravity" },
+      { type: "heading", level: 3, text: "What is the Stability Triangle?" },
+      { type: "paragraph", html: "The <strong>stability triangle</strong> is the three-point base formed by the two front axle ends and the rear axle pivot point. As long as the combined center of gravity of the truck and its load stays within this triangle, the forklift remains stable." },
+      { type: "hotspot_diagram", src: img("stability-triangle.svg"), alt: "Stability triangle diagram with front axle, rear pivot, and center of gravity",
+        caption: "Tap each point of the triangle to understand how stability works.",
+        hotspots: [
+          { x: 38, y: 47, label: "Front Axle (drive wheels)", description: "The two front wheel contact points form the wide base of the triangle. Most of the machine + load weight rides here." },
+          { x: 50, y: 73, label: "Rear Axle Pivot", description: "The rear axle pivots on a single center point — that is the third corner of the triangle, NOT the two rear wheels. This is why forklifts feel tippy in turns." },
+          { x: 50, y: 56, label: "Center of Gravity", description: "With no load, the CG sits near the middle of the triangle. Lifting, tilting, and turning all move it. Keep it inside the triangle or the truck tips." },
+          { x: 50, y: 84, label: "Tip-Over Zone", description: "If the combined CG crosses outside the triangle — from overloading, raised loads, sharp turns, or slopes — the forklift tips toward that side." },
+        ] },
+      { type: "heading", level: 3, text: "See It In Motion" },
+      { type: "image", src: img("stability-triangle-animated.svg"), alt: "Animation of the center of gravity moving outside the stability triangle", caption: "Watch how raising a load pushes the center of gravity toward the edge of the triangle." },
+      { type: "heading", level: 3, text: "Tip-Over Risk" },
+      { type: "paragraph", html: "When the center of gravity shifts outside the stability triangle — due to overloading, sharp turns, or operating on slopes — the forklift can <strong>tip over</strong>. Tip-overs are one of the leading causes of forklift fatalities." },
+      { type: "list", items: [
+        "Never make sharp turns at speed",
+        "Reduce speed before turning",
+        "Be extra cautious on ramps, slopes, and uneven surfaces",
+      ] },
+      { type: "heading", level: 3, text: "Lateral Stability" },
+      { type: "paragraph", html: "Turning too quickly shifts the center of gravity sideways. The higher the load, the more unstable the truck becomes during turns. Always <strong>slow down before turning</strong>, not during the turn." },
+      { type: "callout", variant: "warning", text: "Tip-overs are among the leading causes of forklift operator fatalities. Always respect the stability triangle." },
+      { type: "key_takeaways", items: [
+        "The stability triangle is formed by the front axle ends and rear axle pivot",
+        "Keep the center of gravity within the triangle to prevent tip-overs",
+        "Reduce speed before turns — sharp turns cause lateral instability",
+        "Higher loads mean greater tip-over risk during turns",
+      ] },
+    ]),
   },
   {
     module: "Stability & Load Handling",
     title: "Rated Capacity & Data Plate",
     type: "lesson",
-    estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Rated Capacity & Data Plate",
-        image: img("load-center.svg"),
-        sections: [
-          { heading: "The Data Plate", content: "<p>Every forklift has a manufacturer's <strong>data plate</strong> indicating the maximum lifting capacity at various load centers. Before lifting any load, verify your forklift is rated to handle its weight.</p>" },
-          { heading: "Load Center", content: "<p>The <strong>load center</strong> is the distance from the fork's vertical face to the center of the load. A forklift's capacity decreases as the load center increases. Always verify you're using the right equipment for the weight and size of the load.</p>" },
-          { heading: "Attachments Reduce Capacity", content: "<p>Using attachments (clamps, rotators, fork extensions) changes the truck's center of gravity and <strong>reduces the rated capacity</strong>. Always check the adjusted capacity when using any attachment.</p>" },
-          { heading: "Never Overload", content: "<p>Exceeding the rated capacity greatly increases the risk of instability and tip-over. Display weight limits clearly on the vehicle. If a load seems too heavy or unbalanced, do not attempt to lift it — get a higher-capacity truck.</p>" },
+    estimatedMinutes: 5,
+    config: blocks([
+      { type: "hero_image", src: img("load-center.svg"), alt: "Diagram of load center distance and capacity" },
+      { type: "heading", level: 2, text: "Rated Capacity & Data Plate" },
+      { type: "heading", level: 3, text: "The Data Plate" },
+      { type: "paragraph", html: "Every forklift has a manufacturer's <strong>data plate</strong> indicating the maximum lifting capacity at various load centers. Before lifting any load, verify your forklift is rated to handle its weight." },
+      { type: "heading", level: 3, text: "Load Center" },
+      { type: "paragraph", html: "The <strong>load center</strong> is the distance from the fork's vertical face to the center of the load. A forklift's capacity decreases as the load center increases. Always verify you're using the right equipment for the weight and size of the load." },
+      { type: "image", src: img("load-center-animated.svg"), alt: "Animation showing capacity dropping as the load center grows", caption: "As the load center grows from 24 to 36 inches, the same truck can safely lift far less." },
+      { type: "drag_drop", mode: "matching",
+        prompt: "Match each load center distance to the capacity this truck can safely lift.",
+        items: [
+          { id: "lc24", label: "24 in load center", targetId: "cap5000" },
+          { id: "lc30", label: "30 in load center", targetId: "cap4000" },
+          { id: "lc36", label: "36 in load center", targetId: "cap3300" },
         ],
-        takeaways: [
-          "Always check the data plate for rated capacity before lifting",
-          "Capacity decreases as load center distance increases",
-          "Attachments reduce the forklift's rated capacity",
-          "Never exceed the rated capacity — use a larger truck if needed",
-        ],
-      }),
-    },
+        targets: [
+          { id: "cap5000", label: "5,000 lbs — full rated capacity" },
+          { id: "cap4000", label: "4,000 lbs — reduced capacity" },
+          { id: "cap3300", label: "3,300 lbs — lowest capacity" },
+        ] },
+      { type: "heading", level: 3, text: "Attachments Reduce Capacity" },
+      { type: "paragraph", html: "Using attachments (clamps, rotators, fork extensions) changes the truck's center of gravity and <strong>reduces the rated capacity</strong>. Always check the adjusted capacity when using any attachment." },
+      { type: "heading", level: 3, text: "Never Overload" },
+      { type: "paragraph", html: "Exceeding the rated capacity greatly increases the risk of instability and tip-over. Display weight limits clearly on the vehicle. If a load seems too heavy or unbalanced, do not attempt to lift it — get a higher-capacity truck." },
+      { type: "key_takeaways", items: [
+        "Always check the data plate for rated capacity before lifting",
+        "Capacity decreases as load center distance increases",
+        "Attachments reduce the forklift's rated capacity",
+        "Never exceed the rated capacity — use a larger truck if needed",
+      ] },
+    ]),
   },
   {
     module: "Stability & Load Handling",
     title: "Picking Up and Carrying Loads Safely",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Picking Up and Carrying Loads Safely",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Fork Position", content: "<p>Carry forks as low as possible — typically <strong>4 to 6 inches</strong> from the ground. This lowers the center of gravity and reduces the risk of tip-over.</p>" },
-          { heading: "Mast Tilt", content: "<p>Tilt the mast slightly back when traveling with a load to stabilize it. Never tilt loads forward except when depositing them. Excessive forward tilt can cause the truck to tip.</p>" },
-          { heading: "Visibility", content: "<p>If a load blocks your forward view, <strong>drive in reverse</strong> to maintain a clear line of sight. Use spotters when navigating tight spaces or areas with limited visibility.</p>" },
-          { heading: "Securing Loads", content: "<p>Before transporting any load, ensure it is <strong>properly secured and balanced</strong>. You may need shrink-wrap or straps to prevent shifting or spilling during transport. Never move an unsecured load.</p>" },
-        ],
-        takeaways: [
-          "Carry forks 4–6 inches from the ground",
-          "Tilt the mast back when traveling with a load",
-          "Drive in reverse if the load blocks your forward view",
-          "Always ensure loads are secured before moving",
-        ],
-        tip: "When you can't see past the load, travel in reverse and use a spotter for tight areas.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("forklift-lifting-scene.svg"), alt: "Forklift placing a pallet on a rack level" },
+      { type: "heading", level: 2, text: "Picking Up and Carrying Loads Safely" },
+      { type: "heading", level: 3, text: "Fork Position" },
+      { type: "paragraph", html: "Carry forks as low as possible — typically <strong>4 to 6 inches</strong> from the ground. This lowers the center of gravity and reduces the risk of tip-over." },
+      { type: "heading", level: 3, text: "Mast Tilt" },
+      { type: "paragraph", html: "Tilt the mast slightly back when traveling with a load to stabilize it. Never tilt loads forward except when depositing them. Excessive forward tilt can cause the truck to tip." },
+      { type: "heading", level: 3, text: "Visibility" },
+      { type: "paragraph", html: "If a load blocks your forward view, <strong>drive in reverse</strong> to maintain a clear line of sight. Use spotters when navigating tight spaces or areas with limited visibility." },
+      { type: "heading", level: 3, text: "Securing Loads" },
+      { type: "paragraph", html: "Before transporting any load, ensure it is <strong>properly secured and balanced</strong>. You may need shrink-wrap or straps to prevent shifting or spilling during transport. Never move an unsecured load." },
+      { type: "embedded_quiz", questions: [
+        { question: "You pick up a wrapped pallet and realize it completely blocks your forward view. What do you do?", type: "mcq_single", options: ["Lean out the side to see around it", "Raise the load higher so you can see under it", "Travel in reverse with a clear line of sight", "Drive forward slowly and honk"], correctAnswers: "Travel in reverse with a clear line of sight", explanation: "When the load blocks your forward view, travel in reverse so you can see where you are going. Never lean outside the cage or raise the load to see under it." },
+        { question: "While carrying a load, the mast should be tilted:", type: "mcq_single", options: ["Fully forward", "Slightly back", "It doesn't matter", "Fully down"], correctAnswers: "Slightly back", explanation: "A slight back tilt cradles the load against the backrest and keeps it stable during travel." },
+      ] },
+      { type: "callout", variant: "tip", text: "When you can't see past the load, travel in reverse and use a spotter for tight areas." },
+      { type: "key_takeaways", items: [
+        "Carry forks 4–6 inches from the ground",
+        "Tilt the mast back when traveling with a load",
+        "Drive in reverse if the load blocks your forward view",
+        "Always ensure loads are secured before moving",
+      ] },
+    ]),
   },
   {
     module: "Stability & Load Handling",
@@ -273,73 +331,97 @@ export const COURSE_STEPS: StepDef[] = [
     module: "Pre-Operation Inspection & Fueling",
     title: "Pre-Shift Inspection Checklist",
     type: "lesson",
-    estimatedMinutes: 5,
-    config: {
-      html_content: lessonHtml({
-        title: "Pre-Shift Inspection Checklist",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Your Responsibility", content: "<p>As the operator, it is <strong>your responsibility</strong> to conduct a daily safety inspection before using the machine. This must be done at the <strong>start of each shift</strong>.</p>" },
-          { heading: "Walk-Around Inspection", content: "<p>Walk around the entire vehicle, checking for:</p><ul><li><strong>Tires:</strong> Check for damage, proper inflation</li><li><strong>Forks:</strong> Inspect for cracks, bends, or excessive wear</li><li><strong>Chains & hydraulics:</strong> Check for leaks, damage</li><li><strong>Lights, horn, and backup alarm:</strong> Test functionality</li><li><strong>Brakes:</strong> Test both service and parking brakes</li><li><strong>Steering:</strong> Check for responsiveness</li><li><strong>Fluid levels:</strong> Check fuel, oil, coolant, hydraulic fluid</li><li><strong>Seat belt:</strong> Ensure it functions properly</li></ul>" },
-          { heading: "Tag Out Unsafe Equipment", content: "<p>If you find any safety issue, <strong>do not operate the forklift</strong>. Report the problem to your supervisor or maintenance team immediately. Tag out the equipment so no one else uses it until repairs are completed.</p>" },
-        ],
-        takeaways: [
-          "Pre-shift inspection is required before every shift",
-          "Check tires, forks, chains, hydraulics, lights, horn, brakes, steering",
-          "Tag out and report any unsafe equipment immediately",
-          "Never operate a forklift that fails inspection",
-        ],
-        tip: "Always buckle your seat belt before starting the engine — it's your primary protection in a tip-over.",
-      }),
-    },
+    estimatedMinutes: 6,
+    config: blocks([
+      { type: "hero_image", src: photo("pre-inspection-scene.svg"), alt: "Operator inspecting forklift forks with a checklist before a shift" },
+      { type: "heading", level: 2, text: "Pre-Shift Inspection Checklist" },
+      { type: "heading", level: 3, text: "Your Responsibility" },
+      { type: "paragraph", html: "As the operator, it is <strong>your responsibility</strong> to conduct a daily safety inspection before using the machine. This must be done at the <strong>start of each shift</strong>." },
+      { type: "heading", level: 3, text: "Walk-Around Inspection" },
+      { type: "paragraph", html: "Do a full walk-around before you climb on. Tap each point on the forklift to see what to check." },
+      { type: "hotspot_diagram", src: img("forklift-anatomy.svg"), alt: "Forklift walkaround inspection points",
+        caption: "A complete walk-around takes less than 5 minutes and can save a life.",
+        hotspots: [
+          { x: 46, y: 79, label: "Tires & Wheels", description: "Check for cuts, chunks missing, proper inflation (pneumatic), and debris wrapped around axles." },
+          { x: 73, y: 86, label: "Forks", description: "Look for cracks, bends, and heel wear. Check the fork locking pins. Bent or cracked forks mean the truck is out of service." },
+          { x: 56, y: 35, label: "Mast & Lift Chains", description: "Inspect chains for kinks, rust, and broken links. Check that the mast raises, lowers, and tilts smoothly without jerking." },
+          { x: 40, y: 63, label: "Hydraulics & Leaks", description: "Look under the truck for fresh fluid spots. Check hoses and cylinders for leaks. A hydraulic leak means DO NOT OPERATE." },
+          { x: 36, y: 31, label: "Overhead Guard", description: "Check for bent posts, cracks, or missing bolts. The guard is your protection from falling loads." },
+          { x: 46, y: 69, label: "Data Plate", description: "Must be present and legible. If you cannot read the rated capacity, do not operate the truck." },
+          { x: 34, y: 53, label: "Seat & Seat Belt", description: "Test that the seat belt latches and retracts. Buckle up before starting the engine — every single time." },
+          { x: 42, y: 56, label: "Horn, Lights & Alarm", description: "Test the horn, headlights, warning lights, and backup alarm. If pedestrians can't hear you coming, the truck is not safe." },
+        ] },
+      { type: "heading", level: 3, text: "Also Check" },
+      { type: "list", items: [
+        "<strong>Brakes:</strong> Test both service and parking brakes",
+        "<strong>Steering:</strong> Check for responsiveness",
+        "<strong>Fluid levels:</strong> Fuel, oil, coolant, hydraulic fluid",
+      ] },
+      { type: "heading", level: 3, text: "Tag Out Unsafe Equipment" },
+      { type: "paragraph", html: "If you find any safety issue, <strong>do not operate the forklift</strong>. Report the problem to your supervisor or maintenance team immediately. Tag out the equipment so no one else uses it until repairs are completed." },
+      { type: "embedded_quiz", questions: [
+        { question: "During your walk-around you find a slow hydraulic drip under the mast. The truck seems to work fine. What now?", type: "mcq_single", options: ["Operate carefully and re-check at lunch", "Wipe it clean and keep working", "Tag out the truck and report it — do not operate", "Add hydraulic fluid to compensate"], correctAnswers: "Tag out the truck and report it — do not operate", explanation: "Any hydraulic leak can lead to sudden loss of load control. Tag out and report — never operate a leaking truck." },
+      ] },
+      { type: "callout", variant: "tip", text: "Always buckle your seat belt before starting the engine — it's your primary protection in a tip-over." },
+      { type: "key_takeaways", items: [
+        "Pre-shift inspection is required before every shift",
+        "Check tires, forks, chains, hydraulics, lights, horn, brakes, steering",
+        "Tag out and report any unsafe equipment immediately",
+        "Never operate a forklift that fails inspection",
+      ] },
+    ]),
   },
   {
     module: "Pre-Operation Inspection & Fueling",
     title: "Maintenance and Repairs",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Maintenance and Repairs",
-        image: img("pre-shift-checklist.svg"),
-        sections: [
-          { heading: "Repair Before Use", content: "<p>If a safety issue is identified during inspection, <strong>repairs must be made before the equipment is used</strong>. Never operate a forklift with known defects.</p>" },
-          { heading: "Fluid Leaks", content: "<p>Do not operate any vehicle with <strong>fuel, oil, or hydraulic leaks</strong>. Hydraulic leaks can lead to sudden loss of load control, creating an extremely dangerous situation.</p>" },
-          { heading: "Document and Report", content: "<p>All maintenance issues must be documented and reported. This creates a paper trail for compliance and helps prevent recurring issues.</p>" },
-        ],
-        takeaways: [
-          "Repairs must be completed before the equipment is used",
-          "Never operate a forklift with any fluid leaks",
-          "Document all maintenance issues for compliance",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Forklift inspection points diagram" },
+      { type: "heading", level: 2, text: "Maintenance and Repairs" },
+      { type: "heading", level: 3, text: "Repair Before Use" },
+      { type: "paragraph", html: "If a safety issue is identified during inspection, <strong>repairs must be made before the equipment is used</strong>. Never operate a forklift with known defects." },
+      { type: "heading", level: 3, text: "Fluid Leaks" },
+      { type: "paragraph", html: "Do not operate any vehicle with <strong>fuel, oil, or hydraulic leaks</strong>. Hydraulic leaks can lead to sudden loss of load control, creating an extremely dangerous situation." },
+      { type: "heading", level: 3, text: "Document and Report" },
+      { type: "paragraph", html: "All maintenance issues must be documented and reported. This creates a paper trail for compliance and helps prevent recurring issues." },
+      { type: "key_takeaways", items: [
+        "Repairs must be completed before the equipment is used",
+        "Never operate a forklift with any fluid leaks",
+        "Document all maintenance issues for compliance",
+      ] },
+    ]),
   },
   {
     module: "Pre-Operation Inspection & Fueling",
     title: "Fueling and Charging Safety",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Fueling and Charging Safety (LPG / Electric)",
-        image: img("ppe-gloves.svg"),
-        sections: [
-          { heading: "Designated Areas Only", content: "<p>Refueling and recharging must <strong>only occur in designated areas</strong> with proper ventilation. Never refuel in general work areas.</p>" },
-          { heading: "PPE Requirements", content: "<ul><li>Wear <strong>gloves</strong> when handling LPG tanks</li><li>Wear <strong>eye protection</strong> as applicable</li><li>Follow your facility's specific PPE requirements</li></ul>" },
-          { heading: "No Smoking", content: "<p>Employees are <strong>strictly prohibited from smoking</strong> or using any open flame while operating a forklift. Sparks or open flames must remain at least <strong>50 feet away</strong> from fueling stations and battery recharging areas.</p>" },
-          { heading: "LPG Safety", content: "<p>When changing propane tanks: check for leaks, ensure proper connection, and verify the tank is secured. Report any gas smell immediately.</p>" },
-          { heading: "Electric Battery Safety", content: "<p>When charging batteries: turn off the charger before connecting/disconnecting. Electric batteries produce hydrogen gas during charging — ensure adequate ventilation to prevent explosion risk.</p>" },
-        ],
-        takeaways: [
-          "Refuel/recharge only in designated, ventilated areas",
-          "Wear gloves when handling LPG tanks",
-          "No smoking within 50 feet of fueling/charging areas",
-          "Always check for leaks after connecting LPG tanks",
-        ],
-        warning: "No smoking, open flames, or sparks near fueling or charging areas. Hydrogen gas from charging batteries is highly explosive.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("ppe-gloves.svg"), alt: "Required PPE for fueling: gloves, vest, hard hat, eye protection" },
+      { type: "heading", level: 2, text: "Fueling and Charging Safety (LPG / Electric)" },
+      { type: "heading", level: 3, text: "Designated Areas Only" },
+      { type: "paragraph", html: "Refueling and recharging must <strong>only occur in designated areas</strong> with proper ventilation. Never refuel in general work areas." },
+      { type: "heading", level: 3, text: "PPE Requirements" },
+      { type: "list", items: [
+        "Wear <strong>gloves</strong> when handling LPG tanks",
+        "Wear <strong>eye protection</strong> as applicable",
+        "Follow your facility's specific PPE requirements",
+      ] },
+      { type: "heading", level: 3, text: "No Smoking" },
+      { type: "paragraph", html: "Employees are <strong>strictly prohibited from smoking</strong> or using any open flame while operating a forklift. Sparks or open flames must remain at least <strong>50 feet away</strong> from fueling stations and battery recharging areas." },
+      { type: "flip_cards", title: "LPG vs. Electric — Know Your Fuel", cards: [
+        { front: "LPG (Propane)", back: "Wear gloves — liquid propane causes frostbite. Check for leaks after connecting, secure the tank, and report any gas smell immediately." },
+        { front: "Electric (Battery)", back: "Turn off the charger before connecting or disconnecting. Charging produces explosive hydrogen gas — ventilation is mandatory." },
+      ] },
+      { type: "callout", variant: "warning", text: "No smoking, open flames, or sparks near fueling or charging areas. Hydrogen gas from charging batteries is highly explosive." },
+      { type: "key_takeaways", items: [
+        "Refuel/recharge only in designated, ventilated areas",
+        "Wear gloves when handling LPG tanks",
+        "No smoking within 50 feet of fueling/charging areas",
+        "Always check for leaks after connecting LPG tanks",
+      ] },
+    ]),
   },
   {
     module: "Pre-Operation Inspection & Fueling",
@@ -360,92 +442,103 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Speed, Space, and Awareness",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Speed, Space, and Awareness",
-        image: img("safe-driving.svg"),
-        sections: [
-          { heading: "Speed Limits", content: "<p>The maximum safe speed for operating a forklift is typically <strong>5 mph</strong>. Forklifts are designed to move heavy loads, not to race. Focus on working <strong>efficiently, not faster</strong>.</p>" },
-          { heading: "Stopping Distance", content: "<p>Maintain adequate stopping distance at all times. Keep at least <strong>three vehicle lengths</strong> or a <strong>3-second gap</strong> between vehicles.</p>" },
-          { heading: "Surface Conditions", content: "<p>Be aware of wet floors, debris, oil spills, and uneven surfaces. These conditions significantly increase stopping distance and tip-over risk. Slow down and navigate carefully.</p>" },
-        ],
-        takeaways: [
-          "Maximum safe speed is typically 5 mph",
-          "Maintain at least 3 vehicle lengths between trucks",
-          "Wet floors and debris increase stopping distance",
-          "Efficiency comes from smooth operation, not speed",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("safe-driving.svg"), alt: "Proper driving posture with seat belt, low load, and eyes forward" },
+      { type: "heading", level: 2, text: "Speed, Space, and Awareness" },
+      { type: "heading", level: 3, text: "Speed Limits" },
+      { type: "paragraph", html: "The maximum safe speed for operating a forklift is typically <strong>5 mph</strong>. Forklifts are designed to move heavy loads, not to race. Focus on working <strong>efficiently, not faster</strong>." },
+      { type: "heading", level: 3, text: "Stopping Distance" },
+      { type: "paragraph", html: "Maintain adequate stopping distance at all times. Keep at least <strong>three vehicle lengths</strong> or a <strong>3-second gap</strong> between vehicles." },
+      { type: "heading", level: 3, text: "Surface Conditions" },
+      { type: "paragraph", html: "Be aware of wet floors, debris, oil spills, and uneven surfaces. These conditions significantly increase stopping distance and tip-over risk. Slow down and navigate carefully." },
+      { type: "embedded_quiz", questions: [
+        { question: "Another forklift is working in the same aisle ahead of you. How much space should you keep?", type: "mcq_single", options: ["One vehicle length", "Half an aisle", "At least three vehicle lengths", "Enough to see their forks"], correctAnswers: "At least three vehicle lengths", explanation: "Keep at least three vehicle lengths (about a 3-second gap) so you can stop safely if they brake suddenly." },
+      ] },
+      { type: "key_takeaways", items: [
+        "Maximum safe speed is typically 5 mph",
+        "Maintain at least 3 vehicle lengths between trucks",
+        "Wet floors and debris increase stopping distance",
+        "Efficiency comes from smooth operation, not speed",
+      ] },
+    ]),
   },
   {
     module: "Safe Driving & Pedestrians",
     title: "Intersections, Blind Spots, and Horn Use",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Intersections, Blind Spots, and Horn Use",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Approach With Caution", content: "<p>At every intersection, blind corner, or area with limited visibility: <strong>slow down, sound your horn, and look both ways</strong> before proceeding.</p>" },
-          { heading: "Mirrors and Visibility", content: "<p>Use available mirrors and look in the direction of travel. If a load blocks your forward view, travel in reverse. Never pass at intersections, blind spots, or hazardous areas.</p>" },
-          { heading: "Horn Protocol", content: "<p>The horn is a <strong>warning device</strong>, not a demand for right-of-way. Sound it at intersections, blind corners, doorways, and whenever pedestrians may be present. Use it to alert others to your presence.</p>" },
-        ],
-        takeaways: [
-          "Slow down, honk, and look at every intersection",
-          "Use mirrors and drive in reverse when view is blocked",
-          "The horn warns others — it doesn't give you right-of-way",
-          "Never pass at intersections or blind spots",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Warehouse aisle with clearance zones" },
+      { type: "heading", level: 2, text: "Intersections, Blind Spots, and Horn Use" },
+      { type: "heading", level: 3, text: "Approach With Caution" },
+      { type: "paragraph", html: "At every intersection, blind corner, or area with limited visibility: <strong>slow down, sound your horn, and look both ways</strong> before proceeding." },
+      { type: "heading", level: 3, text: "Mirrors and Visibility" },
+      { type: "paragraph", html: "Use available mirrors and look in the direction of travel. If a load blocks your forward view, travel in reverse. Never pass at intersections, blind spots, or hazardous areas." },
+      { type: "heading", level: 3, text: "Horn Protocol" },
+      { type: "paragraph", html: "The horn is a <strong>warning device</strong>, not a demand for right-of-way. Sound it at intersections, blind corners, doorways, and whenever pedestrians may be present. Use it to alert others to your presence." },
+      { type: "key_takeaways", items: [
+        "Slow down, honk, and look at every intersection",
+        "Use mirrors and drive in reverse when view is blocked",
+        "The horn warns others — it doesn't give you right-of-way",
+        "Never pass at intersections or blind spots",
+      ] },
+    ]),
   },
   {
     module: "Safe Driving & Pedestrians",
     title: "Pedestrian Right of Way",
     type: "lesson",
-    estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Pedestrian Right of Way",
-        image: img("pedestrian-safety.svg"),
-        sections: [
-          { heading: "Pedestrians Always Have Priority", content: "<p>Pedestrians <strong>always have the right of way</strong>. Never drive toward a person near a fixed object. Always ensure people are clear before moving.</p>" },
-          { heading: "Communication", content: "<ul><li>Make <strong>eye contact</strong> with pedestrians before proceeding</li><li>Sound the horn as a <strong>warning</strong>, not as a demand to move</li><li>Wait for pedestrians to acknowledge you and move to safety</li></ul>" },
-          { heading: "Pedestrian Zones", content: "<p>Be especially alert in areas where pedestrians commonly walk: near break rooms, restrooms, offices, shipping/receiving areas, and anywhere workers cross forklift paths.</p>" },
-        ],
-        takeaways: [
-          "Pedestrians always have the right of way",
-          "Make eye contact before proceeding near people",
-          "Sound the horn as a warning, not a demand",
-          "Be extra alert near break rooms, offices, and crossing areas",
-        ],
-      }),
-    },
+    estimatedMinutes: 4,
+    config: blocks([
+      { type: "hero_image", src: photo("pedestrian-crossing-scene.svg"), alt: "Forklift yielding to a pedestrian in a marked walkway" },
+      { type: "heading", level: 2, text: "Pedestrian Right of Way" },
+      { type: "heading", level: 3, text: "Pedestrians Always Have Priority" },
+      { type: "paragraph", html: "Pedestrians <strong>always have the right of way</strong>. Never drive toward a person near a fixed object. Always ensure people are clear before moving." },
+      { type: "image", src: img("pedestrian-safety.svg"), alt: "Diagram of forklift blind spots and pedestrian separation zones", caption: "Blind spots extend behind the truck and around the mast — assume pedestrians don't see you." },
+      { type: "heading", level: 3, text: "Communication" },
+      { type: "list", items: [
+        "Make <strong>eye contact</strong> with pedestrians before proceeding",
+        "Sound the horn as a <strong>warning</strong>, not as a demand to move",
+        "Wait for pedestrians to acknowledge you and move to safety",
+      ] },
+      { type: "scenario", title: "What Would You Do?",
+        prompt: "You are carrying a pallet down the main aisle at walking speed. Twenty feet ahead, a coworker steps out from between two racks reading a clipboard. They have not seen you.",
+        choices: [
+          { text: "Sound the horn repeatedly and keep moving — they'll step back", correct: false, feedback: "The horn is a warning, not a demand for right of way. A startled pedestrian may step the wrong way. You must stop until they are clear." },
+          { text: "Stop, sound the horn once, and wait for eye contact before proceeding", correct: true, feedback: "Exactly right. Pedestrians always have the right of way. Stop, warn, make eye contact, and only proceed once they are clearly out of your path." },
+          { text: "Steer around them while keeping your speed", correct: false, feedback: "Never swerve around a pedestrian who hasn't seen you — they may move into your new path, and sharp steering with a load risks a tip-over." },
+        ] },
+      { type: "heading", level: 3, text: "Pedestrian Zones" },
+      { type: "paragraph", html: "Be especially alert in areas where pedestrians commonly walk: near break rooms, restrooms, offices, shipping/receiving areas, and anywhere workers cross forklift paths." },
+      { type: "key_takeaways", items: [
+        "Pedestrians always have the right of way",
+        "Make eye contact before proceeding near people",
+        "Sound the horn as a warning, not a demand",
+        "Be extra alert near break rooms, offices, and crossing areas",
+      ] },
+    ]),
   },
   {
     module: "Safe Driving & Pedestrians",
     title: "Direction Changes and Smooth Handling",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Direction Changes and Smooth Handling",
-        image: img("safe-driving.svg"),
-        sections: [
-          { heading: "Complete Stop Before Direction Change", content: "<p>Always come to a <strong>complete stop</strong> before changing from forward to reverse or vice versa. Abrupt direction changes can cause loads to shift or fall, and increase tip-over risk.</p>" },
-          { heading: "Smooth Movements", content: "<p>Smooth acceleration, braking, and steering prevent load shifts, spills, and tip-overs. Jerky movements are the enemy of stability.</p>" },
-          { heading: "Do Not Accelerate While Turning", content: "<p>Accelerating during a turn significantly increases the risk of tipping. The unique weight distribution of a forklift, combined with a heavy load, makes it easy to lose control if not handled carefully.</p>" },
-        ],
-        takeaways: [
-          "Come to a complete stop before changing direction",
-          "Smooth acceleration and braking prevent load shifts",
-          "Never accelerate while turning",
-          "Jerky movements increase tip-over risk",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("safe-driving.svg"), alt: "Safe driving posture and smooth handling" },
+      { type: "heading", level: 2, text: "Direction Changes and Smooth Handling" },
+      { type: "heading", level: 3, text: "Complete Stop Before Direction Change" },
+      { type: "paragraph", html: "Always come to a <strong>complete stop</strong> before changing from forward to reverse or vice versa. Abrupt direction changes can cause loads to shift or fall, and increase tip-over risk." },
+      { type: "heading", level: 3, text: "Smooth Movements" },
+      { type: "paragraph", html: "Smooth acceleration, braking, and steering prevent load shifts, spills, and tip-overs. Jerky movements are the enemy of stability." },
+      { type: "heading", level: 3, text: "Do Not Accelerate While Turning" },
+      { type: "paragraph", html: "Accelerating during a turn significantly increases the risk of tipping. The unique weight distribution of a forklift, combined with a heavy load, makes it easy to lose control if not handled carefully." },
+      { type: "key_takeaways", items: [
+        "Come to a complete stop before changing direction",
+        "Smooth acceleration and braking prevent load shifts",
+        "Never accelerate while turning",
+        "Jerky movements increase tip-over risk",
+      ] },
+    ]),
   },
   {
     module: "Safe Driving & Pedestrians",
@@ -468,71 +561,100 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Ramps and Slopes",
     type: "lesson",
     estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Ramps and Slopes",
-        image: img("ramps-slopes.svg"),
-        sections: [
-          { heading: "Loaded Travel on Ramps", content: "<p>When traveling on a ramp <strong>with a load</strong>: keep the load pointed <strong>uphill</strong> (upgrade). This means driving forward up a ramp and in reverse down a ramp when loaded.</p>" },
-          { heading: "Unloaded Travel on Ramps", content: "<p>When traveling on a ramp <strong>without a load</strong>: the forks should point <strong>downhill</strong> (downgrade).</p>" },
-          { heading: "Ramp Safety Rules", content: "<ul><li>Ascend and descend slowly</li><li>On steep grades (>10%), travel with load upgrade</li><li>Tilt load back slightly for stability</li><li><strong>Never turn on a ramp</strong> — the risk of tip-over is extremely high</li><li>Never park on a ramp unless absolutely necessary (chock wheels if you must)</li></ul>" },
-        ],
-        takeaways: [
-          "Loaded: keep load pointed uphill (upgrade)",
-          "Unloaded: forks pointed downhill (downgrade)",
-          "Never turn on a ramp — extreme tip-over risk",
-          "Travel slowly and tilt the load back slightly",
-        ],
-        warning: "Turning on a ramp dramatically increases tip-over risk. Always travel straight up or down.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("ramps-slopes.svg"), alt: "Forklift on a ramp with the load pointed upgrade" },
+      { type: "heading", level: 2, text: "Ramps and Slopes" },
+      { type: "heading", level: 3, text: "Loaded Travel on Ramps" },
+      { type: "paragraph", html: "When traveling on a ramp <strong>with a load</strong>: keep the load pointed <strong>uphill</strong> (upgrade). This means driving forward up a ramp and in reverse down a ramp when loaded." },
+      { type: "heading", level: 3, text: "Unloaded Travel on Ramps" },
+      { type: "paragraph", html: "When traveling on a ramp <strong>without a load</strong>: the forks should point <strong>downhill</strong> (downgrade)." },
+      { type: "scenario", title: "Ramp Decision",
+        prompt: "You picked up a full pallet on the upper level and need to take it DOWN the ramp to ground level. What is the correct way to descend?",
+        choices: [
+          { text: "Drive forward down the ramp — you can see better", correct: false, feedback: "With the load pointed downhill, gravity pulls the pallet off the forks and the combined center of gravity shifts toward the front axle — a recipe for losing the load or tipping." },
+          { text: "Back down the ramp so the load stays pointed uphill", correct: true, feedback: "Correct. Loaded on a ramp = load always points upgrade. Going down, that means traveling in reverse, slowly, looking over your shoulder or using a spotter." },
+          { text: "Turn around halfway down to face the load uphill", correct: false, feedback: "Never turn on a ramp. Turning shifts the center of gravity sideways on an incline — this is one of the highest tip-over-risk maneuvers possible." },
+        ] },
+      { type: "heading", level: 3, text: "Ramp Safety Rules" },
+      { type: "list", items: [
+        "Ascend and descend slowly",
+        "On steep grades (>10%), travel with load upgrade",
+        "Tilt load back slightly for stability",
+        "<strong>Never turn on a ramp</strong> — the risk of tip-over is extremely high",
+        "Never park on a ramp unless absolutely necessary (chock wheels if you must)",
+      ] },
+      { type: "callout", variant: "warning", text: "Turning on a ramp dramatically increases tip-over risk. Always travel straight up or down." },
+      { type: "key_takeaways", items: [
+        "Loaded: keep load pointed uphill (upgrade)",
+        "Unloaded: forks pointed downhill (downgrade)",
+        "Never turn on a ramp — extreme tip-over risk",
+        "Travel slowly and tilt the load back slightly",
+      ] },
+    ]),
   },
   {
     module: "Ramps, Docks & Elevated Work",
     title: "Docks and Trailer Safety",
     type: "lesson",
-    estimatedMinutes: 4,
-    config: {
-      html_content: lessonHtml({
-        title: "Docks and Trailer Safety",
-        image: img("dock-safety.svg"),
-        sections: [
-          { heading: "Before Entering a Trailer", content: "<p>Before driving into any truck or trailer:</p><ul><li>Verify the trailer is <strong>properly chocked</strong> (wheel chocks in place)</li><li>Confirm the trailer <strong>brakes are set</strong></li><li>Check the condition of the trailer floor — look for rot, holes, or weakness</li><li>Ensure a <strong>dock plate</strong> is properly positioned</li></ul>" },
-          { heading: "Dock Plates", content: "<p>Never attempt to drive directly from the dock to the trailer without a dock plate. This can result in a spilled load or a stuck forklift. Keep forks at the recommended <strong>4–6 inch</strong> carrying height when entering.</p>" },
-          { heading: "Edge Awareness", content: "<p>Maintain at least <strong>one tire-width distance</strong> from dock edges or platform edges. Drop-off hazards are a serious risk in dock areas.</p>" },
-          { heading: "Trailer Movement", content: "<p>A forklift's braking force can cause an unbraked trailer to move away from the dock, potentially trapping the forklift inside. <strong>Always verify chocks and brakes</strong> before entering.</p>" },
-        ],
-        takeaways: [
-          "Always verify chocks and brakes before entering a trailer",
-          "Use a dock plate — never jump the gap",
-          "Check trailer floor condition before driving on it",
-          "Maintain at least one tire-width from dock edges",
-        ],
-      }),
-    },
+    estimatedMinutes: 5,
+    config: blocks([
+      { type: "hero_image", src: photo("dock-loading-scene.svg"), alt: "Forklift entering a trailer over a dock plate at a loading dock" },
+      { type: "heading", level: 2, text: "Docks and Trailer Safety" },
+      { type: "heading", level: 3, text: "Before Entering a Trailer" },
+      { type: "list", items: [
+        "Verify the trailer is <strong>properly chocked</strong> (wheel chocks in place)",
+        "Confirm the trailer <strong>brakes are set</strong>",
+        "Check the condition of the trailer floor — look for rot, holes, or weakness",
+        "Ensure a <strong>dock plate</strong> is properly positioned",
+      ] },
+      { type: "heading", level: 3, text: "Know the Dock Hazards" },
+      { type: "paragraph", html: "Dock areas pack several serious hazards into a small space. Tap each marker to learn what to check." },
+      { type: "hotspot_diagram", src: img("dock-scene.svg"), alt: "Cross-section of a loading dock with trailer, dock plate, and wheel chocks",
+        hotspots: [
+          { x: 54, y: 67, label: "Dock Plate", description: "Must be rated for your truck's weight, properly seated, and secured before you cross. Never jump the gap — enter straight and slow, forks 4–6 inches up." },
+          { x: 31, y: 88, label: "Wheel Chocks", description: "Chocks against the trailer wheels stop it from creeping away from the dock. Verify them yourself — do not take anyone's word for it." },
+          { x: 31, y: 62, label: "Trailer Floor", description: "Check for rot, holes, and weak boards before driving in. Confirm the trailer's landing gear or nose support if the tractor is detached." },
+          { x: 61, y: 67, label: "Dock Edge", description: "An open dock is a 4-foot drop. Stay at least one tire-width from the edge and never operate near an unprotected open dock door." },
+          { x: 59, y: 73, label: "Trailer Creep Gap", description: "Every forklift entry pushes the trailer slightly. Watch the gap between trailer and dock — a growing gap means the trailer is creeping and must be re-secured." },
+        ] },
+      { type: "heading", level: 3, text: "Trailer Movement" },
+      { type: "paragraph", html: "A forklift's braking force can cause an unbraked trailer to move away from the dock, potentially trapping the forklift inside. <strong>Always verify chocks and brakes</strong> before entering." },
+      { type: "key_takeaways", items: [
+        "Always verify chocks and brakes before entering a trailer",
+        "Use a dock plate — never jump the gap",
+        "Check trailer floor condition before driving on it",
+        "Maintain at least one tire-width from dock edges",
+      ] },
+    ]),
   },
   {
     module: "Ramps, Docks & Elevated Work",
     title: "Lifting People and Elevated Work",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Lifting People and Elevated Work",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Never Lift People on Bare Forks", content: "<p>It is <strong>never acceptable</strong> to lift a person on the forks without an approved safety platform. This includes standing on pallets, buckets, or any makeshift platform.</p>" },
-          { heading: "Approved Safety Platforms", content: "<p>An OSHA-approved safety platform must include:</p><ul><li><strong>42-inch guardrails</strong> on all sides</li><li>Mid-rail positioned halfway between top rail and platform</li><li><strong>4-inch toe boards</strong></li><li>Secure attachment to the mast (chain or locking device)</li><li><strong>7-foot overhead guard</strong> for crush protection</li><li>Personal fall protection (safety line and harness)</li></ul>" },
-          { heading: "Operator Responsibilities During Elevation", content: "<p>When lifting a person in a platform: the engine must remain running, the operator must <strong>stay at the controls at all times</strong>, and the forklift must not be driven to another location with a person elevated.</p>" },
-        ],
-        takeaways: [
-          "Never lift people on bare forks or makeshift platforms",
-          "Only use OSHA-approved platforms with guardrails and fall protection",
-          "Operator must remain at the controls while someone is elevated",
-          "Never move the forklift with a person elevated in a platform",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("aerial-lift-scene.svg"), alt: "Worker in a harness on an elevated platform with a ground guard below" },
+      { type: "heading", level: 2, text: "Lifting People and Elevated Work" },
+      { type: "heading", level: 3, text: "Never Lift People on Bare Forks" },
+      { type: "paragraph", html: "It is <strong>never acceptable</strong> to lift a person on the forks without an approved safety platform. This includes standing on pallets, buckets, or any makeshift platform." },
+      { type: "heading", level: 3, text: "Approved Safety Platforms" },
+      { type: "list", items: [
+        "<strong>42-inch guardrails</strong> on all sides",
+        "Mid-rail positioned halfway between top rail and platform",
+        "<strong>4-inch toe boards</strong>",
+        "Secure attachment to the mast (chain or locking device)",
+        "<strong>7-foot overhead guard</strong> for crush protection",
+        "Personal fall protection (safety line and harness)",
+      ] },
+      { type: "heading", level: 3, text: "Operator Responsibilities During Elevation" },
+      { type: "paragraph", html: "When lifting a person in a platform: the engine must remain running, the operator must <strong>stay at the controls at all times</strong>, and the forklift must not be driven to another location with a person elevated." },
+      { type: "key_takeaways", items: [
+        "Never lift people on bare forks or makeshift platforms",
+        "Only use OSHA-approved platforms with guardrails and fall protection",
+        "Operator must remain at the controls while someone is elevated",
+        "Never move the forklift with a person elevated in a platform",
+      ] },
+    ]),
   },
   {
     module: "Ramps, Docks & Elevated Work",
@@ -552,47 +674,68 @@ export const COURSE_STEPS: StepDef[] = [
     module: "Parking & Shutdown",
     title: "Parking and Securing the Forklift",
     type: "lesson",
-    estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Parking and Securing the Forklift",
-        image: img("parking-shutdown.svg"),
-        sections: [
-          { heading: "Parking Procedure", content: "<p>When parking your forklift:</p><ol><li><strong>Lower forks</strong> completely flat to the ground</li><li>Tilt forks slightly forward</li><li><strong>Set the parking brake</strong></li><li><strong>Neutralize all controls</strong></li><li><strong>Turn off the engine/power</strong></li><li><strong>Remove the key</strong></li></ol>" },
-          { heading: "Parking Location", content: "<p>Park only in <strong>designated areas</strong>. Never block fire exits, emergency equipment, or traffic lanes. If parking on an incline, chock the wheels.</p>" },
-        ],
-        takeaways: [
-          "Lower forks, set brake, neutralize controls, turn off engine, remove key",
-          "Park only in designated areas",
-          "Never block fire exits or emergency equipment",
-          "Chock wheels if parking on an incline",
-        ],
-      }),
-    },
+    estimatedMinutes: 4,
+    config: blocks([
+      { type: "hero_image", src: img("parking-shutdown.svg"), alt: "Parked forklift with forks lowered, chocked wheel, and shutdown steps" },
+      { type: "heading", level: 2, text: "Parking and Securing the Forklift" },
+      { type: "heading", level: 3, text: "Parking Procedure" },
+      { type: "paragraph", html: "Every shutdown follows the same sequence. Put the steps in order — you will do this at the end of every shift for the rest of your career." },
+      { type: "drag_drop", mode: "ordering",
+        prompt: "Arrange the parking procedure steps in the correct order.",
+        items: [
+          { id: "p1", label: "Lower forks completely flat to the ground" },
+          { id: "p2", label: "Tilt forks slightly forward" },
+          { id: "p3", label: "Set the parking brake" },
+          { id: "p4", label: "Neutralize all controls" },
+          { id: "p5", label: "Turn off the engine / power" },
+          { id: "p6", label: "Remove the key" },
+        ] },
+      { type: "heading", level: 3, text: "Parking Location" },
+      { type: "paragraph", html: "Park only in <strong>designated areas</strong>. Never block fire exits, emergency equipment, or traffic lanes. If parking on an incline, chock the wheels." },
+      { type: "key_takeaways", items: [
+        "Lower forks, set brake, neutralize controls, turn off engine, remove key",
+        "Park only in designated areas",
+        "Never block fire exits or emergency equipment",
+        "Chock wheels if parking on an incline",
+      ] },
+    ]),
   },
   {
     module: "Parking & Shutdown",
     title: "Unattended Forklift Definition",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Unattended Forklift: When and What To Do",
-        image: img("parking-shutdown.svg"),
-        sections: [
-          { heading: "What 'Unattended' Means", content: "<p>A forklift is considered <strong>unattended</strong> when the operator is <strong>more than 25 feet away</strong> from the vehicle AND the vehicle is <strong>out of their line of sight</strong>.</p>" },
-          { heading: "Unattended Procedure", content: "<p>When leaving a forklift unattended:</p><ul><li>Shut off power</li><li>Set brakes</li><li>Lower forks fully</li><li>Return mast to vertical</li><li>Remove the key to prevent unauthorized use</li><li>Block wheels if on an incline</li></ul>" },
-          { heading: "Temporarily Dismounted (Within 25 Feet)", content: "<p>If you are within 25 feet and have the forklift in your line of sight:</p><ul><li>Lower forks</li><li>Neutralize controls</li><li>Set brakes</li></ul><p>You do not need to remove the key in this case, but the forklift must be secured.</p>" },
-          { heading: "Reporting Accidents", content: "<p>Report <strong>all accidents</strong>, even minor ones — including minor scrapes, near-misses, and property damage. Failure to report can lead to disciplinary action and hides safety issues that need to be addressed.</p>" },
-        ],
-        takeaways: [
-          "Unattended = 25+ feet away AND out of sight",
-          "Full shutdown required when unattended: power off, brake set, key removed",
-          "Within 25 feet: lower forks, neutralize controls, set brakes",
-          "Report ALL accidents, even minor ones",
-        ],
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: img("parking-shutdown.svg"), alt: "Forklift parked and secured" },
+      { type: "heading", level: 2, text: "Unattended Forklift: When and What To Do" },
+      { type: "heading", level: 3, text: "What 'Unattended' Means" },
+      { type: "paragraph", html: "A forklift is considered <strong>unattended</strong> when the operator is <strong>more than 25 feet away</strong> from the vehicle AND the vehicle is <strong>out of their line of sight</strong>." },
+      { type: "heading", level: 3, text: "Unattended Procedure" },
+      { type: "list", items: [
+        "Shut off power",
+        "Set brakes",
+        "Lower forks fully",
+        "Return mast to vertical",
+        "Remove the key to prevent unauthorized use",
+        "Block wheels if on an incline",
+      ] },
+      { type: "heading", level: 3, text: "Temporarily Dismounted (Within 25 Feet)" },
+      { type: "paragraph", html: "If you are within 25 feet and have the forklift in your line of sight:" },
+      { type: "list", items: [
+        "Lower forks",
+        "Neutralize controls",
+        "Set brakes",
+      ] },
+      { type: "paragraph", html: "You do not need to remove the key in this case, but the forklift must be secured." },
+      { type: "heading", level: 3, text: "Reporting Accidents" },
+      { type: "paragraph", html: "Report <strong>all accidents</strong>, even minor ones — including minor scrapes, near-misses, and property damage. Failure to report can lead to disciplinary action and hides safety issues that need to be addressed." },
+      { type: "key_takeaways", items: [
+        "Unattended = 25+ feet away AND out of sight",
+        "Full shutdown required when unattended: power off, brake set, key removed",
+        "Within 25 feet: lower forks, neutralize controls, set brakes",
+        "Report ALL accidents, even minor ones",
+      ] },
+    ]),
   },
   {
     module: "Parking & Shutdown",
@@ -611,24 +754,37 @@ export const COURSE_STEPS: StepDef[] = [
     module: "Site-Specific Rules & Employer Packet",
     title: "Site-Specific Training Matters",
     type: "lesson",
-    estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "Site-Specific Training Matters",
-        image: img("warehouse-aisle.svg"),
-        sections: [
-          { heading: "Every Workplace Is Different", content: "<p>Every worksite has unique hazards: narrow aisles, specific pedestrian traffic patterns, loading docks, racking configurations, cold storage areas, outdoor areas, and more. Your supervisor must review <strong>site-specific policies</strong> with you before you operate at any new location.</p>" },
-          { heading: "Site-Specific Topics", content: "<ul><li>Facility speed limits and traffic patterns</li><li>Designated parking and charging areas</li><li>Pedestrian zones and crossings</li><li>Emergency procedures and assembly points</li><li>Communication protocols (radio, signals)</li><li>Specific equipment types and attachments used</li></ul>" },
-          { heading: "Refresher Training", content: "<p>Additional training is required when:</p><ul><li>Operating a new type of equipment</li><li>Working at a new facility</li><li>After an accident or near-miss</li><li>When unsafe operation is observed</li></ul>" },
-        ],
-        takeaways: [
-          "Every workplace has unique hazards that require site-specific training",
-          "Your supervisor must review site policies before you operate",
-          "Additional training is required for new equipment or facilities",
-          "After accidents or observed unsafe behavior, retraining is required",
-        ],
-      }),
-    },
+    estimatedMinutes: 4,
+    config: blocks([
+      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Warehouse aisle showing site-specific clearances" },
+      { type: "heading", level: 2, text: "Site-Specific Training Matters" },
+      { type: "heading", level: 3, text: "Every Workplace Is Different" },
+      { type: "paragraph", html: "Every worksite has unique hazards: narrow aisles, specific pedestrian traffic patterns, loading docks, racking configurations, cold storage areas, outdoor areas, and more. Your supervisor must review <strong>site-specific policies</strong> with you before you operate at any new location." },
+      { type: "heading", level: 3, text: "Site-Specific Topics" },
+      { type: "list", items: [
+        "Facility speed limits and traffic patterns",
+        "Designated parking and charging areas",
+        "Pedestrian zones and crossings",
+        "Emergency procedures and assembly points",
+        "Communication protocols (radio, signals)",
+        "Specific equipment types and attachments used",
+      ] },
+      { type: "heading", level: 3, text: "What Your Employer Owes You" },
+      { type: "paragraph", html: "OSHA puts specific duties on your employer. Flip each card to see what they are responsible for." },
+      { type: "flip_cards", title: "Employer Responsibilities", cards: [
+        { front: "Practical Training", back: "Hands-on training on the specific equipment you will operate, at the actual worksite, before you work solo." },
+        { front: "Evaluation", back: "A supervisor or qualified trainer must watch you operate and formally sign off on your competence." },
+        { front: "Documentation", back: "Signed evaluation forms, permits, and attendance records kept on file — OSHA can request them during inspections." },
+        { front: "Refresher Training", back: "Required after an accident or near-miss, when unsafe operation is observed, or when you move to new equipment or a new facility." },
+        { front: "Re-Evaluation", back: "At least every 3 years, your employer must re-evaluate your performance to keep your certification current." },
+      ] },
+      { type: "key_takeaways", items: [
+        "Every workplace has unique hazards that require site-specific training",
+        "Your supervisor must review site policies before you operate",
+        "Additional training is required for new equipment or facilities",
+        "After accidents or observed unsafe behavior, retraining is required",
+      ] },
+    ]),
   },
   {
     module: "Site-Specific Rules & Employer Packet",
@@ -716,24 +872,29 @@ export const COURSE_STEPS: StepDef[] = [
     title: "Congratulations: What's Next",
     type: "lesson",
     estimatedMinutes: 3,
-    config: {
-      html_content: lessonHtml({
-        title: "You're Certified! What's Next",
-        image: img("forklift-hero.svg"),
-        sections: [
-          { heading: "Your Certificate", content: "<p>Congratulations on completing the formal instruction portion of your forklift operator certification! Your digital certificate is now available for download. It includes a unique certificate number and QR code that employers can use for instant verification.</p>" },
-          { heading: "Next Step: Practical Evaluation", content: "<p>Remember, your employer must still complete the <strong>hands-on practical evaluation</strong> at your worksite. Share the employer documentation packet (available in Module 7) with your supervisor. It includes:</p><ul><li>Performance Evaluation Checklist</li><li>Operator Permit / Authorization Form</li><li>Site Attendance Sheet</li></ul>" },
-          { heading: "Wallet Card (Optional)", content: "<p>Want a professional, wallet-sized operator ID card? Order your physical card from your certification page. It makes it easy to show proof of training on the job.</p>" },
-          { heading: "Stay Safe", content: "<p>Your training doesn't end here. Continue to follow safe operating procedures every day. If you ever have questions or need a refresher, you can revisit this course at any time. Stay safe out there!</p>" },
-        ],
-        takeaways: [
-          "Download your certificate from your certification page",
-          "Share the employer packet with your supervisor for practical evaluation",
-          "Consider ordering a wallet-sized operator ID card",
-          "Re-evaluation is required at least every 3 years",
-        ],
-        tip: "Bookmark your verification page link — employers can use it to instantly verify your certification.",
-      }),
-    },
+    config: blocks([
+      { type: "hero_image", src: photo("ppe-workers-scene.svg"), alt: "Team of certified workers in PPE in front of a forklift" },
+      { type: "heading", level: 2, text: "You're Certified! What's Next" },
+      { type: "heading", level: 3, text: "Your Certificate" },
+      { type: "paragraph", html: "Congratulations on completing the formal instruction portion of your forklift operator certification! Your digital certificate is now available for download. It includes a unique certificate number and QR code that employers can use for instant verification." },
+      { type: "heading", level: 3, text: "Next Step: Practical Evaluation" },
+      { type: "paragraph", html: "Remember, your employer must still complete the <strong>hands-on practical evaluation</strong> at your worksite. Share the employer documentation packet (available in Module 7) with your supervisor. It includes:" },
+      { type: "list", items: [
+        "Performance Evaluation Checklist",
+        "Operator Permit / Authorization Form",
+        "Site Attendance Sheet",
+      ] },
+      { type: "heading", level: 3, text: "Wallet Card (Optional)" },
+      { type: "paragraph", html: "Want a professional, wallet-sized operator ID card? Order your physical card from your certification page. It makes it easy to show proof of training on the job." },
+      { type: "heading", level: 3, text: "Stay Safe" },
+      { type: "paragraph", html: "Your training doesn't end here. Continue to follow safe operating procedures every day. If you ever have questions or need a refresher, you can revisit this course at any time. Stay safe out there!" },
+      { type: "callout", variant: "tip", text: "Bookmark your verification page link — employers can use it to instantly verify your certification." },
+      { type: "key_takeaways", items: [
+        "Download your certificate from your certification page",
+        "Share the employer packet with your supervisor for practical evaluation",
+        "Consider ordering a wallet-sized operator ID card",
+        "Re-evaluation is required at least every 3 years",
+      ] },
+    ]),
   },
 ];
