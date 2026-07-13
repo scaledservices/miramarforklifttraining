@@ -8,12 +8,13 @@ import { sendOrderReceipt, sendNewOrderAdminAlert } from "../email";
 import { generateInvoicePdf } from "../invoice-pdf";
 import { pdfStore } from "../pdf-store";
 import { resolveLocale } from "../locale-resolver";
+import { resolveCourseSlug } from "@shared/course-slug-map";
 import { requireAuth } from "./middleware";
 
 export function registerOrderRoutes(app: Express) {
 app.post("/api/orders", requireAuth, async (req: Request, res: Response) => {
   try {
-    const { items, groupId, isTeamPurchase, refundPolicyAccepted } = req.body;
+    const { items, groupId, isTeamPurchase, refundPolicyAccepted, locale } = req.body;
     if (!refundPolicyAccepted) return res.status(400).json({ error: "You must accept the refund policy" });
     if (!items || !Array.isArray(items) || items.length === 0) return res.status(400).json({ error: "Cart is empty" });
 
@@ -21,8 +22,9 @@ app.post("/api/orders", requireAuth, async (req: Request, res: Response) => {
     const validatedItems: { courseId: number; quantity: number; unitPrice: string }[] = [];
 
     for (const item of items) {
-      const course = item.courseSlug
-        ? await storage.getCourseBySlug(item.courseSlug)
+      const resolvedSlug = item.courseSlug ? resolveCourseSlug(item.courseSlug, locale) : undefined;
+      const course = resolvedSlug
+        ? await storage.getCourseBySlug(resolvedSlug)
         : await storage.getCourse(item.courseId);
       if (!course || !course.isActive) return res.status(400).json({ error: `Course ${item.courseSlug || item.courseId} not found or inactive` });
       let qty = Math.max(1, parseInt(item.quantity) || 1);

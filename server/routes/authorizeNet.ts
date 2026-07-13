@@ -16,6 +16,7 @@ import {
 } from "../authorizeNetClient";
 import { sendOrderReceipt, sendNewOrderAdminAlert } from "../email";
 import { resolveLocale } from "../locale-resolver";
+import { resolveCourseSlug } from "@shared/course-slug-map";
 import { logger, logPaymentError } from "../monitoring";
 import { requireAuth, payLimiter } from "./middleware";
 
@@ -298,19 +299,11 @@ async function buildOrder(
   isTeamPurchase: boolean,
   locale?: string
 ): Promise<{ order: any; total: number }> {
-  const ES_SLUG_MAP: Record<string, string> = {
-    "online-forklift-operator-certification": "certificacion-operador-montacargas-en-linea",
-    "online-forklift-operator-training": "certificacion-operador-montacargas-en-linea",
-  };
-
   const orderItems = [];
   let total = 0;
 
   for (const item of items) {
-    let slug = item.courseSlug;
-    if (locale === "es" && ES_SLUG_MAP[slug]) {
-      slug = ES_SLUG_MAP[slug];
-    }
+    const slug = resolveCourseSlug(item.courseSlug, locale);
     const course = await storage.getCourseBySlug(slug);
     if (!course) throw new Error(`Course not found: ${item.courseSlug}`);
     // Flat per-seat pricing for any quantity (July 2026 decision: no automated
