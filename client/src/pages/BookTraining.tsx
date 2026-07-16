@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { catalog, type Product } from "@/data/catalog";
 import { brand } from "@shared/config/brand";
+import { getLocation } from "@shared/config/locations";
 import { industry } from "@shared/config/industry";
 import SEOHead from "@/components/seo/SEOHead";
 import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
@@ -36,6 +37,15 @@ import {
 } from "lucide-react";
 
 type Step = 1 | 2 | 3 | 4;
+
+// Booking service areas are regions; each maps to one training facility.
+// Used to show ONLY that facility's courses and address after the ZIP check
+// instead of the full list of all locations.
+const SERVICE_AREA_FACILITY: Record<string, string> = {
+  "southern-california": "san-diego",
+  "central-california": "fresno",
+  "southern-nevada": "las-vegas",
+};
 
 interface ServiceArea {
   id: number;
@@ -225,9 +235,17 @@ export default function BookTraining() {
   // Note: with 100% upfront payment (BOOKING_DEPOSIT_RATE = 1.0), deposit =
   // total and balanceDue = 0. The variable names are kept for API compat.
 
+  // Only offer courses for the facility serving the customer's ZIP —
+  // never the full multi-location list (Alberto demo feedback, 2026-07-13).
+  const facilitySlug = serviceArea ? SERVICE_AREA_FACILITY[serviceArea.slug] : undefined;
+  const facility = facilitySlug ? getLocation(facilitySlug) : undefined;
+
   const handsOnProducts = useMemo(
-    () => catalog.filter((p) => p.category === "hands-on"),
-    []
+    () =>
+      catalog.filter(
+        (p) => p.category === "hands-on" && (!facilitySlug || p.location === facilitySlug)
+      ),
+    [facilitySlug]
   );
 
   const fromDate = useMemo(() => {
@@ -303,8 +321,9 @@ export default function BookTraining() {
         // forklift) so the visitor never starts from an empty selection.
         setSelectedProducts((prev) => {
           if (prev.length > 0) return prev;
+          const areaFacility = SERVICE_AREA_FACILITY[data.serviceArea.slug];
           const defaultProduct = catalog.find(
-            (p) => p.slug === `standard-forklift-certification-${data.serviceArea.slug}` && p.category === "hands-on"
+            (p) => p.slug === `standard-forklift-certification-${areaFacility}` && p.category === "hands-on"
           );
           return defaultProduct ? [defaultProduct] : prev;
         });
@@ -671,11 +690,22 @@ export default function BookTraining() {
                     </Button>
                   </div>
                   {serviceArea && (
-                    <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
-                      <span className="text-sm text-green-700 dark:text-green-300" data-testid="text-area-found">
-                        {t("bookTraining.areaAvailable", { area: serviceArea.name })}
-                      </span>
+                    <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
+                        <span className="text-sm text-green-700 dark:text-green-300" data-testid="text-area-found">
+                          {t("bookTraining.areaAvailable", { area: serviceArea.name })}
+                        </span>
+                      </div>
+                      {facility && (
+                        <div className="flex items-start gap-2 mt-2 ml-7" data-testid="text-facility-address">
+                          <MapPin className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                          <span className="text-sm text-green-700 dark:text-green-300">
+                            <span className="font-semibold block">{t("requestQuote.facilityAddressTitle")}</span>
+                            {facility.displayName}, {facility.address.full}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
                   {zipError && (
@@ -1115,6 +1145,14 @@ export default function BookTraining() {
                       </span>
                       <span className="text-muted-foreground">{t("bookTraining.serviceAreaLabel")}</span>
                       <span className="font-medium text-foreground">{serviceArea?.name}</span>
+                      {facility && (
+                        <>
+                          <span className="text-muted-foreground">{t("requestQuote.facilityAddressTitle")}</span>
+                          <span className="font-medium text-foreground" data-testid="text-review-facility-address">
+                            {facility.displayName}, {facility.address.full}
+                          </span>
+                        </>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-y-2 text-sm pt-4">
