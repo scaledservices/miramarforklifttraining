@@ -119,8 +119,9 @@ function drawOfficialSeal(doc: PDFKit.PDFDocument, cx: number, cy: number, radiu
   const topText = "MIRAMAR FORKLIFT TRAINING";
   drawCircularText(doc, cx, cy, radius - 12, topText, 200, 340, 10, brown);
 
-  // Curved text along the bottom arc: label (e.g. "OFFICIAL SEAL")
-  drawCircularText(doc, cx, cy, radius - 12, label, 20, 160, 9, brown);
+  // Curved text along the bottom arc: label (e.g. "OFFICIAL SEAL"),
+  // drawn inward so it reads upright along the bottom of the seal.
+  drawCircularText(doc, cx, cy, radius - 12, label, 20, 160, 9, brown, true);
 
   // Center text
   doc.fontSize(11).fillColor(brown).text("OSHA", cx - radius, cy - 10, {
@@ -182,6 +183,7 @@ function drawCircularText(
   angleEnd: number,
   fontSize: number,
   color: string,
+  inward = false,
 ) {
   const chars = text.split("");
   const totalAngle = angleEnd - angleStart;
@@ -193,14 +195,19 @@ function drawCircularText(
   doc.fontSize(fontSize);
 
   for (let i = 0; i < chars.length; i++) {
-    const angle = angleStart + i * anglePerChar;
+    // For bottom-arc ("inward") text, walk the arc in reverse and rotate the
+    // glyphs the other way so the label reads left to right, right side up.
+    const angle = inward ? angleEnd - i * anglePerChar : angleStart + i * anglePerChar;
     const x = cx + r * Math.cos(rad(angle));
     const y = cy + r * Math.sin(rad(angle));
-    const rotation = (angle * 180) / Math.PI + 90;
+    // `angle` is already in degrees (pdfkit's rotate() takes degrees). The
+    // previous code re-converted it as if it were radians, which scattered
+    // the seal's lettering into unreadable marks.
+    const rotation = inward ? angle - 90 : angle + 90;
     doc.save();
     doc.translate(x, y);
     doc.rotate(rotation);
-    doc.text(chars[i], 0, -fontSize / 2, { align: "center", width: fontSize });
+    doc.text(chars[i], -fontSize / 2, -fontSize / 2, { align: "center", width: fontSize });
     doc.restore();
   }
   doc.restore();
