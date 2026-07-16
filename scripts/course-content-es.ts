@@ -82,18 +82,11 @@ export const COURSE_STEPS_ES: StepDef[] = [
       ] },
     ]),
   },
-  {
-    module: "Bienvenida y Cumplimiento OSHA",
-    title: "Verificación de Conocimiento: Requisitos OSHA",
-    type: "checkpoint",
-    estimatedMinutes: 2,
-    config: { passing_score: 0, max_attempts: 999 },
-    questions: [
-      { question: "La capacitación de OSHA para operadores de montacargas requiere instrucción formal, capacitación práctica Y una evaluación.", type: "mcq_single", options: ["Verdadero", "Falso"], correctAnswers: "Verdadero", explanation: "OSHA requiere los tres componentes: instrucción formal, capacitación práctica y una evaluación del desempeño del operador." },
-      { question: "Este curso en línea reemplaza la necesidad de evaluación práctica por parte de su empleador.", type: "mcq_single", options: ["Verdadero", "Falso"], correctAnswers: "Falso", explanation: "Este curso cubre solo la instrucción formal. Su empleador aún debe realizar la capacitación práctica y la evaluación en su lugar de trabajo." },
-      { question: "Si no está seguro acerca de una operación, debe preguntar a su supervisor antes de proceder.", type: "mcq_single", options: ["Verdadero", "Falso"], correctAnswers: "Verdadero", explanation: "Siempre consulte a su supervisor cuando tenga dudas. Operar un montacargas sin el conocimiento adecuado crea riesgos serios de seguridad." },
-    ],
-  },
+  // NOTA (2026-07-16): las verificaciones intermedias se redujeron de 7 a 3
+  // para simplificar la experiencia del estudiante (comentarios de la demo
+  // de Alberto). Los elementos interactivos de las lecciones y el examen
+  // final no cambian. Las preguntas clave de las verificaciones eliminadas
+  // se combinaron en las tres restantes. (Mirrors course-content.ts.)
 
   // ═══ MÓDULO 1: Fundamentos del Montacargas + Responsabilidades ═══
   {
@@ -180,11 +173,12 @@ export const COURSE_STEPS_ES: StepDef[] = [
   },
   {
     module: "Fundamentos y Responsabilidades del Montacargas",
-    title: "Verificación de Conocimiento: Fundamentos y Responsabilidades",
+    title: "Verificación de Conocimiento: OSHA y Fundamentos",
     type: "checkpoint",
     estimatedMinutes: 2,
     config: { passing_score: 0, max_attempts: 999 },
     questions: [
+      { question: "La capacitación de OSHA para operadores de montacargas requiere instrucción formal, capacitación práctica Y una evaluación.", type: "mcq_single", options: ["Verdadero", "Falso"], correctAnswers: "Verdadero", explanation: "OSHA requiere los tres componentes: instrucción formal, capacitación práctica y una evaluación del desempeño del operador." },
       { question: "¿Cuándo es aceptable llevar un pasajero en un montacargas?", type: "mcq_single", options: ["Al conducir lentamente", "Cuando una plataforma de seguridad aprobada por OSHA con barandillas está correctamente instalada", "Durante emergencias", "Cuando el supervisor lo aprueba"], correctAnswers: "Cuando una plataforma de seguridad aprobada por OSHA con barandillas está correctamente instalada", explanation: "Los pasajeros nunca están permitidos a menos que se use una plataforma de trabajo aprobada por OSHA con barandillas, tablones de pie y protección contra caídas." },
       { question: "Si nota una fuga menor de aceite en el montacargas durante la inspección pre-turno, debe:", type: "mcq_single", options: ["Continuar trabajando y reportar al final del turno", "Reportarlo inmediatamente y no operar hasta que se autorice", "Limpiarlo y seguir trabajando", "Solo reportar si empeora"], correctAnswers: "Reportarlo inmediatamente y no operar hasta que se autorice", explanation: "Cualquier preocupación de seguridad debe reportarse inmediatamente. Los vehículos no deben operarse hasta que se consideren seguros." },
       { question: "Todo su cuerpo debe permanecer dentro de la jaula protectora del montacargas en todo momento mientras opera.", type: "mcq_single", options: ["Verdadero", "Falso"], correctAnswers: "Verdadero", explanation: "Mantenga todas las partes del cuerpo dentro del área del operador para evitar peligros de aplastamiento con el mástil, la protección superior o los objetos circundantes." },
@@ -296,20 +290,6 @@ export const COURSE_STEPS_ES: StepDef[] = [
       ] },
     ]),
   },
-  {
-    module: "Estabilidad y Manejo de Cargas",
-    title: "Verificación de Conocimiento: Estabilidad y Cargas",
-    type: "checkpoint",
-    estimatedMinutes: 2,
-    config: { passing_score: 0, max_attempts: 999 },
-    questions: [
-      { question: "Al viajar con una carga, las horquillas deben estar:", type: "mcq_single", options: ["Elevadas lo más alto posible", "A nivel de los ojos", "4 a 6 pulgadas del suelo", "Tocando el suelo"], correctAnswers: "4 a 6 pulgadas del suelo", explanation: "Llevar las horquillas a 4–6 pulgadas del suelo mantiene el centro de gravedad bajo y reduce el riesgo de volcadura." },
-      { question: "Usar accesorios en un montacargas afecta:", type: "mcq_single", options: ["El color del montacargas", "La capacidad nominal — se reduce", "El volumen de la bocina", "La presión de las llantas"], correctAnswers: "La capacidad nominal — se reduce", explanation: "Los accesorios cambian el centro de gravedad y reducen la capacidad de elevación nominal del montacargas." },
-      { question: "Debe reducir la velocidad antes de entrar en un giro, no durante el giro.", type: "mcq_single", options: ["Verdadero", "Falso"], correctAnswers: "Verdadero", explanation: "Reducir la velocidad durante un giro aumenta la inestabilidad lateral. Siempre reduzca la velocidad antes de comenzar a girar." },
-      { question: "Si una carga es demasiado pesada para su montacargas, debe:", type: "mcq_single", options: ["Intentar levantarla con cuidado", "Usar un camión de mayor capacidad", "Agregar contrapeso en la parte trasera", "Conducir más rápido para impulso"], correctAnswers: "Usar un camión de mayor capacidad", explanation: "Nunca exceda la capacidad nominal. Consiga el equipo adecuado para el trabajo." },
-    ],
-  },
-
   // ═══ MÓDULO 3: Inspección Pre-Operación + Combustible/Carga ═══
   {
     module: "Inspección Pre-Operación y Combustible",
@@ -409,12 +389,13 @@ export const COURSE_STEPS_ES: StepDef[] = [
   },
   {
     module: "Inspección Pre-Operación y Combustible",
-    title: "Verificación de Conocimiento: Inspección y Combustible",
+    title: "Verificación de Conocimiento: Estabilidad, Cargas e Inspección",
     type: "checkpoint",
-    estimatedMinutes: 2,
+    estimatedMinutes: 3,
     config: { passing_score: 0, max_attempts: 999 },
     questions: [
-      { question: "¿Cuándo debe realizarse la inspección pre-turno?", type: "mcq_single", options: ["Al final de cada turno", "Solo cuando el supervisor lo solicita", "Al inicio de cada turno, antes de operar", "Una vez a la semana"], correctAnswers: "Al inicio de cada turno, antes de operar", explanation: "Las inspecciones pre-turno son obligatorias al inicio de cada turno antes de operar el montacargas." },
+      { question: "Al viajar con una carga, las horquillas deben estar:", type: "mcq_single", options: ["Elevadas lo más alto posible", "A nivel de los ojos", "4 a 6 pulgadas del suelo", "Tocando el suelo"], correctAnswers: "4 a 6 pulgadas del suelo", explanation: "Llevar las horquillas a 4 a 6 pulgadas del suelo mantiene el centro de gravedad bajo y reduce el riesgo de volcadura." },
+      { question: "Si una carga es demasiado pesada para su montacargas, debe:", type: "mcq_single", options: ["Intentar levantarla con cuidado", "Usar un camión de mayor capacidad", "Agregar contrapeso en la parte trasera", "Conducir más rápido para impulso"], correctAnswers: "Usar un camión de mayor capacidad", explanation: "Nunca exceda la capacidad nominal. Consiga el equipo adecuado para el trabajo." },
       { question: "Si descubre una fuga hidráulica durante la inspección pre-turno, debe:", type: "mcq_single", options: ["Continuar trabajando con cuidado", "Reportarlo y NO operar el montacargas", "Rellenar el fluido hidráulico y continuar", "Revisar de nuevo al final del turno"], correctAnswers: "Reportarlo y NO operar el montacargas", explanation: "Nunca opere un montacargas con fugas de fluidos. Las fugas hidráulicas pueden causar pérdida repentina del control de la carga." },
       { question: "Está prohibido fumar dentro de cuántos pies de las áreas de combustible o carga:", type: "mcq_single", options: ["10 pies", "25 pies", "50 pies", "100 pies"], correctAnswers: "50 pies", explanation: "Prohibido fumar o llamas abiertas dentro de 50 pies de estaciones de reabastecimiento y áreas de recarga de baterías." },
     ],
@@ -524,19 +505,6 @@ export const COURSE_STEPS_ES: StepDef[] = [
       ] },
     ]),
   },
-  {
-    module: "Conducción Segura y Peatones",
-    title: "Verificación de Conocimiento: Conducción Segura",
-    type: "checkpoint",
-    estimatedMinutes: 2,
-    config: { passing_score: 0, max_attempts: 999 },
-    questions: [
-      { question: "¿Cuál es la velocidad máxima segura recomendada para un montacargas en un almacén?", type: "mcq_single", options: ["3 mph", "5 mph", "10 mph", "15 mph"], correctAnswers: "5 mph", explanation: "OSHA recomienda un máximo de 5 mph en ambientes de almacén." },
-      { question: "En intersecciones y esquinas ciegas, los operadores de montacargas deben:", type: "mcq_single", options: ["Acelerar para pasar rápidamente", "Detenerse, tocar la bocina y proceder lentamente después de verificar", "Confiar en que los peatones se moverán", "Encender las luces"], correctAnswers: "Detenerse, tocar la bocina y proceder lentamente después de verificar", explanation: "Los operadores deben detenerse, tocar la bocina y mirar en ambas direcciones antes de proceder por cualquier intersección." },
-      { question: "Los peatones cerca de operaciones de montacargas:", type: "mcq_single", options: ["Deben moverse rápidamente", "Siempre tienen el derecho de paso", "Deben usar chalecos reflectantes para ser vistos", "Deben señalar al operador"], correctAnswers: "Siempre tienen el derecho de paso", explanation: "Los peatones siempre tienen el derecho de paso. Los operadores de montacargas deben ceder el paso a los peatones en todo momento." },
-    ],
-  },
-
   // ═══ MÓDULO 5: Rampas, Muelles, Remolques y Trabajo Elevado ═══
   {
     module: "Rampas, Muelles y Elevación",
@@ -638,19 +606,6 @@ export const COURSE_STEPS_ES: StepDef[] = [
       ] },
     ]),
   },
-  {
-    module: "Rampas, Muelles y Elevación",
-    title: "Verificación de Conocimiento: Rampas, Muelles y Elevación",
-    type: "checkpoint",
-    estimatedMinutes: 2,
-    config: { passing_score: 0, max_attempts: 999 },
-    questions: [
-      { question: "Al viajar SUBIENDO una rampa con carga, la carga debe mirar:", type: "mcq_single", options: ["Cuesta abajo", "Cuesta arriba", "No importa", "De lado"], correctAnswers: "Cuesta arriba", explanation: "Al viajar en una rampa con carga, mantenga la carga apuntando cuesta arriba para evitar que se deslice de las horquillas." },
-      { question: "¿Es aceptable elevar a un trabajador de mantenimiento en las horquillas sin una plataforma de seguridad?", type: "mcq_single", options: ["Sí, si se sujeta", "No, nunca sin una plataforma de seguridad aprobada", "Sí, para tareas rápidas", "Solo con aprobación del supervisor"], correctAnswers: "No, nunca sin una plataforma de seguridad aprobada", explanation: "Elevar personas en horquillas vacías nunca es aceptable. Se requiere una plataforma de seguridad aprobada por OSHA con barandillas, tablones de pie y protección contra caídas." },
-      { question: "Una plataforma de seguridad aprobada por OSHA debe incluir barandillas, tablones de pie y protección contra caídas.", type: "mcq_single", options: ["Verdadero", "Falso"], correctAnswers: "Verdadero", explanation: "Las plataformas aprobadas deben tener barandillas de 42 pulgadas, barandillas intermedias, tablones de pie de 4 pulgadas, sujeción segura al mástil, protección superior y protección personal contra caídas." },
-    ],
-  },
-
   // ═══ MÓDULO 6: Estacionamiento, Montacargas Desatendido y Apagado ═══
   {
     module: "Estacionamiento y Apagado",
@@ -721,11 +676,15 @@ export const COURSE_STEPS_ES: StepDef[] = [
   },
   {
     module: "Estacionamiento y Apagado",
-    title: "Verificación de Conocimiento: Estacionamiento y Apagado",
+    title: "Verificación de Conocimiento: Operación Segura y Apagado",
     type: "checkpoint",
-    estimatedMinutes: 1,
+    estimatedMinutes: 3,
     config: { passing_score: 0, max_attempts: 999 },
     questions: [
+      { question: "Los peatones cerca de operaciones de montacargas:", type: "mcq_single", options: ["Deben moverse rápidamente", "Siempre tienen el derecho de paso", "Deben usar chalecos reflectantes para ser vistos", "Deben señalar al operador"], correctAnswers: "Siempre tienen el derecho de paso", explanation: "Los peatones siempre tienen el derecho de paso. Los operadores de montacargas deben ceder el paso a los peatones en todo momento." },
+      { question: "En intersecciones y esquinas ciegas, los operadores de montacargas deben:", type: "mcq_single", options: ["Acelerar para pasar rápidamente", "Detenerse, tocar la bocina y proceder lentamente después de verificar", "Confiar en que los peatones se moverán", "Encender las luces"], correctAnswers: "Detenerse, tocar la bocina y proceder lentamente después de verificar", explanation: "Los operadores deben detenerse, tocar la bocina y mirar en ambas direcciones antes de proceder por cualquier intersección." },
+      { question: "Al viajar SUBIENDO una rampa con carga, la carga debe mirar:", type: "mcq_single", options: ["Cuesta abajo", "Cuesta arriba", "No importa", "De lado"], correctAnswers: "Cuesta arriba", explanation: "Al viajar en una rampa con carga, mantenga la carga apuntando cuesta arriba para evitar que se deslice de las horquillas." },
+      { question: "¿Es aceptable elevar a un trabajador de mantenimiento en las horquillas sin una plataforma de seguridad?", type: "mcq_single", options: ["Sí, si se sujeta", "No, nunca sin una plataforma de seguridad aprobada", "Sí, para tareas rápidas", "Solo con aprobación del supervisor"], correctAnswers: "No, nunca sin una plataforma de seguridad aprobada", explanation: "Elevar personas en horquillas vacías nunca es aceptable. Se requiere una plataforma de seguridad aprobada por OSHA con barandillas, tablones de pie y protección contra caídas." },
       { question: "Al dejar un montacargas desatendido, los pasos correctos incluyen:", type: "mcq_single", options: ["Solo apagar el motor", "Bajar horquillas, poner freno, apagar motor, retirar llave", "Solo poner el freno", "Nada si es solo por unos minutos"], correctAnswers: "Bajar horquillas, poner freno, apagar motor, retirar llave", explanation: "Cuando desatendido: apague la energía, ponga los frenos, baje las horquillas, regrese el mástil a posición vertical y retire la llave." },
       { question: "Debe reportar accidentes incluso si parecen menores.", type: "mcq_single", options: ["Verdadero", "Falso"], correctAnswers: "Verdadero", explanation: "Todos los accidentes deben reportarse, incluyendo los menores y los casi-accidentes. Esto ayuda a identificar y corregir problemas de seguridad." },
     ],
@@ -768,43 +727,23 @@ export const COURSE_STEPS_ES: StepDef[] = [
       ] },
     ]),
   },
+  // Consolidado de tres pasos de descarga separados en uno para reducir
+  // clics antes del examen final (2026-07-16). Mismos archivos y URLs.
   {
     module: "Reglas del Sitio y Paquete del Empleador",
-    title: "Reglas y Regulaciones de OSHA (Referencia)",
-    type: "download",
-    estimatedMinutes: 1,
-    config: {
-      description: "Este documento de referencia describe las normas de seguridad esenciales de OSHA para operadores de camiones industriales motorizados. Su capacitación ha sido cubierta por las lecciones de este curso — esto se proporciona como referencia adicional.",
-      downloads: [
-        { label: "Directrices de OSHA para Operación Segura de PITs (PDF)", url: "/api/documents/osha-rules-regulations/download?locale=es", filename: "OSHA-Guidelines-for-the-Safe-Operation-of-Powered-Industrial-Trucks.pdf" },
-      ],
-    },
-  },
-  {
-    module: "Reglas del Sitio y Paquete del Empleador",
-    title: "Paquete de Evaluación Práctica del Empleador",
+    title: "Paquete del Empleador y Documentos de Referencia",
     type: "download",
     estimatedMinutes: 2,
     config: {
-      description: "Su empleador debe completar una evaluación práctica antes de que pueda operar un montacargas en su instalación. Proporcione estos formularios a su supervisor. Incluyen la lista de evaluación de desempeño, formulario de permiso/autorización del operador y hoja de asistencia del sitio.",
+      description: "Su empleador debe completar una evaluación práctica antes de que pueda operar un montacargas en su instalación. Proporcione los primeros tres formularios a su supervisor: la lista de evaluación de desempeño, el formulario de permiso/autorización del operador y la hoja de asistencia del sitio. Las directrices de OSHA y la presentación de capacitación se incluyen como referencias adicionales.",
       downloads: [
         { label: "Prueba de Desempeño (PDF)", url: "/api/documents/performance-evaluation/download?locale=es", filename: "PERFORMANCE-TEST.pdf" },
         { label: "Permiso de Operación PIT (PDF)", url: "/api/documents/operator-permit/download?locale=es", filename: "Powered-Industrial-Truck-PIT-PERMIT-TO-OPERATE.pdf" },
         { label: "Formulario de Asistencia y Programación (PDF)", url: "/api/documents/attendance-sheet/download?locale=es", filename: "ATTENDANCE-FORM-AND-SCHEDULING.pdf" },
-      ],
-      important: "Haga que su supervisor complete estos formularios y los mantenga archivados. OSHA puede solicitar estos registros durante las inspecciones.",
-    },
-  },
-  {
-    module: "Reglas del Sitio y Paquete del Empleador",
-    title: "Presentación del Sitio (Referencia)",
-    type: "download",
-    estimatedMinutes: 1,
-    config: {
-      description: "Esta presentación cubre las directrices de OSHA, tipos de equipo, procedimientos de operación segura y protocolos de carga. Sirve como referencia integral para operadores de montacargas.",
-      downloads: [
+        { label: "Directrices de OSHA para Operación Segura de PITs (PDF)", url: "/api/documents/osha-rules-regulations/download?locale=es", filename: "OSHA-Guidelines-for-the-Safe-Operation-of-Powered-Industrial-Trucks.pdf" },
         { label: "Presentación de Capacitación Forklift Certified (PDF)", url: "/api/documents/site-presentation/download?locale=es", filename: "Forklift-Certified-Training.pdf" },
       ],
+      important: "Haga que su supervisor complete estos formularios y los mantenga archivados. OSHA puede solicitar estos registros durante las inspecciones.",
     },
   },
 

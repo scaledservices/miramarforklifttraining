@@ -98,18 +98,10 @@ export const COURSE_STEPS: StepDef[] = [
       ] },
     ]),
   },
-  {
-    module: "Welcome & OSHA Compliance",
-    title: "Knowledge Check: OSHA Requirements",
-    type: "checkpoint",
-    estimatedMinutes: 2,
-    config: { passing_score: 0, max_attempts: 999 },
-    questions: [
-      { question: "OSHA training for forklift operators requires formal instruction, practical training, AND an evaluation.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "OSHA requires all three components: formal instruction, practical/hands-on training, and an evaluation of operator performance." },
-      { question: "This online course replaces the need for hands-on evaluation by your employer.", type: "mcq_single", options: ["True", "False"], correctAnswers: "False", explanation: "This course covers formal instruction only. Your employer must still conduct hands-on training and evaluation at your worksite." },
-      { question: "If you are unsure about an operation, you should ask your supervisor before proceeding.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "Always consult your supervisor when uncertain. Operating a forklift without proper knowledge creates serious safety risks." },
-    ],
-  },
+  // NOTE (2026-07-16): interim checkpoints reduced from 7 to 3 to simplify
+  // the student experience (Alberto demo feedback). Interactive lesson
+  // elements and the final exam are unchanged. Key questions from removed
+  // checkpoints were merged into the remaining three.
 
   // ═══ MODULE 1: Forklift Basics + Responsibilities ═══
   {
@@ -196,11 +188,12 @@ export const COURSE_STEPS: StepDef[] = [
   },
   {
     module: "Forklift Basics & Responsibilities",
-    title: "Knowledge Check: Basics & Responsibilities",
+    title: "Knowledge Check: OSHA & Forklift Basics",
     type: "checkpoint",
     estimatedMinutes: 2,
     config: { passing_score: 0, max_attempts: 999 },
     questions: [
+      { question: "OSHA training for forklift operators requires formal instruction, practical training, AND an evaluation.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "OSHA requires all three components: formal instruction, practical/hands-on training, and an evaluation of operator performance." },
       { question: "When is it acceptable to carry a passenger on a forklift?", type: "mcq_single", options: ["When driving slowly", "When an OSHA-approved safety platform with guardrails is properly attached", "During emergencies", "When the supervisor approves"], correctAnswers: "When an OSHA-approved safety platform with guardrails is properly attached", explanation: "Passengers are never allowed unless using an OSHA-approved work platform with guardrails, toe boards, and fall protection." },
       { question: "If you notice a minor oil leak on the forklift during pre-shift inspection, you should:", type: "mcq_single", options: ["Continue working and report at end of shift", "Report it immediately and do not operate until cleared", "Clean it up and keep working", "Only report if it gets worse"], correctAnswers: "Report it immediately and do not operate until cleared", explanation: "Any safety concern must be reported immediately. Vehicles should not be operated until they are deemed safe." },
       { question: "Your entire body must remain inside the forklift's protective cage at all times while operating.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "Keep all body parts inside the operator's area to avoid crush hazards with the mast, overhead guard, or surrounding objects." },
@@ -312,20 +305,6 @@ export const COURSE_STEPS: StepDef[] = [
       ] },
     ]),
   },
-  {
-    module: "Stability & Load Handling",
-    title: "Knowledge Check: Stability & Loads",
-    type: "checkpoint",
-    estimatedMinutes: 2,
-    config: { passing_score: 0, max_attempts: 999 },
-    questions: [
-      { question: "When traveling with a load, forks should be:", type: "mcq_single", options: ["Raised as high as possible", "At eye level", "4 to 6 inches from the ground", "Touching the ground"], correctAnswers: "4 to 6 inches from the ground", explanation: "Carrying forks 4–6 inches from the ground keeps the center of gravity low and reduces tip-over risk." },
-      { question: "Using attachments on a forklift affects the:", type: "mcq_single", options: ["Color of the forklift", "Rated capacity — it is reduced", "Horn volume", "Tire pressure"], correctAnswers: "Rated capacity — it is reduced", explanation: "Attachments change the center of gravity and reduce the forklift's rated lifting capacity." },
-      { question: "You should slow down before entering a turn, not during the turn.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "Slowing down during a turn increases lateral instability. Always reduce speed before you begin turning." },
-      { question: "If a load is too heavy for your forklift, you should:", type: "mcq_single", options: ["Try to lift it carefully", "Use a larger-capacity truck", "Add counterweight to the back", "Drive faster for momentum"], correctAnswers: "Use a larger-capacity truck", explanation: "Never exceed rated capacity. Get the right equipment for the job." },
-    ],
-  },
-
   // ═══ MODULE 3: Pre-Operation Inspection + Fueling/Charging ═══
   {
     module: "Pre-Operation Inspection & Fueling",
@@ -425,13 +404,14 @@ export const COURSE_STEPS: StepDef[] = [
   },
   {
     module: "Pre-Operation Inspection & Fueling",
-    title: "Knowledge Check: Inspections & Fueling",
+    title: "Knowledge Check: Stability, Loads & Inspections",
     type: "checkpoint",
-    estimatedMinutes: 2,
+    estimatedMinutes: 3,
     config: { passing_score: 0, max_attempts: 999 },
     questions: [
+      { question: "When traveling with a load, forks should be:", type: "mcq_single", options: ["Raised as high as possible", "At eye level", "4 to 6 inches from the ground", "Touching the ground"], correctAnswers: "4 to 6 inches from the ground", explanation: "Carrying forks 4 to 6 inches from the ground keeps the center of gravity low and reduces tip-over risk." },
+      { question: "If a load is too heavy for your forklift, you should:", type: "mcq_single", options: ["Try to lift it carefully", "Use a larger-capacity truck", "Add counterweight to the back", "Drive faster for momentum"], correctAnswers: "Use a larger-capacity truck", explanation: "Never exceed rated capacity. Get the right equipment for the job." },
       { question: "If a safety issue is found during pre-shift inspection, repairs must be completed:", type: "mcq_single", options: ["By end of day", "Before the equipment is used", "Within a week", "Only if a supervisor requests it"], correctAnswers: "Before the equipment is used", explanation: "Repairs must be made before use if the equipment is unsafe. Never operate a defective forklift." },
-      { question: "Gloves should be worn when handling LPG (propane) tanks.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "LPG can cause frostbite on contact with skin. Gloves provide essential protection." },
       { question: "Is it acceptable to smoke near a forklift charging station as long as you're careful?", type: "mcq_single", options: ["Yes, if no gas is visible", "No, never within 50 feet", "Only during breaks", "Only outdoors"], correctAnswers: "No, never within 50 feet", explanation: "Smoking and open flames must remain at least 50 feet from fueling and charging areas due to explosive gas risk." },
     ],
   },
@@ -540,21 +520,6 @@ export const COURSE_STEPS: StepDef[] = [
       ] },
     ]),
   },
-  {
-    module: "Safe Driving & Pedestrians",
-    title: "Knowledge Check: Safe Driving",
-    type: "checkpoint",
-    estimatedMinutes: 2,
-    config: { passing_score: 0, max_attempts: 999 },
-    questions: [
-      { question: "The primary purpose of the forklift horn is to:", type: "mcq_single", options: ["Demand right of way", "Warn others of your presence", "Signal that you're speeding", "Request pedestrians to move faster"], correctAnswers: "Warn others of your presence", explanation: "The horn is a warning device to alert others to the forklift's presence, not a demand for right-of-way." },
-      { question: "Pedestrians always have the right of way around forklifts.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "Pedestrians always have priority. Operators must yield to pedestrians at all times." },
-      { question: "When approaching an intersection, you should:", type: "mcq_single", options: ["Speed up to clear it quickly", "Stop, sound horn, and look both ways", "Flash your headlights", "Assume no one is coming"], correctAnswers: "Stop, sound horn, and look both ways", explanation: "Operators must slow down/stop, sound the horn, and look before proceeding through any intersection." },
-      { question: "The safest way to change direction (forward to reverse) is to:", type: "mcq_single", options: ["Come to a complete stop first", "Shift quickly while moving", "Turn the steering wheel sharply", "Accelerate through the change"], correctAnswers: "Come to a complete stop first", explanation: "Always stop completely before changing direction to prevent load shifts and maintain stability." },
-      { question: "It's okay to speed if no one else is around.", type: "mcq_single", options: ["True", "False"], correctAnswers: "False", explanation: "Speed limits apply at all times regardless of whether other people are present. Hazards can appear unexpectedly." },
-    ],
-  },
-
   // ═══ MODULE 5: Ramps, Docks, Trailers, and Elevated Work ═══
   {
     module: "Ramps, Docks & Elevated Work",
@@ -656,19 +621,6 @@ export const COURSE_STEPS: StepDef[] = [
       ] },
     ]),
   },
-  {
-    module: "Ramps, Docks & Elevated Work",
-    title: "Knowledge Check: Ramps, Docks & Elevation",
-    type: "checkpoint",
-    estimatedMinutes: 2,
-    config: { passing_score: 0, max_attempts: 999 },
-    questions: [
-      { question: "When traveling UP a ramp with a load, the load should face:", type: "mcq_single", options: ["Downhill", "Uphill", "It doesn't matter", "Sideways"], correctAnswers: "Uphill", explanation: "When traveling on a ramp with a load, keep the load pointed uphill (upgrade) to prevent the load from sliding off the forks." },
-      { question: "Is it acceptable to lift a maintenance worker on the forks without a safety platform?", type: "mcq_single", options: ["Yes, if they hold on", "No, never without an approved safety platform", "Yes, for quick tasks", "Only with supervisor approval"], correctAnswers: "No, never without an approved safety platform", explanation: "Lifting people on bare forks is never acceptable. An OSHA-approved safety platform with guardrails, toe boards, and fall protection is required." },
-      { question: "An OSHA-approved safety platform must include guardrails, toe boards, and fall protection.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "Approved platforms must have 42-inch guardrails, mid-rails, 4-inch toe boards, secure mast attachment, overhead guard, and personal fall protection." },
-    ],
-  },
-
   // ═══ MODULE 6: Parking, Unattended Forklift, and Shutdown ═══
   {
     module: "Parking & Shutdown",
@@ -739,11 +691,15 @@ export const COURSE_STEPS: StepDef[] = [
   },
   {
     module: "Parking & Shutdown",
-    title: "Knowledge Check: Parking & Shutdown",
+    title: "Knowledge Check: Safe Operation & Shutdown",
     type: "checkpoint",
-    estimatedMinutes: 1,
+    estimatedMinutes: 3,
     config: { passing_score: 0, max_attempts: 999 },
     questions: [
+      { question: "Pedestrians always have the right of way around forklifts.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "Pedestrians always have priority. Operators must yield to pedestrians at all times." },
+      { question: "When approaching an intersection, you should:", type: "mcq_single", options: ["Speed up to clear it quickly", "Stop, sound horn, and look both ways", "Flash your headlights", "Assume no one is coming"], correctAnswers: "Stop, sound horn, and look both ways", explanation: "Operators must slow down/stop, sound the horn, and look before proceeding through any intersection." },
+      { question: "When traveling UP a ramp with a load, the load should face:", type: "mcq_single", options: ["Downhill", "Uphill", "It doesn't matter", "Sideways"], correctAnswers: "Uphill", explanation: "When traveling on a ramp with a load, keep the load pointed uphill (upgrade) to prevent the load from sliding off the forks." },
+      { question: "Is it acceptable to lift a maintenance worker on the forks without a safety platform?", type: "mcq_single", options: ["Yes, if they hold on", "No, never without an approved safety platform", "Yes, for quick tasks", "Only with supervisor approval"], correctAnswers: "No, never without an approved safety platform", explanation: "Lifting people on bare forks is never acceptable. An OSHA-approved safety platform with guardrails, toe boards, and fall protection is required." },
       { question: "When leaving a forklift unattended, the correct steps include:", type: "mcq_single", options: ["Just turn off the engine", "Lower forks, set brake, turn off engine, remove key", "Set the brake only", "Nothing if it's just for a few minutes"], correctAnswers: "Lower forks, set brake, turn off engine, remove key", explanation: "When unattended: shut off power, set brakes, lower forks, return mast to vertical, and remove the key." },
       { question: "You should report accidents even if they seem minor.", type: "mcq_single", options: ["True", "False"], correctAnswers: "True", explanation: "All accidents must be reported, including minor ones and near-misses. This helps identify and correct safety issues." },
     ],
@@ -786,43 +742,23 @@ export const COURSE_STEPS: StepDef[] = [
       ] },
     ]),
   },
+  // Consolidated from three separate download steps into one to reduce
+  // click-throughs before the final exam (2026-07-16). Same files, same URLs.
   {
     module: "Site-Specific Rules & Employer Packet",
-    title: "OSHA Rules & Regulations (Reference)",
-    type: "download",
-    estimatedMinutes: 1,
-    config: {
-      description: "This reference document outlines the essential OSHA safety standards for Powered Industrial Truck operators. Your training has been covered by the lessons in this course — this is provided as an additional reference.",
-      downloads: [
-        { label: "OSHA Guidelines for Safe Operation of PITs (PDF)", url: "/api/documents/osha-rules-regulations/download", filename: "OSHA-Guidelines-for-the-Safe-Operation-of-Powered-Industrial-Trucks.pdf" },
-      ],
-    },
-  },
-  {
-    module: "Site-Specific Rules & Employer Packet",
-    title: "Employer Practical Evaluation Packet",
+    title: "Employer Packet & Reference Documents",
     type: "download",
     estimatedMinutes: 2,
     config: {
-      description: "Your employer must complete a hands-on evaluation before you can operate a forklift at their facility. Provide these forms to your supervisor. They include the performance evaluation checklist, operator permit/authorization form, and site attendance sheet.",
+      description: "Your employer must complete a hands-on evaluation before you can operate a forklift at their facility. Provide the first three forms to your supervisor: the performance evaluation checklist, operator permit/authorization form, and site attendance sheet. The OSHA guidelines and training presentation are included as additional references.",
       downloads: [
         { label: "Performance Test (PDF)", url: "/api/documents/performance-evaluation/download", filename: "PERFORMANCE-TEST.pdf" },
         { label: "PIT Permit to Operate (PDF)", url: "/api/documents/operator-permit/download", filename: "Powered-Industrial-Truck-PIT-PERMIT-TO-OPERATE.pdf" },
         { label: "Attendance Form & Scheduling (PDF)", url: "/api/documents/attendance-sheet/download", filename: "ATTENDANCE-FORM-AND-SCHEDULING.pdf" },
-      ],
-      important: "Have your supervisor complete these forms and keep them on file. OSHA may request these records during inspections.",
-    },
-  },
-  {
-    module: "Site-Specific Rules & Employer Packet",
-    title: "Site Presentation (Reference)",
-    type: "download",
-    estimatedMinutes: 1,
-    config: {
-      description: "This presentation covers OSHA guidelines, equipment types, safe operating procedures, and loading protocols. It serves as a comprehensive reference for forklift operators.",
-      downloads: [
+        { label: "OSHA Guidelines for Safe Operation of PITs (PDF)", url: "/api/documents/osha-rules-regulations/download", filename: "OSHA-Guidelines-for-the-Safe-Operation-of-Powered-Industrial-Trucks.pdf" },
         { label: "Forklift Certified Training Presentation (PDF)", url: "/api/documents/site-presentation/download", filename: "Forklift-Certified-Training.pdf" },
       ],
+      important: "Have your supervisor complete these forms and keep them on file. OSHA may request these records during inspections.",
     },
   },
 
