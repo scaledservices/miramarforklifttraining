@@ -8,13 +8,12 @@ import { faqItems } from "@/data/faq";
 import FAQSection from "@/components/sections/FAQSection";
 import TrustBadgeBar from "@/components/sections/TrustBadgeBar";
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import OptimizedImage from "@/components/ui/optimized-image";
 import {
   Shield, Award, Clock, MapPin, Wrench, Users,
   ArrowRight, CheckCircle, Building2, Star, RefreshCw, Phone,
-  AlertTriangle, Warehouse, HardHat, Truck, Factory,
+  AlertTriangle, Warehouse, HardHat, Truck, Factory, Monitor,
 } from "lucide-react";
 
 export default function Home() {
@@ -83,6 +82,41 @@ export default function Home() {
     },
   ];
 
+  // All three certification paths shown directly in the hero.
+  // Business priority order (hard rule): Onsite > Hands-on > Online.
+  const heroPaths = [
+    {
+      id: "onsite",
+      icon: Building2,
+      title: t("home.heroPathOnsite"),
+      desc: t("home.heroPathOnsiteDesc"),
+      price: t("guidedSelector.onsitePrice"),
+      priceNote: t("guidedSelector.onsitePriceNote"),
+      href: "/request-quote",
+      prominent: true,
+    },
+    {
+      id: "hands-on",
+      icon: Wrench,
+      title: t("home.heroPathHandsOn"),
+      desc: t("home.heroPathHandsOnDesc"),
+      price: t("guidedSelector.handsOnPrice"),
+      priceNote: t("guidedSelector.handsOnPriceNote"),
+      href: "/book-training",
+      prominent: false,
+    },
+    {
+      id: "online",
+      icon: Monitor,
+      title: t("home.heroPathOnline"),
+      desc: t("home.heroPathOnlineDesc"),
+      price: t("guidedSelector.onlinePrice"),
+      priceNote: t("guidedSelector.onlinePriceNote"),
+      href: "/p/online-forklift-operator-training",
+      prominent: false,
+    },
+  ];
+
   const industries = [
     { icon: Warehouse, title: t("home.industryWarehousingTitle"), desc: t("home.industryWarehousingDesc"), ref: "industry-warehousing", testId: "industry-warehousing" },
     { icon: HardHat, title: t("home.industryConstructionTitle"), desc: t("home.industryConstructionDesc"), ref: "industry-construction", testId: "industry-construction" },
@@ -141,18 +175,59 @@ export default function Home() {
                 {t("home.heroSubtitleUnified")}
               </p>
 
-              {/* One focused CTA — no competing actions in the hero. */}
-              <div>
-                <Link href="/get-certified">
-                  <Button size="lg" className="w-full sm:w-auto bg-accent text-accent-foreground border-accent-border text-base px-8 py-6 transition-transform hover:scale-[1.02]" data-testid="button-hero-get-certified">
-                    <Shield className="h-5 w-5 mr-2" />
-                    {t("cta.getCertifiedToday")}
-                  </Button>
-                </Link>
+              {/* "Get Certified Today" heading with all three paths directly
+                  below it — Onsite > Hands-on > Online, onsite most prominent. */}
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-5 drop-shadow-md" style={{ fontFamily: "'Roboto Slab', serif" }} data-testid="text-hero-get-certified">
+                <Shield className="inline-block h-6 w-6 mr-2 text-accent align-[-3px]" />
+                {t("cta.getCertifiedToday")}
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {heroPaths.map((path) => (
+                  <Link
+                    key={path.id}
+                    href={path.href}
+                    className={`group rounded-xl p-4 flex flex-col transition-all hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                      path.prominent
+                        ? "bg-accent text-accent-foreground shadow-md ring-1 ring-white/40"
+                        : "bg-white/10 text-white border border-white/20 backdrop-blur-sm hover:bg-white/15"
+                    }`}
+                    data-testid={`hero-path-${path.id}`}
+                  >
+                    {path.prominent && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                        <Star className="w-3 h-3 fill-current" />
+                        {t("common.mostPopular")}
+                      </span>
+                    )}
+                    <span className="flex items-center gap-2 font-bold text-base leading-tight">
+                      <path.icon className={`w-5 h-5 shrink-0 ${path.prominent ? "" : "text-accent"}`} />
+                      {path.title}
+                    </span>
+                    <span className={`text-xs mt-1 ${path.prominent ? "text-accent-foreground/80" : "text-white/70"}`}>
+                      {path.desc}
+                    </span>
+                    <span className="flex items-center justify-between mt-3 pt-2 border-t border-current/20">
+                      <span className="text-sm font-bold">
+                        {path.price}{" "}
+                        <span className={`text-[11px] font-normal ${path.prominent ? "text-accent-foreground/80" : "text-white/70"}`}>
+                          {path.priceNote}
+                        </span>
+                      </span>
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  </Link>
+                ))}
               </div>
 
-              <p className="mt-5 text-sm font-semibold text-accent drop-shadow-sm" data-testid="text-hero-price-anchor">
-                {t("home.priceAnchorUnified")}
+              <p className="mt-4">
+                <Link
+                  href="/get-certified"
+                  className="text-sm text-white/70 hover:text-accent underline-offset-4 hover:underline transition-colors"
+                  data-testid="link-hero-compare-options"
+                >
+                  {t("home.heroHelpChoose")}
+                </Link>
               </p>
 
               <a
