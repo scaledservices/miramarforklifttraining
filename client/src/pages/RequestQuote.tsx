@@ -221,30 +221,14 @@ export default function RequestQuote() {
             </Link>
           </div>
 
-          <div className="bg-primary/10 border border-primary/40 rounded-xl p-5 mb-6">
-            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+          {/* Pricing intentionally not shown here: quotes are customized by
+              company size and location (Alberto demo feedback, 2026-07-13). */}
+          <div className="bg-primary/10 border border-primary/40 rounded-xl p-5 mb-6" data-testid="custom-quote-callout">
+            <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-brand-orange" />
-              {t("requestQuote.startingPricesTitle", { defaultValue: "Starting Prices" })}
+              {t("requestQuote.customQuoteTitle")}
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 shrink-0 text-brand-green mt-0.5" />
-                <div>
-                  <span className="font-medium text-foreground">{t("requestQuote.priceOnsiteLabel", { defaultValue: "Onsite / Company Training" })}</span>
-                  <span className="block text-muted-foreground">{t("requestQuote.priceOnsiteValue", { defaultValue: "From $280 per person depending on group size and equipment" })}</span>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 shrink-0 text-brand-green mt-0.5" />
-                <div>
-                  <span className="font-medium text-foreground">{t("requestQuote.priceHandsOnLabel", { defaultValue: "Hands-On at Our Location" })}</span>
-                  <span className="block text-muted-foreground">{t("requestQuote.priceHandsOnValue", { defaultValue: "From $200-300 per person depending on equipment" })}</span>
-                </div>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-3">
-              {t("requestQuote.priceNote", { defaultValue: "Volume discounts available for 5+ trainees. Train-the-Trainer available for $750. Final pricing confirmed in your quote." })}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("requestQuote.customQuoteDesc")}</p>
           </div>
 
           <div className="bg-card border rounded-xl p-6 shadow-sm">
@@ -343,6 +327,18 @@ export default function RequestQuote() {
                     <FormMessage />
                   </FormItem>
                 )} />
+
+                {/* Clearly show the address of the facility the customer selected. */}
+                {trainingLocation === "facility" && showFacilityOption && selectedLocation && (
+                  <div className="border rounded-lg p-4 bg-accent/10 flex items-start gap-3" data-testid="facility-address-display">
+                    <MapPin className="h-5 w-5 text-brand-orange shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-semibold text-foreground">{t("requestQuote.facilityAddressTitle")}</p>
+                      <p className="text-foreground mt-1">{selectedLocation.displayName}</p>
+                      <p className="text-muted-foreground">{selectedLocation.address.full}</p>
+                    </div>
+                  </div>
+                )}
 
                 {trainingLocation === "onsite" && (
                   <div className="space-y-3 border rounded-lg p-4 bg-muted/30">

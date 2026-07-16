@@ -440,18 +440,8 @@ export default function RequestOnsiteTraining() {
             </ul>
           </div>
 
-          <div className="bg-card border rounded-xl p-6 space-y-4">
-            <h3 className="font-semibold text-foreground">{t("onsiteTraining.pricingGuide")}</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t("onsiteTraining.pricingFromLabel")}</span>
-                <span className="font-medium">{t("onsiteTraining.pricingFromValue")}</span>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">{t("onsiteTraining.pricingQuoteNote")}</p>
-            <p className="text-xs text-muted-foreground">{t("onsiteTraining.travelNote")}</p>
-          </div>
-
+          {/* Pricing card removed: quotes are customized by company size and
+              location (Alberto demo feedback, 2026-07-13). */}
           <div className="bg-card border rounded-xl p-6 space-y-3">
             <h3 className="font-semibold text-foreground">{t("onsiteTraining.contactDirectly")}</h3>
             <div className="space-y-2 text-sm">

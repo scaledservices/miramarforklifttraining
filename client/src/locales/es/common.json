@@ -1689,11 +1689,6 @@
     "benefitGroups": "Ideal para <strong>grupos de 5 o más</strong> operadores",
     "benefitCurriculum": "Currículo alineado con {{body}} con <strong>certificados el mismo día</strong>",
     "benefitScheduling": "Horarios flexibles incluyendo <strong>fines de semana y noches</strong>",
-    "pricingGuide": "Guía de Precios",
-    "pricingFromLabel": "Capacitación en su sitio",
-    "pricingFromValue": "Desde $280/persona",
-    "pricingQuoteNote": "Los precios para grupos se cotizan por trabajo — díganos el tamaño de su equipo, el equipo a operar y la ubicación y le enviaremos una cotización exacta, normalmente el mismo día.",
-    "travelNote": "Pueden aplicar tarifas de viaje fuera de nuestras áreas de servicio estándar. Todos los detalles se incluyen en su cotización.",
     "contactDirectly": "Contáctenos Directamente",
     "servingAreas": "Sirviendo el sur de California, Las Vegas y áreas circundantes",
     "successTitle": "¡Solicitud Recibida!",
@@ -2328,12 +2323,9 @@
       "scissorLift": "Plataforma de Tijera (Scissor Lift)",
       "aerialBoomLift": "Plataforma Aérea (Boom Lift)"
     },
-    "priceHandsOnLabel": "Práctica en Nuestra Ubicación",
-    "priceHandsOnValue": "Desde $200-300 por persona según el equipo",
-    "priceNote": "Los precios de grupo y por volumen se confirman en su cotización. Capacitar al Capacitador disponible por $750.",
-    "priceOnsiteLabel": "Capacitación en Sitio / Empresa",
-    "priceOnsiteValue": "Desde $280 por persona según el tamaño del grupo y el equipo",
-    "startingPricesTitle": "Precios Iniciales"
+    "customQuoteTitle": "Cotización Personalizada para Su Equipo",
+    "customQuoteDesc": "Cada cotización se personaliza según el tamaño de su empresa, la ubicación y el equipo. Envíenos los detalles a continuación y le responderemos en un día hábil.",
+    "facilityAddressTitle": "Su capacitación se llevará a cabo en:"
   },
   "serviceAreas": {
     "notFoundTitle": "Área de Servicio No Encontrada",

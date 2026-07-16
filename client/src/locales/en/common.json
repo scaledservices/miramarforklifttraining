@@ -1692,11 +1692,6 @@
     "benefitGroups": "Ideal for <strong>groups of 5 or more</strong> operators",
     "benefitCurriculum": "{{body}}-aligned curriculum with <strong>same-day certificates</strong>",
     "benefitScheduling": "Flexible scheduling including <strong>weekends and evenings</strong>",
-    "pricingGuide": "Pricing Guide",
-    "pricingFromLabel": "Onsite training",
-    "pricingFromValue": "From $280/person",
-    "pricingQuoteNote": "Group pricing is quoted per job — tell us your crew size, equipment, and location and we'll send an exact quote, usually the same day.",
-    "travelNote": "Travel fees may apply outside our standard service areas. All details included in your quote.",
     "contactDirectly": "Contact Us Directly",
     "servingAreas": "Serving Southern California, Las Vegas, and surrounding areas",
     "successTitle": "Request Received!",
@@ -2328,12 +2323,9 @@
       "scissorLift": "Scissor Lift",
       "aerialBoomLift": "Aerial Boom Lift"
     },
-    "priceHandsOnLabel": "Hands-On at Our Location",
-    "priceHandsOnValue": "From $200-300 per person depending on equipment",
-    "priceNote": "Group pricing and volume rates are confirmed in your quote. Train-the-Trainer available for $750.",
-    "priceOnsiteLabel": "Onsite / Company Training",
-    "priceOnsiteValue": "From $280 per person depending on group size and equipment",
-    "startingPricesTitle": "Starting Prices"
+    "customQuoteTitle": "Custom Quote for Your Team",
+    "customQuoteDesc": "Every quote is customized to your company size, location, and equipment. Send us the details below and we will respond within one business day.",
+    "facilityAddressTitle": "Your training will take place at:"
   },
   "serviceAreas": {
     "notFoundTitle": "Service Area Not Found",
