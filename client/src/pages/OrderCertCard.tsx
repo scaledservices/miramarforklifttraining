@@ -20,10 +20,52 @@ import {
   Package,
   Loader2,
   Lock,
+  Image as ImageIcon,
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+
+/**
+ * Read a user-selected photo and downscale it to a small JPEG data URL so
+ * the order payload stays well under the server's JSON body limit.
+ */
+function processPhotoFile(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith("image/")) {
+      reject(new Error("invalid file type"));
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const maxDim = 480;
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("canvas unavailable"));
+        return;
+      }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      let dataUrl = canvas.toDataURL("image/jpeg", 0.8);
+      // Guard the JSON body limit: retry at a lower quality if needed.
+      if (dataUrl.length > 90_000) {
+        dataUrl = canvas.toDataURL("image/jpeg", 0.6);
+      }
+      resolve(dataUrl);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("could not load image"));
+    };
+    img.src = url;
+  });
+}
 
 interface PaymentConfig {
   configured: boolean;
@@ -99,8 +141,34 @@ export default function OrderCertCard() {
     month: "",
     year: "",
     cardCode: "",
-    zip: "",
   });
+
+  // Billing address: same as shipping by default, with a separate form when
+  // the customer unchecks the box (Alberto demo feedback, 2026-07-13).
+  const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
+  const [billing, setBilling] = useState({
+    name: "",
+    address: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "US",
+  });
+  const effectiveBilling = billingSameAsShipping ? shipping : billing;
+
+  // Optional customer photo for the printed ID card (downscaled data URL).
+  const [idPhoto, setIdPhoto] = useState<string | null>(null);
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      setIdPhoto(await processPhotoFile(file));
+    } catch {
+      toast({ title: t("orderCertCard.photoInvalid"), variant: "destructive" });
+    }
+  };
 
   const { data: paymentConfig } = useQuery<PaymentConfig>({
     queryKey: ["/api/payment/config"],
@@ -143,8 +211,15 @@ export default function OrderCertCard() {
       const payload: Record<string, unknown> = {
         certificationId: certId,
         shippingAddress: shipping,
+        // Billing address and optional ID-card photo are collected in the
+        // form. The server does not persist them yet (flagged in
+        // PROGRESS.md); it safely ignores unknown fields.
+        billingAddress: effectiveBilling,
         shippingMethod,
       };
+      if (idPhoto) {
+        payload.idPhoto = idPhoto;
+      }
       if (data.paymentNonce) {
         payload.paymentNonce = data.paymentNonce;
       }
@@ -188,6 +263,9 @@ export default function OrderCertCard() {
     if (step === 1) {
       return shipping.name && shipping.address && shipping.city && shipping.state && shipping.zip;
     }
+    if (step === 3 && !billingSameAsShipping) {
+      return billing.name && billing.address && billing.city && billing.state && billing.zip;
+    }
     return true;
   };
 
@@ -217,7 +295,7 @@ export default function OrderCertCard() {
             month: cardForm.month,
             year: cardForm.year.length === 2 ? `20${cardForm.year}` : cardForm.year,
             cardCode: cardForm.cardCode,
-            zip: cardForm.zip || undefined,
+            zip: effectiveBilling.zip || undefined,
           },
           authData: {
             apiLoginID: paymentConfig.apiLoginID,
@@ -346,6 +424,43 @@ export default function OrderCertCard() {
                 <Input id="country" value={shipping.country} onChange={(e) => setShipping({ ...shipping, country: e.target.value })} data-testid="input-shipping-country" />
               </div>
             </div>
+
+            {/* Optional photo for the printed ID card */}
+            <div className="border-t pt-4 space-y-3" data-testid="section-id-photo">
+              <div>
+                <p className="font-medium">{t("orderCertCard.photoTitle")}</p>
+                <p className="text-sm text-muted-foreground">{t("orderCertCard.photoDesc")}</p>
+              </div>
+              {idPhoto ? (
+                <div className="flex items-center gap-4">
+                  <img
+                    src={idPhoto}
+                    alt={t("orderCertCard.photoTitle")}
+                    className="h-24 w-24 rounded-md object-cover border"
+                    data-testid="img-id-photo-preview"
+                  />
+                  <div className="flex flex-col gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <label className="cursor-pointer" data-testid="button-change-photo">
+                        {t("orderCertCard.photoChange")}
+                        <input type="file" accept="image/*" className="sr-only" onChange={handlePhotoChange} data-testid="input-id-photo" />
+                      </label>
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setIdPhoto(null)} data-testid="button-remove-photo">
+                      {t("orderCertCard.photoRemove")}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button asChild variant="outline">
+                  <label className="cursor-pointer" data-testid="button-upload-photo">
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    {t("orderCertCard.photoButton")}
+                    <input type="file" accept="image/*" className="sr-only" onChange={handlePhotoChange} data-testid="input-id-photo" />
+                  </label>
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
@@ -410,6 +525,54 @@ export default function OrderCertCard() {
                     {t("orderCertCard.securePaymentDesc", { defaultValue: "Your card is processed securely through Authorize.net. We never see or store your card details." })}
                   </p>
                 </div>
+                {/* Billing address — defaults to the shipping address */}
+                <div className="space-y-3" data-testid="section-billing-address">
+                  <p className="font-medium">{t("orderCertCard.billingAddressTitle")}</p>
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="billingSame"
+                      checked={billingSameAsShipping}
+                      onCheckedChange={(checked) => setBillingSameAsShipping(checked === true)}
+                      data-testid="checkbox-billing-same"
+                    />
+                    <Label htmlFor="billingSame" className="font-normal cursor-pointer">
+                      {t("orderCertCard.billingSameAsShipping")}
+                    </Label>
+                  </div>
+                  {!billingSameAsShipping && (
+                    <div className="space-y-3 border rounded-md p-4 bg-muted/30">
+                      <div className="space-y-2">
+                        <Label htmlFor="billingName">{t("orderCertCard.fullName")}</Label>
+                        <Input id="billingName" value={billing.name} onChange={(e) => setBilling({ ...billing, name: e.target.value })} disabled={isProcessing} data-testid="input-billing-name" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="billingAddress">{t("orderCertCard.address")}</Label>
+                        <Input id="billingAddress" value={billing.address} onChange={(e) => setBilling({ ...billing, address: e.target.value })} disabled={isProcessing} data-testid="input-billing-address" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="billingCity">{t("orderCertCard.city")}</Label>
+                          <Input id="billingCity" value={billing.city} onChange={(e) => setBilling({ ...billing, city: e.target.value })} disabled={isProcessing} data-testid="input-billing-city" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="billingState">{t("orderCertCard.state")}</Label>
+                          <Input id="billingState" value={billing.state} onChange={(e) => setBilling({ ...billing, state: e.target.value })} disabled={isProcessing} data-testid="input-billing-state" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="billingZip">{t("orderCertCard.zipCode")}</Label>
+                          <Input id="billingZip" inputMode="numeric" maxLength={10} value={billing.zip} onChange={(e) => setBilling({ ...billing, zip: e.target.value })} disabled={isProcessing} data-testid="input-billing-zip" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="billingCountry">{t("orderCertCard.country")}</Label>
+                          <Input id="billingCountry" value={billing.country} onChange={(e) => setBilling({ ...billing, country: e.target.value })} disabled={isProcessing} data-testid="input-billing-country" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-3">
                   <div className="space-y-2">
                     <Label htmlFor="cardNumber">{t("orderCertCard.cardNumber", { defaultValue: "Card Number" })}</Label>
@@ -468,20 +631,6 @@ export default function OrderCertCard() {
                         data-testid="input-card-code"
                       />
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cardZip">{t("orderCertCard.cardZip", { defaultValue: "Billing ZIP" })}</Label>
-                    <Input
-                      id="cardZip"
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="12345"
-                      maxLength={10}
-                      value={cardForm.zip}
-                      onChange={(e) => setCardForm({ ...cardForm, zip: e.target.value })}
-                      disabled={isProcessing}
-                      data-testid="input-card-zip"
-                    />
                   </div>
                 </div>
               </>
