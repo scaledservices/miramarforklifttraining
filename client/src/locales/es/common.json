@@ -1116,7 +1116,8 @@
     "tryAgain": "Intentar de nuevo",
     "tipLabel": "Consejo",
     "warningLabel": "Advertencia",
-    "keyTakeaways": "Puntos Clave"
+    "keyTakeaways": "Puntos Clave",
+    "back": "Atrás"
   },
   "productCard": {
     "online": "En Línea",

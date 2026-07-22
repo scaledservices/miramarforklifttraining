@@ -9,8 +9,9 @@ interface HotspotDiagramProps {
 
 /**
  * Image with numbered hotspot pins. Tap/click or keyboard-activate a pin to
- * reveal its label + description in a detail card below the image (reliable on
- * mobile where floating tooltips clip). Tap again to dismiss.
+ * reveal its label + description in a popover anchored INSIDE the diagram
+ * frame - never in document flow, so the lesson footer (Continue button) is
+ * never pushed out of view when a pin opens.
  */
 export default function HotspotDiagram({ block }: HotspotDiagramProps) {
   const { t } = useTranslation();
@@ -23,6 +24,10 @@ export default function HotspotDiagram({ block }: HotspotDiagramProps) {
   };
 
   const activeSpot = active !== null ? block.hotspots[active] : null;
+  // Keep the popover inside the frame: pins on the left half open to the
+  // right and vice versa; vertically it hugs the top or bottom edge.
+  const panelSide = activeSpot && activeSpot.x > 50 ? "left-3" : "right-3";
+  const panelVert = activeSpot && activeSpot.y > 50 ? "bottom-3" : "top-3";
 
   return (
     <div className="my-6" data-testid="hotspot-diagram">
@@ -43,35 +48,35 @@ export default function HotspotDiagram({ block }: HotspotDiagramProps) {
             {i + 1}
           </button>
         ))}
+        <div aria-live="polite">
+          {activeSpot && (
+            <div
+              className={`absolute ${panelSide} ${panelVert} z-10 max-w-[min(20rem,80%)] p-3 rounded-lg border border-[#FFC326]/60 bg-black/85 text-white shadow-lg backdrop-blur-sm flex items-start gap-2.5`}
+              data-testid="hotspot-detail"
+            >
+              <span className="shrink-0 w-6 h-6 rounded-full bg-[#FFC326] text-black text-xs font-bold flex items-center justify-center mt-0.5">
+                {active! + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm">{activeSpot.label}</p>
+                <p className="text-sm text-white/80 mt-1">{activeSpot.description}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActive(null)}
+                className="shrink-0 p-1 rounded hover:bg-white/20"
+                aria-label={t("lms.close")}
+                data-testid="hotspot-detail-close"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       {block.caption && (
         <p className="text-xs text-muted-foreground mt-2 text-center italic">{block.caption}</p>
       )}
-      <div aria-live="polite">
-        {activeSpot && (
-          <div
-            className="mt-3 p-4 rounded-lg border border-[#FFC326]/60 bg-[#FFC326]/10 dark:bg-[#FFC326]/5 flex items-start gap-3"
-            data-testid="hotspot-detail"
-          >
-            <span className="shrink-0 w-6 h-6 rounded-full bg-[#FFC326] text-black text-xs font-bold flex items-center justify-center mt-0.5">
-              {active! + 1}
-            </span>
-            <div className="flex-1">
-              <p className="font-semibold text-sm">{activeSpot.label}</p>
-              <p className="text-sm text-muted-foreground mt-1">{activeSpot.description}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setActive(null)}
-              className="shrink-0 p-1 rounded hover:bg-black/5 dark:hover:bg-white/10"
-              aria-label={t("lms.close")}
-              data-testid="hotspot-detail-close"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        )}
-      </div>
       <p className="text-xs text-muted-foreground mt-2" data-testid="hotspot-progress">
         {t("lms.hotspotProgress", { visited: visited.size, total: block.hotspots.length })}
       </p>

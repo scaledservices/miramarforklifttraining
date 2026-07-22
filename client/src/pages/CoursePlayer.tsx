@@ -151,6 +151,16 @@ export default function CoursePlayer() {
     setSidebarOpen(false);
   };
 
+  const handleNavigateStep = (direction: "prev" | "next") => {
+    const currentIndex = steps.findIndex((s) => s.id === activeStepId);
+    const targetIndex = direction === "prev" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= steps.length) return;
+    setShowCertSuccess(false);
+    setActiveStepId(steps[targetIndex].id);
+  };
+
+  const activeStepIndex = steps.findIndex((s) => s.id === activeStepId);
+
   const handleResume = () => {
     const firstIncomplete = steps.find((s) => s.progress.status !== "completed");
     if (firstIncomplete) {
@@ -415,6 +425,9 @@ export default function CoursePlayer() {
                       step={stepWithProgress}
                       enrollmentId={parseInt(enrollmentId || "0")}
                       onComplete={handleStepComplete}
+                      hasPrev={activeStepIndex > 0}
+                      hasNext={activeStepIndex >= 0 && activeStepIndex < steps.length - 1}
+                      onNavigate={handleNavigateStep}
                     />
                   )}
                   {stepWithProgress.type === "download" && (

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Check, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import InteractiveLesson from "./InteractiveLesson";
 import type { LessonBlock } from "@shared/lesson-blocks";
@@ -18,9 +18,12 @@ interface ContentStepProps {
   };
   enrollmentId: number;
   onComplete: (result?: any) => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
+  onNavigate?: (direction: "prev" | "next") => void;
 }
 
-export default function ContentStep({ step, enrollmentId, onComplete }: ContentStepProps) {
+export default function ContentStep({ step, enrollmentId, onComplete, hasPrev, hasNext, onNavigate }: ContentStepProps) {
   const { t } = useTranslation();
   const [marked, setMarked] = useState(step.progress.status === "completed");
   const config = step.config as any;
@@ -67,21 +70,52 @@ export default function ContentStep({ step, enrollmentId, onComplete }: ContentS
       )}
 
       <div className="border-t pt-4">
-        {marked ? (
-          <div className="flex items-center gap-2 text-green-600" data-testid="text-content-completed">
-            <Check className="h-5 w-5" />
-            <span className="font-medium">{t("lms.completed")}</span>
+        <div className="flex items-center justify-between gap-3">
+          {hasPrev && onNavigate ? (
+            <Button
+              variant="outline"
+              onClick={() => onNavigate("prev")}
+              data-testid="button-prev-step"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              {t("lms.back")}
+            </Button>
+          ) : (
+            <span />
+          )}
+          {marked ? (
+            hasNext && onNavigate ? (
+              <Button
+                onClick={() => onNavigate("next")}
+                size="lg"
+                data-testid="button-next-step"
+              >
+                {t("lms.continue")}
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            ) : (
+              <div className="flex items-center gap-2 text-green-600" data-testid="text-content-completed-final">
+                <Check className="h-5 w-5" />
+                <span className="font-medium">{t("lms.completed")}</span>
+              </div>
+            )
+          ) : (
+            <Button
+              onClick={() => markComplete.mutate()}
+              disabled={markComplete.isPending}
+              size="lg"
+              data-testid="button-mark-complete"
+            >
+              {markComplete.isPending ? t("lms.saving") : t("lms.continue")}
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          )}
+        </div>
+        {marked && (
+          <div className="flex items-center gap-2 text-green-600 mt-2" data-testid="text-content-completed">
+            <Check className="h-4 w-4" />
+            <span className="text-sm">{t("lms.completed")}</span>
           </div>
-        ) : (
-          <Button
-            onClick={() => markComplete.mutate()}
-            disabled={markComplete.isPending}
-            size="lg"
-            data-testid="button-mark-complete"
-          >
-            {markComplete.isPending ? t("lms.saving") : t("lms.continue")}
-            <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
         )}
       </div>
     </div>
