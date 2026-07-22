@@ -9,8 +9,6 @@ import { createServer as createHttpServer } from "http";
 import { readFileSync } from "fs";
 import { startJobScheduler } from "./jobs";
 import { ensureSequences, pool } from "./db";
-import { isStripeConfigured } from "./stripeClient";
-import { WebhookHandlers } from "./webhookHandlers";
 import { installConsoleCapture, errorHandler, logger, logDbError } from "./monitoring";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -71,12 +69,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://js.stripe.com", "https://js.authorize.net", "https://jstest.authorize.net", "https://maps.googleapis.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://js.authorize.net", "https://jstest.authorize.net", "https://maps.googleapis.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
       imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
-      connectSrc: ["'self'", "https://api.stripe.com", "https://api.authorize.net", "https://apitest.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net", "wss:", "ws:"],
-      frameSrc: ["'self'", "https://js.stripe.com", "https://hooks.stripe.com", "https://accept.authorize.net", "https://test.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net"],
+      connectSrc: ["'self'", "https://api.authorize.net", "https://apitest.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net", "wss:", "ws:"],
+      frameSrc: ["'self'", "https://accept.authorize.net", "https://test.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
@@ -93,31 +91,6 @@ declare module "http" {
     rawBody: unknown;
   }
 }
-
-app.post(
-  '/api/stripe/webhook',
-  express.raw({ type: 'application/json' }),
-  async (req, res) => {
-    const signature = req.headers['stripe-signature'];
-    if (!signature) {
-      return res.status(400).json({ error: 'Missing stripe-signature' });
-    }
-
-    try {
-      const sig = Array.isArray(signature) ? signature[0] : signature;
-      if (!Buffer.isBuffer(req.body)) {
-        console.error('STRIPE WEBHOOK ERROR: req.body is not a Buffer');
-        return res.status(500).json({ error: 'Webhook processing error' });
-      }
-
-      await WebhookHandlers.processWebhook(req.body as Buffer, sig);
-      res.status(200).json({ received: true });
-    } catch (error: any) {
-      console.error('Webhook error:', error.message);
-      res.status(400).json({ error: 'Webhook processing error' });
-    }
-  }
-);
 
 app.use(
   express.json({
@@ -169,40 +142,6 @@ app.use((req, res, next) => {
 
 (async () => {
   await ensureSequences();
-
-  if (isStripeConfigured()) {
-    try {
-      const { runMigrations } = await import('stripe-replit-sync');
-      console.log('Initializing Stripe schema...');
-      await runMigrations({ databaseUrl: process.env.DATABASE_URL! });
-      console.log('Stripe schema ready');
-
-      const { getStripeSync } = await import('./stripeClient');
-      const stripeSync = await getStripeSync();
-
-      const domains = process.env.REPLIT_DOMAINS?.split(',')[0];
-      if (domains) {
-        const webhookBaseUrl = `https://${domains}`;
-        try {
-          const webhookResult = await stripeSync.findOrCreateManagedWebhook(
-            `${webhookBaseUrl}/api/stripe/webhook`
-          );
-          const webhookUrl = webhookResult?.webhook?.url || webhookResult?.url || `${webhookBaseUrl}/api/stripe/webhook`;
-          console.log(`Stripe webhook configured: ${webhookUrl}`);
-        } catch (webhookErr: any) {
-          console.log(`[STRIPE] Webhook setup skipped (use Stripe Dashboard to configure): ${webhookErr.message}`);
-        }
-      }
-
-      stripeSync.syncBackfill()
-        .then(() => console.log('Stripe data synced'))
-        .catch((err: any) => console.error('Stripe sync error:', err));
-    } catch (err) {
-      console.error('Stripe initialization failed (non-fatal):', err);
-    }
-  } else {
-    console.log('[STRIPE] Not configured - using demo mode for payments');
-  }
 
   await registerRoutes(httpServer, app);
 

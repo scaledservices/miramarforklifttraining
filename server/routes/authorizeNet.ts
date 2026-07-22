@@ -23,8 +23,7 @@ import { requireAuth, payLimiter } from "./middleware";
 export function registerAuthorizeNetRoutes(app: Express) {
   /**
    * GET /api/payment/config
-   * Replaces /api/stripe/config. Returns Authorize.net configuration
-   * for the client to initialize Accept UI.
+   * Returns Authorize.net configuration for the client to initialize Accept UI.
    */
   app.get("/api/payment/config", async (_req: Request, res: Response) => {
     try {

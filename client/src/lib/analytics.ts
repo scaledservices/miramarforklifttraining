@@ -5,7 +5,7 @@
  * - page_view: any page load
  * - cta_click: any CTA button click (with the CTA's destination/label)
  * - quote_submit: quote form submission (with leadSource)
- * - checkout_contact: checkout contact page viewed (Stripe parked)
+ * - checkout_contact: checkout contact page viewed
  *
  * Design decisions:
  * - Uses Google Analytics 4 (gtag) if MEASUREMENT_ID is set in env.
@@ -90,7 +90,7 @@ export function trackLeadSubmit(leadSource: string, location?: string): void {
 }
 
 /**
- * Track the checkout contact page being viewed (since Stripe is parked).
+ * Track the checkout contact page being viewed.
  */
 export function trackCheckoutContact(): void {
   trackEvent("checkout_contact", {});

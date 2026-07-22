@@ -51,7 +51,7 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
   if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
     return next();
   }
-  if (req.path.startsWith("/api/stripe/webhook") || req.path.startsWith("/api/webhooks/")) {
+  if (req.path.startsWith("/api/webhooks/")) {
     return next();
   }
   if (req.path.match(/^\/api\/auth\/(google|linkedin|facebook)\/(callback)?/)) {
