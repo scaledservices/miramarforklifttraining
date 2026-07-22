@@ -220,6 +220,14 @@ export const certCardOrders = pgTable("cert_card_orders", {
   certificationId: integer("certification_id").notNull().references(() => certifications.id),
   quantity: integer("quantity").notNull().default(1),
   shippingAddress: jsonb("shipping_address").notNull(),
+  // Billing address used for the Authorize.net charge (AVS). Stored so the
+  // receipt/audit trail shows what was actually billed. Nullable only for
+  // legacy rows created before this column existed.
+  billingAddress: jsonb("billing_address"),
+  // Customer-supplied photo for the physical ID card, stored as a JPEG data
+  // URL (client downscales to <=480px, ~90KB max). Used at fulfillment/print
+  // time. Nullable: photo is optional and legacy rows have none.
+  idPhoto: text("id_photo"),
   shippingMethod: text("shipping_method", { enum: ["standard", "expedited"] }).notNull(),
   shippingCost: numeric("shipping_cost", { precision: 10, scale: 2 }).notNull(),
   totalAmount: numeric("total_amount", { precision: 10, scale: 2 }).notNull(),
@@ -227,6 +235,13 @@ export const certCardOrders = pgTable("cert_card_orders", {
   trackingNumber: text("tracking_number"),
   carrier: text("carrier"),
   paymentId: integer("payment_id"),
+  // Authorize.net (or demo) transaction id for the card charge. The payments
+  // table is keyed to course orders (orderId FK is NOT NULL), so card-order
+  // payment references live here; earnings split goes in chargeMetadata.
+  providerTransactionId: text("provider_transaction_id"),
+  // Earnings split + surcharge detail for the charge, same 70/30 default and
+  // platformSettings.profit_split convention as course-order payments.
+  chargeMetadata: jsonb("charge_metadata"),
   paidAt: timestamp("paid_at"),
   refundedAt: timestamp("refunded_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -283,7 +298,7 @@ export const insertEnrollmentSchema = createInsertSchema(enrollments).omit({ id:
 export const insertStepProgressSchema = createInsertSchema(stepProgress).omit({ id: true });
 export const insertExamAttemptSchema = createInsertSchema(examAttempts).omit({ id: true, startedAt: true, completedAt: true });
 export const insertCertificationSchema = createInsertSchema(certifications).omit({ id: true, certificateNumber: true, verificationToken: true, pdfUrl: true, pdfGeneratedAt: true, reissuedAt: true, issuedAt: true, updatedAt: true });
-export const insertCertCardOrderSchema = createInsertSchema(certCardOrders).omit({ id: true, trackingNumber: true, carrier: true, paymentId: true, paidAt: true, refundedAt: true, createdAt: true, updatedAt: true });
+export const insertCertCardOrderSchema = createInsertSchema(certCardOrders).omit({ id: true, trackingNumber: true, carrier: true, paymentId: true, refundedAt: true, createdAt: true, updatedAt: true });
 export const insertContactSubmissionSchema = createInsertSchema(contactSubmissions).omit({ id: true, createdAt: true });
 export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({ id: true, createdAt: true });
 export const insertEmailOutboxSchema = createInsertSchema(emailOutbox).omit({ id: true, createdAt: true });

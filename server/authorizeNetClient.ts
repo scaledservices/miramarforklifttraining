@@ -56,12 +56,23 @@ interface TransactionResult {
  * The nonce is generated client-side by Accept UI — it contains the encrypted
  * card data and is single-use. Our server never sees raw card numbers.
  */
+export interface BillingAddress {
+  firstName?: string;
+  lastName?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+}
+
 export async function createTransactionFromNonce(
   paymentNonce: string,
   amount: number,
   orderId: number,
   orderNumber: string,
-  isCardPayment: boolean = true
+  isCardPayment: boolean = true,
+  billTo?: BillingAddress
 ): Promise<TransactionResult> {
   if (!isAuthorizeNetConfigured()) {
     return {
@@ -95,6 +106,21 @@ export async function createTransactionFromNonce(
       id: String(orderId),
     },
   };
+
+  // Billing address enables AVS (Address Verification Service) checks on the
+  // charge. Only included when the caller supplies one - the course checkout
+  // flow does not collect billing addresses yet, card orders do.
+  if (billTo && (billTo.address || billTo.zip)) {
+    transactionRequest.billTo = {
+      firstName: (billTo.firstName || "").slice(0, 50),
+      lastName: (billTo.lastName || "").slice(0, 50),
+      address: (billTo.address || "").slice(0, 60),
+      city: (billTo.city || "").slice(0, 40),
+      state: (billTo.state || "").slice(0, 40),
+      zip: (billTo.zip || "").slice(0, 20),
+      country: (billTo.country || "US").slice(0, 60),
+    };
+  }
 
   const requestBody = {
     createTransactionRequest: {

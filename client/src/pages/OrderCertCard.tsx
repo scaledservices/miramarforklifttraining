@@ -211,9 +211,6 @@ export default function OrderCertCard() {
       const payload: Record<string, unknown> = {
         certificationId: certId,
         shippingAddress: shipping,
-        // Billing address and optional ID-card photo are collected in the
-        // form. The server does not persist them yet (flagged in
-        // PROGRESS.md); it safely ignores unknown fields.
         billingAddress: effectiveBilling,
         shippingMethod,
       };
