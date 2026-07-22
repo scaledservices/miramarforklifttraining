@@ -23,6 +23,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { formatCardNumber, digitsOnly } from "@/lib/inputFormat";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
@@ -580,7 +581,7 @@ export default function OrderCertCard() {
                       autoComplete="cc-number"
                       placeholder="1234 5678 9012 3456"
                       value={cardForm.cardNumber}
-                      onChange={(e) => setCardForm({ ...cardForm, cardNumber: e.target.value })}
+                      onChange={(e) => setCardForm({ ...cardForm, cardNumber: formatCardNumber(e.target.value) })}
                       disabled={isProcessing}
                       data-testid="input-card-number"
                     />
@@ -595,7 +596,7 @@ export default function OrderCertCard() {
                         placeholder="MM"
                         maxLength={2}
                         value={cardForm.month}
-                        onChange={(e) => setCardForm({ ...cardForm, month: e.target.value })}
+                        onChange={(e) => setCardForm({ ...cardForm, month: digitsOnly(e.target.value).slice(0, 2) })}
                         disabled={isProcessing}
                         data-testid="input-card-month"
                       />
@@ -609,7 +610,7 @@ export default function OrderCertCard() {
                         placeholder="YY"
                         maxLength={2}
                         value={cardForm.year}
-                        onChange={(e) => setCardForm({ ...cardForm, year: e.target.value })}
+                        onChange={(e) => setCardForm({ ...cardForm, year: digitsOnly(e.target.value).slice(0, 2) })}
                         disabled={isProcessing}
                         data-testid="input-card-year"
                       />
@@ -623,7 +624,7 @@ export default function OrderCertCard() {
                         placeholder="123"
                         maxLength={4}
                         value={cardForm.cardCode}
-                        onChange={(e) => setCardForm({ ...cardForm, cardCode: e.target.value })}
+                        onChange={(e) => setCardForm({ ...cardForm, cardCode: digitsOnly(e.target.value).slice(0, 4) })}
                         disabled={isProcessing}
                         data-testid="input-card-code"
                       />
