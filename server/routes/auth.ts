@@ -95,6 +95,24 @@ app.get("/api/auth/me", async (req: Request, res: Response) => {
   return res.json({ user: sanitizeUser(user) });
 });
 
+// Dev-only: demo account list for the QA account-switcher banner. Registered
+// only outside production so the endpoint (and these credentials) can never
+// exist on a deployed environment. These accounts come from the local seed
+// script; the banner logs in through the normal /api/auth/login endpoint.
+if (process.env.NODE_ENV !== "production") {
+  app.get("/api/dev/demo-accounts", (_req: Request, res: Response) => {
+    return res.json({
+      accounts: [
+        { role: "Admin", email: "admin@miramarforklift.com", password: "DemoPass!234" },
+        { role: "Crew Admin", email: "group@miramarforklift.com", password: "DemoPass!234" },
+        { role: "Individual", email: "user@miramarforklift.com", password: "DemoPass!234" },
+        { role: "Member", email: "member1@miramarforklift.com", password: "DemoPass!234" },
+        { role: "Certified", email: "certified@miramarforklift.com", password: "DemoPass!234" },
+      ],
+    });
+  });
+}
+
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   const { Strategy: GoogleStrategy } = await import("passport-google-oauth20");
   const domain = process.env.REPLIT_DOMAINS?.split(",")[0] || `localhost:${process.env.PORT || 5000}`;
