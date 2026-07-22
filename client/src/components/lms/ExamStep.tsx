@@ -55,6 +55,18 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
   const passingScore = config?.passing_score || 70;
   const isAlreadyComplete = step.progress.status === "completed";
 
+  // Shuffle each question's option order per attempt so correct answers are
+  // not clustered on the same letter (QA found long runs of "B"). Answers
+  // are submitted as option TEXT, not indices, so display order is purely
+  // cosmetic and the server-side grader is unaffected.
+  const [shuffledOptions, setShuffledOptions] = useState<Record<number, string[]>>(() => {
+    const map: Record<number, string[]> = {};
+    for (const q of questions) {
+      map[q.id] = [...q.options].sort(() => Math.random() - 0.5);
+    }
+    return map;
+  });
+
   const submitExam = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", `/api/course-player/${enrollmentId}/exam-submit`, {
@@ -89,6 +101,13 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
   const handleRetry = () => {
     setAnswers({});
     setResult(null);
+    setShuffledOptions(() => {
+      const map: Record<number, string[]> = {};
+      for (const q of questions) {
+        map[q.id] = [...q.options].sort(() => Math.random() - 0.5);
+      }
+      return map;
+    });
   };
 
   const allAnswered = questions.every((q) => {
@@ -213,7 +232,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                   onValueChange={(val) => handleSingleAnswer(q.id, val)}
                   data-testid={`radio-group-${q.id}`}
                 >
-                  {(q.options as string[]).map((option, oi) => (
+                  {(shuffledOptions[q.id] ?? q.options).map((option, oi) => (
                     <div key={oi} className="flex items-center gap-3 py-1.5">
                       <RadioGroupItem
                         value={option}
@@ -228,7 +247,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                 </RadioGroup>
               ) : (
                 <div className="space-y-2" data-testid={`checkbox-group-${q.id}`}>
-                  {(q.options as string[]).map((option, oi) => {
+                  {(shuffledOptions[q.id] ?? q.options).map((option, oi) => {
                     const checked = ((answers[q.id] as string[]) || []).includes(option);
                     return (
                       <div key={oi} className="flex items-center gap-3 py-1.5">

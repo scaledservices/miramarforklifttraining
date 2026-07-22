@@ -330,7 +330,7 @@ export default function CoursePlayer() {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-1 max-w-xs">
-            <Progress value={progressPercent} className="flex-1 h-2" data-testid="progress-bar-course" />
+            <Progress value={progressPercent} className="flex-1 h-2 bg-white/20" indicatorClassName="bg-[#4f3b3b]" data-testid="progress-bar-course" />
             <span className="text-sm font-medium text-primary-foreground whitespace-nowrap" data-testid="text-progress-percent">
               {progressPercent}%
             </span>

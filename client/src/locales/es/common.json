@@ -2283,9 +2283,6 @@
     "questionsCall": "¿Preguntas? Llámanos al",
     "pageTitle": "Solicita una Cotización de Capacitación",
     "pageSubtitle": "Cuéntanos sobre tu equipo de trabajo y tu maquinaria. Te enviaremos una cotización personalizada con precios y fechas disponibles — normalmente en un día hábil.",
-    "selfServeTitle": "¿Quieres reservar ahora mismo?",
-    "selfServeDesc": "Si ya sabes lo que necesitas, puedes ver la disponibilidad y reservar tu capacitación en línea en minutos.",
-    "selfServeCta": "Reservar Capacitación en Línea",
     "formTitle": "Cuéntanos Sobre Tus Necesidades de Capacitación",
     "firstName": "Nombre",
     "lastName": "Apellido",
@@ -2779,7 +2776,6 @@
     "navMoney": "Dinero",
     "navMore": "Más",
     "moreTitle": "Más",
-    "navCustomers": "Clientes",
     "navCertificates": "Certificados",
     "navBookings": "Todas las reservas",
     "navAvailability": "Disponibilidad",
@@ -2914,6 +2910,7 @@
     "fulfillStepBalance": "{{due}} por cobrar. Cobra antes de terminar",
     "fulfillStepComplete_one": "Marcar completo: crea {{count}} certificado y envía correo al cliente",
     "fulfillStepComplete_other": "Marcar completo: crea {{count}} certificados y envía correo al cliente",
-    "fulfillViewCerts": "Ver certificados"
+    "fulfillViewCerts": "Ver certificados",
+    "navUsers": "Usuarios"
   }
 }

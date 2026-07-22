@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, Building2, Users, MapPin, Phone, Mail, Calendar, CalendarDays, ClipboardList, Clock } from "lucide-react";
+import { CheckCircle, Building2, Users, MapPin, Phone, Mail, Calendar, ClipboardList, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/seo/SEOHead";
 import { formatUsPhone, normalizeEmail, capitalizeWords, digitsOnly } from "@/lib/inputFormat";
@@ -208,21 +208,10 @@ export default function RequestQuote() {
 
       <div className="max-w-5xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2">
-          <div className="bg-accent/10 border-2 border-accent rounded-xl p-5 mb-6" data-testid="self-serve-callout">
-            <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 text-brand-orange" />
-              {t("requestQuote.selfServeTitle")}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-3">{t("requestQuote.selfServeDesc")}</p>
-            <Link href="/book-training">
-              <Button className="bg-accent text-accent-foreground border-accent-border" data-testid="button-self-serve-book">
-                {t("requestQuote.selfServeCta")}
-              </Button>
-            </Link>
-          </div>
-
           {/* Pricing intentionally not shown here: quotes are customized by
-              company size and location (Alberto demo feedback, 2026-07-13). */}
+              company size and location (Alberto demo feedback, 2026-07-13).
+              The "book right now" self-serve callout was removed per QA:
+              hands-on booking is offered from the homepage hero instead. */}
           <div className="bg-primary/10 border border-primary/40 rounded-xl p-5 mb-6" data-testid="custom-quote-callout">
             <h3 className="font-semibold text-foreground mb-1 flex items-center gap-2">
               <ClipboardList className="h-5 w-5 text-brand-orange" />

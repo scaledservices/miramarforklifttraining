@@ -2283,9 +2283,6 @@
     "questionsCall": "Questions? Call us at",
     "pageTitle": "Request a Training Quote",
     "pageSubtitle": "Tell us about your crew and equipment. We will send you a custom quote with pricing and available dates — usually within one business day.",
-    "selfServeTitle": "Want to book right now?",
-    "selfServeDesc": "If you already know what you need, you can check availability and book your training online in minutes.",
-    "selfServeCta": "Book Training Online",
     "formTitle": "Tell Us About Your Training Needs",
     "firstName": "First Name",
     "lastName": "Last Name",
@@ -2779,7 +2776,6 @@
     "navMoney": "Money",
     "navMore": "More",
     "moreTitle": "More",
-    "navCustomers": "Customers",
     "navCertificates": "Certificates",
     "navBookings": "All Bookings",
     "navAvailability": "Availability",
@@ -2914,6 +2910,7 @@
     "fulfillStepBalance": "{{due}} still due — collect before finishing",
     "fulfillStepComplete_one": "Mark complete — creates {{count}} certificate and emails the customer",
     "fulfillStepComplete_other": "Mark complete — creates {{count}} certificates and emails the customer",
-    "fulfillViewCerts": "See Certificates"
+    "fulfillViewCerts": "See Certificates",
+    "navUsers": "Users"
   }
 }

@@ -16,7 +16,6 @@ import {
   AlertTriangle,
   RefreshCw,
   Loader2,
-  GraduationCap,
 } from "lucide-react";
 import EmployerDocs from "@/components/lms/EmployerDocs";
 import { queryClient } from "@/lib/queryClient";
@@ -200,24 +199,9 @@ export default function Certification() {
         </CardContent>
       </Card>
 
-      <Card data-testid="card-instructor-cta">
-        <CardContent className="py-6 flex items-start gap-4">
-          <div className="h-10 w-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-            <GraduationCap className="h-5 w-5 text-primary" />
-          </div>
-          <div className="space-y-2 flex-1">
-            <h3 className="font-semibold">{t("certification.instructorTitle")}</h3>
-            <p className="text-sm text-muted-foreground">
-              {t("certification.instructorDesc")}
-            </p>
-            <Link href="/become-an-instructor">
-              <Button variant="outline" data-testid="button-become-instructor">
-                {t("certification.learnMoreApply")}
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+      {/* "Become an Instructor" CTA removed per QA 2026-07-22: instructor
+          program is shelved. Route /become-an-instructor still exists but is
+          no longer linked from the certificate page. */}
 
       <EmployerDocs />
     </div>

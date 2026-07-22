@@ -48,7 +48,7 @@ const operateItems: NavItem[] = [
   { title: "Availability", url: "/admin/sessions", icon: CalendarClock },
   { title: "Standing Sessions", url: "/admin/standing-sessions", icon: Repeat },
   { title: "Leads", url: "/admin/leads", icon: Target },
-  { title: "Customers", url: "/admin/users", icon: Users },
+  { title: "Users", url: "/admin/users", icon: Users },
   { title: "Money", url: "/admin/money", icon: DollarSign },
   { title: "Analytics", url: "/admin/analytics", icon: TrendingUp },
   { title: "Discounts", url: "/admin/discounts", icon: Tag },
