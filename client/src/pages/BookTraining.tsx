@@ -637,22 +637,6 @@ export default function BookTraining() {
           ))}
         </div>
 
-        {/* Goal gradient — starts at 25%, never 0. Purchase-style progress. */}
-        <div className="-mt-4 mb-8 max-w-md mx-auto" data-testid="booking-progress-bar">
-          <div className="flex items-center justify-between text-xs font-medium mb-1.5">
-            <span className="text-muted-foreground">{t("bookTraining.stepProgress", { step, total: 4 })}</span>
-            <span className="text-brand-green" data-testid="text-booking-progress">
-              {t("bookTraining.progressLabel", { percent: step * 25 })}
-            </span>
-          </div>
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <div
-              className="h-full rounded-full bg-brand-green transition-all duration-500"
-              style={{ width: `${step * 25}%` }}
-            />
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             {step === 1 && (
@@ -747,7 +731,7 @@ export default function BookTraining() {
                     </h2>
                     <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.selectTrainingDesc")}</p>
 
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
                       {handsOnProducts.map((p) => {
                         const isSelected = selectedProducts.some((sp) => sp.id === p.id);
                         return (

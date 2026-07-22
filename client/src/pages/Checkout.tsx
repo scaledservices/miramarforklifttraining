@@ -450,6 +450,17 @@ export default function Checkout() {
                         />
                       </div>
                     </div>
+                    <div className="flex items-start gap-3 rounded-lg border p-3 bg-muted/30">
+                      <Checkbox
+                        id="refundPolicy"
+                        checked={refundAccepted}
+                        onCheckedChange={(checked) => setRefundAccepted(checked === true)}
+                        data-testid="checkbox-refund-policy"
+                      />
+                      <Label htmlFor="refundPolicy" className="text-sm leading-relaxed cursor-pointer">
+                        {t("checkout.refundCheckbox")}
+                      </Label>
+                    </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">{t("checkout.cardFeeNote", { defaultValue: "Includes 3% card processing fee" })}</span>
                       <span className="font-medium text-muted-foreground">+${surcharge.toFixed(2)}</span>
@@ -543,23 +554,6 @@ export default function Checkout() {
               </CardContent>
             </Card>
           )}
-
-          <Card>
-            <CardContent className="p-6">
-              <h2 className="font-bold text-lg mb-4">{t("checkout.refundPolicyTitle")}</h2>
-              <div className="flex items-start gap-3">
-                <Checkbox
-                  id="refundPolicy"
-                  checked={refundAccepted}
-                  onCheckedChange={(checked) => setRefundAccepted(checked === true)}
-                  data-testid="checkbox-refund-policy"
-                />
-                <Label htmlFor="refundPolicy" className="text-sm leading-relaxed cursor-pointer">
-                  {t("checkout.refundCheckbox")}
-                </Label>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="lg:col-span-1">
