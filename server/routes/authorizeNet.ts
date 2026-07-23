@@ -117,6 +117,12 @@ export function registerAuthorizeNetRoutes(app: Express) {
         }
         const v = validateAddOn(rawAddOn);
         if (!v.ok) return res.status(400).json({ error: v.error });
+        // Server is source of truth (spec 1.2): count is 0..seatCount. The
+        // client stepper clamps, but never trust it.
+        const seatCount = (items as Array<{ quantity?: number }>).reduce((n, i) => n + (i.quantity || 1), 0);
+        if (v.value.count > seatCount) {
+          return res.status(400).json({ error: `Photo ID count (${v.value.count}) exceeds seats purchased (${seatCount})` });
+        }
         if (v.value.count > 0) addOn = v.value;
       }
 
