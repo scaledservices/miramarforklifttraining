@@ -139,7 +139,20 @@ export function registerAuthorizeNetRoutes(app: Express) {
 
           // Apply discount (server-computed) to the demo order
           const demoDiscount = await applyDiscountToOrder(discount, order.id, orderRes.total);
-          const demoTotal = demoDiscount.discountedTotal;
+          let demoTotal = demoDiscount.discountedTotal;
+
+          // Photo ID add-on: same server-priced math as the real charge path
+          // (discounts never apply, 3% surcharge folds in, entitlements created).
+          let demoAddOnTotal = 0;
+          let demoSurcharge = 0;
+          if (addOn) {
+            const shipUnit = SHIPPING_RATES[addOn.shippingMethod];
+            demoAddOnTotal = Number((addOn.count * (PHOTO_ID_PRICE + shipUnit)).toFixed(2));
+            demoTotal = Number((demoTotal + demoAddOnTotal).toFixed(2));
+            demoSurcharge = calculateCardSurcharge(demoTotal);
+            demoTotal = Number((demoTotal + demoSurcharge).toFixed(2));
+            await db.update(ordersTable).set({ total: String(demoTotal) }).where(eq(ordersTable.id, order.id));
+          }
 
           // Record a demo payment
           const { payments: paymentsTable } = await import("@shared/schema");
@@ -159,12 +172,24 @@ export function registerAuthorizeNetRoutes(app: Express) {
 
           await postPaymentProcessing(order.id, req.session.userId!, `demo-${Date.now()}`, demoTotal, isTeamPurchase);
 
+          // Photo ID add-on: create entitlements + save shipping address even
+          // when Authorize.net is not configured (demo/QA parity).
+          if (addOn) {
+            await createPhotoIdEntitlements(order.id, req.session.userId!, addOn, demoAddOnTotal, demoSurcharge);
+            const { users: usersTable } = await import("@shared/schema");
+            await db.update(usersTable)
+              .set({ savedShippingAddress: addOn.shippingAddress })
+              .where(eq(usersTable.id, req.session.userId!));
+          }
+
           return res.json({
             success: true,
             orderId: order.id,
             orderNumber: order.orderNumber,
             transactionId: `demo-${Date.now()}`,
             demoMode: true,
+            photoIdAddOn: addOn ? { count: addOn.count, total: demoAddOnTotal } : undefined,
+            surcharge: demoSurcharge > 0 ? demoSurcharge : undefined,
           });
         }
 
