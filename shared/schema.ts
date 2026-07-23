@@ -90,7 +90,7 @@ export const examQuestions = pgTable("exam_questions", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const orders = pgTable("orders", {
+export const orders: any = pgTable("orders", {
   id: serial("id").primaryKey(),
   orderNumber: text("order_number").notNull().unique(),
   invoiceNumber: text("invoice_number").unique(),
@@ -940,7 +940,7 @@ export type DiscountRedemption = typeof discountRedemptions.$inferSelect;
 // validateDiscountCode / recordDiscountRedemption helpers work unchanged.
 // ---------------------------------------------------------------------------
 
-export const referralCodes = pgTable("referral_codes", {
+export const referralCodes: any = pgTable("referral_codes", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
   code: text("code").notNull().unique(),
