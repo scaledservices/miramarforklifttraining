@@ -19,6 +19,12 @@ export const users = pgTable("users", {
   passwordResetTokenUsedAt: timestamp("password_reset_token_used_at"),
   notificationPreferences: jsonb("notification_preferences"),
   locale: text("locale").notNull().default("en"),
+  // Addresses captured at checkout, reused to prefill later purchases.
+  // Shape: { name, address, city, state, zip, country }. The entitlement /
+  // card-order rows snapshot the address actually used per order, so profile
+  // edits never rewrite historical fulfillment addresses.
+  savedShippingAddress: jsonb("saved_shipping_address"),
+  savedBillingAddress: jsonb("saved_billing_address"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => [
   uniqueIndex("users_auth_provider_idx").on(table.authProvider, table.authProviderId)
@@ -248,6 +254,32 @@ export const certCardOrders = pgTable("cert_card_orders", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Photo ID entitlements: a PAID claim to a wallet card, created at course
+// checkout (Chunk 1) before any certification exists. Decouples payment (at
+// checkout) from fulfillment (photo upload -> cert_card_orders row). See
+// .hermes/fable-wallet-card-spec.md section 1.5.
+export const photoIdEntitlements = pgTable("photo_id_entitlements", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull().references(() => orders.id),
+  // null until claimed: team purchases create N unclaimed entitlements that
+  // members consume first-come as they certify + upload a photo (or the
+  // manager assigns them per member).
+  enrollmentId: integer("enrollment_id").references(() => enrollments.id),
+  purchasedByUserId: integer("purchased_by_user_id").notNull().references(() => users.id),
+  shippingMethod: text("shipping_method", { enum: ["standard", "expedited"] }).notNull(),
+  shippingAddress: jsonb("shipping_address").notNull(),
+  // Per-ID charged share including its portion of the 3% surcharge.
+  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  status: text("status", { enum: ["awaiting_photo", "fulfilled", "refunded"] }).notNull().default("awaiting_photo"),
+  certCardOrderId: integer("cert_card_order_id").references(() => certCardOrders.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("photo_id_entitlements_order_idx").on(table.orderId),
+  index("photo_id_entitlements_buyer_idx").on(table.purchasedByUserId),
+  index("photo_id_entitlements_enrollment_idx").on(table.enrollmentId),
+]);
+
 export const contactSubmissions = pgTable("contact_submissions", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -299,6 +331,7 @@ export const insertStepProgressSchema = createInsertSchema(stepProgress).omit({ 
 export const insertExamAttemptSchema = createInsertSchema(examAttempts).omit({ id: true, startedAt: true, completedAt: true });
 export const insertCertificationSchema = createInsertSchema(certifications).omit({ id: true, certificateNumber: true, verificationToken: true, pdfUrl: true, pdfGeneratedAt: true, reissuedAt: true, issuedAt: true, updatedAt: true });
 export const insertCertCardOrderSchema = createInsertSchema(certCardOrders).omit({ id: true, trackingNumber: true, carrier: true, paymentId: true, refundedAt: true, createdAt: true, updatedAt: true });
+export const insertPhotoIdEntitlementSchema = createInsertSchema(photoIdEntitlements).omit({ id: true, certCardOrderId: true, createdAt: true, updatedAt: true });
 export const insertContactSubmissionSchema = createInsertSchema(contactSubmissions).omit({ id: true, createdAt: true });
 export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({ id: true, createdAt: true });
 export const insertEmailOutboxSchema = createInsertSchema(emailOutbox).omit({ id: true, createdAt: true });
@@ -318,6 +351,7 @@ export type InsertStepProgress = z.infer<typeof insertStepProgressSchema>;
 export type InsertExamAttempt = z.infer<typeof insertExamAttemptSchema>;
 export type InsertCertification = z.infer<typeof insertCertificationSchema>;
 export type InsertCertCardOrder = z.infer<typeof insertCertCardOrderSchema>;
+export type InsertPhotoIdEntitlement = z.infer<typeof insertPhotoIdEntitlementSchema>;
 export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;
 export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
 
@@ -336,6 +370,7 @@ export type StepProgress = typeof stepProgress.$inferSelect;
 export type ExamAttempt = typeof examAttempts.$inferSelect;
 export type Certification = typeof certifications.$inferSelect;
 export type CertCardOrder = typeof certCardOrders.$inferSelect;
+export type PhotoIdEntitlement = typeof photoIdEntitlements.$inferSelect;
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type EmailOutboxEntry = typeof emailOutbox.$inferSelect;

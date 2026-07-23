@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingCart, ArrowLeft, AlertCircle, Loader2, CreditCard, Lock, Phone, Mail, Tag, X } from "lucide-react";
@@ -97,6 +98,32 @@ export default function Checkout() {
   const [discountInput, setDiscountInput] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
   const [discountError, setDiscountError] = useState<string | null>(null);
+
+  // Photo ID add-on (Chunk 1): checkbox in the order summary rail. Photos are
+  // uploaded later from the dashboard (deferred collection, spec §1.3). The
+  // server gates the add-on behind platform_settings.photo_id_addon_enabled
+  // and re-prices it; this UI mirrors that math for display only.
+  const [photoIdChecked, setPhotoIdChecked] = useState(false);
+  const [photoIdCount, setPhotoIdCount] = useState(1);
+  const [photoIdShippingMethod, setPhotoIdShippingMethod] = useState<"standard" | "expedited">("standard");
+  const [photoIdShipping, setPhotoIdShipping] = useState({ name: "", address: "", city: "", state: "", zip: "" });
+
+  const PHOTO_ID_PRICE = 9.99;
+  const PHOTO_ID_SHIPPING = { standard: 4.99, expedited: 9.99 } as const;
+  const seatCount = items.reduce((n, i) => n + (i.quantity || 1), 0);
+  const isTeamCart = items.some((i) => i.isTeamProduct) || seatCount > 1;
+
+  // Prefill the add-on shipping address from the signed-in user's profile.
+  useEffect(() => {
+    const saved = (user as any)?.savedShippingAddress;
+    if (saved && !photoIdShipping.name) {
+      setPhotoIdShipping({
+        name: saved.name || "", address: saved.address || "", city: saved.city || "",
+        state: saved.state || "", zip: saved.zip || "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const { data: paymentConfig } = useQuery<PaymentConfig>({
     queryKey: ["/api/payment/config"],
@@ -188,9 +215,16 @@ export default function Checkout() {
     : 0;
   const discountedSubtotal = Number(Math.max(0, totalPrice - discountAmount).toFixed(2));
 
-  // Calculate 3% card surcharge (on the discounted subtotal)
-  const surcharge = isConfigured ? Number((discountedSubtotal * 0.03).toFixed(2)) : 0;
-  const totalWithSurcharge = Number((discountedSubtotal + surcharge).toFixed(2));
+  // Photo ID add-on math (mirrors server; server is source of truth). Added
+  // AFTER discount (discounts never apply to the add-on), BEFORE surcharge.
+  const photoIdAddOnTotal = photoIdChecked && photoIdCount > 0
+    ? Number((photoIdCount * (PHOTO_ID_PRICE + PHOTO_ID_SHIPPING[photoIdShippingMethod])).toFixed(2))
+    : 0;
+  const preSurchargeTotal = Number((discountedSubtotal + photoIdAddOnTotal).toFixed(2));
+
+  // Calculate 3% card surcharge (on the discounted subtotal + add-on)
+  const surcharge = isConfigured ? Number((preSurchargeTotal * 0.03).toFixed(2)) : 0;
+  const totalWithSurcharge = Number((preSurchargeTotal + surcharge).toFixed(2));
 
   useEffect(() => {
     if (items.length > 0) trackCheckoutContact();
@@ -207,6 +241,13 @@ export default function Checkout() {
       };
       if (appliedDiscount) {
         payload.discountCode = appliedDiscount.code;
+      }
+      if (photoIdChecked && photoIdCount > 0) {
+        payload.photoIdAddOn = {
+          count: photoIdCount,
+          shippingMethod: photoIdShippingMethod,
+          shippingAddress: photoIdShipping,
+        };
       }
       if (data.paymentNonce) {
         payload.paymentNonce = data.paymentNonce;
@@ -567,8 +608,89 @@ export default function Checkout() {
                     <span className="font-medium shrink-0">${(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
+                {photoIdAddOnTotal > 0 && (
+                  <div className="flex justify-between gap-2" data-testid="text-photo-id-line-item">
+                    <span className="text-muted-foreground">
+                      {t("checkout.photoId.lineItem", { count: photoIdCount, defaultValue: `Photo ID wallet card (x${photoIdCount})` })}
+                    </span>
+                    <span className="font-medium shrink-0">${photoIdAddOnTotal.toFixed(2)}</span>
+                  </div>
+                )}
               </div>
               <Separator className="my-4" />
+
+              {/* Photo ID add-on (Chunk 1). Server gates this behind
+                  platform_settings.photo_id_addon_enabled; the API returns
+                  400 if it is somehow posted while disabled. */}
+              <div className="space-y-3 mb-4" data-testid="photo-id-addon">
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="photoIdAddon"
+                    checked={photoIdChecked}
+                    onCheckedChange={(c) => setPhotoIdChecked(c === true)}
+                    data-testid="checkbox-photo-id-addon"
+                  />
+                  <Label htmlFor="photoIdAddon" className="text-sm leading-relaxed cursor-pointer">
+                    {t("checkout.photoId.addTitle", { defaultValue: "Add a Photo ID wallet card" })}{" "}
+                    <span className="text-muted-foreground">— {t("checkout.photoId.priceNote", { defaultValue: "$9.99 + shipping" })}</span>
+                  </Label>
+                </div>
+
+                {photoIdChecked && (
+                  <div className="ml-7 space-y-3 rounded-lg border p-3 bg-muted/30">
+                    <p className="text-xs text-muted-foreground">
+                      {t("checkout.photoId.mailNote", { defaultValue: "Alberto mails your printed wallet card after you finish. Add the address below." })}{" "}
+                      {isTeamCart && t("checkout.photoId.oneAddress", { defaultValue: "All cards ship to one address; hand them out to your crew." })}
+                    </p>
+                    {isTeamCart && (
+                      <div className="flex items-center gap-3">
+                        <Label className="text-sm whitespace-nowrap">{t("checkout.photoId.countLabel", { defaultValue: "How many photo IDs?" })}</Label>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={seatCount}
+                          value={photoIdCount}
+                          onChange={(e) => setPhotoIdCount(Math.max(1, Math.min(seatCount, parseInt(e.target.value) || 1)))}
+                          className="w-20"
+                          data-testid="input-photo-id-count"
+                        />
+                      </div>
+                    )}
+                    <RadioGroup
+                      value={photoIdShippingMethod}
+                      onValueChange={(v: string) => setPhotoIdShippingMethod(v as "standard" | "expedited")}
+                      className="flex gap-4"
+                      data-testid="radio-photo-id-shipping"
+                    >
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="standard" id="ship-std" />
+                        <Label htmlFor="ship-std" className="text-sm cursor-pointer">
+                          {t("checkout.photoId.standard", { defaultValue: "Standard" })} ${PHOTO_ID_SHIPPING.standard.toFixed(2)}
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <RadioGroupItem value="expedited" id="ship-exp" />
+                        <Label htmlFor="ship-exp" className="text-sm cursor-pointer">
+                          {t("checkout.photoId.expedited", { defaultValue: "Expedited" })} ${PHOTO_ID_SHIPPING.expedited.toFixed(2)}
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                    <div className="space-y-2">
+                      <p className="text-xs font-medium">{t("checkout.shipping.whyTitle", { defaultValue: "Where should we mail the wallet card?" })}</p>
+                      <Input placeholder={t("orderCertCard.name", { defaultValue: "Full name" })} value={photoIdShipping.name} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, name: e.target.value })} data-testid="input-photo-id-ship-name" />
+                      <Input placeholder={t("orderCertCard.address", { defaultValue: "Street address" })} value={photoIdShipping.address} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, address: e.target.value })} data-testid="input-photo-id-ship-address" />
+                      <div className="grid grid-cols-3 gap-2">
+                        <Input placeholder={t("orderCertCard.city", { defaultValue: "City" })} value={photoIdShipping.city} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, city: e.target.value })} data-testid="input-photo-id-ship-city" />
+                        <Input placeholder={t("orderCertCard.state", { defaultValue: "State" })} value={photoIdShipping.state} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, state: e.target.value })} data-testid="input-photo-id-ship-state" />
+                        <Input placeholder={t("orderCertCard.zip", { defaultValue: "ZIP" })} value={photoIdShipping.zip} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, zip: digitsOnly(e.target.value).slice(0, 5) })} data-testid="input-photo-id-ship-zip" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {t("checkout.photoId.photoLater", { defaultValue: "You will add each photo from your dashboard after checkout." })}
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Discount code */}
               <div className="space-y-2 mb-4">

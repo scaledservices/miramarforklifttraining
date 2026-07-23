@@ -1056,7 +1056,22 @@
     "securePayment": "Secure Card Payment",
     "securePaymentDesc": "Your card information is processed securely through Authorize.net. We never see or store your card details.",
     "sessionExpired": "Your session expired. Please sign in again below — your cart is saved.",
-    "subtotal": "Subtotal"
+    "subtotal": "Subtotal",
+    "photoId": {
+      "addTitle": "Add a Photo ID wallet card",
+      "priceNote": "$9.99 + shipping",
+      "mailNote": "Alberto mails your printed wallet card after you finish. Add the address below.",
+      "oneAddress": "All cards ship to one address; hand them out to your crew.",
+      "countLabel": "How many photo IDs?",
+      "standard": "Standard",
+      "expedited": "Expedited",
+      "photoLater": "You will add each photo from your dashboard after checkout.",
+      "lineItem": "Photo ID wallet card (x{{count}})"
+    },
+    "shipping": {
+      "whyTitle": "Where should we mail the wallet card?",
+      "whyNote": "We collect this now so Alberto can mail your printed card as soon as it is ready."
+    }
   },
   "checkoutAuth": {
     "title": "Account Required",

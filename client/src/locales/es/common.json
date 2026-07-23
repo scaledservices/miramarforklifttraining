@@ -1056,7 +1056,22 @@
     "securePayment": "Pago Seguro con Tarjeta",
     "securePaymentDesc": "La información de su tarjeta se procesa de forma segura a través de Authorize.net. Nunca vemos ni almacenamos los datos de su tarjeta.",
     "sessionExpired": "Su sesión expiró. Inicie sesión de nuevo abajo — su carrito está guardado.",
-    "subtotal": "Subtotal"
+    "subtotal": "Subtotal",
+    "photoId": {
+      "addTitle": "Agregar una tarjeta de identificacion con foto",
+      "priceNote": "$9.99 + envio",
+      "mailNote": "Alberto envia su tarjeta impresa cuando termine. Agregue la direccion abajo.",
+      "oneAddress": "Todas las tarjetas se envian a una sola direccion; distribuyalas a su equipo.",
+      "countLabel": "Cuantas tarjetas con foto?",
+      "standard": "Estandar",
+      "expedited": "Expres",
+      "photoLater": "Agregara cada foto desde su panel despues del pago.",
+      "lineItem": "Tarjeta de identificacion con foto (x{{count}})"
+    },
+    "shipping": {
+      "whyTitle": "A donde enviamos la tarjeta?",
+      "whyNote": "Pedimos esto ahora para que Alberto pueda enviar su tarjeta impresa apenas este lista."
+    }
   },
   "checkoutAuth": {
     "title": "Cuenta Requerida",

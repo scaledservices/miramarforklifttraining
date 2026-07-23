@@ -19,6 +19,44 @@ import { resolveLocale } from "../locale-resolver";
 import { resolveCourseSlug } from "@shared/course-slug-map";
 import { logger, logPaymentError } from "../monitoring";
 import { requireAuth, payLimiter } from "./middleware";
+import { SHIPPING_RATES } from "../constants";
+
+// Photo ID wallet card pricing (matches certs.ts; Alberto demo decision).
+const PHOTO_ID_PRICE = 9.99;
+
+interface PhotoIdAddOn {
+  count: number;
+  shippingMethod: "standard" | "expedited";
+  shippingAddress: {
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    zip: string;
+    country?: string;
+  };
+}
+
+function isPhotoIdAddOnEnabled(flagRows: { value: unknown }[]): boolean {
+  const v = flagRows[0]?.value as any;
+  return v === true || v === "true" || v?.enabled === true;
+}
+
+function validateAddOn(raw: unknown): { ok: true; value: PhotoIdAddOn } | { ok: false; error: string } {
+  if (raw == null) return { ok: false, error: "missing" };
+  const a = raw as any;
+  const count = Number(a.count);
+  if (!Number.isInteger(count) || count < 0 || count > 50) return { ok: false, error: "Invalid photo ID count" };
+  if (count === 0) return { ok: true, value: { count: 0, shippingMethod: "standard", shippingAddress: a.shippingAddress } };
+  if (a.shippingMethod !== "standard" && a.shippingMethod !== "expedited") return { ok: false, error: "Invalid shipping method" };
+  const s = a.shippingAddress;
+  if (!s || typeof s.name !== "string" || !s.name.trim() || typeof s.address !== "string" || !s.address.trim()
+    || typeof s.city !== "string" || !s.city.trim() || typeof s.state !== "string" || !s.state.trim()
+    || typeof s.zip !== "string" || !s.zip.trim()) {
+    return { ok: false, error: "Shipping address is required for photo ID cards" };
+  }
+  return { ok: true, value: { count, shippingMethod: a.shippingMethod, shippingAddress: s } };
+}
 
 export function registerAuthorizeNetRoutes(app: Express) {
   /**
@@ -58,7 +96,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
    */
   app.post("/api/authorize-net/charge", requireAuth, payLimiter, async (req: Request, res: Response) => {
     try {
-      const { items, refundPolicyAccepted, isTeamPurchase, locale, paymentNonce, isCardPayment, discountCode } = req.body;
+      const { items, refundPolicyAccepted, isTeamPurchase, locale, paymentNonce, isCardPayment, discountCode, photoIdAddOn: rawAddOn } = req.body;
       const userId = req.session.userId!;
 
       if (!items || !Array.isArray(items) || items.length === 0) {
@@ -67,6 +105,19 @@ export function registerAuthorizeNetRoutes(app: Express) {
 
       if (!refundPolicyAccepted) {
         return res.status(400).json({ error: "You must accept the refund policy" });
+      }
+
+      // Photo ID add-on: gated by platform_settings.photo_id_addon_enabled
+      // (default off until QA sign-off), server-validated, server-priced.
+      let addOn: PhotoIdAddOn | null = null;
+      if (rawAddOn != null) {
+        const flagRows = await db.select().from(platformSettings).where(eq(platformSettings.key, "photo_id_addon_enabled"));
+        if (!isPhotoIdAddOnEnabled(flagRows)) {
+          return res.status(400).json({ error: "Photo ID add-on is not available" });
+        }
+        const v = validateAddOn(rawAddOn);
+        if (!v.ok) return res.status(400).json({ error: v.error });
+        if (v.value.count > 0) addOn = v.value;
       }
 
       // Re-validate any discount code server-side (never trust the client).
@@ -134,11 +185,25 @@ export function registerAuthorizeNetRoutes(app: Express) {
       const discountResult = await applyDiscountToOrder(discount, order.id, orderRes.total);
       let total = discountResult.discountedTotal;
 
+      // Photo ID add-on: server-priced, added AFTER discount (fixed cost,
+      // discounts never apply) and BEFORE the 3% surcharge (one surcharge
+      // line over the whole charge, same as course seats).
+      let addOnTotal = 0;
+      if (addOn) {
+        const shipUnit = SHIPPING_RATES[addOn.shippingMethod];
+        addOnTotal = Number((addOn.count * (PHOTO_ID_PRICE + shipUnit)).toFixed(2));
+        total = Number((total + addOnTotal).toFixed(2));
+        await db.update(ordersTable).set({ total: String(total) }).where(eq(ordersTable.id, order.id));
+      }
+
       // Add 3% card surcharge if card payment
       let surcharge = 0;
       if (isCardPayment !== false) {
         surcharge = calculateCardSurcharge(total);
         total = Number((total + surcharge).toFixed(2));
+        if (addOn) {
+          await db.update(ordersTable).set({ total: String(total) }).where(eq(ordersTable.id, order.id));
+        }
       }
 
       // Charge the card via Authorize.net
@@ -187,11 +252,23 @@ export function registerAuthorizeNetRoutes(app: Express) {
       // Post-payment processing (earnings split, emails, audit log)
       await postPaymentProcessing(order.id, req.session.userId!, result.transactionId!, total, isTeamPurchase);
 
+      // Photo ID add-on: create entitlements + save the shipping address to
+      // the buyer's profile (prefill for later purchases). Money already
+      // moved above; this is fulfillment bookkeeping only.
+      if (addOn) {
+        await createPhotoIdEntitlements(order.id, req.session.userId!, addOn, addOnTotal, surcharge);
+        const { users: usersTable } = await import("@shared/schema");
+        await db.update(usersTable)
+          .set({ savedShippingAddress: addOn.shippingAddress })
+          .where(eq(usersTable.id, req.session.userId!));
+      }
+
       return res.json({
         success: true,
         orderId: order.id,
         orderNumber: order.orderNumber,
         transactionId: result.transactionId,
+        photoIdAddOn: addOn ? { count: addOn.count, total: addOnTotal } : undefined,
         surcharge: surcharge > 0 ? surcharge : undefined,
         discountAmount: discountResult.discountAmount > 0 ? discountResult.discountAmount : undefined,
       });
@@ -287,6 +364,70 @@ async function applyDiscountToOrder(
     await db.update(ordersTable).set({ total: String(discountedTotal) }).where(eq(ordersTable.id, orderId));
   }
   return { discountedTotal, discountAmount };
+}
+
+/**
+ * Create photo_id_entitlements rows after a successful charge that included
+ * the add-on. Individual buyers: one entitlement linked to their enrollment.
+ * Team purchases: N unclaimed entitlements (enrollmentId null) consumed
+ * first-come as members certify + upload a photo (Chunk 2 fulfillment path).
+ *
+ * `amount` per entitlement = its share of the add-on total plus its share of
+ * the card surcharge attributable to the add-on (so a later partial refund of
+ * just the add-on refunds the buyer's true out-of-pocket for it).
+ */
+async function createPhotoIdEntitlements(
+  orderId: number,
+  buyerUserId: number,
+  addOn: PhotoIdAddOn,
+  addOnTotal: number,
+  totalSurcharge: number
+): Promise<void> {
+  const { photoIdEntitlements: entTable } = await import("@shared/schema");
+  const orderEnrollments = await storage.getEnrollmentsByOrder(orderId);
+  const buyerEnrollment = orderEnrollments.find((e) => e.userId === buyerUserId);
+  const isTeamOrder = orderEnrollments.some((e) => e.userId === null);
+
+  // Surcharge is flat 3% over the pre-surcharge total, so the add-on's share
+  // is 3% of the add-on total.
+  const addOnSurchargeShare = Number((addOnTotal * 0.03).toFixed(2));
+  const perUnit = Number(((addOnTotal + addOnSurchargeShare) / addOn.count).toFixed(2));
+
+  const rows: {
+    orderId: number;
+    enrollmentId: number | null;
+    purchasedByUserId: number;
+    shippingMethod: "standard" | "expedited";
+    shippingAddress: PhotoIdAddOn["shippingAddress"];
+    amount: string;
+    status: "awaiting_photo";
+  }[] = [];
+
+  if (!isTeamOrder && buyerEnrollment && addOn.count === 1) {
+    rows.push({
+      orderId,
+      enrollmentId: buyerEnrollment.id,
+      purchasedByUserId: buyerUserId,
+      shippingMethod: addOn.shippingMethod,
+      shippingAddress: addOn.shippingAddress,
+      amount: String(perUnit),
+      status: "awaiting_photo",
+    });
+  } else {
+    for (let i = 0; i < addOn.count; i++) {
+      rows.push({
+        orderId,
+        enrollmentId: null,
+        purchasedByUserId: buyerUserId,
+        shippingMethod: addOn.shippingMethod,
+        shippingAddress: addOn.shippingAddress,
+        amount: String(perUnit),
+        status: "awaiting_photo",
+      });
+    }
+  }
+
+  await db.insert(entTable).values(rows);
 }
 
 /**
