@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, useSearch } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,6 +77,17 @@ interface PaymentConfig {
   demoMode?: boolean;
 }
 
+interface PhotoIdEntitlement {
+  id: number;
+  orderId: number;
+  enrollmentId: number | null;
+  purchasedByUserId: number;
+  shippingMethod: "standard" | "expedited";
+  shippingAddress: { name: string; address: string; city: string; state: string; zip: string; country?: string };
+  amount: string;
+  status: "awaiting_photo" | "fulfilled" | "refunded";
+}
+
 // Authorize.net Accept.js (v1) — dispatchData API
 declare global {
   interface Window {
@@ -111,29 +122,29 @@ interface AcceptSecureData {
   };
 }
 
+type Address = { name: string; address: string; city: string; state: string; zip: string; country: string };
+const EMPTY_ADDRESS: Address = { name: "", address: "", city: "", state: "", zip: "", country: "US" };
+
 export default function OrderCertCard() {
   const { t } = useTranslation();
   const params = useParams<{ certificationId: string }>();
   const certId = parseInt(params.certificationId || "0");
+  const searchString = useSearch();
+  const entitlementIdParam = parseInt(new URLSearchParams(searchString).get("entitlement") || "0");
   const { toast } = useToast();
 
-  const STEPS = [
-    t("orderCertCard.stepConfirm"),
-    t("orderCertCard.stepShipping"),
-    t("orderCertCard.stepMethod"),
-    t("orderCertCard.stepPayment"),
-    t("orderCertCard.stepDone"),
-  ];
+  // Prepaid branch (spec 2.1): arriving with ?entitlement=N means the card
+  // was paid at course checkout. No payment step; the photo consumes the
+  // entitlement and creates the fulfillment row.
+  const [prepaidEntitlement, setPrepaidEntitlement] = useState<PhotoIdEntitlement | null>(null);
+
+  const STEPS = prepaidEntitlement
+    ? [t("orderCertCard.stepPhoto"), t("orderCertCard.stepDone")]
+    : [t("orderCertCard.stepPhoto"), t("orderCertCard.stepReview"), t("orderCertCard.stepDone")];
 
   const [step, setStep] = useState(0);
-  const [shipping, setShipping] = useState({
-    name: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    country: "US",
-  });
+  const [shipping, setShipping] = useState<Address>(EMPTY_ADDRESS);
+  const [shippingPrefilled, setShippingPrefilled] = useState(false);
   const [shippingMethod, setShippingMethod] = useState<"standard" | "expedited">("standard");
   const [isProcessing, setIsProcessing] = useState(false);
   const [acceptLoaded, setAcceptLoaded] = useState(false);
@@ -147,17 +158,11 @@ export default function OrderCertCard() {
   // Billing address: same as shipping by default, with a separate form when
   // the customer unchecks the box (Alberto demo feedback, 2026-07-13).
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
-  const [billing, setBilling] = useState({
-    name: "",
-    address: "",
-    city: "",
-    state: "",
-    zip: "",
-    country: "US",
-  });
+  const [billing, setBilling] = useState<Address>(EMPTY_ADDRESS);
   const effectiveBilling = billingSameAsShipping ? shipping : billing;
 
-  // Optional customer photo for the printed ID card (downscaled data URL).
+  // Photo upload is STEP 1 and REQUIRED (spec 2.1) — you cannot proceed
+  // without it. Downscaled data URL, same processing as before.
   const [idPhoto, setIdPhoto] = useState<string | null>(null);
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -201,12 +206,58 @@ export default function OrderCertCard() {
 
   const cert = data?.certification;
 
+  // Claimable prepaid entitlements for this cert (Chunk 2 fulfillment).
+  const { data: entitlementsData } = useQuery<{ entitlements: PhotoIdEntitlement[] }>({
+    queryKey: ["/api/photo-id/entitlements", certId],
+    enabled: certId > 0,
+  });
+
+  // Resolve the entitlement to use: explicit ?entitlement= param wins;
+  // otherwise auto-pick the single claimable row so a member following a
+  // dashboard prompt lands straight in the prepaid flow.
+  useEffect(() => {
+    const list = entitlementsData?.entitlements ?? [];
+    if (entitlementIdParam > 0) {
+      const found = list.find((e) => e.id === entitlementIdParam);
+      if (found) setPrepaidEntitlement(found);
+    } else if (list.length === 1) {
+      setPrepaidEntitlement(list[0]);
+    }
+  }, [entitlementsData, entitlementIdParam]);
+
+  // Prefill shipping from the saved profile address (spec 3.3) — default,
+  // not a lock. Entitlement address wins over the profile address.
+  const { data: meData } = useQuery<{ user: any }>({ queryKey: ["/api/auth/me"] });
+  useEffect(() => {
+    if (shippingPrefilled) return;
+    const fromEntitlement = prepaidEntitlement?.shippingAddress;
+    const fromProfile = meData?.user?.savedShippingAddress;
+    const saved = fromEntitlement || fromProfile;
+    if (saved && typeof saved === "object" && saved.name) {
+      setShipping({
+        name: saved.name || "",
+        address: saved.address || "",
+        city: saved.city || "",
+        state: saved.state || "",
+        zip: saved.zip || "",
+        country: saved.country || "US",
+      });
+      setShippingPrefilled(true);
+    }
+  }, [meData, prepaidEntitlement, shippingPrefilled]);
+
+  // Prepaid: shipping method comes from the entitlement (paid at checkout).
+  useEffect(() => {
+    if (prepaidEntitlement) setShippingMethod(prepaidEntitlement.shippingMethod);
+  }, [prepaidEntitlement]);
+
   const cardPrice = 9.99;
   const shippingCost = shippingMethod === "standard" ? 4.99 : 9.99;
   const subtotal = cardPrice + shippingCost;
   const surcharge = paymentConfig?.configured ? Number((subtotal * 0.03).toFixed(2)) : 0;
   const total = Number((subtotal + surcharge).toFixed(2));
 
+  // Pay-now path (no prepaid entitlement) — POST /api/cert-cards, unchanged.
   const orderMutation = useMutation({
     mutationFn: async (data: { paymentNonce?: string }) => {
       const payload: Record<string, unknown> = {
@@ -226,7 +277,28 @@ export default function OrderCertCard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/certifications"] });
-      setStep(4);
+      setStep(prepaidEntitlement ? 1 : 2);
+      setIsProcessing(false);
+    },
+    onError: (err: Error) => {
+      toast({ title: t("orderCertCard.orderFailed"), description: err.message, variant: "destructive" });
+      setIsProcessing(false);
+    },
+  });
+
+  // Prepaid path: photo consumes the entitlement, no charge (spec 2.1).
+  const prepaidMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/photo-id/${prepaidEntitlement!.id}/photo`, {
+        certificationId: certId,
+        idPhoto,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/certifications"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/photo-id/entitlements"] });
+      setStep(1);
       setIsProcessing(false);
     },
     onError: (err: Error) => {
@@ -257,18 +329,33 @@ export default function OrderCertCard() {
     );
   }
 
+  const photoStepIndex = 0;
+  const reviewStepIndex = 1; // pay-now mode only
+  const doneStepIndex = prepaidEntitlement ? 1 : 2;
+
   const canProceed = () => {
-    if (step === 1) {
-      return shipping.name && shipping.address && shipping.city && shipping.state && shipping.zip;
+    if (step === photoStepIndex) {
+      // Photo is REQUIRED (spec 2.1) — no Continue without it.
+      return !!idPhoto;
     }
-    if (step === 3 && !billingSameAsShipping) {
-      return billing.name && billing.address && billing.city && billing.state && billing.zip;
+    if (step === reviewStepIndex && !prepaidEntitlement) {
+      const shippingOk = shipping.name && shipping.address && shipping.city && shipping.state && shipping.zip;
+      if (!shippingOk) return false;
+      if (!billingSameAsShipping) {
+        return !!(billing.name && billing.address && billing.city && billing.state && billing.zip);
+      }
     }
     return true;
   };
 
   const handleNext = () => {
-    if (step === 3) {
+    if (prepaidEntitlement && step === photoStepIndex) {
+      // Prepaid: photo step IS the submit step.
+      setIsProcessing(true);
+      prepaidMutation.mutate();
+      return;
+    }
+    if (!prepaidEntitlement && step === reviewStepIndex) {
       // Payment step — use Accept.js dispatchData if configured, demo mode otherwise
       if (paymentConfig?.configured && paymentConfig.clientKey && paymentConfig.apiLoginID && acceptLoaded && window.Accept) {
         // Basic validation
@@ -353,13 +440,14 @@ export default function OrderCertCard() {
         ))}
       </div>
 
-      {step === 0 && (
-        <Card data-testid="step-confirm">
+      {step === photoStepIndex && (
+        <Card data-testid="step-photo">
           <CardHeader>
-            <CardTitle className="text-lg">{t("orderCertCard.confirmTitle")}</CardTitle>
+            <CardTitle className="text-lg">{t("orderCertCard.photoTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-4">
+            {/* Certificate context (was old step 0) */}
+            <div className="flex items-start gap-4 pb-2 border-b">
               <div className="h-12 w-12 rounded-md bg-accent/20 flex items-center justify-center shrink-0">
                 <Award className="h-6 w-6 text-accent" />
               </div>
@@ -367,68 +455,20 @@ export default function OrderCertCard() {
                 <p className="font-semibold" data-testid="text-cert-number">
                   {t("orderCertCard.certificateNum", { number: cert.certificateNumber })}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  {t("orderCertCard.issuedOn", { date: new Date(cert.issuedAt).toLocaleDateString() })}
-                </p>
-                {cert.expiresAt && (
-                  <p className="text-sm text-muted-foreground">
-                    {t("orderCertCard.expiresOn", { date: new Date(cert.expiresAt).toLocaleDateString() })}
-                  </p>
-                )}
                 <Badge variant="secondary" data-testid="badge-cert-status">{String(t(`status.${cert.status}`, cert.status))}</Badge>
               </div>
             </div>
-            <div className="border-t pt-4">
-              <p className="text-sm text-muted-foreground">
-                {t("orderCertCard.cardDescription")}
-              </p>
-              <p className="mt-2 font-semibold" data-testid="text-card-price">{t("orderCertCard.cardPrice")}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
-      {step === 1 && (
-        <Card data-testid="step-shipping">
-          <CardHeader>
-            <CardTitle className="text-lg">{t("orderCertCard.shippingAddressTitle")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">{t("orderCertCard.fullName")}</Label>
-              <Input id="name" value={shipping.name} onChange={(e) => setShipping({ ...shipping, name: e.target.value })} data-testid="input-shipping-name" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="address">{t("orderCertCard.address")}</Label>
-              <Input id="address" value={shipping.address} onChange={(e) => setShipping({ ...shipping, address: e.target.value })} data-testid="input-shipping-address" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="city">{t("orderCertCard.city")}</Label>
-                <Input id="city" value={shipping.city} onChange={(e) => setShipping({ ...shipping, city: e.target.value })} data-testid="input-shipping-city" />
+            {prepaidEntitlement && (
+              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-sm" data-testid="banner-prepaid">
+                <p className="font-medium text-green-800 dark:text-green-400">
+                  {t("orderCertCard.prepaidTitle")}
+                </p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="state">{t("orderCertCard.state")}</Label>
-                <Input id="state" value={shipping.state} onChange={(e) => setShipping({ ...shipping, state: e.target.value })} data-testid="input-shipping-state" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="zip">{t("orderCertCard.zipCode")}</Label>
-                <Input id="zip" value={shipping.zip} onChange={(e) => setShipping({ ...shipping, zip: e.target.value })} data-testid="input-shipping-zip" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="country">{t("orderCertCard.country")}</Label>
-                <Input id="country" value={shipping.country} onChange={(e) => setShipping({ ...shipping, country: e.target.value })} data-testid="input-shipping-country" />
-              </div>
-            </div>
+            )}
 
-            {/* Optional photo for the printed ID card */}
-            <div className="border-t pt-4 space-y-3" data-testid="section-id-photo">
-              <div>
-                <p className="font-medium">{t("orderCertCard.photoTitle")}</p>
-                <p className="text-sm text-muted-foreground">{t("orderCertCard.photoDesc")}</p>
-              </div>
+            <div className="space-y-3" data-testid="section-id-photo">
+              <p className="text-sm text-muted-foreground">{t("orderCertCard.photoRequired")}</p>
               {idPhoto ? (
                 <div className="flex items-center gap-4">
                   <img
@@ -458,61 +498,93 @@ export default function OrderCertCard() {
                   </label>
                 </Button>
               )}
+              <p className="text-xs text-muted-foreground" data-testid="text-photo-guidance">
+                {t("orderCertCard.photoGuidance")}
+              </p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {step === 2 && (
-        <Card data-testid="step-shipping-method">
+      {step === reviewStepIndex && !prepaidEntitlement && (
+        <Card data-testid="step-review">
           <CardHeader>
-            <CardTitle className="text-lg">{t("orderCertCard.shippingMethodTitle")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <button
-              type="button"
-              className={`w-full text-left p-4 rounded-md border transition-colors ${
-                shippingMethod === "standard" ? "border-accent bg-accent/10" : "border-border"
-              }`}
-              onClick={() => setShippingMethod("standard")}
-              data-testid="button-shipping-standard"
-            >
-              <div className="flex items-center gap-3">
-                <Truck className="h-5 w-5 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="font-semibold">{t("orderCertCard.standardShipping")}</p>
-                  <p className="text-sm text-muted-foreground">{t("orderCertCard.standardDays")}</p>
-                </div>
-                <p className="font-semibold">$4.99</p>
-              </div>
-            </button>
-            <button
-              type="button"
-              className={`w-full text-left p-4 rounded-md border transition-colors ${
-                shippingMethod === "expedited" ? "border-accent bg-accent/10" : "border-border"
-              }`}
-              onClick={() => setShippingMethod("expedited")}
-              data-testid="button-shipping-expedited"
-            >
-              <div className="flex items-center gap-3">
-                <Zap className="h-5 w-5 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="font-semibold">{t("orderCertCard.expeditedShipping")}</p>
-                  <p className="text-sm text-muted-foreground">{t("orderCertCard.expeditedDays")}</p>
-                </div>
-                <p className="font-semibold">$9.99</p>
-              </div>
-            </button>
-          </CardContent>
-        </Card>
-      )}
-
-      {step === 3 && (
-        <Card data-testid="step-payment">
-          <CardHeader>
-            <CardTitle className="text-lg">{t("orderCertCard.paymentTitle")}</CardTitle>
+            <CardTitle className="text-lg">{t("orderCertCard.reviewTitle", { defaultValue: "Review and pay" })}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Shipping address (prefilled from the saved profile, editable) */}
+            <div className="space-y-3" data-testid="section-shipping-address">
+              <p className="font-medium">{t("orderCertCard.shippingAddressTitle")}</p>
+              <div className="space-y-2">
+                <Label htmlFor="name">{t("orderCertCard.fullName")}</Label>
+                <Input id="name" value={shipping.name} onChange={(e) => setShipping({ ...shipping, name: e.target.value })} data-testid="input-shipping-name" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address">{t("orderCertCard.address")}</Label>
+                <Input id="address" value={shipping.address} onChange={(e) => setShipping({ ...shipping, address: e.target.value })} data-testid="input-shipping-address" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">{t("orderCertCard.city")}</Label>
+                  <Input id="city" value={shipping.city} onChange={(e) => setShipping({ ...shipping, city: e.target.value })} data-testid="input-shipping-city" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state">{t("orderCertCard.state")}</Label>
+                  <Input id="state" value={shipping.state} onChange={(e) => setShipping({ ...shipping, state: e.target.value })} data-testid="input-shipping-state" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="zip">{t("orderCertCard.zipCode")}</Label>
+                  <Input id="zip" value={shipping.zip} onChange={(e) => setShipping({ ...shipping, zip: e.target.value })} data-testid="input-shipping-zip" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="country">{t("orderCertCard.country")}</Label>
+                  <Input id="country" value={shipping.country} onChange={(e) => setShipping({ ...shipping, country: e.target.value })} data-testid="input-shipping-country" />
+                </div>
+              </div>
+            </div>
+
+            {/* Shipping tier folds into review as a compact radio (spec 2.2) */}
+            <div className="space-y-2" data-testid="section-shipping-method">
+              <p className="font-medium">{t("orderCertCard.shippingMethodTitle")}</p>
+              <button
+                type="button"
+                className={`w-full text-left p-3 rounded-md border transition-colors ${
+                  shippingMethod === "standard" ? "border-accent bg-accent/10" : "border-border"
+                }`}
+                onClick={() => setShippingMethod("standard")}
+                data-testid="button-shipping-standard"
+              >
+                <div className="flex items-center gap-3">
+                  <Truck className="h-5 w-5 text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="font-semibold">{t("orderCertCard.standardShipping")}</p>
+                    <p className="text-sm text-muted-foreground">{t("orderCertCard.standardDays")}</p>
+                  </div>
+                  <p className="font-semibold">$4.99</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                className={`w-full text-left p-3 rounded-md border transition-colors ${
+                  shippingMethod === "expedited" ? "border-accent bg-accent/10" : "border-border"
+                }`}
+                onClick={() => setShippingMethod("expedited")}
+                data-testid="button-shipping-expedited"
+              >
+                <div className="flex items-center gap-3">
+                  <Zap className="h-5 w-5 text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="font-semibold">{t("orderCertCard.expeditedShipping")}</p>
+                    <p className="text-sm text-muted-foreground">{t("orderCertCard.expeditedDays")}</p>
+                  </div>
+                  <p className="font-semibold">$9.99</p>
+                </div>
+              </button>
+            </div>
+
+            {/* Payment */}
             {paymentConfig?.configured ? (
               <>
                 <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
@@ -669,7 +741,7 @@ export default function OrderCertCard() {
         </Card>
       )}
 
-      {step === 4 && (
+      {step === doneStepIndex && (
         <Card data-testid="step-confirmation">
           <CardContent className="py-12 text-center space-y-6">
             <div className="h-20 w-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto">
@@ -678,7 +750,7 @@ export default function OrderCertCard() {
             <div className="space-y-2">
               <h2 className="text-2xl font-bold" data-testid="text-order-confirmed">{t("orderCertCard.orderConfirmed")}</h2>
               <p className="text-muted-foreground">
-                {t("orderCertCard.orderConfirmedDesc")}
+                {prepaidEntitlement ? t("orderCertCard.photoReceived", { defaultValue: "Photo received. Your card is queued for printing and will ship to:" }) : t("orderCertCard.orderConfirmedDesc")}
               </p>
               <p className="font-medium" data-testid="text-shipping-address">
                 {shipping.name}, {shipping.address}, {shipping.city}, {shipping.state} {shipping.zip}
@@ -696,7 +768,7 @@ export default function OrderCertCard() {
         </Card>
       )}
 
-      {step < 4 && (
+      {step < doneStepIndex && (
         <div className="flex justify-between gap-3">
           <Button
             variant="outline"
@@ -709,7 +781,7 @@ export default function OrderCertCard() {
           </Button>
           <Button
             onClick={handleNext}
-            disabled={!canProceed() || isProcessing || (step === 3 && !paymentConfig?.configured && !paymentConfig?.demoMode)}
+            disabled={!canProceed() || isProcessing || (step === reviewStepIndex && !prepaidEntitlement && !paymentConfig?.configured && !paymentConfig?.demoMode)}
             data-testid="button-next-step"
           >
             {isProcessing ? (
@@ -717,7 +789,12 @@ export default function OrderCertCard() {
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 {t("orderCertCard.processing")}
               </>
-            ) : step === 3 ? (
+            ) : prepaidEntitlement && step === photoStepIndex ? (
+              <>
+                <CheckCircle className="h-4 w-4 mr-2" />
+                {t("orderCertCard.submitPhoto", { defaultValue: "Submit photo" })}
+              </>
+            ) : step === reviewStepIndex ? (
               <>
                 <Lock className="h-4 w-4 mr-2" />
                 {t("orderCertCard.placeOrder", { defaultValue: `Pay $${total.toFixed(2)}` })}

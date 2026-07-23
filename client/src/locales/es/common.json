@@ -943,12 +943,20 @@
     "docPermitDesc": "Formulario de permiso de operación para documentar la autorización del operador de montacargas según las regulaciones de {{body}}."
   },
   "orderCertCard": {
-    "pageTitle": "Ordenar Tarjeta de Billetera",
+    "pageTitle": "Ordenar una tarjeta con foto",
     "stepConfirm": "Confirmar",
     "stepShipping": "Envío",
     "stepMethod": "Método",
     "stepPayment": "Pago",
     "stepDone": "Listo",
+    "stepPhoto": "Foto",
+    "stepReview": "Revisar y pagar",
+    "photoRequired": "Se necesita una foto para imprimir su tarjeta.",
+    "photoGuidance": "Centre su cara. Use un fondo simple. Buena luz.",
+    "prepaidTitle": "Su tarjeta ya esta pagada. Solo agregue su foto.",
+    "reviewTitle": "Revisar y pagar",
+    "submitPhoto": "Enviar foto",
+    "photoReceived": "Foto recibida. Su tarjeta esta en cola para imprimirse y se enviara a:",
     "certNotFound": "Certificación No Encontrada",
     "certNotFoundDesc": "No se pudieron cargar los detalles de la certificación.",
     "confirmTitle": "Confirma Tu Pedido de Tarjeta",
@@ -989,7 +997,7 @@
     "cardMonth": "MM",
     "cardYear": "AA",
     "cardZip": "Código Postal de Facturación",
-    "photoTitle": "Foto para Su Tarjeta de Identificación (Opcional)",
+    "photoTitle": "Foto para Su Tarjeta de Identificación",
     "photoDesc": "Suba una foto clara de frente y la imprimiremos en su tarjeta de billetera. JPG o PNG.",
     "photoButton": "Subir Foto",
     "photoChange": "Cambiar Foto",
@@ -1002,6 +1010,16 @@
     "paymentNotConfigured": "El pago no está configurado. Llámenos para ordenar.",
     "securePayment": "Pago Seguro con Tarjeta",
     "securePaymentDesc": "Su tarjeta se procesa de forma segura a través de Authorize.net. Nunca vemos ni almacenamos los datos de su tarjeta."
+  },
+  "teamPhotoId": {
+    "title": "Tarjetas con foto del equipo",
+    "statusNotOrdered": "Sin ordenar",
+    "statusPhotoNeeded": "Falta la foto",
+    "statusOrdered": "Ordenada",
+    "statusShipped": "Enviada",
+    "orderFor": "Ordenar tarjeta con foto",
+    "remind": "Recordar al miembro",
+    "uploadFor": "Subir su foto"
   },
   "checkout": {
     "emptyCartTitle": "Tu Carrito Está Vacío",

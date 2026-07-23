@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, BookOpen, TrendingUp, Award, ChevronRight, ShoppingCart, GraduationCap, AlertTriangle, Lightbulb } from "lucide-react";
 import GroupLayout from "./GroupLayout";
+import TeamPhotoIdStatus from "@/components/dashboard/TeamPhotoIdStatus";
 
 // Course recommendation logic based on completed certifications
 const COURSE_RECOMMENDATIONS: Record<string, { slug: string; title: string; reason: string }[]> = {
@@ -220,6 +221,9 @@ export default function GroupDashboard() {
             </CardContent>
           </Card>
         )}
+
+        {/* Team photo-ID status (wallet-card spec 2.3) */}
+        {!isLoading && group?.id && <TeamPhotoIdStatus groupId={group.id} />}
 
         {/* Course Recommendations based on completed certifications */}
         {!isLoading && totalCerts > 0 && (() => {

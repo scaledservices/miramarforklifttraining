@@ -943,12 +943,20 @@
     "docPermitDesc": "Permit to operate form for documenting forklift operator authorization per {{body}} regulations."
   },
   "orderCertCard": {
-    "pageTitle": "Order Wallet Card",
+    "pageTitle": "Order a Photo ID",
     "stepConfirm": "Confirm",
     "stepShipping": "Shipping",
     "stepMethod": "Method",
     "stepPayment": "Payment",
     "stepDone": "Done",
+    "stepPhoto": "Photo",
+    "stepReview": "Review and pay",
+    "photoRequired": "A photo is required to print your card.",
+    "photoGuidance": "Center your face. Use a plain background. Good light.",
+    "prepaidTitle": "Your card is already paid. Just add your photo.",
+    "reviewTitle": "Review and pay",
+    "submitPhoto": "Submit photo",
+    "photoReceived": "Photo received. Your card is queued for printing and will ship to:",
     "certNotFound": "Certification Not Found",
     "certNotFoundDesc": "Unable to load certification details.",
     "confirmTitle": "Confirm Your Card Order",
@@ -989,7 +997,7 @@
     "cardMonth": "MM",
     "cardYear": "YY",
     "cardZip": "Billing ZIP",
-    "photoTitle": "Photo for Your ID Card (Optional)",
+    "photoTitle": "Photo for Your ID Card",
     "photoDesc": "Upload a clear, front-facing photo and we will print it on your wallet card. JPG or PNG.",
     "photoButton": "Upload Photo",
     "photoChange": "Change Photo",
@@ -1002,6 +1010,16 @@
     "paymentNotConfigured": "Payment is not configured. Please call us to order.",
     "securePayment": "Secure Card Payment",
     "securePaymentDesc": "Your card is processed securely through Authorize.net. We never see or store your card details."
+  },
+  "teamPhotoId": {
+    "title": "Team photo IDs",
+    "statusNotOrdered": "Not ordered",
+    "statusPhotoNeeded": "Photo needed",
+    "statusOrdered": "Ordered",
+    "statusShipped": "Shipped",
+    "orderFor": "Order Photo ID",
+    "remind": "Remind member",
+    "uploadFor": "Upload photo for them"
   },
   "checkout": {
     "emptyCartTitle": "Your Cart is Empty",
