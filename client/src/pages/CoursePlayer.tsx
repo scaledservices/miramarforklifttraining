@@ -186,11 +186,13 @@ export default function CoursePlayer() {
     const groups: { module: string; steps: { step: StepWithProgress; index: number }[] }[] = [];
     let currentModule = "";
     steps.forEach((step, index) => {
-      const config = step.config as any;
-      const moduleMatch = (config?.html_content as string)?.match?.(/class="lesson-content"/);
       const stepModule = getStepModule(step, index);
-      if (stepModule !== currentModule) {
-        currentModule = stepModule;
+      // "Course" is the no-match fallback: treat it as a continuation of the
+      // current section rather than starting a new one, so a stray untitled step
+      // doesn't split a module in two.
+      const effective = stepModule === "Course" && currentModule ? currentModule : stepModule;
+      if (effective !== currentModule) {
+        currentModule = effective;
         groups.push({ module: currentModule, steps: [] });
       }
       groups[groups.length - 1]?.steps.push({ step, index });
@@ -198,24 +200,55 @@ export default function CoursePlayer() {
     return groups;
   };
 
+  // Derive the module/section label from each step's own content (title + type),
+  // NOT from a hardcoded array index. The previous index-based map assumed a fixed
+  // 32-step forklift layout and broke whenever the DB step list drifted from that
+  // layout (e.g. leftover duplicate steps), producing phantom duplicate section
+  // headers. Deriving from content is stable across all courses and locales.
+  const MODULE_KEY_ORDER = [
+    "moduleWelcome",
+    "moduleBasics",
+    "moduleStability",
+    "moduleInspection",
+    "moduleDriving",
+    "moduleRamps",
+    "moduleParking",
+    "moduleSiteSpecific",
+    "moduleFinalExam",
+  ] as const;
+  type ModuleKey = (typeof MODULE_KEY_ORDER)[number];
+
+  // Case-insensitive keyword matchers, ordered most-specific first so the first
+  // hit wins. Matching is done against the step's title, so it works in any
+  // language that keeps the seeded titles (EN/ES) and is immune to reordering.
+  const MODULE_MATCHERS: { key: ModuleKey; pattern: RegExp }[] = [
+    { key: "moduleFinalExam", pattern: /final exam|examen final|congratulations|felicitaciones|what's next|qué sigue|que sigue/i },
+    { key: "moduleSiteSpecific", pattern: /site-specific|site specific|employer packet|osha rules|osha guidelines|reglas del sitio|espec[ií]fica del sitio|paquete del empleador|evaluation packet|evaluaci[oó]n pr[aá]ctica|presentaci[oó]n del sitio|reference documents|documentos de referencia/i },
+    { key: "moduleParking", pattern: /parking|shutdown|unattended|estacionamiento|apagado|desatendida|safe operation/i },
+    { key: "moduleRamps", pattern: /ramp|slope|dock|trailer|lifting people|elevated work|rampa|pendiente|muelle|remolque|elevad/i },
+    { key: "moduleDriving", pattern: /speed|intersection|blind spot|horn|pedestrian|direction change|smooth handling|driving|conducci|peaton|intersecci/i },
+    { key: "moduleInspection", pattern: /inspection|maintenance|repair|fueling|charging|inspecci|mantenimiento|reparaci|combustible|carga de bater/i },
+    { key: "moduleStability", pattern: /stability|center of gravity|capacity|data plate|load|estabilidad|centro de gravedad|capacidad|carga/i },
+    { key: "moduleBasics", pattern: /powered industrial truck|\bpit\b|authorization|safe work culture|basics|responsibilit|b[aá]sico|autorizaci/i },
+    { key: "moduleWelcome", pattern: /welcome|osha compliance|what this course covers|bienvenida|cumplimiento/i },
+  ];
+
+  // Module rank used to detect when a step belongs to a NEW (later) section.
+  // A section header is emitted whenever the derived module advances past the
+  // previous one; steps that fall back to "Course" keep the current section.
+  const moduleRank = (key: ModuleKey): number => MODULE_KEY_ORDER.indexOf(key);
+
   const getStepModule = (step: StepWithProgress, index: number): string => {
-    const moduleMap: Record<number, string> = {};
-    let currentMod = "Course";
-    let modNum = 0;
-    for (let i = 0; i < steps.length; i++) {
-      const s = steps[i];
-      if (i === 0) currentMod = t("coursePlayer.moduleWelcome");
-      else if (i === 3) { currentMod = t("coursePlayer.moduleBasics"); modNum = 1; }
-      else if (i === 6) { currentMod = t("coursePlayer.moduleStability"); modNum = 2; }
-      else if (i === 10) { currentMod = t("coursePlayer.moduleInspection"); modNum = 3; }
-      else if (i === 14) { currentMod = t("coursePlayer.moduleDriving"); modNum = 4; }
-      else if (i === 19) { currentMod = t("coursePlayer.moduleRamps"); modNum = 5; }
-      else if (i === 23) { currentMod = t("coursePlayer.moduleParking"); modNum = 6; }
-      else if (i === 26) { currentMod = t("coursePlayer.moduleSiteSpecific"); modNum = 7; }
-      else if (i === 30) { currentMod = t("coursePlayer.moduleFinalExam"); modNum = 8; }
-      moduleMap[i] = currentMod;
+    const title = step.title || "";
+    for (const { key, pattern } of MODULE_MATCHERS) {
+      if (pattern.test(title)) return t(`coursePlayer.${key}`);
     }
-    return moduleMap[index] || "Course";
+    // Fallback by step type so untitled/atypical steps still land in a sensible
+    // section: exams cluster with completion, downloads with the employer packet,
+    // checkpoints inherit whatever section precedes them.
+    if (step.type === "exam") return t("coursePlayer.moduleFinalExam");
+    if (step.type === "download") return t("coursePlayer.moduleSiteSpecific");
+    return "Course";
   };
 
   if (stepsLoading) {
