@@ -1253,8 +1253,12 @@ export class DatabaseStorage implements IStorage {
     const maxDate = new Date(today);
     maxDate.setDate(maxDate.getDate() + (windowDays || 90));
 
-    const fromDate = new Date(from);
-    const toDate = new Date(to);
+    // Parse date-only strings as LOCAL noon, not UTC midnight. `new Date("YYYY-MM-DD")`
+    // is UTC midnight (the previous local evening), which made current.getDay()
+    // disagree with the UTC-derived date label and shifted availability by one day.
+    const parseLocal = (s: string) => new Date(`${s}T12:00:00`);
+    const fromDate = parseLocal(from);
+    const toDate = parseLocal(to);
     const effectiveFrom = fromDate > leadDate ? fromDate : leadDate;
     const effectiveTo = toDate < maxDate ? toDate : maxDate;
 
@@ -1287,7 +1291,8 @@ export class DatabaseStorage implements IStorage {
 
     while (current <= effectiveTo) {
       const dayOfWeek = current.getDay();
-      const dateStr = current.toISOString().split('T')[0];
+      // LOCAL date label (matches getDay()); toISOString() is UTC and off by one.
+      const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`;
 
       if (daysOfWeek.includes(dayOfWeek) && !blackoutSet.has(dateStr)) {
         const trainerBusy = trainerBlockedDates.has(dateStr);

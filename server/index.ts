@@ -53,7 +53,9 @@ const app = express();
 
 const isDev = !isProduction;
 let sslOptions = undefined;
-if (isDev) {
+// Dev SSL is opt-in (DEV_SSL=true) so local QA/browsers don't hit the
+// self-signed cert wall. Authorize.net local testing sets DEV_SSL=true.
+if (isDev && process.env.DEV_SSL === "true") {
   try {
     sslOptions = {
       key: readFileSync("key.pem"),
