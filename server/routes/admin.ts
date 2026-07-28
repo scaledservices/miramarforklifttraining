@@ -680,7 +680,7 @@ app.get("/api/admin/companies", requireRole("admin", "super_admin"), async (req:
     if (req.query.state) filters.billingState = req.query.state as string;
     const companyList = await storage.getCompanies(filters);
 
-    const { onsiteTrainingRequests, contacts: contactsTable } = await import("@shared/schema");
+    const { onsiteTrainingRequests, contacts: contactsTable, trainingEvents: trainingEventsTable } = await import("@shared/schema");
     const { sql: sqlFn } = await import("drizzle-orm");
 
     const requestCounts = await db.select({
@@ -693,6 +693,21 @@ app.get("/api/admin/companies", requireRole("admin", "super_admin"), async (req:
     const requestCountMap = new Map<number, number>();
     for (const rc of requestCounts) {
       if (rc.companyId) requestCountMap.set(rc.companyId, rc.count);
+    }
+
+    // Aggregate imported/historical training-event revenue + most recent activity
+    // per company, so the list can sort by value and show last-contact at a glance.
+    const eventStats = await db.select({
+      companyId: trainingEventsTable.companyId,
+      totalRevenue: sqlFn<number>`coalesce(sum(${trainingEventsTable.revenue}), 0)::int`,
+      lastEventAt: sqlFn<string | null>`max(coalesce(${trainingEventsTable.scheduledStart}, ${trainingEventsTable.createdAt}))`,
+    }).from(trainingEventsTable)
+      .where(isNotNull(trainingEventsTable.companyId))
+      .groupBy(trainingEventsTable.companyId);
+
+    const eventStatsMap = new Map<number, { totalRevenue: number; lastEventAt: string | null }>();
+    for (const es of eventStats) {
+      if (es.companyId) eventStatsMap.set(es.companyId, { totalRevenue: es.totalRevenue ?? 0, lastEventAt: es.lastEventAt ?? null });
     }
 
     const primaryContacts = await db.select().from(contactsTable)
@@ -722,6 +737,8 @@ app.get("/api/admin/companies", requireRole("admin", "super_admin"), async (req:
         repName,
         requestCount: requestCountMap.get(company.id) ?? 0,
         primaryContact: primaryContactMap.get(company.id) ?? null,
+        totalRevenue: eventStatsMap.get(company.id)?.totalRevenue ?? 0,
+        lastEventAt: eventStatsMap.get(company.id)?.lastEventAt ?? null,
       };
     }));
 
