@@ -35,7 +35,17 @@ app.get("/api/certifications/:id", requireAuth, async (req: Request, res: Respon
   try {
     const cert = await storage.getCertification(parseInt(req.params.id as string));
     if (!cert || cert.userId !== req.session.userId) return res.status(404).json({ error: "Certification not found" });
-    return res.json({ certification: cert });
+    // Surface any active (non-canceled/refunded) card order up-front so the order
+    // page can render an "already ordered" state instead of letting the user fill
+    // out payment details and hit a 409 after the fact (prevention over error).
+    const cardOrders = await storage.getCertCardOrdersByCertification(cert.id);
+    const active = cardOrders.find(
+      (co) => co.userId === req.session.userId! && !["canceled", "refunded"].includes(co.status)
+    );
+    const existingCardOrder = active
+      ? { id: active.id, status: active.status, createdAt: active.createdAt }
+      : null;
+    return res.json({ certification: cert, existingCardOrder });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }

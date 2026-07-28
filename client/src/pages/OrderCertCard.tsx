@@ -199,12 +199,19 @@ export default function OrderCertCard() {
     document.head.appendChild(script);
   }, [paymentConfig?.configured, paymentConfig?.environment]);
 
-  const { data, isLoading, error } = useQuery<{ certification: any }>({
+  const { data, isLoading, error } = useQuery<{
+    certification: any;
+    existingCardOrder: { id: number; status: string; createdAt: string } | null;
+  }>({
     queryKey: ["/api/certifications", certId],
     enabled: certId > 0,
   });
 
   const cert = data?.certification;
+  // Prevention over error: if the server says an active card order already
+  // exists for this cert, render an "already ordered" state instead of the
+  // payment wizard (never let the user reach the 409 after entering card details).
+  const existingCardOrder = data?.existingCardOrder ?? null;
 
   // Claimable prepaid entitlements for this cert (Chunk 2 fulfillment).
   const { data: entitlementsData } = useQuery<{ entitlements: PhotoIdEntitlement[] }>({
@@ -325,6 +332,37 @@ export default function OrderCertCard() {
         <Link href="/dashboard">
           <Button data-testid="button-back-dashboard">{t("certification.backToDashboard")}</Button>
         </Link>
+      </div>
+    );
+  }
+
+  // Already ordered: an active card order exists for this cert. Show the
+  // existing order state and a way back, instead of the payment wizard.
+  if (existingCardOrder) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 text-center space-y-4" data-testid="already-ordered-card">
+        <Package className="h-12 w-12 text-accent mx-auto" />
+        <h1 className="text-2xl font-bold" data-testid="text-already-ordered-title">
+          {t("orderCertCard.alreadyOrderedTitle", { defaultValue: "Card already ordered" })}
+        </h1>
+        <p className="text-muted-foreground" data-testid="text-already-ordered-desc">
+          {t("orderCertCard.alreadyOrderedDesc", {
+            defaultValue: "You already have an active card order for this certification. Its current status is shown below.",
+          })}
+        </p>
+        <div className="inline-flex items-center gap-2">
+          <Badge variant="secondary" className="capitalize" data-testid="badge-existing-order-status">
+            {existingCardOrder.status.replace(/_/g, " ")}
+          </Badge>
+          <span className="text-sm text-muted-foreground">
+            {t("orderCertCard.orderNumber", { defaultValue: "Order" })} #{existingCardOrder.id}
+          </span>
+        </div>
+        <div className="pt-2">
+          <Link href={`/certifications/${certId}`}>
+            <Button data-testid="button-view-certification">{t("orderCertCard.viewCertification", { defaultValue: "View certification" })}</Button>
+          </Link>
+        </div>
       </div>
     );
   }
