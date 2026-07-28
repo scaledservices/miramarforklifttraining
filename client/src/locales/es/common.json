@@ -1784,6 +1784,7 @@
     "spotsRemaining": "{{count}} lugares disponibles",
     "nextAvailable": "Próxima disponibilidad: {{date}}",
     "trainerConfirmation": "Para ser confirmado por el instructor. Las sesiones de Las Vegas requieren un grupo mínimo, así que nos comunicaremos con usted para confirmar su fecha después de la reserva.",
+    "tentativeNotice": "Esta fecha está reservada provisionalmente en otra ubicación. Aún puede reservarla - nuestro equipo confirmará su sesión dentro de un día hábil.",
     "noSlotsForDate": "No hay horarios disponibles para esta fecha. Intente otra fecha.",
     "yourDetails": "Sus Datos",
     "contactNameLabel": "Nombre de Contacto",

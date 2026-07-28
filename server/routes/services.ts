@@ -178,9 +178,10 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
       return res.status(400).json({ error: "This date is blocked for training" });
     }
 
-    const trainerBusy = await storage.isTrainerBookedOnDate(sessionDate, serviceAreaId);
+    const groupThreshold = (rules as any).groupThreshold ?? 4;
+    const trainerBusy = await storage.isTrainerBookedOnDate(sessionDate, serviceAreaId, groupThreshold);
     if (trainerBusy) {
-      return res.status(409).json({ error: "The trainer is already booked at another location on this date. Please select a different date." });
+      return res.status(409).json({ error: "The trainer is already committed to a group at another location on this date. Please select a different date." });
     }
 
     const maxParticipants = rules.maxParticipants || 10;

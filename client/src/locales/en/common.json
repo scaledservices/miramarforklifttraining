@@ -1787,6 +1787,7 @@
     "spotsRemaining": "{{count}} spots remaining",
     "nextAvailable": "Next available: {{date}}",
     "trainerConfirmation": "To be confirmed by the trainer. Las Vegas sessions require a minimum group size, so we will reach out to confirm your date after booking.",
+    "tentativeNotice": "This date is tentatively held at another location. You can still book it - our team will confirm your session within one business day.",
     "noSlotsForDate": "No available time slots for this date. Please try another date.",
     "yourDetails": "Your Details",
     "contactNameLabel": "Contact Name",

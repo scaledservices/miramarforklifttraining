@@ -191,8 +191,9 @@ export interface IStorage {
 
   getAvailableSlots(serviceAreaId: number, from: string, to: string): Promise<AvailableSlot[]>;
   getBookedParticipants(serviceAreaId: number, sessionDate: string, startTime: string): Promise<number>;
-  getTrainerBlockedDates(from: string, to: string, excludeServiceAreaId?: number): Promise<Set<string>>;
-  isTrainerBookedOnDate(sessionDate: string, excludeServiceAreaId?: number): Promise<boolean>;
+  getTrainerBlockedDates(from: string, to: string, excludeServiceAreaId?: number, groupThreshold?: number): Promise<Set<string>>;
+  getTrainerSoftHoldDates(from: string, to: string, excludeServiceAreaId?: number, groupThreshold?: number): Promise<Set<string>>;
+  isTrainerBookedOnDate(sessionDate: string, excludeServiceAreaId?: number, groupThreshold?: number): Promise<boolean>;
 
   createBooking(data: InsertBooking): Promise<Booking>;
   getBookingById(id: number): Promise<Booking | undefined>;
@@ -1283,7 +1284,9 @@ export class DatabaseStorage implements IStorage {
       bookedMap.set(`${b.sessionDate}_${b.startTime}`, Number(b.totalParticipants));
     }
 
-    const trainerBlockedDates = await this.getTrainerBlockedDates(from, to, serviceAreaId);
+    const groupThreshold = (rules as any).groupThreshold ?? 4;
+    const trainerBlockedDates = await this.getTrainerBlockedDates(from, to, serviceAreaId, groupThreshold);
+    const softHoldDates = await this.getTrainerSoftHoldDates(from, to, serviceAreaId, groupThreshold);
 
     const blackoutSet = new Set(blackoutDates || []);
     const slots: AvailableSlot[] = [];
@@ -1296,6 +1299,7 @@ export class DatabaseStorage implements IStorage {
 
       if (daysOfWeek.includes(dayOfWeek) && !blackoutSet.has(dateStr)) {
         const trainerBusy = trainerBlockedDates.has(dateStr);
+        const tentative = !trainerBusy && softHoldDates.has(dateStr);
         for (const slot of timeSlots) {
           const booked = bookedMap.get(`${dateStr}_${slot.startTime}`) || 0;
           slots.push({
@@ -1305,6 +1309,7 @@ export class DatabaseStorage implements IStorage {
             maxParticipants,
             bookedParticipants: trainerBusy ? maxParticipants : booked,
             available: !trainerBusy && booked < maxParticipants,
+            tentative,
           });
         }
       }
@@ -1328,7 +1333,9 @@ export class DatabaseStorage implements IStorage {
     return Number(result?.total || 0);
   }
 
-  async getTrainerBlockedDates(from: string, to: string, excludeServiceAreaId?: number): Promise<Set<string>> {
+  // Group priority: only GROUP bookings (participants >= groupThreshold) at
+  // another city hard-block the day for this area. Small bookings never block.
+  async getTrainerBlockedDates(from: string, to: string, excludeServiceAreaId?: number, groupThreshold: number = 4): Promise<Set<string>> {
     const conditions = [
       sql`${bookings.sessionDate} >= ${from}`,
       sql`${bookings.sessionDate} <= ${to}`,
@@ -1337,16 +1344,53 @@ export class DatabaseStorage implements IStorage {
     if (excludeServiceAreaId !== undefined) {
       conditions.push(ne(bookings.serviceAreaId, excludeServiceAreaId));
     }
-    const results = await db.selectDistinct({
+    const results = await db.select({
       sessionDate: bookings.sessionDate,
+      totalParticipants: sql<number>`COALESCE(SUM(${bookings.participantCount}), 0)`,
     })
     .from(bookings)
-    .where(and(...conditions));
+    .where(and(...conditions))
+    .groupBy(bookings.sessionDate);
 
-    return new Set(results.map((r) => r.sessionDate));
+    // A date is hard-blocked only if the combined group size at other cities
+    // meets the threshold (a committed group, not a stray individual).
+    return new Set(
+      results
+        .filter((r) => Number(r.totalParticipants) >= groupThreshold)
+        .map((r) => r.sessionDate)
+    );
   }
 
-  async isTrainerBookedOnDate(sessionDate: string, excludeServiceAreaId?: number): Promise<boolean> {
+  // Soft holds: dates where another city has a SMALL booking (< threshold).
+  // These stay bookable but are surfaced to the customer as "tentative" and to
+  // the trainer as conflicts to resolve.
+  async getTrainerSoftHoldDates(from: string, to: string, excludeServiceAreaId?: number, groupThreshold: number = 4): Promise<Set<string>> {
+    const conditions = [
+      sql`${bookings.sessionDate} >= ${from}`,
+      sql`${bookings.sessionDate} <= ${to}`,
+      ne(bookings.status, 'cancelled'),
+    ];
+    if (excludeServiceAreaId !== undefined) {
+      conditions.push(ne(bookings.serviceAreaId, excludeServiceAreaId));
+    }
+    const results = await db.select({
+      sessionDate: bookings.sessionDate,
+      totalParticipants: sql<number>`COALESCE(SUM(${bookings.participantCount}), 0)`,
+    })
+    .from(bookings)
+    .where(and(...conditions))
+    .groupBy(bookings.sessionDate);
+
+    return new Set(
+      results
+        .filter((r) => Number(r.totalParticipants) > 0 && Number(r.totalParticipants) < groupThreshold)
+        .map((r) => r.sessionDate)
+    );
+  }
+
+  // Booking backstop: block only if another city has a GROUP commitment
+  // (participants >= groupThreshold) on this date. Small soft-holds never block.
+  async isTrainerBookedOnDate(sessionDate: string, excludeServiceAreaId?: number, groupThreshold: number = 4): Promise<boolean> {
     const conditions = [
       eq(bookings.sessionDate, sessionDate),
       ne(bookings.status, 'cancelled'),
@@ -1355,12 +1399,12 @@ export class DatabaseStorage implements IStorage {
       conditions.push(ne(bookings.serviceAreaId, excludeServiceAreaId));
     }
     const [result] = await db.select({
-      count: sql<number>`COUNT(*)`,
+      totalParticipants: sql<number>`COALESCE(SUM(${bookings.participantCount}), 0)`,
     })
     .from(bookings)
     .where(and(...conditions));
 
-    return Number(result?.count || 0) > 0;
+    return Number(result?.totalParticipants || 0) >= groupThreshold;
   }
 
   async createBooking(data: InsertBooking): Promise<Booking> {

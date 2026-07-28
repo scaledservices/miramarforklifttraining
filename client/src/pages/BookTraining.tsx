@@ -68,6 +68,7 @@ interface RawSlot {
   maxParticipants: number;
   bookedParticipants: number;
   available: boolean;
+  tentative?: boolean;
 }
 
 const EQUIPMENT_OPTIONS = [
@@ -273,6 +274,19 @@ export default function BookTraining() {
     }
     return set;
   }, [rawSlots]);
+
+  // Dates that are bookable but soft-held by a small booking at another city.
+  // Shown as "tentative" so the customer knows the trainer will confirm.
+  const tentativeDateSet = useMemo(() => {
+    const set = new Set<string>();
+    if (!rawSlots || !Array.isArray(rawSlots)) return set;
+    for (const s of rawSlots) {
+      if (s.available && s.tentative) set.add(s.date);
+    }
+    return set;
+  }, [rawSlots]);
+
+  const selectedDateTentative = selectedDate ? tentativeDateSet.has(selectedDate) : false;
 
   const slotsForDate = useMemo(() => {
     if (!selectedDate || !rawSlots || !Array.isArray(rawSlots)) return [];
@@ -874,6 +888,12 @@ export default function BookTraining() {
                       <p className="mb-3 flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2" data-testid="text-trainer-confirmation">
                         <AlertCircle className="w-4 h-4 shrink-0" />
                         {t("bookTraining.trainerConfirmation")}
+                      </p>
+                    )}
+                    {selectedDateTentative && (
+                      <p className="mb-3 flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2" data-testid="text-tentative-notice">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        {t("bookTraining.tentativeNotice")}
                       </p>
                     )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

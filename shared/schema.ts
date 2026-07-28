@@ -493,6 +493,14 @@ export interface AvailabilityRules {
   leadTimeDays: number;
   windowDays: number;
   blackoutDates?: string[];
+  /**
+   * Group priority (Alberto weekly review 2026-07-23): a booking with
+   * participantCount >= groupThreshold HARD-BLOCKS the trainer's whole day
+   * across all cities (the trainer can only be in one city/day). Smaller
+   * bookings are a SOFT hold - they never block other cities and can be
+   * re-homed by the trainer if a group claims the day.
+   */
+  groupThreshold?: number;
 }
 
 export interface AvailableSlot {
@@ -502,6 +510,11 @@ export interface AvailableSlot {
   maxParticipants: number;
   bookedParticipants: number;
   available: boolean;
+  /**
+   * True when another city has a small (soft-hold) booking on this date.
+   * The slot is still bookable; the trainer resolves the conflict later.
+   */
+  tentative?: boolean;
 }
 
 export const platformSettings = pgTable("platform_settings", {
