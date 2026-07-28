@@ -73,7 +73,7 @@ export const COURSE_STEPS: StepDef[] = [
       { type: "heading", level: 2, text: "OSHA Compliance: What This Course Covers" },
       { type: "heading", level: 3, text: "OSHA's Three-Part Requirement" },
       { type: "paragraph", html: "Under <strong>29 CFR 1910.178(l)</strong>, OSHA requires all forklift operators to complete three components before operating at work. Explore each one in the diagram below." },
-      { type: "hotspot_diagram", src: img("osha-compliance.svg"), alt: "OSHA three-part training requirement infographic",
+      { type: "hotspot_diagram", src: img("osha-compliance.png"), alt: "OSHA three-part training requirement infographic",
         caption: "OSHA 29 CFR 1910.178(l): all three parts are required.",
         hotspots: [
           { x: 17, y: 42, label: "1. Formal Instruction", description: "Classroom or online training covering all OSHA safety topics — that is exactly what this course provides. It ends with a knowledge assessment (your final exam)." },
@@ -207,11 +207,11 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
-      { type: "hero_image", src: img("stability-triangle.svg"), alt: "Top-down view of a forklift showing the stability triangle" },
+      { type: "hero_image", src: img("stability-triangle.png"), alt: "Top-down view of a forklift showing the stability triangle" },
       { type: "heading", level: 2, text: "Stability Triangle and Center of Gravity" },
       { type: "heading", level: 3, text: "What is the Stability Triangle?" },
       { type: "paragraph", html: "The <strong>stability triangle</strong> is the three-point base formed by the two front axle ends and the rear axle pivot point. As long as the combined center of gravity of the truck and its load stays within this triangle, the forklift remains stable." },
-      { type: "hotspot_diagram", src: img("stability-triangle.svg"), alt: "Stability triangle diagram with front axle, rear pivot, and center of gravity",
+      { type: "hotspot_diagram", src: img("stability-triangle.png"), alt: "Stability triangle diagram with front axle, rear pivot, and center of gravity",
         caption: "Tap each point of the triangle to understand how stability works.",
         hotspots: [
           { x: 38, y: 47, label: "Front Axle (drive wheels)", description: "The two front wheel contact points form the wide base of the triangle. Most of the machine + load weight rides here." },
@@ -245,7 +245,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("load-center.svg"), alt: "Diagram of load center distance and capacity" },
+      { type: "hero_image", src: img("load-center.png"), alt: "Diagram of load center distance and capacity" },
       { type: "heading", level: 2, text: "Rated Capacity & Data Plate" },
       { type: "heading", level: 3, text: "The Data Plate" },
       { type: "paragraph", html: "Every forklift has a manufacturer's <strong>data plate</strong> indicating the maximum lifting capacity at various load centers. Before lifting any load, verify your forklift is rated to handle its weight." },
@@ -356,7 +356,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Forklift inspection points diagram" },
+      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Forklift inspection points diagram" },
       { type: "heading", level: 2, text: "Maintenance and Repairs" },
       { type: "heading", level: 3, text: "Repair Before Use" },
       { type: "paragraph", html: "If a safety issue is identified during inspection, <strong>repairs must be made before the equipment is used</strong>. Never operate a forklift with known defects." },
@@ -377,7 +377,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ppe-gloves.svg"), alt: "Required PPE for fueling: gloves, vest, hard hat, eye protection" },
+      { type: "hero_image", src: img("ppe-gloves.png"), alt: "Required PPE for fueling: gloves, vest, hard hat, eye protection" },
       { type: "heading", level: 2, text: "Fueling and Charging Safety (LPG / Electric)" },
       { type: "heading", level: 3, text: "Designated Areas Only" },
       { type: "paragraph", html: "Refueling and recharging must <strong>only occur in designated areas</strong> with proper ventilation. Never refuel in general work areas." },
@@ -423,7 +423,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.svg"), alt: "Proper driving posture with seat belt, low load, and eyes forward" },
+      { type: "hero_image", src: img("safe-driving.png"), alt: "Proper driving posture with seat belt, low load, and eyes forward" },
       { type: "heading", level: 2, text: "Speed, Space, and Awareness" },
       { type: "heading", level: 3, text: "Speed Limits" },
       { type: "paragraph", html: "The maximum safe speed for operating a forklift is typically <strong>5 mph</strong>. Forklifts are designed to move heavy loads, not to race. Focus on working <strong>efficiently, not faster</strong>." },
@@ -474,7 +474,7 @@ export const COURSE_STEPS: StepDef[] = [
       { type: "heading", level: 2, text: "Pedestrian Right of Way" },
       { type: "heading", level: 3, text: "Pedestrians Always Have Priority" },
       { type: "paragraph", html: "Pedestrians <strong>always have the right of way</strong>. Never drive toward a person near a fixed object. Always ensure people are clear before moving." },
-      { type: "image", src: img("pedestrian-safety.svg"), alt: "Diagram of forklift blind spots and pedestrian separation zones", caption: "Blind spots extend behind the truck and around the mast — assume pedestrians don't see you." },
+      { type: "image", src: img("pedestrian-safety.png"), alt: "Diagram of forklift blind spots and pedestrian separation zones", caption: "Blind spots extend behind the truck and around the mast — assume pedestrians don't see you." },
       { type: "heading", level: 3, text: "Communication" },
       { type: "list", items: [
         "Make <strong>eye contact</strong> with pedestrians before proceeding",
@@ -504,7 +504,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.svg"), alt: "Safe driving posture and smooth handling" },
+      { type: "hero_image", src: img("safe-driving.png"), alt: "Safe driving posture and smooth handling" },
       { type: "heading", level: 2, text: "Direction Changes and Smooth Handling" },
       { type: "heading", level: 3, text: "Complete Stop Before Direction Change" },
       { type: "paragraph", html: "Always come to a <strong>complete stop</strong> before changing from forward to reverse or vice versa. Abrupt direction changes can cause loads to shift or fall, and increase tip-over risk." },
@@ -527,7 +527,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ramps-slopes.svg"), alt: "Forklift on a ramp with the load pointed upgrade" },
+      { type: "hero_image", src: img("ramps-slopes.png"), alt: "Forklift on a ramp with the load pointed upgrade" },
       { type: "heading", level: 2, text: "Ramps and Slopes" },
       { type: "heading", level: 3, text: "Loaded Travel on Ramps" },
       { type: "paragraph", html: "When traveling on a ramp <strong>with a load</strong>: keep the load pointed <strong>uphill</strong> (upgrade). This means driving forward up a ramp and in reverse down a ramp when loaded." },
@@ -628,7 +628,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("parking-shutdown.svg"), alt: "Parked forklift with forks lowered, chocked wheel, and shutdown steps" },
+      { type: "hero_image", src: img("parking-shutdown.png"), alt: "Parked forklift with forks lowered, chocked wheel, and shutdown steps" },
       { type: "heading", level: 2, text: "Parking and Securing the Forklift" },
       { type: "heading", level: 3, text: "Parking Procedure" },
       { type: "paragraph", html: "Every shutdown follows the same sequence. Put the steps in order — you will do this at the end of every shift for the rest of your career." },
@@ -658,7 +658,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("parking-shutdown.svg"), alt: "Forklift parked and secured" },
+      { type: "hero_image", src: img("parking-shutdown.png"), alt: "Forklift parked and secured" },
       { type: "heading", level: 2, text: "Unattended Forklift: When and What To Do" },
       { type: "heading", level: 3, text: "What 'Unattended' Means" },
       { type: "paragraph", html: "A forklift is considered <strong>unattended</strong> when the operator is <strong>more than 25 feet away</strong> from the vehicle AND the vehicle is <strong>out of their line of sight</strong>." },

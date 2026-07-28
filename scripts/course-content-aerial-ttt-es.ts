@@ -53,7 +53,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Requisitos de Capacitación ANSI A92.24" },
+      { type: "hero_image", src: img("osha-compliance.png"), alt: "Requisitos de Capacitación ANSI A92.24" },
       { type: "heading", level: 2, text: "Requisitos de Capacitación ANSI A92.24" },
       { type: "heading", level: 3, text: "Quién Debe Ser Capacitado?" },
       { type: "paragraph", html: "ANSI A92.24 requiere capacitación para: <strong>operadores</strong>, <strong>ocupantes</strong>, <strong>supervisores</strong>, y <strong>personal de servicio</strong>." },
@@ -238,7 +238,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Evaluación de Operadores de Elevadores Aéreos" },
+      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Evaluación de Operadores de Elevadores Aéreos" },
       { type: "heading", level: 2, text: "Evaluación de Operadores de Elevadores Aéreos" },
       { type: "heading", level: 3, text: "Lista de Evaluación" },
       { type: "paragraph", html: "Inspección, protección contra caídas, controles, elevación, estabilizadores, condiciones de superficie, peligros aéreos, emergencias, apagado." },
@@ -280,7 +280,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Administrando Su Programa de Capacitación de Elevadores Aéreos" },
+      { type: "hero_image", src: img("osha-compliance.png"), alt: "Administrando Su Programa de Capacitación de Elevadores Aéreos" },
       { type: "heading", level: 2, text: "Administrando Su Programa de Capacitación de Elevadores Aéreos" },
       { type: "heading", level: 3, text: "Gestión de Registros" },
       { type: "paragraph", html: "Mantenga: registros de capacitación, listas de evaluación, registros de familiarización (por marca/modelo), planes de rescate, reportes de incidentes, recapacitación." },

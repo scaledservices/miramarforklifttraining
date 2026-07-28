@@ -81,7 +81,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Employer Responsibilities & Documentation" },
+      { type: "hero_image", src: img("osha-compliance.png"), alt: "Employer Responsibilities & Documentation" },
       { type: "heading", level: 2, text: "Employer Responsibilities & Documentation" },
       { type: "heading", level: 3, text: "Employer's Duty (1910.178(l)(1))" },
       { type: "paragraph", html: "The employer is responsible for ensuring that each operator is <strong>trained</strong>, <strong>evaluated</strong>, and <strong>certified</strong> as required. This includes:" },
@@ -191,7 +191,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Assessment Strategies" },
+      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Assessment Strategies" },
       { type: "heading", level: 2, text: "Assessment Strategies" },
       { type: "heading", level: 3, text: "Knowledge Assessment" },
       { type: "paragraph", html: "Test understanding of formal instruction through:" },
@@ -563,7 +563,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Conducting the Operator Evaluation" },
+      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Conducting the Operator Evaluation" },
       { type: "heading", level: 2, text: "Conducting the Operator Evaluation" },
       { type: "heading", level: 3, text: "Evaluation vs. Training" },
       { type: "paragraph", html: "Training and evaluation are <strong>separate activities</strong>. Training is when you teach and coach. Evaluation is when you <strong>observe and assess</strong> without coaching. The evaluation determines whether the operator is competent to operate independently." },
@@ -631,7 +631,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Administering Your Training Program" },
+      { type: "hero_image", src: img("osha-compliance.png"), alt: "Administering Your Training Program" },
       { type: "heading", level: 2, text: "Administering Your Training Program" },
       { type: "heading", level: 3, text: "Training Records Management" },
       { type: "paragraph", html: "Maintain organized training records for each operator:" },
@@ -699,7 +699,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("pedestrian-safety.svg"), alt: "Building a Safety Culture" },
+      { type: "hero_image", src: img("pedestrian-safety.png"), alt: "Building a Safety Culture" },
       { type: "heading", level: 2, text: "Building a Safety Culture" },
       { type: "heading", level: 3, text: "The Trainer's Role in Safety Culture" },
       { type: "paragraph", html: "As a forklift trainer, you are a <strong>safety leader</strong> in your organization. Your attitude, behavior, and commitment to safety set the tone for all operators. Lead by example — always follow safe practices yourself." },

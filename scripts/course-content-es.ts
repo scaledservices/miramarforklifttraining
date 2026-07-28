@@ -57,7 +57,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
       { type: "heading", level: 2, text: "Cumplimiento OSHA: Lo Que Cubre Este Curso" },
       { type: "heading", level: 3, text: "Requisito de Tres Partes de OSHA" },
       { type: "paragraph", html: "Bajo <strong>29 CFR 1910.178(l)</strong>, OSHA requiere que todos los operadores de montacargas completen tres componentes antes de operar en el trabajo. Explore cada uno en el diagrama a continuación." },
-      { type: "hotspot_diagram", src: img("osha-compliance.svg"), alt: "Infografía del requisito de capacitación de tres partes de OSHA",
+      { type: "hotspot_diagram", src: img("osha-compliance.png"), alt: "Infografía del requisito de capacitación de tres partes de OSHA",
         caption: "OSHA 29 CFR 1910.178(l): las tres partes son requeridas.",
         hotspots: [
           { x: 17, y: 42, label: "1. Instrucción Formal", description: "Capacitación en aula o en línea que cubre todos los temas de seguridad de OSHA — eso es exactamente lo que proporciona este curso. Termina con una evaluación de conocimiento (su examen final)." },
@@ -192,11 +192,11 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
-      { type: "hero_image", src: img("stability-triangle.svg"), alt: "Vista superior de un montacargas mostrando el triángulo de estabilidad" },
+      { type: "hero_image", src: img("stability-triangle.png"), alt: "Vista superior de un montacargas mostrando el triángulo de estabilidad" },
       { type: "heading", level: 2, text: "Triángulo de Estabilidad y Centro de Gravedad" },
       { type: "heading", level: 3, text: "¿Qué es el Triángulo de Estabilidad?" },
       { type: "paragraph", html: "El <strong>triángulo de estabilidad</strong> es la base de tres puntos formada por los dos extremos del eje delantero y el punto de pivote del eje trasero. Mientras el centro de gravedad combinado del camión y su carga se mantenga dentro de este triángulo, el montacargas permanece estable." },
-      { type: "hotspot_diagram", src: img("stability-triangle.svg"), alt: "Diagrama del triángulo de estabilidad con eje delantero, pivote trasero y centro de gravedad",
+      { type: "hotspot_diagram", src: img("stability-triangle.png"), alt: "Diagrama del triángulo de estabilidad con eje delantero, pivote trasero y centro de gravedad",
         caption: "Toque cada punto del triángulo para entender cómo funciona la estabilidad.",
         hotspots: [
           { x: 38, y: 47, label: "Eje Delantero (ruedas motrices)", description: "Los dos puntos de contacto de las ruedas delanteras forman la base ancha del triángulo. La mayor parte del peso de la máquina + carga descansa aquí." },
@@ -230,7 +230,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("load-center.svg"), alt: "Diagrama de la distancia del centro de carga y la capacidad" },
+      { type: "hero_image", src: img("load-center.png"), alt: "Diagrama de la distancia del centro de carga y la capacidad" },
       { type: "heading", level: 2, text: "Capacidad Nominal y Placa de Datos" },
       { type: "heading", level: 3, text: "La Placa de Datos" },
       { type: "paragraph", html: "Cada montacargas tiene una <strong>placa de datos</strong> del fabricante que indica la capacidad máxima de elevación a varios centros de carga. Antes de levantar cualquier carga, verifique que su montacargas esté clasificado para manejar su peso." },
@@ -341,7 +341,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Diagrama de puntos de inspección del montacargas" },
+      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Diagrama de puntos de inspección del montacargas" },
       { type: "heading", level: 2, text: "Mantenimiento y Reparaciones" },
       { type: "heading", level: 3, text: "Reparar Antes de Usar" },
       { type: "paragraph", html: "Si se identifica un problema de seguridad durante la inspección, <strong>las reparaciones deben hacerse antes de que se use el equipo</strong>. Nunca opere un montacargas con defectos conocidos." },
@@ -362,7 +362,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ppe-gloves.svg"), alt: "EPP requerido para reabastecer: guantes, chaleco, casco, protección ocular" },
+      { type: "hero_image", src: img("ppe-gloves.png"), alt: "EPP requerido para reabastecer: guantes, chaleco, casco, protección ocular" },
       { type: "heading", level: 2, text: "Seguridad en Combustible y Carga (GLP / Eléctrico)" },
       { type: "heading", level: 3, text: "Solo en Áreas Designadas" },
       { type: "paragraph", html: "El reabastecimiento y la recarga <strong>solo deben ocurrir en áreas designadas</strong> con ventilación adecuada. Nunca reabastezca en áreas de trabajo generales." },
@@ -408,7 +408,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.svg"), alt: "Postura de conducción correcta con cinturón de seguridad, carga baja y ojos al frente" },
+      { type: "hero_image", src: img("safe-driving.png"), alt: "Postura de conducción correcta con cinturón de seguridad, carga baja y ojos al frente" },
       { type: "heading", level: 2, text: "Velocidad, Espacio y Atención" },
       { type: "heading", level: 3, text: "Límites de Velocidad" },
       { type: "paragraph", html: "La velocidad máxima segura para operar un montacargas es típicamente de <strong>5 mph</strong>. Los montacargas están diseñados para mover cargas pesadas, no para correr. Concéntrese en trabajar de manera <strong>eficiente, no más rápida</strong>." },
@@ -459,7 +459,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
       { type: "heading", level: 2, text: "Derecho de Paso de los Peatones" },
       { type: "heading", level: 3, text: "Los Peatones Siempre Tienen Prioridad" },
       { type: "paragraph", html: "Los peatones <strong>siempre tienen el derecho de paso</strong>. Nunca conduzca hacia una persona que esté cerca de un objeto fijo. Siempre asegúrese de que las personas estén fuera del camino antes de moverse." },
-      { type: "image", src: img("pedestrian-safety.svg"), alt: "Diagrama de los puntos ciegos del montacargas y las zonas de separación de peatones", caption: "Los puntos ciegos se extienden detrás del camión y alrededor del mástil — asuma que los peatones no lo ven." },
+      { type: "image", src: img("pedestrian-safety.png"), alt: "Diagrama de los puntos ciegos del montacargas y las zonas de separación de peatones", caption: "Los puntos ciegos se extienden detrás del camión y alrededor del mástil — asuma que los peatones no lo ven." },
       { type: "heading", level: 3, text: "Comunicación" },
       { type: "list", items: [
         "Haga <strong>contacto visual</strong> con los peatones antes de proceder",
@@ -489,7 +489,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.svg"), alt: "Postura de conducción segura y manejo suave" },
+      { type: "hero_image", src: img("safe-driving.png"), alt: "Postura de conducción segura y manejo suave" },
       { type: "heading", level: 2, text: "Cambios de Dirección y Manejo Suave" },
       { type: "heading", level: 3, text: "Detención Completa Antes de Cambiar de Dirección" },
       { type: "paragraph", html: "Siempre llegue a una <strong>detención completa</strong> antes de cambiar de avance a reversa o viceversa. Los cambios de dirección abruptos pueden causar que las cargas se desplacen o caigan, y aumentan el riesgo de volcadura." },
@@ -512,7 +512,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ramps-slopes.svg"), alt: "Montacargas en una rampa con la carga apuntando cuesta arriba" },
+      { type: "hero_image", src: img("ramps-slopes.png"), alt: "Montacargas en una rampa con la carga apuntando cuesta arriba" },
       { type: "heading", level: 2, text: "Operación en Rampas y Pendientes" },
       { type: "heading", level: 3, text: "Viaje con Carga en Rampas" },
       { type: "paragraph", html: "Al viajar en una rampa <strong>con carga</strong>: mantenga la carga apuntando <strong>cuesta arriba</strong>. Esto significa conducir hacia adelante al subir una rampa y en reversa al bajar una rampa cuando está cargado." },
@@ -613,7 +613,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("parking-shutdown.svg"), alt: "Montacargas estacionado con horquillas bajadas, rueda calzada y pasos de apagado" },
+      { type: "hero_image", src: img("parking-shutdown.png"), alt: "Montacargas estacionado con horquillas bajadas, rueda calzada y pasos de apagado" },
       { type: "heading", level: 2, text: "Estacionamiento y Aseguramiento del Montacargas" },
       { type: "heading", level: 3, text: "Procedimiento de Estacionamiento" },
       { type: "paragraph", html: "Cada apagado sigue la misma secuencia. Ponga los pasos en orden — hará esto al final de cada turno por el resto de su carrera." },
@@ -643,7 +643,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("parking-shutdown.svg"), alt: "Montacargas estacionado y asegurado" },
+      { type: "hero_image", src: img("parking-shutdown.png"), alt: "Montacargas estacionado y asegurado" },
       { type: "heading", level: 2, text: "Montacargas Desatendido: Cuándo y Qué Hacer" },
       { type: "heading", level: 3, text: "Qué Significa 'Desatendido'" },
       { type: "paragraph", html: "Un montacargas se considera <strong>desatendido</strong> cuando el operador está a <strong>más de 25 pies de distancia</strong> del vehículo Y el vehículo está <strong>fuera de su línea de visión</strong>." },

@@ -69,7 +69,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.svg"), alt: "ANSI A92.24 Training Requirements" },
+      { type: "hero_image", src: img("osha-compliance.png"), alt: "ANSI A92.24 Training Requirements" },
       { type: "heading", level: 2, text: "ANSI A92.24 Training Requirements" },
       { type: "heading", level: 3, text: "Who Must Be Trained?" },
       { type: "paragraph", html: "ANSI A92.24 requires training for:" },
@@ -336,7 +336,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Operator Evaluation for Aerial Lifts" },
+      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Operator Evaluation for Aerial Lifts" },
       { type: "heading", level: 2, text: "Operator Evaluation for Aerial Lifts" },
       { type: "heading", level: 3, text: "Evaluation Checklist" },
       { type: "paragraph", html: "Create a checklist covering:" },
@@ -389,7 +389,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Administering Your Aerial Lift Training Program" },
+      { type: "hero_image", src: img("osha-compliance.png"), alt: "Administering Your Aerial Lift Training Program" },
       { type: "heading", level: 2, text: "Administering Your Aerial Lift Training Program" },
       { type: "heading", level: 3, text: "Records Management" },
       { type: "paragraph", html: "Maintain: training records, evaluation checklists, familiarization logs (per make/model), rescue plans, incident reports, refresher training." },

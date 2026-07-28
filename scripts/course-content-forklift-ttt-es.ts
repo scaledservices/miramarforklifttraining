@@ -65,7 +65,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Responsabilidades del Empleador y Documentación" },
+      { type: "hero_image", src: img("osha-compliance.png"), alt: "Responsabilidades del Empleador y Documentación" },
       { type: "heading", level: 2, text: "Responsabilidades del Empleador y Documentación" },
       { type: "heading", level: 3, text: "Deber del Empleador (1910.178(l)(1))" },
       { type: "paragraph", html: "El empleador es responsable de asegurar que cada operador sea <strong>capacitado</strong>, <strong>evaluado</strong> y <strong>certificado</strong>. Esto incluye capacitación inicial, evaluación de competencia, recapacitación cuando sea necesaria, y re-evaluación al menos cada 3 años." },
@@ -148,7 +148,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Estrategias de Evaluación" },
+      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Estrategias de Evaluación" },
       { type: "heading", level: 2, text: "Estrategias de Evaluación" },
       { type: "heading", level: 3, text: "Evaluación de Conocimiento" },
       { type: "paragraph", html: "Pruebe la comprensión mediante: <strong>exámenes escritos</strong>, <strong>preguntas orales</strong>, <strong>cuestionarios throughout</strong>, <strong>estudios de caso</strong>." },
@@ -419,7 +419,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.svg"), alt: "Conducción de la Evaluación del Operador" },
+      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Conducción de la Evaluación del Operador" },
       { type: "heading", level: 2, text: "Conducción de la Evaluación del Operador" },
       { type: "heading", level: 3, text: "Evaluación vs. Capacitación" },
       { type: "paragraph", html: "La capacitación y evaluación son <strong>actividades separadas</strong>. La evaluación determina si el operador es competente para operar independientemente. <strong>Observe sin coaching</strong>." },
@@ -462,7 +462,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.svg"), alt: "Administrando Su Programa de Capacitación" },
+      { type: "hero_image", src: img("osha-compliance.png"), alt: "Administrando Su Programa de Capacitación" },
       { type: "heading", level: 2, text: "Administrando Su Programa de Capacitación" },
       { type: "heading", level: 3, text: "Gestión de Registros" },
       { type: "paragraph", html: "Mantenga: fecha de capacitación, currículo, resultados de evaluación, certificación, recapacitación, re-evaluación, reportes de incidentes." },
@@ -500,7 +500,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("pedestrian-safety.svg"), alt: "Construyendo una Cultura de Seguridad" },
+      { type: "hero_image", src: img("pedestrian-safety.png"), alt: "Construyendo una Cultura de Seguridad" },
       { type: "heading", level: 2, text: "Construyendo una Cultura de Seguridad" },
       { type: "heading", level: 3, text: "El Rol del Instructor" },
       { type: "paragraph", html: "Como instructor, es un <strong>líder de seguridad</strong>. Su actitud y comportamiento establecen el tono. Lidere con el ejemplo." },
