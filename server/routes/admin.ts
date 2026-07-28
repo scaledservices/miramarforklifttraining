@@ -38,6 +38,39 @@ app.get("/api/admin/dashboard", requireRole("admin", "super_admin"), async (_req
   }
 });
 
+// Trainer day-cluster alert (Alberto weekly review 2026-07-23): surfaces
+// upcoming days that have active bookings at 2+ service areas, so Alberto can
+// spot same-day/multi-location scheduling clusters and decide where to be.
+app.get("/api/admin/trainer-day-clusters", requireRole("admin", "super_admin"), async (_req: Request, res: Response) => {
+  try {
+    const today = new Date();
+    const from = today.toISOString().slice(0, 10);
+    const toDate = new Date(today);
+    toDate.setDate(toDate.getDate() + 60);
+    const to = toDate.toISOString().slice(0, 10);
+
+    const rows = await storage.getTrainerDayClusters(from, to);
+
+    // Group by date into per-day clusters.
+    const byDate = new Map<string, { sessionDate: string; locations: { serviceAreaId: number; areaName: string; bookingCount: number; totalParticipants: number }[] }>();
+    for (const r of rows) {
+      if (!byDate.has(r.sessionDate)) {
+        byDate.set(r.sessionDate, { sessionDate: r.sessionDate, locations: [] });
+      }
+      byDate.get(r.sessionDate)!.locations.push({
+        serviceAreaId: r.serviceAreaId,
+        areaName: r.areaName,
+        bookingCount: Number(r.bookingCount),
+        totalParticipants: Number(r.totalParticipants),
+      });
+    }
+    return res.json({ conflicts: Array.from(byDate.values()) });
+  } catch (error) {
+    console.error("[TrainerClusters] Error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.get("/api/admin/settings", requireRole("admin", "super_admin"), async (_req: Request, res: Response) => {
   try {
     const settings = await db.select().from(platformSettings);

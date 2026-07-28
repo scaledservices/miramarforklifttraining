@@ -162,7 +162,7 @@ const internalCatalog: InternalProduct[] = [
     featured: true,
     languages: ["English", "Spanish"],
     supportsTeam: true,
-    image: "/images/training/aerial-lift-hero.svg",
+    image: "/images/training/aerial-lift-hero.png",
     imageAlt: "Aerial lift operator certification training",
     bulkPricing: [
       { minSeats: 1, pricePerSeat: 59, label: "Flat rate" },
@@ -203,7 +203,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: `Become a certified forklift trainer online for $150. OSHA-compliant Train the Trainer certification. Self-paced, 2-3 hours. Qualify to train and evaluate operators.`,
     languages: ["English", "Spanish"],
     supportsTeam: true,
-    image: "/images/training/train-the-trainer-hero.svg",
+    image: "/images/training/train-the-trainer-hero.png",
     imageAlt: "Forklift train the trainer certification",
     bulkPricing: [
       { minSeats: 1, pricePerSeat: 150, label: "Flat rate" },
@@ -243,7 +243,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: `Forklift Train the Trainer certification with physical training kit for $480. Online course plus printed manuals, forms, certificates, and materials shipped to you.`,
     languages: ["English", "Spanish"],
     supportsTeam: true,
-    image: "/images/training/train-the-trainer-hero.svg",
+    image: "/images/training/train-the-trainer-hero.png",
     imageAlt: "Forklift train the trainer combo kit",
     bulkPricing: [
       { minSeats: 1, pricePerSeat: 480, label: "Flat rate" },
@@ -283,7 +283,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: `Become a certified aerial lift trainer online for $150. OSHA and ANSI A92-compliant. Self-paced, 2-3 hours. Qualify to train and evaluate MEWP operators.`,
     languages: ["English", "Spanish"],
     supportsTeam: true,
-    image: "/images/training/train-the-trainer-hero.svg",
+    image: "/images/training/train-the-trainer-hero.png",
     imageAlt: "Aerial lift train the trainer certification",
     bulkPricing: [
       { minSeats: 1, pricePerSeat: 150, label: "Flat rate" },
@@ -324,7 +324,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: `Aerial lift Train the Trainer certification with physical training kit for $480. Online course plus printed manuals, forms, certificates, and materials shipped to you.`,
     languages: ["English", "Spanish"],
     supportsTeam: true,
-    image: "/images/training/train-the-trainer-hero.svg",
+    image: "/images/training/train-the-trainer-hero.png",
     imageAlt: "Aerial lift train the trainer combo kit",
     bulkPricing: [
       { minSeats: 1, pricePerSeat: 480, label: "Flat rate" },

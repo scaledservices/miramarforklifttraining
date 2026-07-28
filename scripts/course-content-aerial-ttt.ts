@@ -37,7 +37,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Welcome & Aerial Lift Regulatory Framework" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Welcome & Aerial Lift Regulatory Framework" },
       { type: "heading", level: 2, text: "Welcome & Aerial Lift Regulatory Framework" },
       { type: "heading", level: 3, text: "About This Course" },
       { type: "paragraph", html: "Welcome to the Aerial & Scissor Lift Train the Trainer Certification! This course prepares you to become a <strong>qualified aerial lift and scissor lift operator trainer</strong>. It combines adult learning principles and training methodology with aerial lift-specific regulatory content." },
@@ -145,7 +145,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "Adult Learning Principles for Aerial Lift Training" },
+      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "Adult Learning Principles for Aerial Lift Training" },
       { type: "heading", level: 2, text: "Adult Learning Principles for Aerial Lift Training" },
       { type: "heading", level: 3, text: "Key Principles" },
       { type: "paragraph", html: "Adults learn best when training is <strong>relevant</strong>, <strong>experience-based</strong>, and <strong>problem-centered</strong>. Use real workplace scenarios from your aerial lift operations." },
@@ -195,7 +195,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Equipment-Related Training Topics" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Equipment-Related Training Topics" },
       { type: "heading", level: 2, text: "Equipment-Related Training Topics" },
       { type: "heading", level: 3, text: "Equipment Knowledge" },
       { type: "paragraph", html: "As a trainer, you must cover all equipment-related topics:" },
@@ -236,7 +236,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Workplace-Related Training Topics" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Workplace-Related Training Topics" },
       { type: "heading", level: 2, text: "Workplace-Related Training Topics" },
       { type: "heading", level: 3, text: "Site-Specific Topics" },
       { type: "paragraph", html: "Customize these to your facility:" },
@@ -301,7 +301,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("scissor-lift-hero.svg"), alt: "Practical Training Methodology for Aerial Lifts" },
+      { type: "hero_image", src: img("scissor-lift-hero.png"), alt: "Practical Training Methodology for Aerial Lifts" },
       { type: "heading", level: 2, text: "Practical Training Methodology for Aerial Lifts" },
       { type: "heading", level: 3, text: "Skills to Practice" },
       { type: "list", items: [
@@ -452,7 +452,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "You're a Certified Aerial Lift Trainer! What's Next" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "You're a Certified Aerial Lift Trainer! What's Next" },
       { type: "heading", level: 2, text: "You're a Certified Aerial Lift Trainer! What's Next" },
       { type: "heading", level: 3, text: "Your Certification" },
       { type: "paragraph", html: "Congratulations! You are now qualified to <strong>train and evaluate aerial lift and scissor lift operators</strong> at your facility in accordance with OSHA 29 CFR 1926.453, 1910.178(l)(2)(iii), and ANSI/SAIA A92 standards." },

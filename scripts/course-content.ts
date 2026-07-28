@@ -38,7 +38,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: photo("warehouse-aisle-scene.svg"), alt: "Warehouse aisle with pallet racking and a loading door" },
+      { type: "hero_image", src: photo("warehouse-aisle-scene.png"), alt: "Warehouse aisle with pallet racking and a loading door" },
       { type: "heading", level: 2, text: "Welcome to Forklift Operator Certification" },
       { type: "heading", level: 3, text: "About This Course" },
       { type: "paragraph", html: "Welcome! This online course provides the <strong>formal instruction</strong> portion of OSHA-compliant powered industrial truck (PIT/forklift) operator certification. The course takes approximately <strong>45–60 minutes</strong> to complete." },
@@ -69,7 +69,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: photo("ppe-workers-scene.svg"), alt: "Workers in full PPE standing in front of a forklift" },
+      { type: "hero_image", src: photo("ppe-workers-scene.png"), alt: "Workers in full PPE standing in front of a forklift" },
       { type: "heading", level: 2, text: "OSHA Compliance: What This Course Covers" },
       { type: "heading", level: 3, text: "OSHA's Three-Part Requirement" },
       { type: "paragraph", html: "Under <strong>29 CFR 1910.178(l)</strong>, OSHA requires all forklift operators to complete three components before operating at work. Explore each one in the diagram below." },
@@ -110,14 +110,14 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
-      { type: "hero_image", src: photo("forklift-lifting-scene.svg"), alt: "Forklift raising a palletized load to a rack while a spotter watches" },
+      { type: "hero_image", src: photo("forklift-lifting-scene.png"), alt: "Forklift raising a palletized load to a rack while a spotter watches" },
       { type: "heading", level: 2, text: "What is a Powered Industrial Truck (PIT)?" },
       { type: "heading", level: 3, text: "Definition" },
       { type: "paragraph", html: "A <strong>Powered Industrial Truck (PIT)</strong> is any mobile, self-propelled vehicle used to carry, push, pull, lift, stack, or tier materials. Common names include forklift, pallet jack, rider truck, fork truck, and lift truck." },
       { type: "paragraph", html: "PITs may be powered by electric motors or internal combustion engines (propane, gasoline, diesel)." },
       { type: "heading", level: 3, text: "Know Your Machine" },
       { type: "paragraph", html: "Before you operate, you need to know the machine's key components. Tap each marker to learn what it does." },
-      { type: "hotspot_diagram", src: img("forklift-anatomy.svg"), alt: "Side view of a counterbalance forklift",
+      { type: "hotspot_diagram", src: img("forklift-anatomy.png"), alt: "Side view of a counterbalance forklift",
         hotspots: [
           { x: 36, y: 31, label: "Overhead Guard", description: "Protects the operator from falling objects. It is not designed to withstand a full load falling on it — never lift more than rated capacity." },
           { x: 56, y: 35, label: "Mast", description: "The vertical assembly that raises and lowers the load. Lift chains and hydraulic cylinders inside the mast do the lifting work." },
@@ -161,7 +161,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: photo("operator-at-controls-scene.svg"), alt: "Operator seated at forklift controls wearing hi-vis vest and seat belt" },
+      { type: "hero_image", src: photo("operator-at-controls-scene.png"), alt: "Operator seated at forklift controls wearing hi-vis vest and seat belt" },
       { type: "heading", level: 2, text: "Authorization & Safe Work Culture" },
       { type: "heading", level: 3, text: "Reporting Hazards" },
       { type: "paragraph", html: "As an operator, you are responsible for immediately reporting any unsafe conditions: damaged equipment, spills, obstructions, poor lighting, or near-miss incidents. Never assume someone else will report it." },
@@ -282,7 +282,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: photo("forklift-lifting-scene.svg"), alt: "Forklift placing a pallet on a rack level" },
+      { type: "hero_image", src: photo("forklift-lifting-scene.png"), alt: "Forklift placing a pallet on a rack level" },
       { type: "heading", level: 2, text: "Picking Up and Carrying Loads Safely" },
       { type: "heading", level: 3, text: "Fork Position" },
       { type: "paragraph", html: "Carry forks as low as possible — typically <strong>4 to 6 inches</strong> from the ground. This lowers the center of gravity and reduces the risk of tip-over." },
@@ -312,13 +312,13 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
-      { type: "hero_image", src: photo("pre-inspection-scene.svg"), alt: "Operator inspecting forklift forks with a checklist before a shift" },
+      { type: "hero_image", src: photo("pre-inspection-scene.png"), alt: "Operator inspecting forklift forks with a checklist before a shift" },
       { type: "heading", level: 2, text: "Pre-Shift Inspection Checklist" },
       { type: "heading", level: 3, text: "Your Responsibility" },
       { type: "paragraph", html: "As the operator, it is <strong>your responsibility</strong> to conduct a daily safety inspection before using the machine. This must be done at the <strong>start of each shift</strong>." },
       { type: "heading", level: 3, text: "Walk-Around Inspection" },
       { type: "paragraph", html: "Do a full walk-around before you climb on. Tap each point on the forklift to see what to check." },
-      { type: "hotspot_diagram", src: img("forklift-anatomy.svg"), alt: "Forklift walkaround inspection points",
+      { type: "hotspot_diagram", src: img("forklift-anatomy.png"), alt: "Forklift walkaround inspection points",
         caption: "A complete walk-around takes less than 5 minutes and can save a life.",
         hotspots: [
           { x: 46, y: 79, label: "Tires & Wheels", description: "Check for cuts, chunks missing, proper inflation (pneumatic), and debris wrapped around axles." },
@@ -448,7 +448,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Warehouse aisle with clearance zones" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Warehouse aisle with clearance zones" },
       { type: "heading", level: 2, text: "Intersections, Blind Spots, and Horn Use" },
       { type: "heading", level: 3, text: "Approach With Caution" },
       { type: "paragraph", html: "At every intersection, blind corner, or area with limited visibility: <strong>slow down, sound your horn, and look both ways</strong> before proceeding." },
@@ -470,7 +470,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: photo("pedestrian-crossing-scene.svg"), alt: "Forklift yielding to a pedestrian in a marked walkway" },
+      { type: "hero_image", src: photo("pedestrian-crossing-scene.png"), alt: "Forklift yielding to a pedestrian in a marked walkway" },
       { type: "heading", level: 2, text: "Pedestrian Right of Way" },
       { type: "heading", level: 3, text: "Pedestrians Always Have Priority" },
       { type: "paragraph", html: "Pedestrians <strong>always have the right of way</strong>. Never drive toward a person near a fixed object. Always ensure people are clear before moving." },
@@ -563,7 +563,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: photo("dock-loading-scene.svg"), alt: "Forklift entering a trailer over a dock plate at a loading dock" },
+      { type: "hero_image", src: photo("dock-loading-scene.png"), alt: "Forklift entering a trailer over a dock plate at a loading dock" },
       { type: "heading", level: 2, text: "Docks and Trailer Safety" },
       { type: "heading", level: 3, text: "Before Entering a Trailer" },
       { type: "list", items: [
@@ -598,7 +598,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: photo("aerial-lift-scene.svg"), alt: "Worker in a harness on an elevated platform with a ground guard below" },
+      { type: "hero_image", src: photo("aerial-lift-scene.png"), alt: "Worker in a harness on an elevated platform with a ground guard below" },
       { type: "heading", level: 2, text: "Lifting People and Elevated Work" },
       { type: "heading", level: 3, text: "Never Lift People on Bare Forks" },
       { type: "paragraph", html: "It is <strong>never acceptable</strong> to lift a person on the forks without an approved safety platform. This includes standing on pallets, buckets, or any makeshift platform." },
@@ -712,7 +712,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Warehouse aisle showing site-specific clearances" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Warehouse aisle showing site-specific clearances" },
       { type: "heading", level: 2, text: "Site-Specific Training Matters" },
       { type: "heading", level: 3, text: "Every Workplace Is Different" },
       { type: "paragraph", html: "Every worksite has unique hazards: narrow aisles, specific pedestrian traffic patterns, loading docks, racking configurations, cold storage areas, outdoor areas, and more. Your supervisor must review <strong>site-specific policies</strong> with you before you operate at any new location." },
@@ -809,7 +809,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: photo("ppe-workers-scene.svg"), alt: "Team of certified workers in PPE in front of a forklift" },
+      { type: "hero_image", src: photo("ppe-workers-scene.png"), alt: "Team of certified workers in PPE in front of a forklift" },
       { type: "heading", level: 2, text: "You're Certified! What's Next" },
       { type: "heading", level: 3, text: "Your Certificate" },
       { type: "paragraph", html: "Congratulations on completing the formal instruction portion of your forklift operator certification! Your digital certificate is now available for download. It includes a unique certificate number and QR code that employers can use for instant verification." },

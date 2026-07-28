@@ -24,6 +24,7 @@ import {
   Award,
   ChevronRight,
   ArrowRight,
+  AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import AdminLayout from "./AdminLayout";
@@ -126,6 +127,15 @@ export default function AdminDashboard() {
   });
   const { data: certsData } = useQuery<{ certifications: DashCert[] }>({
     queryKey: ["/api/admin/certifications"],
+    enabled: isSuperAdmin,
+  });
+
+  // Trainer day-cluster alert (Alberto weekly review 2026-07-23): upcoming
+  // days with active bookings at 2+ locations.
+  const { data: trainerClusters } = useQuery<{
+    conflicts: { sessionDate: string; locations: { serviceAreaId: number; areaName: string; bookingCount: number; totalParticipants: number }[] }[];
+  }>({
+    queryKey: ["/api/admin/trainer-day-clusters"],
     enabled: isSuperAdmin,
   });
 
@@ -241,6 +251,41 @@ export default function AdminDashboard() {
             testId="card-metric-growth"
           />
         </div>
+
+        {isSuperAdmin && (trainerClusters?.conflicts?.length ?? 0) > 0 && (
+          <Card className="border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-800" data-testid="card-trainer-conflicts">
+            <CardHeader className="flex flex-row items-center gap-2 space-y-0 pb-2">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <CardTitle className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Trainer Scheduling Conflicts
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                These upcoming days have bookings at more than one location. Review and confirm where the trainer will be.
+              </p>
+              {trainerClusters!.conflicts.map((c) => (
+                <div
+                  key={c.sessionDate}
+                  className="rounded-lg border border-amber-200 dark:border-amber-800 bg-background px-3 py-2"
+                  data-testid={`trainer-conflict-${c.sessionDate}`}
+                >
+                  <p className="text-sm font-semibold text-foreground">
+                    {new Date(c.sessionDate + "T12:00:00").toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
+                  </p>
+                  <ul className="mt-1 space-y-0.5">
+                    {c.locations.map((loc) => (
+                      <li key={loc.serviceAreaId} className="text-sm text-muted-foreground flex justify-between">
+                        <span>{loc.areaName}</span>
+                        <span>{loc.bookingCount} booking{loc.bookingCount !== 1 ? "s" : ""} · {loc.totalParticipants} participant{loc.totalParticipants !== 1 ? "s" : ""}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {isSuperAdmin && (
           <>

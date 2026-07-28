@@ -37,7 +37,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "Welcome & OSHA Regulatory Framework" },
+      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "Welcome & OSHA Regulatory Framework" },
       { type: "heading", level: 2, text: "Welcome & OSHA Regulatory Framework" },
       { type: "heading", level: 3, text: "About This Course" },
       { type: "paragraph", html: "Welcome to the Forklift Train the Trainer Certification! This course prepares you to become a <strong>qualified forklift operator trainer</strong> under OSHA 29 CFR 1910.178(l)(2)(iii). The course takes approximately <strong>2-3 hours</strong> to complete." },
@@ -139,7 +139,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "How Adults Learn: Andragogy Basics" },
+      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "How Adults Learn: Andragogy Basics" },
       { type: "heading", level: 2, text: "How Adults Learn: Andragogy Basics" },
       { type: "heading", level: 3, text: "Adult Learning Theory" },
       { type: "paragraph", html: "Adults learn differently than children. Malcolm Knowles identified key principles of adult learning (<strong>andragogy</strong>):" },
@@ -254,7 +254,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "Designing Your Training Program" },
+      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "Designing Your Training Program" },
       { type: "heading", level: 2, text: "Designing Your Training Program" },
       { type: "heading", level: 3, text: "Needs Assessment" },
       { type: "paragraph", html: "Before designing training, identify what your operators need to know:" },
@@ -315,7 +315,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Designing Practical Exercises" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Designing Practical Exercises" },
       { type: "heading", level: 2, text: "Designing Practical Exercises" },
       { type: "heading", level: 3, text: "Progressive Skill Building" },
       { type: "paragraph", html: "Design exercises that build skills progressively:" },
@@ -381,7 +381,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("forklift-hero.svg"), alt: "Truck-Related Topics (1910.178(l)(3)(i))" },
+      { type: "hero_image", src: img("forklift-hero.png"), alt: "Truck-Related Topics (1910.178(l)(3)(i))" },
       { type: "heading", level: 2, text: "Truck-Related Topics (1910.178(l)(3)(i))" },
       { type: "heading", level: 3, text: "OSHA Requires 13 Truck-Related Topics" },
       { type: "paragraph", html: "OSHA 1910.178(l)(3)(i) requires training on <strong>13 truck-related topics</strong>. As a trainer, you must cover ALL of these in your operator training:" },
@@ -434,7 +434,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Workplace-Related Topics (1910.178(l)(3)(ii))" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Workplace-Related Topics (1910.178(l)(3)(ii))" },
       { type: "heading", level: 2, text: "Workplace-Related Topics (1910.178(l)(3)(ii))" },
       { type: "heading", level: 3, text: "OSHA Requires 9 Workplace-Related Topics" },
       { type: "paragraph", html: "OSHA 1910.178(l)(3)(ii) requires training on <strong>9 workplace-related topics</strong>. These are site-specific and must be tailored to your facility:" },
@@ -492,7 +492,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Conducting Practical Training Sessions" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Conducting Practical Training Sessions" },
       { type: "heading", level: 2, text: "Conducting Practical Training Sessions" },
       { type: "heading", level: 3, text: "Setting Up for Success" },
       { type: "paragraph", html: "Before the practical training session:" },
@@ -779,7 +779,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.svg"), alt: "You're a Certified Trainer! What's Next" },
+      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "You're a Certified Trainer! What's Next" },
       { type: "heading", level: 2, text: "You're a Certified Trainer! What's Next" },
       { type: "heading", level: 3, text: "Your Certification" },
       { type: "paragraph", html: "Congratulations on completing the Forklift Train the Trainer Certification! You are now qualified to <strong>train and evaluate forklift operators</strong> at your facility in accordance with OSHA 29 CFR 1910.178(l)(2)(iii)." },

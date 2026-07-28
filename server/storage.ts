@@ -200,6 +200,7 @@ export interface IStorage {
   getBookingsForUser(userId: number): Promise<Booking[]>;
   getAllBookings(filters: { status?: string; serviceAreaId?: number; from?: string; to?: string }): Promise<Booking[]>;
   updateBookingStatus(id: number, status: Booking["status"]): Promise<Booking | undefined>;
+  getTrainerDayClusters(from: string, to: string): Promise<{ sessionDate: string; serviceAreaId: number; areaName: string; bookingCount: number; totalParticipants: number }[]>;
   updateBookingOrderId(id: number, orderId: number): Promise<Booking | undefined>;
 
   createSupportConversation(data: InsertSupportConversation): Promise<SupportConversation>;
@@ -1395,6 +1396,35 @@ export class DatabaseStorage implements IStorage {
       .where(eq(bookings.id, id))
       .returning();
     return booking;
+  }
+
+  // Trainer scheduling visibility (Alberto weekly review 2026-07-23): surface
+  // upcoming days that have active bookings at 2+ service areas, so Alberto
+  // can spot same-day/multi-location clusters and resolve conflicts.
+  async getTrainerDayClusters(from: string, to: string): Promise<{ sessionDate: string; serviceAreaId: number; areaName: string; bookingCount: number; totalParticipants: number }[]> {
+    const rows = await db.select({
+      sessionDate: bookings.sessionDate,
+      serviceAreaId: bookings.serviceAreaId,
+      areaName: serviceAreas.name,
+      bookingCount: sql<number>`COUNT(*)`,
+      totalParticipants: sql<number>`COALESCE(SUM(${bookings.participantCount}), 0)`,
+    })
+    .from(bookings)
+    .innerJoin(serviceAreas, eq(bookings.serviceAreaId, serviceAreas.id))
+    .where(and(
+      sql`${bookings.sessionDate} >= ${from}`,
+      sql`${bookings.sessionDate} <= ${to}`,
+      ne(bookings.status, 'cancelled'),
+    ))
+    .groupBy(bookings.sessionDate, bookings.serviceAreaId, serviceAreas.name)
+    .orderBy(asc(bookings.sessionDate));
+
+    // Keep only dates that appear at 2+ distinct service areas.
+    const dateAreaCount = new Map<string, number>();
+    for (const r of rows) {
+      dateAreaCount.set(r.sessionDate, (dateAreaCount.get(r.sessionDate) || 0) + 1);
+    }
+    return rows.filter((r) => (dateAreaCount.get(r.sessionDate) || 0) >= 2);
   }
 
   async updateBookingOrderId(id: number, orderId: number): Promise<Booking | undefined> {

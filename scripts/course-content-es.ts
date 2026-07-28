@@ -22,7 +22,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: photo("warehouse-aisle-scene.svg"), alt: "Pasillo de almacén con estanterías de tarimas y una puerta de carga" },
+      { type: "hero_image", src: photo("warehouse-aisle-scene.png"), alt: "Pasillo de almacén con estanterías de tarimas y una puerta de carga" },
       { type: "heading", level: 2, text: "Bienvenido a la Certificación de Operador de Montacargas" },
       { type: "heading", level: 3, text: "Acerca de Este Curso" },
       { type: "paragraph", html: "¡Bienvenido! Este curso en línea proporciona la porción de <strong>instrucción formal</strong> de la certificación de operador de camiones industriales motorizados (PIT/montacargas) en cumplimiento con OSHA. El curso toma aproximadamente <strong>45–60 minutos</strong> para completar." },
@@ -53,7 +53,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: photo("ppe-workers-scene.svg"), alt: "Trabajadores con EPP completo frente a un montacargas" },
+      { type: "hero_image", src: photo("ppe-workers-scene.png"), alt: "Trabajadores con EPP completo frente a un montacargas" },
       { type: "heading", level: 2, text: "Cumplimiento OSHA: Lo Que Cubre Este Curso" },
       { type: "heading", level: 3, text: "Requisito de Tres Partes de OSHA" },
       { type: "paragraph", html: "Bajo <strong>29 CFR 1910.178(l)</strong>, OSHA requiere que todos los operadores de montacargas completen tres componentes antes de operar en el trabajo. Explore cada uno en el diagrama a continuación." },
@@ -95,14 +95,14 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
-      { type: "hero_image", src: photo("forklift-lifting-scene.svg"), alt: "Montacargas elevando una carga en tarima hacia una estantería mientras un ayudante observa" },
+      { type: "hero_image", src: photo("forklift-lifting-scene.png"), alt: "Montacargas elevando una carga en tarima hacia una estantería mientras un ayudante observa" },
       { type: "heading", level: 2, text: "¿Qué es un Camión Industrial Motorizado (PIT)?" },
       { type: "heading", level: 3, text: "Definición" },
       { type: "paragraph", html: "Un <strong>Camión Industrial Motorizado (PIT)</strong> es cualquier vehículo móvil autopropulsado utilizado para transportar, empujar, jalar, levantar, apilar o escalonar materiales. Los nombres comunes incluyen montacargas, patín hidráulico, montacargas de conductor y camión elevador." },
       { type: "paragraph", html: "Los PITs pueden ser impulsados por motores eléctricos o motores de combustión interna (propano, gasolina, diésel)." },
       { type: "heading", level: 3, text: "Conozca Su Máquina" },
       { type: "paragraph", html: "Antes de operar, necesita conocer los componentes clave de la máquina. Toque cada marcador para aprender qué hace." },
-      { type: "hotspot_diagram", src: img("forklift-anatomy.svg"), alt: "Vista lateral de un montacargas de contrapeso",
+      { type: "hotspot_diagram", src: img("forklift-anatomy.png"), alt: "Vista lateral de un montacargas de contrapeso",
         hotspots: [
           { x: 36, y: 31, label: "Protección Superior", description: "Protege al operador de objetos que caen. No está diseñada para resistir una carga completa cayendo sobre ella — nunca levante más de la capacidad nominal." },
           { x: 56, y: 35, label: "Mástil", description: "El conjunto vertical que sube y baja la carga. Las cadenas de elevación y los cilindros hidráulicos dentro del mástil hacen el trabajo de elevación." },
@@ -146,7 +146,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: photo("operator-at-controls-scene.svg"), alt: "Operador sentado en los controles del montacargas con chaleco de alta visibilidad y cinturón de seguridad" },
+      { type: "hero_image", src: photo("operator-at-controls-scene.png"), alt: "Operador sentado en los controles del montacargas con chaleco de alta visibilidad y cinturón de seguridad" },
       { type: "heading", level: 2, text: "Autorización y Cultura de Trabajo Seguro" },
       { type: "heading", level: 3, text: "Reportar Peligros" },
       { type: "paragraph", html: "Como operador, usted es responsable de reportar inmediatamente cualquier condición insegura: equipo dañado, derrames, obstrucciones, mala iluminación o incidentes cercanos. Nunca asuma que alguien más lo reportará." },
@@ -267,7 +267,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: photo("forklift-lifting-scene.svg"), alt: "Montacargas colocando una tarima en un nivel de estantería" },
+      { type: "hero_image", src: photo("forklift-lifting-scene.png"), alt: "Montacargas colocando una tarima en un nivel de estantería" },
       { type: "heading", level: 2, text: "Recoger y Transportar Cargas de Forma Segura" },
       { type: "heading", level: 3, text: "Posición de las Horquillas" },
       { type: "paragraph", html: "Lleve las horquillas lo más bajo posible — típicamente <strong>4 a 6 pulgadas</strong> del suelo. Esto baja el centro de gravedad y reduce el riesgo de volcadura." },
@@ -297,13 +297,13 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
-      { type: "hero_image", src: photo("pre-inspection-scene.svg"), alt: "Operador inspeccionando las horquillas del montacargas con una lista de verificación antes de un turno" },
+      { type: "hero_image", src: photo("pre-inspection-scene.png"), alt: "Operador inspeccionando las horquillas del montacargas con una lista de verificación antes de un turno" },
       { type: "heading", level: 2, text: "Lista de Inspección Pre-Turno" },
       { type: "heading", level: 3, text: "Su Responsabilidad" },
       { type: "paragraph", html: "Como operador, es <strong>su responsabilidad</strong> realizar una inspección de seguridad diaria antes de usar la máquina. Esto debe hacerse al <strong>inicio de cada turno</strong>." },
       { type: "heading", level: 3, text: "Inspección de Recorrido" },
       { type: "paragraph", html: "Haga un recorrido completo alrededor del vehículo antes de subirse. Toque cada punto en el montacargas para ver qué revisar." },
-      { type: "hotspot_diagram", src: img("forklift-anatomy.svg"), alt: "Puntos de inspección del recorrido alrededor del montacargas",
+      { type: "hotspot_diagram", src: img("forklift-anatomy.png"), alt: "Puntos de inspección del recorrido alrededor del montacargas",
         caption: "Un recorrido completo toma menos de 5 minutos y puede salvar una vida.",
         hotspots: [
           { x: 46, y: 79, label: "Llantas y Ruedas", description: "Revise cortes, pedazos faltantes, inflado apropiado (neumáticas) y desechos enredados en los ejes." },
@@ -433,7 +433,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Pasillo de almacén con zonas de espacio libre" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Pasillo de almacén con zonas de espacio libre" },
       { type: "heading", level: 2, text: "Intersecciones, Puntos Ciegos y Uso de la Bocina" },
       { type: "heading", level: 3, text: "Aproxímese con Precaución" },
       { type: "paragraph", html: "En cada intersección, esquina ciega o área con visibilidad limitada: <strong>reduzca la velocidad, toque la bocina y mire en ambas direcciones</strong> antes de proceder." },
@@ -455,7 +455,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: photo("pedestrian-crossing-scene.svg"), alt: "Montacargas cediendo el paso a un peatón en un carril peatonal marcado" },
+      { type: "hero_image", src: photo("pedestrian-crossing-scene.png"), alt: "Montacargas cediendo el paso a un peatón en un carril peatonal marcado" },
       { type: "heading", level: 2, text: "Derecho de Paso de los Peatones" },
       { type: "heading", level: 3, text: "Los Peatones Siempre Tienen Prioridad" },
       { type: "paragraph", html: "Los peatones <strong>siempre tienen el derecho de paso</strong>. Nunca conduzca hacia una persona que esté cerca de un objeto fijo. Siempre asegúrese de que las personas estén fuera del camino antes de moverse." },
@@ -548,7 +548,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: photo("dock-loading-scene.svg"), alt: "Montacargas entrando a un remolque sobre una placa de muelle en un muelle de carga" },
+      { type: "hero_image", src: photo("dock-loading-scene.png"), alt: "Montacargas entrando a un remolque sobre una placa de muelle en un muelle de carga" },
       { type: "heading", level: 2, text: "Operaciones en Muelles de Carga" },
       { type: "heading", level: 3, text: "Antes de Entrar a un Remolque" },
       { type: "list", items: [
@@ -583,7 +583,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: photo("aerial-lift-scene.svg"), alt: "Trabajador con arnés en una plataforma elevada con un vigilante en el suelo" },
+      { type: "hero_image", src: photo("aerial-lift-scene.png"), alt: "Trabajador con arnés en una plataforma elevada con un vigilante en el suelo" },
       { type: "heading", level: 2, text: "Elevación de Personas y Trabajo Elevado" },
       { type: "heading", level: 3, text: "Nunca Eleve Personas en las Horquillas Vacías" },
       { type: "paragraph", html: "<strong>Nunca es aceptable</strong> elevar a una persona en las horquillas sin una plataforma de seguridad aprobada. Esto incluye pararse sobre tarimas, cubetas o cualquier plataforma improvisada." },
@@ -697,7 +697,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Pasillo de almacén mostrando espacios libres específicos del sitio" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Pasillo de almacén mostrando espacios libres específicos del sitio" },
       { type: "heading", level: 2, text: "La Importancia de la Capacitación Específica del Sitio" },
       { type: "heading", level: 3, text: "Cada Lugar de Trabajo es Diferente" },
       { type: "paragraph", html: "Cada lugar de trabajo tiene peligros únicos: pasillos estrechos, patrones de tráfico peatonal específicos, muelles de carga, configuraciones de estantería, áreas de almacenamiento frío, áreas exteriores y más. Su supervisor debe revisar las <strong>políticas específicas del sitio</strong> con usted antes de operar en cualquier nueva ubicación." },
@@ -794,7 +794,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: photo("ppe-workers-scene.svg"), alt: "Equipo de trabajadores certificados con EPP frente a un montacargas" },
+      { type: "hero_image", src: photo("ppe-workers-scene.png"), alt: "Equipo de trabajadores certificados con EPP frente a un montacargas" },
       { type: "heading", level: 2, text: "¡Está Certificado! ¿Qué Sigue?" },
       { type: "heading", level: 3, text: "Su Certificado" },
       { type: "paragraph", html: "¡Felicitaciones por completar la porción de instrucción formal de su certificación de operador de montacargas! Su certificado digital ahora está disponible para descargar. Incluye un número de certificado único y código QR que los empleadores pueden usar para verificación instantánea." },

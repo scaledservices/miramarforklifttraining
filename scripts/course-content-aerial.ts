@@ -37,7 +37,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Welcome to Aerial & Scissor Lift Certification" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Welcome to Aerial & Scissor Lift Certification" },
       { type: "heading", level: 2, text: "Welcome to Aerial & Scissor Lift Certification" },
       { type: "heading", level: 3, text: "About This Course" },
       { type: "paragraph", html: "Welcome! This online course provides the <strong>formal instruction</strong> portion of OSHA-compliant aerial lift and scissor lift operator certification. The course takes approximately <strong>60-90 minutes</strong> to complete." },
@@ -130,7 +130,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "What is a Mobile Elevating Work Platform (MEWP)?" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "What is a Mobile Elevating Work Platform (MEWP)?" },
       { type: "heading", level: 2, text: "What is a Mobile Elevating Work Platform (MEWP)?" },
       { type: "heading", level: 3, text: "Definition" },
       { type: "paragraph", html: "A <strong>Mobile Elevating Work Platform (MEWP)</strong> is a machine used to position personnel, tools, and materials at elevated work locations. MEWPs include aerial lifts, scissor lifts, boom lifts, and vertical towers. The term MEWP was adopted by ANSI in the 2020 revision of the A92 standards." },
@@ -168,7 +168,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("scissor-lift-hero.svg"), alt: "Scissor Lifts: Operation and Components" },
+      { type: "hero_image", src: img("scissor-lift-hero.png"), alt: "Scissor Lifts: Operation and Components" },
       { type: "heading", level: 2, text: "Scissor Lifts: Operation and Components" },
       { type: "heading", level: 3, text: "What is a Scissor Lift?" },
       { type: "paragraph", html: "A <strong>scissor lift</strong> is a Group A MEWP that uses crossed tubular supports (a pantograph mechanism) to raise and lower the platform vertically. Scissor lifts provide a large, stable working platform ideal for tasks requiring multiple workers and materials at moderate heights." },
@@ -200,7 +200,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Boom Lifts: Articulating and Telescopic" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Boom Lifts: Articulating and Telescopic" },
       { type: "heading", level: 2, text: "Boom Lifts: Articulating and Telescopic" },
       { type: "heading", level: 3, text: "Articulating Boom Lifts" },
       { type: "paragraph", html: "<strong>Articulating boom lifts</strong> (knuckle booms) have multiple hinged sections that allow the platform to reach up and over obstacles. The jointed arm provides excellent maneuverability for reaching over equipment, structures, or obstacles. These are classified as <strong>Group B</strong> MEWPs because the platform can extend beyond the tipping lines." },
@@ -208,7 +208,7 @@ export const COURSE_STEPS: StepDef[] = [
       { type: "paragraph", html: "<strong>Telescopic boom lifts</strong> (stick booms) use straight, extendable sections for maximum horizontal and vertical reach. They offer the highest reach capabilities but cannot reach over obstacles. Also classified as <strong>Group B</strong> MEWPs." },
       { type: "heading", level: 3, text: "Know Your Boom Lift" },
       { type: "paragraph", html: "Before you operate, you need to know the machine's key components. Tap each marker to learn what it does." },
-      { type: "hotspot_diagram", src: img("aerial-lift-anatomy.svg"), alt: "Side view of an articulating boom lift with elevated basket",
+      { type: "hotspot_diagram", src: img("aerial-lift-anatomy.png"), alt: "Side view of an articulating boom lift with elevated basket",
         caption: "Anatomy of an articulating boom lift — tap each marker to explore.",
         hotspots: [
           { x: 24, y: 79, label: "Chassis", description: "The wheeled base that supports and moves the entire machine. Its weight counterbalances the elevated platform — always position it on firm, level ground." },
@@ -619,7 +619,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Environmental and Workplace Hazards" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Environmental and Workplace Hazards" },
       { type: "heading", level: 2, text: "Environmental and Workplace Hazards" },
       { type: "heading", level: 3, text: "Weather Conditions" },
       { type: "paragraph", html: "Weather significantly affects MEWP safety:" },
@@ -816,7 +816,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "You're Certified! What's Next" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "You're Certified! What's Next" },
       { type: "heading", level: 2, text: "You're Certified! What's Next" },
       { type: "heading", level: 3, text: "Your Certificate" },
       { type: "paragraph", html: "Congratulations on completing the formal instruction portion of your aerial and scissor lift operator certification! Your digital certificate is now available for download. It includes a unique certificate number and QR code that employers can use for instant verification." },

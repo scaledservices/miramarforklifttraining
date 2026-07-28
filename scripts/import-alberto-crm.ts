@@ -26,6 +26,9 @@
 
 import XLSX from "xlsx";
 import * as fs from "fs";
+import { db, pool } from "../server/db";
+import { companies, contacts, trainingEvents } from "../shared/schema";
+import { eq } from "drizzle-orm";
 
 // ---- Config -----------------------------------------------------------------
 
@@ -507,6 +510,99 @@ function mergeCompanies(
   return merged;
 }
 
+// ---- Commit: DB write path --------------------------------------------------
+// Idempotent via importBatchId: re-running wipes this batch's rows and
+// re-imports, so a partial/failed run can be safely retried. Imported data is
+// reference/attribution only (per Tally gate) - never the system of record.
+
+interface CommitResult {
+  companiesInserted: number;
+  contactsInserted: number;
+  eventsInserted: number;
+}
+
+async function wipeBatch(): Promise<void> {
+  await db.delete(trainingEvents).where(eq(trainingEvents.importBatchId, IMPORT_BATCH_ID));
+  await db.delete(contacts).where(eq(contacts.importBatchId, IMPORT_BATCH_ID));
+  await db.delete(companies).where(eq(companies.importBatchId, IMPORT_BATCH_ID));
+}
+
+async function writeDataset(
+  companiesMap: Map<string, MappedCompany>,
+  contactsList: MappedContact[],
+  eventsList: MappedTrainingEvent[],
+  companyIdByKey: Map<string, number>,
+  contactIdByEmail: Map<string, number>
+): Promise<CommitResult> {
+  const result: CommitResult = { companiesInserted: 0, contactsInserted: 0, eventsInserted: 0 };
+
+  // Companies: insert only keys not already created by an earlier dataset.
+  for (const [key, comp] of companiesMap) {
+    if (companyIdByKey.has(key)) continue;
+    const [row] = await db.insert(companies).values({
+      name: comp.name,
+      phone: comp.phone,
+      email: comp.email,
+      billingStreet: comp.billingStreet,
+      billingCity: comp.billingCity,
+      billingState: comp.billingState,
+      billingZip: comp.billingZip,
+      leadSource: comp.leadSource,
+      importBatchId: IMPORT_BATCH_ID,
+      sourceEra: comp.sourceEra,
+      notes: comp.notes,
+    }).returning({ id: companies.id });
+    companyIdByKey.set(key, row.id);
+    result.companiesInserted++;
+  }
+
+  // Contacts: link to their company; track email -> id for event linkage.
+  for (const c of contactsList) {
+    const companyId = companyIdByKey.get(c.companyKey) ?? null;
+    const [row] = await db.insert(contacts).values({
+      companyId,
+      firstName: c.firstName,
+      lastName: c.lastName,
+      email: c.email,
+      phone: c.phone,
+      tags: c.tags,
+      notes: c.notes,
+      isPrimary: c.isPrimary,
+      importBatchId: IMPORT_BATCH_ID,
+    }).returning({ id: contacts.id });
+    if (c.email && !contactIdByEmail.has(c.email)) contactIdByEmail.set(c.email, row.id);
+    result.contactsInserted++;
+  }
+
+  // Training events: revenue is dollars in the mapper -> integer cents column.
+  for (const e of eventsList) {
+    const companyId = companyIdByKey.get(e.companyKey) ?? null;
+    const primaryContactId = e.contactEmail ? (contactIdByEmail.get(e.contactEmail) ?? null) : null;
+    await db.insert(trainingEvents).values({
+      companyId,
+      primaryContactId,
+      title: e.title,
+      status: e.status as any,
+      locationType: e.locationType as any,
+      onsiteStreet: e.onsiteStreet,
+      onsiteCity: e.onsiteCity,
+      onsiteState: e.onsiteState,
+      onsiteZip: e.onsiteZip,
+      scheduledStart: e.scheduledStart,
+      traineeCount: e.traineeCount,
+      equipmentTypes: e.equipmentTypes,
+      revenue: e.revenue !== null ? Math.round(e.revenue * 100) : null,
+      rawEmployeesCode: e.rawEmployeesCode,
+      sourceEra: e.sourceEra,
+      adminNotes: e.adminNotes,
+      importBatchId: IMPORT_BATCH_ID,
+    });
+    result.eventsInserted++;
+  }
+
+  return result;
+}
+
 // ---- Report Helpers ---------------------------------------------------------
 
 function printDataset1Stats(
@@ -598,17 +694,10 @@ function printOnsiteStats(
 
 // ---- Main -------------------------------------------------------------------
 
-function main() {
+async function main() {
   console.log("=".repeat(70));
   console.log("Alberto CRM Import —", COMMIT ? "COMMIT MODE" : "DRY-RUN (no DB writes)");
   console.log("=".repeat(70));
-
-  if (COMMIT) {
-    console.error(
-      "\n[ABORT] --commit is not enabled. Dry-run only until Peter approves the mapping.\n"
-    );
-    process.exit(2);
-  }
 
   console.log(`\nImport batch ID: ${IMPORT_BATCH_ID}`);
   console.log(`Dataset filter:  ${DATASET_FILTER ?? "ALL (1+2+3)"}`);
@@ -721,10 +810,54 @@ function main() {
   console.log(`    trainingEvents.status:  "completed" (has revenue+contact) | "unscheduled" (missing data)`);
 
   console.log("\n" + "=".repeat(70));
-  console.log("DRY-RUN COMPLETE — nothing was written to the database.");
-  console.log("Review the mapping above. See CRM_DATA_ANALYSIS.md for full analysis.");
-  console.log("To proceed, add importBatchId migration + enable --commit (with Peter's approval).");
+  if (!COMMIT) {
+    console.log("DRY-RUN COMPLETE — nothing was written to the database.");
+    console.log("Review the mapping above. See CRM_DATA_ANALYSIS.md for full analysis.");
+    console.log("To proceed, run with --commit (writes to the database).");
+    console.log("=".repeat(70) + "\n");
+    return;
+  }
+
+  // ---- COMMIT: wipe this batch and write DS1 -> DS2 -> DS3 ----
+  console.log("COMMIT MODE — writing to the database...");
+  console.log("=".repeat(70));
+  await wipeBatch();
+  const companyIdByKey = new Map<string, number>();
+  const contactIdByEmail = new Map<string, number>();
+  const totals: CommitResult = { companiesInserted: 0, contactsInserted: 0, eventsInserted: 0 };
+
+  const accumulate = (r: CommitResult) => {
+    totals.companiesInserted += r.companiesInserted;
+    totals.contactsInserted += r.contactsInserted;
+    totals.eventsInserted += r.eventsInserted;
+  };
+
+  if (ds1Result) {
+    const r = await writeDataset(ds1Result.companies, ds1Result.contacts, [], companyIdByKey, contactIdByEmail);
+    accumulate(r);
+    console.log(`  DS1 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts`);
+  }
+  if (ds2Result) {
+    const r = await writeDataset(ds2Result.companies, ds2Result.contacts, ds2Result.events, companyIdByKey, contactIdByEmail);
+    accumulate(r);
+    console.log(`  DS2 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts, ${r.eventsInserted} events`);
+  }
+  if (ds3Result) {
+    const r = await writeDataset(ds3Result.companies, ds3Result.contacts, ds3Result.events, companyIdByKey, contactIdByEmail);
+    accumulate(r);
+    console.log(`  DS3 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts, ${r.eventsInserted} events`);
+  }
+
+  console.log("\n  TOTAL inserted:");
+  console.log(`    companies:       ${totals.companiesInserted}`);
+  console.log(`    contacts:        ${totals.contactsInserted}`);
+  console.log(`    training events: ${totals.eventsInserted}`);
   console.log("=".repeat(70) + "\n");
 }
 
-main();
+main()
+  .then(() => pool.end())
+  .catch((err) => {
+    console.error("\n[FATAL] Import failed:", err);
+    pool.end().finally(() => process.exit(1));
+  });

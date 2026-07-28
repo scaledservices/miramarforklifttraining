@@ -21,7 +21,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera" },
       { type: "heading", level: 2, text: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera" },
       { type: "heading", level: 3, text: "Acerca de Este Curso" },
       { type: "paragraph", html: "¡Bienvenido! Este curso en línea proporciona la porción de <strong>instrucción formal</strong> de la certificación de operador de elevadores aéreos y de tijera en cumplimiento con OSHA. El curso toma aproximadamente <strong>60-90 minutos</strong> para completar." },
@@ -114,7 +114,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?" },
       { type: "heading", level: 2, text: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?" },
       { type: "heading", level: 3, text: "Definición" },
       { type: "paragraph", html: "Una <strong>Plataforma de Trabajo Móvil Elevadora (MEWP)</strong> es una máquina utilizada para posicionar personal, herramientas y materiales en ubicaciones de trabajo elevadas. Los MEWPs incluyen elevadores aéreos, elevadores de tijera, elevadores de pluma y torres verticales. El término MEWP fue adoptado por ANSI en la revisión de 2020 de los estándares A92." },
@@ -152,7 +152,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("scissor-lift-hero.svg"), alt: "Elevadores de Tijera: Operación y Componentes" },
+      { type: "hero_image", src: img("scissor-lift-hero.png"), alt: "Elevadores de Tijera: Operación y Componentes" },
       { type: "heading", level: 2, text: "Elevadores de Tijera: Operación y Componentes" },
       { type: "heading", level: 3, text: "¿Qué es un Elevador de Tijera?" },
       { type: "paragraph", html: "Un <strong>elevador de tijera</strong> es un MEWP del Grupo A que utiliza soportes tubulares cruzados (mecanismo de pantógrafo) para subir y bajar la plataforma verticalmente. Los elevadores de tijera proporcionan una plataforma de trabajo grande y estable ideal para tareas que requieren múltiples trabajadores y materiales a alturas moderadas." },
@@ -183,7 +183,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "Elevadores de Pluma: Articulados y Telescópicos" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Elevadores de Pluma: Articulados y Telescópicos" },
       { type: "heading", level: 2, text: "Elevadores de Pluma: Articulados y Telescópicos" },
       { type: "heading", level: 3, text: "Elevadores de Pluma Articulados" },
       { type: "paragraph", html: "Los <strong>elevadores de pluma articulados</strong> (plumas articuladas) tienen múltiples secciones articuladas que permiten que la plataforma alcance por encima y sobre obstáculos. El brazo articulado proporciona excelente maniobrabilidad. Clasificados como <strong>Grupo B</strong> porque la plataforma puede extenderse más allá de las líneas de volcadura." },
@@ -191,7 +191,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
       { type: "paragraph", html: "Los <strong>elevadores de pluma telescópicos</strong> usan secciones rectas extensibles para máximo alcance horizontal y vertical. Ofrecen las capacidades de alcance más altas pero no pueden alcanzar sobre obstáculos. También clasificados como <strong>Grupo B</strong>." },
       { type: "heading", level: 3, text: "Conozca Su Elevador de Pluma" },
       { type: "paragraph", html: "Antes de operar, necesita conocer los componentes clave de la máquina. Toque cada marcador para aprender qué hace." },
-      { type: "hotspot_diagram", src: img("aerial-lift-anatomy.svg"), alt: "Vista lateral de un elevador de pluma articulado con canasta elevada",
+      { type: "hotspot_diagram", src: img("aerial-lift-anatomy.png"), alt: "Vista lateral de un elevador de pluma articulado con canasta elevada",
         caption: "Anatomía de un elevador de pluma articulado — toque cada marcador para explorar.",
         hotspots: [
           { x: 24, y: 79, label: "Chasis", description: "La base con ruedas que soporta y mueve toda la máquina. Su peso contrapesa la plataforma elevada — siempre posiciónelo sobre terreno firme y nivelado." },
@@ -557,7 +557,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.svg"), alt: "Peligros Ambientales y del Lugar de Trabajo" },
+      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Peligros Ambientales y del Lugar de Trabajo" },
       { type: "heading", level: 2, text: "Peligros Ambientales y del Lugar de Trabajo" },
       { type: "heading", level: 3, text: "Condiciones Climáticas" },
       { type: "list", items: [
@@ -700,7 +700,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.svg"), alt: "¡Está Certificado! ¿Qué Sigue?" },
+      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "¡Está Certificado! ¿Qué Sigue?" },
       { type: "heading", level: 2, text: "¡Está Certificado! ¿Qué Sigue?" },
       { type: "heading", level: 3, text: "Su Certificado" },
       { type: "paragraph", html: "¡Felicitaciones por completar la porción de instrucción formal de su certificación de operador de elevadores aéreos y de tijera! Su certificado digital está disponible para descargar con número único y código QR." },

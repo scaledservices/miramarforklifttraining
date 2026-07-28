@@ -151,10 +151,7 @@ export default function BookTraining() {
   // to an account that doesn't exist.
   const [authFallbackMode, setAuthFallbackMode] = useState<"login" | "register">("login");
 
-  const [zip, setZip] = useState("");
-  const [checkingZip, setCheckingZip] = useState(false);
   const [serviceArea, setServiceArea] = useState<ServiceArea | null>(null);
-  const [zipError, setZipError] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>(() => {
     if (productSlug) {
@@ -213,8 +210,8 @@ export default function BookTraining() {
 
   // Track funnel entry: user landed on the booking page.
   useEffect(() => {
-    trackEvent("booking_started", { step_name: "zip_check" });
-    trackEvent("booking_step_reached", { step: 1, step_name: "zip_check" });
+    trackEvent("booking_started", { step_name: "city_select" });
+    trackEvent("booking_step_reached", { step: 1, step_name: "city_select" });
   }, []);
 
   const [contactName, setContactName] = useState("");
@@ -307,38 +304,38 @@ export default function BookTraining() {
     }
   }, [step, selectedDate, nextAvailableDate]);
 
-  async function checkZip() {
-    if (!/^\d{5}$/.test(zip)) return;
-    setCheckingZip(true);
-    setZipError(false);
-    try {
-      const res = await fetch(`/api/service-areas/check?zip=${zip}`);
-      const data = await res.json();
-      if (data.available) {
-        setServiceArea(data.serviceArea);
-        setCustomerZip(zip);
-        // Smart default: pre-select the area's most popular course (standard
-        // forklift) so the visitor never starts from an empty selection.
-        setSelectedProducts((prev) => {
-          if (prev.length > 0) return prev;
-          const areaFacility = SERVICE_AREA_FACILITY[data.serviceArea.slug];
-          const defaultProduct = catalog.find(
-            (p) => p.slug === `standard-forklift-certification-${areaFacility}` && p.category === "hands-on"
-          );
-          return defaultProduct ? [defaultProduct] : prev;
-        });
-        trackEvent("booking_step_reached", { step: 2, step_name: "product_selection", zip_code: zip });
-      } else {
-        // Expansion intelligence: log unserved ZIPs to identify demand areas.
-        console.log(`[UNSERVED-ZIP] ${zip}`);
-        setZipError(true);
-        setServiceArea(null);
-      }
-    } catch {
-      setZipError(true);
-    } finally {
-      setCheckingZip(false);
-    }
+  // Fetch the active service areas once so the customer can pick their city
+  // directly (Alberto weekly review 2026-07-23: fixed locations in Fresno,
+  // Las Vegas, San Diego — no ZIP gate, trainees travel across regions).
+  const { data: serviceAreas } = useQuery<ServiceArea[]>({
+    queryKey: ["/api/service-areas"],
+    queryFn: async () => {
+      const res = await fetch("/api/service-areas");
+      if (!res.ok) throw new Error("Failed to fetch service areas");
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Shared: after a service area is chosen (by city), pre-select the area's
+  // most popular course so the visitor never starts from an empty selection.
+  function applyServiceArea(area: ServiceArea) {
+    setServiceArea(area);
+    setSelectedProducts((prev) => {
+      if (prev.length > 0) return prev;
+      const areaFacility = SERVICE_AREA_FACILITY[area.slug];
+      const defaultProduct = catalog.find(
+        (p) => p.slug === `standard-forklift-certification-${areaFacility}` && p.category === "hands-on"
+      );
+      return defaultProduct ? [defaultProduct] : prev;
+    });
+  }
+
+  // City selection replaces the old ZIP-code gate: the customer picks one of
+  // the three fixed training facilities and we map it to its service area.
+  function selectCity(area: ServiceArea) {
+    applyServiceArea(area);
+    trackEvent("booking_step_reached", { step: 2, step_name: "product_selection", service_area: area.slug });
   }
 
   function toggleProduct(product: Product) {
@@ -396,7 +393,7 @@ export default function BookTraining() {
 
     setStep((s) => (s + 1) as Step);
     const nextStep = step + 1;
-    const stepNames: Record<number, string> = { 1: "zip_check", 2: "date_slot", 3: "contact_details", 4: "review_payment" };
+    const stepNames: Record<number, string> = { 1: "city_select", 2: "date_slot", 3: "contact_details", 4: "review_payment" };
     trackEvent("booking_step_reached", {
       step: nextStep,
       step_name: stepNames[nextStep],
@@ -644,80 +641,53 @@ export default function BookTraining() {
                 <div className="bg-card border rounded-xl p-6">
                   <h2 className="text-xl font-semibold mb-1 flex items-center gap-2">
                     <MapPin className="w-5 h-5 text-brand-dark" />
-                    {t("bookTraining.checkAvailability")}
+                    {t("bookTraining.selectCity")}
                   </h2>
-                  <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.enterZipDesc")}</p>
-                  <div className="flex gap-2">
-                    <Input
-                      data-testid="input-booking-zip"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="postal-code"
-                      maxLength={5}
-                      placeholder={t("bookTraining.zipPlaceholder")}
-                      aria-label={t("bookTraining.zipPlaceholder")}
-                      value={zip}
-                      onChange={(e) => {
-                        setZip(e.target.value.replace(/\D/g, "").slice(0, 5));
-                        setZipError(false);
-                        if (serviceArea) { setServiceArea(null); }
-                      }}
-                      onKeyDown={(e) => e.key === "Enter" && checkZip()}
-                      className="max-w-[180px]"
-                    />
-                    <Button
-                      onClick={checkZip}
-                      disabled={zip.length !== 5 || checkingZip}
-                      data-testid="button-check-zip"
-                    >
-                      {checkingZip ? <Loader2 className="w-4 h-4 animate-spin" /> : t("bookTraining.checkButton")}
-                    </Button>
+                  <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.selectCityDesc")}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" data-testid="city-options">
+                    {(serviceAreas ?? []).map((area) => {
+                      const areaFacility = getLocation(SERVICE_AREA_FACILITY[area.slug]);
+                      const isSelected = serviceArea?.slug === area.slug;
+                      return (
+                        <button
+                          key={area.slug}
+                          type="button"
+                          onClick={() => selectCity(area)}
+                          className={`text-left p-4 rounded-lg border-2 transition-colors ${
+                            isSelected
+                              ? "border-accent bg-accent/5"
+                              : "border-border hover:border-primary/30"
+                          }`}
+                          data-testid={`city-option-${area.slug}`}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <MapPin className={`w-4 h-4 ${isSelected ? "text-brand-orange" : "text-accent"}`} />
+                            <span className="font-semibold text-foreground">
+                              {areaFacility?.city ?? area.name}
+                            </span>
+                            {isSelected && <CheckCircle className="w-4 h-4 text-brand-green ml-auto" />}
+                          </div>
+                          {areaFacility && (
+                            <p className="text-xs text-muted-foreground">{areaFacility.address.full}</p>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
-                  {serviceArea && (
+                  {serviceArea && facility && (
                     <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0" />
                         <span className="text-sm text-green-700 dark:text-green-300" data-testid="text-area-found">
-                          {t("bookTraining.areaAvailable", { area: serviceArea.name })}
+                          {t("bookTraining.citySelected", { city: facility.city })}
                         </span>
                       </div>
-                      {facility && (
-                        <div className="flex items-start gap-2 mt-2 ml-7" data-testid="text-facility-address">
-                          <MapPin className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
-                          <span className="text-sm text-green-700 dark:text-green-300">
-                            <span className="font-semibold block">{t("requestQuote.facilityAddressTitle")}</span>
-                            {facility.displayName}, {facility.address.full}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  {zipError && (
-                    <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                      <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 font-medium text-sm mb-3">
-                        <AlertCircle className="w-5 h-5 shrink-0" />
-                        {t("bookTraining.areaNotAvailable")}
-                      </div>
-                      <p className="text-sm text-amber-600 dark:text-amber-400 ml-7 mb-3">
-                        {t("bookTraining.areaNotAvailableDesc")}
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-3 ml-7">
-                        <Link
-                          href="/p/online-forklift-operator-training"
-                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-accent text-accent-foreground font-semibold text-sm hover:brightness-95 transition-all"
-                          data-testid="link-get-certified-online"
-                        >
-                          <Shield className="w-4 h-4" />
-                          {t("bookTraining.getCertifiedOnline")}
-                        </Link>
-                        <Link
-                          href="/request-quote"
-                          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border-2 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 font-semibold text-sm hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-all"
-                          data-testid="link-request-custom-quote"
-                        >
-                          <ClipboardList className="w-4 h-4" />
-                          {t("bookTraining.requestCustomQuote")}
-                        </Link>
+                      <div className="flex items-start gap-2 mt-2 ml-7" data-testid="text-facility-address">
+                        <MapPin className="w-4 h-4 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                        <span className="text-sm text-green-700 dark:text-green-300">
+                          <span className="font-semibold block">{t("requestQuote.facilityAddressTitle")}</span>
+                          {facility.displayName}, {facility.address.full}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -900,6 +870,12 @@ export default function BookTraining() {
                       <Clock className="w-5 h-5 text-brand-dark" />
                       {t("bookTraining.selectTimeSlot")} — {formatDate(selectedDate, i18n.language || "en")}
                     </h3>
+                    {facilitySlug === "las-vegas" && (
+                      <p className="mb-3 flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2" data-testid="text-trainer-confirmation">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        {t("bookTraining.trainerConfirmation")}
+                      </p>
+                    )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {slotsForDate.map((slot) => {
                         const isActive =

@@ -28,6 +28,7 @@ const SERVICE_AREAS = [
       "Thousand Oaks","Simi Valley","Orange County","Inland Empire",
     ],
     availabilityRules: {
+      // San Diego: Mondays, Wednesdays, Fridays (Alberto weekly review 2026-07-23).
       daysOfWeek: [1, 3, 5],
       timeSlots: [
         { startTime: "09:00", endTime: "12:00" },
@@ -52,10 +53,10 @@ const SERVICE_AREAS = [
       "Tulare","Porterville","Madera","Merced","Delano",
     ],
     availabilityRules: {
-      daysOfWeek: [1, 3, 5],
+      // Fresno: Saturdays only at 10:00 a.m. (Alberto weekly review 2026-07-23).
+      daysOfWeek: [6],
       timeSlots: [
-        { startTime: "09:00", endTime: "12:00" },
-        { startTime: "13:00", endTime: "16:00" },
+        { startTime: "10:00", endTime: "13:00" },
       ],
       maxParticipants: 10,
       leadTimeDays: 2,
@@ -76,7 +77,9 @@ const SERVICE_AREAS = [
       "Mesquite","Pahrump",
     ],
     availabilityRules: {
-      daysOfWeek: [1, 3, 5],
+      // Las Vegas: Mondays only; trainer confirms (requires ~4 participants
+      // to justify the trip) (Alberto weekly review 2026-07-23).
+      daysOfWeek: [1],
       timeSlots: [
         { startTime: "09:00", endTime: "12:00" },
         { startTime: "13:00", endTime: "16:00" },
