@@ -21,7 +21,6 @@ import {
   normalizeEmail,
   isValidEmail,
   capitalizeWords,
-  digitsOnly,
   generateTempPassword,
 } from "@/lib/inputFormat";
 import { Button } from "@/components/ui/button";
@@ -79,10 +78,6 @@ const EQUIPMENT_OPTIONS = [
   { value: "Boom/Aerial Lift", key: "onsiteTraining.equipBoomLift" },
   { value: "Other", key: "onsiteTraining.equipOther" },
 ] as const;
-
-const US_STATES = [
-  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY",
-];
 
 function getLocale(lang: string): string {
   return lang?.startsWith("es") ? "es-US" : "en-US";
@@ -219,10 +214,9 @@ export default function BookTraining() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [companyName, setCompanyName] = useState("");
-  const [customerAddress, setCustomerAddress] = useState("");
-  const [customerCity, setCustomerCity] = useState("");
-  const [customerState, setCustomerState] = useState("");
-  const [customerZip, setCustomerZip] = useState("");
+  // Facility bookings train at the chosen center - the booking address is the
+  // facility's own address, not a freeform customer address (Alberto weekly
+  // review 2026-07-23). Derived below once `facility` is known.
   const [participantCount, setParticipantCount] = useState(1);
   const [specialRequests, setSpecialRequests] = useState("");
 
@@ -237,6 +231,12 @@ export default function BookTraining() {
   // never the full multi-location list (Alberto demo feedback, 2026-07-13).
   const facilitySlug = serviceArea ? SERVICE_AREA_FACILITY[serviceArea.slug] : undefined;
   const facility = facilitySlug ? getLocation(facilitySlug) : undefined;
+
+  // The booking's address is the selected facility's address (facility-only flow).
+  const customerAddress = facility?.address.street ?? "";
+  const customerCity = facility?.address.city ?? "";
+  const customerState = facility?.address.state ?? "";
+  const customerZip = facility?.address.zip ?? "";
 
   const handsOnProducts = useMemo(
     () =>
@@ -372,10 +372,6 @@ export default function BookTraining() {
     contactName.trim().length >= 2 &&
     isValidEmail(contactEmail) &&
     isValidUsPhone(contactPhone) &&
-    customerAddress.trim().length >= 3 &&
-    customerCity.trim().length >= 2 &&
-    customerState.length >= 2 &&
-    customerZip.length >= 5 &&
     participantCount >= 1;
 
   async function goNext() {
@@ -1004,56 +1000,16 @@ export default function BookTraining() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium mb-3">{t("bookTraining.trainingLocation")} *</p>
-                  <div className="space-y-3">
-                    <Input
-                      type="text"
-                      autoComplete="street-address"
-                      value={customerAddress}
-                      onChange={(e) => setCustomerAddress(e.target.value)}
-                      placeholder={t("onsiteTraining.streetAddress")}
-                      aria-label={t("onsiteTraining.streetAddress")}
-                      data-testid="input-booking-address"
-                    />
-                    <div className="grid grid-cols-6 gap-3">
-                      <Input
-                        className="col-span-3"
-                        type="text"
-                        autoComplete="address-level2"
-                        value={customerCity}
-                        onChange={(e) => setCustomerCity(e.target.value)}
-                        onBlur={(e) => setCustomerCity(capitalizeWords(e.target.value.trim()))}
-                        placeholder={t("onsiteTraining.city")}
-                        aria-label={t("onsiteTraining.city")}
-                        data-testid="input-booking-city"
-                      />
-                      <select
-                        className="col-span-1 h-10 rounded-md border border-input bg-background px-2 text-sm"
-                        autoComplete="address-level1"
-                        value={customerState}
-                        onChange={(e) => setCustomerState(e.target.value)}
-                        aria-label={t("onsiteTraining.state")}
-                        data-testid="select-booking-state"
-                      >
-                        <option value="">{t("onsiteTraining.state")}</option>
-                        {US_STATES.map((s) => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
-                      </select>
-                      <Input
-                        className="col-span-2"
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="postal-code"
-                        value={customerZip}
-                        onChange={(e) => setCustomerZip(digitsOnly(e.target.value).slice(0, 5))}
-                        placeholder={t("onsiteTraining.zip")}
-                        aria-label={t("onsiteTraining.zip")}
-                        maxLength={5}
-                        data-testid="input-booking-zip-address"
-                      />
+                  <p className="text-sm font-medium mb-3">{t("bookTraining.trainingLocation")}</p>
+                  {facility && (
+                    <div className="flex items-start gap-2 rounded-lg border bg-muted/50 px-4 py-3" data-testid="text-facility-address-step3">
+                      <MapPin className="w-4 h-4 text-brand-dark shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <span className="font-semibold block">{facility.displayName}</span>
+                        <span className="text-muted-foreground">{facility.address.full}</span>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1142,10 +1098,6 @@ export default function BookTraining() {
                       <span className="font-medium text-foreground">{contactEmail}</span>
                       <span className="text-muted-foreground">{t("form.phone")}</span>
                       <span className="font-medium text-foreground">{contactPhone}</span>
-                      <span className="text-muted-foreground">{t("bookTraining.locationLabel")}</span>
-                      <span className="font-medium text-foreground">
-                        {customerAddress}, {customerCity}, {customerState} {customerZip}
-                      </span>
                       <span className="text-muted-foreground">{t("bookTraining.participantsLabel")}</span>
                       <span className="font-medium text-foreground">{participantCount}</span>
                     </div>
