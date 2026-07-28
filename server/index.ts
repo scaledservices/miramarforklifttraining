@@ -53,9 +53,10 @@ const app = express();
 
 const isDev = !isProduction;
 let sslOptions = undefined;
-// Dev SSL is opt-in (DEV_SSL=true) so local QA/browsers don't hit the
-// self-signed cert wall. Authorize.net local testing sets DEV_SSL=true.
-if (isDev && process.env.DEV_SSL === "true") {
+// Dev serves HTTPS so Authorize.net Accept.js (which requires a secure context)
+// works locally. The self-signed cert triggers a one-time browser warning;
+// accept it once per browser. Set DEV_SSL=false to run plain HTTP for non-payment QA.
+if (isDev && process.env.DEV_SSL !== "false") {
   try {
     sslOptions = {
       key: readFileSync("key.pem"),
