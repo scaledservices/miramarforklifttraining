@@ -151,6 +151,7 @@ export interface IStorage {
   updateContactUserId(id: number, userId: number | null): Promise<Contact | undefined>;
   getCompanySummaryStats(companyId: number): Promise<{
     totalRevenue: number;
+    historicalRevenue: number;
     orderCount: number;
     activeLearners: number;
     totalCertifications: number;
@@ -1009,6 +1010,7 @@ export class DatabaseStorage implements IStorage {
 
   async getCompanySummaryStats(companyId: number): Promise<{
     totalRevenue: number;
+    historicalRevenue: number;
     orderCount: number;
     activeLearners: number;
     totalCertifications: number;
@@ -1079,8 +1081,22 @@ export class DatabaseStorage implements IStorage {
       trainingEventCount += row.count;
     }
 
+    // Historical/imported revenue: sum of training-event revenue (Alberto CRM
+    // import). This is where the bulk of a legacy customer's lifetime value lives
+    // — platform orders only capture post-migration online sales.
+    const [histRevResult] = await db.select({
+      historicalRevenue: sql<string>`COALESCE(SUM(${trainingEvents.revenue}), 0)`,
+    }).from(trainingEvents)
+      .where(eq(trainingEvents.companyId, companyId));
+
+    const historicalRevenue = parseFloat(histRevResult?.historicalRevenue || "0");
+    const orderRevenue = parseFloat(revenueResult?.totalRevenue || "0");
+
     return {
-      totalRevenue: parseFloat(revenueResult?.totalRevenue || "0"),
+      // totalRevenue = platform orders + imported training-event revenue, so the
+      // summary cards reflect true lifetime value for imported customers.
+      totalRevenue: orderRevenue + historicalRevenue,
+      historicalRevenue,
       orderCount: revenueResult?.orderCount || 0,
       activeLearners: enrollmentResult?.activeLearners || 0,
       totalCertifications: certResult?.totalCertifications || 0,

@@ -124,6 +124,7 @@ interface CompanyCertification {
 
 interface CompanySummaryStats {
   totalRevenue: number;
+  historicalRevenue: number;
   orderCount: number;
   activeLearners: number;
   totalCertifications: number;
@@ -166,6 +167,8 @@ export default function AdminCompanyDetail() {
   const [editEmail, setEditEmail] = useState("");
   const [editWebsite, setEditWebsite] = useState("");
   const [editIndustry, setEditIndustry] = useState("");
+  const [editCity, setEditCity] = useState("");
+  const [editState, setEditState] = useState("");
   const [editNotes, setEditNotes] = useState("");
 
   const { data, isLoading, isError } = useQuery<{
@@ -200,6 +203,8 @@ export default function AdminCompanyDetail() {
       setEditEmail(company.email || "");
       setEditWebsite(company.website || "");
       setEditIndustry(company.industry || "");
+      setEditCity(company.billingCity || "");
+      setEditState(company.billingState || "");
       setEditNotes(company.notes || "");
     }
   }, [company, editing]);
@@ -283,6 +288,8 @@ export default function AdminCompanyDetail() {
       email: editEmail || null,
       website: editWebsite || null,
       industry: editIndustry || null,
+      billingCity: editCity || null,
+      billingState: editState || null,
       notes: editNotes || null,
     });
   }
@@ -381,6 +388,16 @@ export default function AdminCompanyDetail() {
                   <Input value={editIndustry} onChange={e => setEditIndustry(e.target.value)} />
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>City</Label>
+                  <Input value={editCity} onChange={e => setEditCity(e.target.value)} data-testid="input-edit-city" />
+                </div>
+                <div>
+                  <Label>State</Label>
+                  <Input value={editState} onChange={e => setEditState(e.target.value)} data-testid="input-edit-state" />
+                </div>
+              </div>
               <div>
                 <Label>Notes</Label>
                 <Textarea value={editNotes} onChange={e => setEditNotes(e.target.value)} />
@@ -443,14 +460,49 @@ export default function AdminCompanyDetail() {
           )}
         </div>
 
+        {/* Data-completeness enrichment prompt: Alberto's import left many
+            companies without email/location. Flag them and offer a quick edit
+            so high-value accounts can be enriched over time. */}
+        {(() => {
+          const missing: string[] = [];
+          const hasContactEmail = companyContacts.some(c => !!c.email);
+          if (!company.email && !hasContactEmail) missing.push("email");
+          if (!company.billingCity && !company.billingState) missing.push("location");
+          if (!company.industry) missing.push("industry");
+          if (missing.length === 0) return null;
+          return (
+            <div
+              className="flex items-center justify-between gap-3 border border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-amber-950/20 rounded-xl px-4 py-3"
+              data-testid="banner-incomplete-profile"
+            >
+              <div className="flex items-center gap-2 text-sm">
+                <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <span>
+                  Incomplete profile — missing <strong>{missing.join(", ")}</strong>. Add what you know to make this customer reachable.
+                </span>
+              </div>
+              {!editing && (
+                <Button variant="outline" size="sm" onClick={() => setEditing(true)} data-testid="button-complete-profile">
+                  Complete profile
+                </Button>
+              )}
+            </div>
+          );
+        })()}
+
         {summaryStats && (
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3" data-testid="panel-company-summary">
-            <div className="bg-card border rounded-xl p-4 text-center">
+            <div className="bg-card border rounded-xl p-4 text-center" title={summaryStats.historicalRevenue > 0 ? `Includes $${summaryStats.historicalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })} historical (imported) revenue` : undefined}>
               <DollarSign className="h-4 w-4 mx-auto text-green-600 mb-1" />
               <p className="text-lg font-bold" data-testid="text-total-revenue">
                 ${summaryStats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
               <p className="text-xs text-muted-foreground">{t("adminCompany.revenue")}</p>
+              {summaryStats.historicalRevenue > 0 && (
+                <p className="text-[10px] text-green-700 dark:text-green-400 mt-0.5" data-testid="text-historical-revenue">
+                  ${summaryStats.historicalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })} historical
+                </p>
+              )}
             </div>
             <div className="bg-card border rounded-xl p-4 text-center">
               <ShoppingCart className="h-4 w-4 mx-auto text-blue-600 mb-1" />
