@@ -31,6 +31,9 @@ interface TrainingEvent {
   originatingLeadId: number | null;
   instructorId: number | null;
   createdAt: string;
+  revenue: number | null;
+  equipmentTypes: string[] | null;
+  sourceEra: string | null;
 }
 
 interface LeadNeedingScheduling {
@@ -65,6 +68,29 @@ const statusColorMap: Record<TrainingEventStatus, string> = {
   canceled: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
 };
 
+type EraFilter = "all" | "pre_partnership" | "fla_era" | "mft_era";
+const ERA_LABELS: Record<Exclude<EraFilter, "all">, string> = {
+  pre_partnership: "Pre-Partnership",
+  fla_era: "FLA Era",
+  mft_era: "MFT Era",
+};
+const ERA_BADGE: Record<string, string> = {
+  pre_partnership: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  fla_era: "bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300",
+  mft_era: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
+};
+
+function equipmentLabel(types: string[] | null): string {
+  if (!types || types.length === 0) return "";
+  const map: Record<string, string> = {
+    forklift: "Forklift",
+    scissor_lift: "Scissor",
+    forklift_train_the_trainer: "Forklift TTT",
+    scissor_lift_train_the_trainer: "Scissor TTT",
+  };
+  return types.map((t) => map[t] ?? t.replace(/_/g, " ")).join(", ");
+}
+
 function filterEventsByQueue(events: TrainingEvent[], queue: QueueTab): TrainingEvent[] {
   const now = new Date();
   switch (queue) {
@@ -92,6 +118,7 @@ export default function AdminTrainingEvents() {
   const [search, setSearch] = useState("");
   const [activeQueue, setActiveQueue] = useState<QueueTab>("upcoming");
   const [locationFilter, setLocationFilter] = useState<string>("all");
+  const [eraFilter, setEraFilter] = useState<EraFilter>("all");
   const [showLeadsNeeding, setShowLeadsNeeding] = useState(true);
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -116,13 +143,20 @@ export default function AdminTrainingEvents() {
   const leadsNeeding = leadsData?.leads ?? [];
 
   const queuedEvents = filterEventsByQueue(allEvents, activeQueue);
+  // Era filter applies on top of the queue (revenue-history lens).
+  const eraFiltered = eraFilter === "all" ? queuedEvents : queuedEvents.filter(e => e.sourceEra === eraFilter);
 
   const filtered = search
-    ? queuedEvents.filter(e =>
+    ? eraFiltered.filter(e =>
         e.title.toLowerCase().includes(search.toLowerCase()) ||
+        (e.companyName ?? "").toLowerCase().includes(search.toLowerCase()) ||
         String(e.id).includes(search)
       )
-    : queuedEvents;
+    : eraFiltered;
+
+  // Revenue total across the currently visible (queue + era + search) events.
+  const visibleRevenue = filtered.reduce((sum, e) => sum + (e.revenue ?? 0), 0);
+  const visibleWithRevenue = filtered.filter(e => (e.revenue ?? 0) > 0).length;
 
   const queueCounts: Record<QueueTab, number> = {
     upcoming: filterEventsByQueue(allEvents, "upcoming").length,
@@ -302,6 +336,17 @@ export default function AdminTrainingEvents() {
               ))}
             </SelectContent>
           </Select>
+          <Select value={eraFilter} onValueChange={(v) => setEraFilter(v as EraFilter)}>
+            <SelectTrigger className="w-[170px]" data-testid="select-era-filter">
+              <SelectValue placeholder="All Eras" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Eras</SelectItem>
+              <SelectItem value="pre_partnership">Pre-Partnership</SelectItem>
+              <SelectItem value="fla_era">FLA Era</SelectItem>
+              <SelectItem value="mft_era">MFT Era</SelectItem>
+            </SelectContent>
+          </Select>
           <div className="flex items-center gap-2">
             <div>
               <label className="text-xs text-muted-foreground block mb-1">From</label>
@@ -338,6 +383,15 @@ export default function AdminTrainingEvents() {
         </div>
 
         <div className="border rounded-lg">
+          {/* Revenue summary for the current filter */}
+          <div className="flex items-center justify-between px-4 py-2.5 border-b bg-muted/30" data-testid="revenue-summary">
+            <span className="text-xs text-muted-foreground">
+              {filtered.length} event{filtered.length !== 1 ? "s" : ""} · {visibleWithRevenue} with revenue
+            </span>
+            <span className="text-sm font-semibold" data-testid="text-visible-revenue">
+              Total: <span className="text-green-700 dark:text-green-400">${visibleRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+            </span>
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -345,7 +399,9 @@ export default function AdminTrainingEvents() {
                 <TableHead>Status</TableHead>
                 <TableHead>Company</TableHead>
                 <TableHead>Location</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Equipment</TableHead>
+                <TableHead>Era</TableHead>
+                <TableHead className="text-right">Revenue</TableHead>
                 <TableHead>Date / Time</TableHead>
                 <TableHead>Trainees</TableHead>
                 <TableHead className="w-[40px]"></TableHead>
@@ -355,14 +411,14 @@ export default function AdminTrainingEvents() {
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    {Array.from({ length: 8 }).map((_, j) => (
+                    {Array.from({ length: 10 }).map((_, j) => (
                       <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                     No training events in this queue
                   </TableCell>
                 </TableRow>
@@ -410,7 +466,27 @@ export default function AdminTrainingEvents() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs capitalize">{event.locationType === "facility" ? "Facility" : "On-Site"}</span>
+                      {equipmentLabel(event.equipmentTypes) ? (
+                        <span className="text-xs" data-testid={`text-event-equipment-${event.id}`}>{equipmentLabel(event.equipmentTypes)}</span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {event.sourceEra ? (
+                        <Badge className={`text-xs font-normal ${ERA_BADGE[event.sourceEra] ?? ""}`} data-testid={`badge-event-era-${event.id}`}>
+                          {ERA_LABELS[event.sourceEra as Exclude<EraFilter, "all">] ?? event.sourceEra}
+                        </Badge>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right text-sm font-medium" data-testid={`text-event-revenue-${event.id}`}>
+                      {(event.revenue ?? 0) > 0 ? (
+                        <span className="text-green-700 dark:text-green-400">${(event.revenue ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
