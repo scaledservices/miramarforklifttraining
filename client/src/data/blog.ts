@@ -353,7 +353,7 @@ In-person training includes both formal instruction and practical evaluation at 
 
 Onsite training brings the instructor to your workplace.
 
-- **Typical cost**: $200 to $280 per person, with volume discounts for groups of 5+
+- **Typical cost**: priced by custom quote based on your crew size and location
 - **What is included**: Classroom instruction, hands-on evaluation on your own equipment
 - **Time to complete**: 4-8 hours depending on group size and experience
 - **Best for**: Companies with 2+ operators, especially if you want training on your specific equipment
@@ -383,7 +383,7 @@ At ${brand.name}, the price you see is the price you pay. Our online certificati
 
 **Single operator, experienced**: $45.00 (online) + employer evaluation
 **Single operator, new**: $200 (in-person at our facility)
-**Team of 5, same location**: $200-$280 per person (onsite) with volume discounts
+**Team of 5, same location**: onsite training priced by custom quote — volume discounts for groups of 5+
 **Team of 10+, ongoing hiring**: $750 (Train the Trainer) + ongoing internal training costs
 
 ## Getting the Best Value

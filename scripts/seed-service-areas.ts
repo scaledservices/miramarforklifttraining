@@ -29,10 +29,11 @@ const SERVICE_AREAS = [
     ],
     availabilityRules: {
       // San Diego: Mondays, Wednesdays, Fridays (Alberto weekly review 2026-07-23).
+      // Standard 4-hour blocks 9-1 / 1-5 (Alberto meeting 2026-07-28).
       daysOfWeek: [1, 3, 5],
       timeSlots: [
-        { startTime: "09:00", endTime: "12:00" },
-        { startTime: "13:00", endTime: "16:00" },
+        { startTime: "09:00", endTime: "13:00" },
+        { startTime: "13:00", endTime: "17:00" },
       ],
       maxParticipants: 10,
       leadTimeDays: 2,
@@ -54,10 +55,11 @@ const SERVICE_AREAS = [
       "Tulare","Porterville","Madera","Merced","Delano",
     ],
     availabilityRules: {
-      // Fresno: Saturdays only at 10:00 a.m. (Alberto weekly review 2026-07-23).
+      // Fresno: Saturdays only, start moved to 9:00 a.m. (Alberto meeting
+      // 2026-07-28). Single 4-hour block 9-1.
       daysOfWeek: [6],
       timeSlots: [
-        { startTime: "10:00", endTime: "13:00" },
+        { startTime: "09:00", endTime: "13:00" },
       ],
       maxParticipants: 10,
       leadTimeDays: 2,
@@ -81,10 +83,11 @@ const SERVICE_AREAS = [
     availabilityRules: {
       // Las Vegas: Mondays only; trainer confirms (requires ~4 participants
       // to justify the trip) (Alberto weekly review 2026-07-23).
+      // Standard 4-hour blocks 9-1 / 1-5 (Alberto meeting 2026-07-28).
       daysOfWeek: [1],
       timeSlots: [
-        { startTime: "09:00", endTime: "12:00" },
-        { startTime: "13:00", endTime: "16:00" },
+        { startTime: "09:00", endTime: "13:00" },
+        { startTime: "13:00", endTime: "17:00" },
       ],
       maxParticipants: 10,
       leadTimeDays: 2,

@@ -395,6 +395,87 @@ export default function Checkout() {
           )}
 
           {!needsAuth && (
+            <>
+            {/* Photo ID wallet-card upsell (Alberto 2026-07-28): moved ABOVE the
+                payment section for prominence/upsell visibility. The line item and
+                totals still render in the order-summary rail. */}
+            <Card data-testid="photo-id-upsell-card">
+              <CardContent className="p-6">
+                <div className="space-y-3" data-testid="photo-id-addon">
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="photoIdAddon"
+                      checked={photoIdChecked}
+                      onCheckedChange={(c) => setPhotoIdChecked(c === true)}
+                      data-testid="checkbox-photo-id-addon"
+                    />
+                    <Label htmlFor="photoIdAddon" className="text-sm leading-relaxed cursor-pointer">
+                      <span className="font-semibold text-base">{t("checkout.photoId.addTitle", { defaultValue: "Add a Photo ID wallet card" })}</span>{" "}
+                      <span className="text-muted-foreground">— {t("checkout.photoId.priceNote", { defaultValue: "$9.99 + shipping" })}</span>
+                      <span className="block text-xs text-muted-foreground mt-0.5">
+                        {t("checkout.photoId.upsellTagline", { defaultValue: "A durable photo ID card your crew can show on any job site." })}
+                      </span>
+                    </Label>
+                  </div>
+
+                  {photoIdChecked && (
+                    <div className="ml-7 space-y-3 rounded-lg border p-3 bg-muted/30">
+                      <p className="text-xs text-muted-foreground">
+                        {t("checkout.photoId.mailNote", { defaultValue: "Alberto mails your printed wallet card after you finish. Add the address below." })}{" "}
+                        {isTeamCart && t("checkout.photoId.oneAddress", { defaultValue: "All cards ship to one address; hand them out to your crew." })}
+                      </p>
+                      {isTeamCart && (
+                        <div className="flex items-center gap-3">
+                          <Label className="text-sm whitespace-nowrap">{t("checkout.photoId.countLabel", { defaultValue: "How many photo IDs?" })}</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={seatCount}
+                            value={photoIdCount}
+                            onChange={(e) => setPhotoIdCount(Math.max(1, Math.min(seatCount, parseInt(e.target.value) || 1)))}
+                            className="w-20"
+                            data-testid="input-photo-id-count"
+                          />
+                        </div>
+                      )}
+                      <RadioGroup
+                        value={photoIdShippingMethod}
+                        onValueChange={(v: string) => setPhotoIdShippingMethod(v as "standard" | "expedited")}
+                        className="flex gap-4"
+                        data-testid="radio-photo-id-shipping"
+                      >
+                        <div className="flex items-center gap-2">
+                          <RadioGroupItem value="standard" id="ship-std" />
+                          <Label htmlFor="ship-std" className="text-sm cursor-pointer">
+                            {t("checkout.photoId.standard", { defaultValue: "Standard" })} ${PHOTO_ID_SHIPPING.standard.toFixed(2)}
+                          </Label>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <RadioGroupItem value="expedited" id="ship-exp" />
+                          <Label htmlFor="ship-exp" className="text-sm cursor-pointer">
+                            {t("checkout.photoId.expedited", { defaultValue: "Expedited" })} ${PHOTO_ID_SHIPPING.expedited.toFixed(2)}
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                      <div className="space-y-2">
+                        <p className="text-xs font-medium">{t("checkout.shipping.whyTitle", { defaultValue: "Where should we mail the wallet card?" })}</p>
+                        <Input placeholder={t("orderCertCard.name", { defaultValue: "Full name" })} value={photoIdShipping.name} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, name: e.target.value })} data-testid="input-photo-id-ship-name" />
+                        <Input placeholder={t("orderCertCard.address", { defaultValue: "Street address" })} value={photoIdShipping.address} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, address: e.target.value })} data-testid="input-photo-id-ship-address" />
+                        <div className="grid grid-cols-3 gap-2">
+                          <Input placeholder={t("orderCertCard.city", { defaultValue: "City" })} value={photoIdShipping.city} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, city: e.target.value })} data-testid="input-photo-id-ship-city" />
+                          <Input placeholder={t("orderCertCard.state", { defaultValue: "State" })} value={photoIdShipping.state} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, state: e.target.value })} data-testid="input-photo-id-ship-state" />
+                          <Input placeholder={t("orderCertCard.zip", { defaultValue: "ZIP" })} value={photoIdShipping.zip} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, zip: digitsOnly(e.target.value).slice(0, 5) })} data-testid="input-photo-id-ship-zip" />
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {t("checkout.photoId.photoLater", { defaultValue: "You will add each photo from your dashboard after checkout." })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-4">
@@ -594,6 +675,7 @@ export default function Checkout() {
                 )}
               </CardContent>
             </Card>
+            </>
           )}
         </div>
 
@@ -619,78 +701,9 @@ export default function Checkout() {
               </div>
               <Separator className="my-4" />
 
-              {/* Photo ID add-on (Chunk 1). Server gates this behind
-                  platform_settings.photo_id_addon_enabled; the API returns
-                  400 if it is somehow posted while disabled. */}
-              <div className="space-y-3 mb-4" data-testid="photo-id-addon">
-                <div className="flex items-start gap-3">
-                  <Checkbox
-                    id="photoIdAddon"
-                    checked={photoIdChecked}
-                    onCheckedChange={(c) => setPhotoIdChecked(c === true)}
-                    data-testid="checkbox-photo-id-addon"
-                  />
-                  <Label htmlFor="photoIdAddon" className="text-sm leading-relaxed cursor-pointer">
-                    {t("checkout.photoId.addTitle", { defaultValue: "Add a Photo ID wallet card" })}{" "}
-                    <span className="text-muted-foreground">— {t("checkout.photoId.priceNote", { defaultValue: "$9.99 + shipping" })}</span>
-                  </Label>
-                </div>
-
-                {photoIdChecked && (
-                  <div className="ml-7 space-y-3 rounded-lg border p-3 bg-muted/30">
-                    <p className="text-xs text-muted-foreground">
-                      {t("checkout.photoId.mailNote", { defaultValue: "Alberto mails your printed wallet card after you finish. Add the address below." })}{" "}
-                      {isTeamCart && t("checkout.photoId.oneAddress", { defaultValue: "All cards ship to one address; hand them out to your crew." })}
-                    </p>
-                    {isTeamCart && (
-                      <div className="flex items-center gap-3">
-                        <Label className="text-sm whitespace-nowrap">{t("checkout.photoId.countLabel", { defaultValue: "How many photo IDs?" })}</Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={seatCount}
-                          value={photoIdCount}
-                          onChange={(e) => setPhotoIdCount(Math.max(1, Math.min(seatCount, parseInt(e.target.value) || 1)))}
-                          className="w-20"
-                          data-testid="input-photo-id-count"
-                        />
-                      </div>
-                    )}
-                    <RadioGroup
-                      value={photoIdShippingMethod}
-                      onValueChange={(v: string) => setPhotoIdShippingMethod(v as "standard" | "expedited")}
-                      className="flex gap-4"
-                      data-testid="radio-photo-id-shipping"
-                    >
-                      <div className="flex items-center gap-2">
-                        <RadioGroupItem value="standard" id="ship-std" />
-                        <Label htmlFor="ship-std" className="text-sm cursor-pointer">
-                          {t("checkout.photoId.standard", { defaultValue: "Standard" })} ${PHOTO_ID_SHIPPING.standard.toFixed(2)}
-                        </Label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <RadioGroupItem value="expedited" id="ship-exp" />
-                        <Label htmlFor="ship-exp" className="text-sm cursor-pointer">
-                          {t("checkout.photoId.expedited", { defaultValue: "Expedited" })} ${PHOTO_ID_SHIPPING.expedited.toFixed(2)}
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                    <div className="space-y-2">
-                      <p className="text-xs font-medium">{t("checkout.shipping.whyTitle", { defaultValue: "Where should we mail the wallet card?" })}</p>
-                      <Input placeholder={t("orderCertCard.name", { defaultValue: "Full name" })} value={photoIdShipping.name} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, name: e.target.value })} data-testid="input-photo-id-ship-name" />
-                      <Input placeholder={t("orderCertCard.address", { defaultValue: "Street address" })} value={photoIdShipping.address} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, address: e.target.value })} data-testid="input-photo-id-ship-address" />
-                      <div className="grid grid-cols-3 gap-2">
-                        <Input placeholder={t("orderCertCard.city", { defaultValue: "City" })} value={photoIdShipping.city} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, city: e.target.value })} data-testid="input-photo-id-ship-city" />
-                        <Input placeholder={t("orderCertCard.state", { defaultValue: "State" })} value={photoIdShipping.state} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, state: e.target.value })} data-testid="input-photo-id-ship-state" />
-                        <Input placeholder={t("orderCertCard.zip", { defaultValue: "ZIP" })} value={photoIdShipping.zip} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, zip: digitsOnly(e.target.value).slice(0, 5) })} data-testid="input-photo-id-ship-zip" />
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {t("checkout.photoId.photoLater", { defaultValue: "You will add each photo from your dashboard after checkout." })}
-                    </p>
-                  </div>
-                )}
-              </div>
+              {/* Photo ID add-on relocated above the payment section (Alberto
+                  2026-07-28) for upsell prominence; only the line item + totals
+                  remain here in the summary rail. */}
 
               {/* Discount code */}
               <div className="space-y-2 mb-4">
