@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen, Clock, PlayCircle, Award, GraduationCap, Gift } from "lucide-react";
 import { Redirect } from "wouter";
+import DashboardBookings from "@/components/dashboard/DashboardBookings";
 
 interface EnrollmentWithCourse {
   id: number;
@@ -63,6 +64,9 @@ export default function Dashboard() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Upcoming hands-on training: calendar + seat tracking (#7) */}
+        <DashboardBookings />
+
         {/* Referral banner */}
         <Link href="/referral" className="mb-6 block">
           <div className="flex items-center gap-4 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-4 transition-colors hover:bg-primary/10">

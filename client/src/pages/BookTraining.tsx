@@ -12,6 +12,7 @@ import { industry } from "@shared/config/industry";
 import SEOHead from "@/components/seo/SEOHead";
 import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
 import AddonUpsell from "@/components/booking/AddonUpsell";
+import AttendeeNamesForm from "@/components/booking/AttendeeNamesForm";
 import CardPaymentSection from "@/components/checkout/CardPaymentSection";
 import { computeBookingPrice, BOOKING_DEPOSIT_RATE } from "@shared/config/bookingPricing";
 import { trackEvent } from "@/lib/analytics";
@@ -222,6 +223,7 @@ export default function BookTraining() {
 
   const [submitted, setSubmitted] = useState(false);
   const [bookingNumber, setBookingNumber] = useState("");
+  const [bookingId, setBookingId] = useState<number | null>(null);
   const [depositInfo, setDepositInfo] = useState<{ deposit: number; depositSurcharge: number; depositCharged: number; balanceDue: number; volumeDiscount: number; total: number } | null>(null);
 
   // Note: with 100% upfront payment (BOOKING_DEPOSIT_RATE = 1.0), deposit =
@@ -442,6 +444,7 @@ export default function BookTraining() {
     onSuccess: async (res) => {
       const data = await res.json();
       setBookingNumber(data.bookingNumber || "");
+      setBookingId(typeof data.id === "number" ? data.id : null);
       setDepositInfo(data.pricing || null);
       setSubmitted(true);
       trackEvent("booking_completed", {
@@ -575,6 +578,11 @@ export default function BookTraining() {
                 <span>{t("booking.paidInFull")}</span>
                 <span>{t("booking.paidInFullBadge")}</span>
               </div>
+            </div>
+          )}
+          {bookingId && participantCount > 0 && (
+            <div className="bg-card border rounded-lg p-5">
+              <AttendeeNamesForm bookingId={bookingId} participantCount={participantCount} />
             </div>
           )}
           <div className="bg-muted rounded-lg p-5 text-left space-y-2">
