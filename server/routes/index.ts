@@ -33,6 +33,7 @@ import { registerStandingSessionRoutes } from "./standing-sessions";
 import { registerLogRoutes } from "./logs";
 import { registerAnalyticsRoutes } from "./analytics";
 import { registerPhotoIdRoutes } from "./photoId";
+import { registerAttendeeRoutes } from "./attendees";
 import { requestContextMiddleware } from "../monitoring";
 
 export async function registerRoutes(
@@ -95,6 +96,7 @@ export async function registerRoutes(
   registerLogRoutes(app);
   registerAnalyticsRoutes(app);
   registerPhotoIdRoutes(app);
+  registerAttendeeRoutes(app);
 
   return httpServer;
 }

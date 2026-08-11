@@ -15,6 +15,7 @@ import {
   serviceAreas, bookings,
   type ServiceArea, type InsertServiceArea,
   type Booking, type InsertBooking,
+  bookingAttendees, type BookingAttendee, type InsertBookingAttendee,
   type AvailabilityRules, type AvailableSlot,
   supportConversations, supportMessages,
   type SupportConversation, type InsertSupportConversation,
@@ -1461,6 +1462,33 @@ export class DatabaseStorage implements IStorage {
       .where(eq(bookings.id, id))
       .returning();
     return booking;
+  }
+
+  // ---- Booking attendees (Alberto 2026-07-28): optional per-seat trainee
+  // names captured at checkout, via on-site QR sign-in, or by admin. ----
+  async getAttendeesForBooking(bookingId: number): Promise<BookingAttendee[]> {
+    return db.select().from(bookingAttendees)
+      .where(eq(bookingAttendees.bookingId, bookingId))
+      .orderBy(bookingAttendees.id);
+  }
+
+  async addBookingAttendee(data: InsertBookingAttendee): Promise<BookingAttendee> {
+    const [row] = await db.insert(bookingAttendees).values(data).returning();
+    return row;
+  }
+
+  async getAttendeeCountsForBookings(bookingIds: number[]): Promise<Record<number, number>> {
+    if (bookingIds.length === 0) return {};
+    const rows = await db.select({
+      bookingId: bookingAttendees.bookingId,
+      count: sql<number>`COUNT(*)`,
+    })
+    .from(bookingAttendees)
+    .where(inArray(bookingAttendees.bookingId, bookingIds))
+    .groupBy(bookingAttendees.bookingId);
+    const out: Record<number, number> = {};
+    for (const r of rows) out[r.bookingId] = Number(r.count);
+    return out;
   }
 
   // Trainer scheduling visibility (Alberto weekly review 2026-07-23): surface

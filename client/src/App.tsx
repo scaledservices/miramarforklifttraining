@@ -41,6 +41,7 @@ import AcceptInvite from "@/pages/AcceptInvite";
 import Certification from "@/pages/Certification";
 import CertificateVerify from "@/pages/CertificateVerify";
 import PayBalance from "@/pages/PayBalance";
+import BookingSignIn from "@/pages/BookingSignIn";
 import OrderCertCard from "@/pages/OrderCertCard";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
@@ -214,6 +215,7 @@ function AppRoutes() {
       <Route path="/course/:enrollmentId">{() => <ProtectedRoute><CoursePlayer /></ProtectedRoute>}</Route>
       <Route path="/certifications/:id">{() => <ProtectedRoute><Certification /></ProtectedRoute>}</Route>
       <Route path="/pay-balance/:bookingId" component={PayBalance} />
+      <Route path="/signin/:bookingNumber" component={BookingSignIn} />
       <Route path="/verify" component={CertificateVerify} />
       <Route path="/verify/:certificateNumber" component={CertificateVerify} />
       <Route path="/order-cert-card/:certificationId">{() => <ProtectedRoute><OrderCertCard /></ProtectedRoute>}</Route>

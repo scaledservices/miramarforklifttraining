@@ -486,6 +486,33 @@ export const insertBookingPhotoSchema = createInsertSchema(bookingPhotos).omit({
 export type InsertBookingPhoto = z.infer<typeof insertBookingPhotoSchema>;
 export type BookingPhoto = typeof bookingPhotos.$inferSelect;
 
+// Booking attendees (Alberto meeting 2026-07-28): optional per-seat trainee
+// names for group/hands-on bookings. Serves three flows:
+//   #5 - the booking purchaser can optionally name attendees at checkout
+//   #8 - on-site QR / iPad sign-in self-registration on the training day
+//   #7 - seat reservation tracking on the customer dashboard
+// A row may be created with only a booking + seat index (an unnamed reserved
+// seat) and filled in later either by the purchaser or by the trainee via the
+// public sign-in link. `source` records how the name was captured.
+export const bookingAttendees = pgTable("booking_attendees", {
+  id: serial("id").primaryKey(),
+  bookingId: integer("booking_id").notNull().references(() => bookings.id),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  email: text("email"),
+  phone: text("phone"),
+  source: text("source", { enum: ["checkout", "signin", "admin"] }).notNull().default("checkout"),
+  checkedInAt: timestamp("checked_in_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("booking_attendees_booking_id_idx").on(table.bookingId),
+]);
+
+export const insertBookingAttendeeSchema = createInsertSchema(bookingAttendees).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertBookingAttendee = z.infer<typeof insertBookingAttendeeSchema>;
+export type BookingAttendee = typeof bookingAttendees.$inferSelect;
+
 export interface AvailabilityRules {
   daysOfWeek: number[];
   timeSlots: { startTime: string; endTime: string }[];

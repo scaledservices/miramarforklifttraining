@@ -37,6 +37,7 @@ import {
   Link2,
 } from "lucide-react";
 import PayLinkQRDialog from "@/components/admin/PayLinkQRDialog";
+import SigninQRDialog from "@/components/admin/SigninQRDialog";
 import type { Booking, ServiceArea, BookingPhoto } from "@shared/schema";
 
 const statusColors: Record<string, string> = {
@@ -82,6 +83,7 @@ export default function AdminBookings() {
   const [rescheduleForm, setRescheduleForm] = useState({ sessionDate: "", startTime: "", endTime: "" });
   const [completePromptOpen, setCompletePromptOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
+  const [signinQrOpen, setSigninQrOpen] = useState(false);
   const [photoLightbox, setPhotoLightbox] = useState<BookingPhoto | null>(null);
   const [captionInputs, setCaptionInputs] = useState<Record<number, string>>({});
   const [shareLinkCopied, setShareLinkCopied] = useState(false);
@@ -624,6 +626,13 @@ export default function AdminBookings() {
                   </div>
                 </div>
 
+                {/* On-site class sign-in QR (Alberto 2026-07-28): trainees scan to
+                    self-register, replacing the paper sign-in sheet. */}
+                <Button size="sm" variant="outline" onClick={() => setSigninQrOpen(true)} data-testid="button-show-signin-qr">
+                  <QrCode className="h-4 w-4 mr-1" />
+                  Class sign-in QR
+                </Button>
+
                 <div className="space-y-1 text-sm">
                   <div className="font-medium flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -959,6 +968,15 @@ export default function AdminBookings() {
             bookingId={selectedBooking.id}
             customerName={selectedBooking.contactName}
             amountDue={finance.balanceDue}
+          />
+        )}
+
+        {selectedBooking && (
+          <SigninQRDialog
+            open={signinQrOpen}
+            onOpenChange={setSigninQrOpen}
+            bookingNumber={selectedBooking.bookingNumber}
+            sessionLabel={formatSession(selectedBooking)}
           />
         )}
 
