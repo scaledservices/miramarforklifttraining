@@ -386,6 +386,85 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// ---- #6 (Alberto 2026-07-28): admin manual booking creation. Alberto takes
+// phone/in-person bookings that never go through the online checkout; this lets
+// staff record them directly so the calendar + trainer-availability stay
+// accurate (auto-updates scheduling). No payment is captured here - the office
+// collects by their normal channel (check/ACH/card) and reconciles via the
+// booking finance tools. Honors the same availability rules (day-of-week, valid
+// slot, blackout, group-priority trainer conflict, seat capacity).
+app.post("/api/admin/bookings", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+  try {
+    const { serviceAreaId, productSlug, sessionDate, startTime, endTime, participantCount, customerAddress, customerCity, customerState, customerZip, contactName, contactPhone, contactEmail, specialRequests, totalPrice: rawTotal, status: rawStatus } = req.body;
+
+    if (!serviceAreaId || !productSlug || !sessionDate || !startTime || !endTime || !participantCount || !contactName || !contactPhone || !contactEmail) {
+      return res.status(400).json({ error: "serviceAreaId, productSlug, sessionDate, startTime, endTime, participantCount, contactName, contactPhone, contactEmail are required" });
+    }
+
+    const area = await storage.getServiceAreaById(Number(serviceAreaId));
+    if (!area) return res.status(404).json({ error: "Service area not found" });
+    const rules = area.availabilityRules as any;
+
+    // Availability validation mirrors the public flow but is advisory for
+    // admins (they may legitimately book an off-schedule date by overriding
+    // availability separately). Hard-stop only on trainer group conflict +
+    // seat capacity, which would create an operational double-book.
+    const groupThreshold = rules?.groupThreshold ?? 4;
+    const trainerBusy = await storage.isTrainerBookedOnDate(sessionDate, Number(serviceAreaId), groupThreshold);
+    if (trainerBusy) {
+      return res.status(409).json({ error: "The trainer is already committed to a group at another location on this date." });
+    }
+    const maxParticipants = rules?.maxParticipants || 10;
+    const bookedAlready = await storage.getBookedParticipants(Number(serviceAreaId), sessionDate, startTime);
+    const remaining = maxParticipants - bookedAlready;
+    if (Number(participantCount) > remaining) {
+      return res.status(400).json({ error: `Only ${remaining} spot(s) remaining for this time slot` });
+    }
+
+    // Admin bookings need an owning user for the bookings.userId FK. Use the
+    // acting admin as the record owner; the customer is identified by the
+    // contact fields. (A full customer-account linkup is a later enhancement.)
+    const ownerUserId = req.session.userId!;
+
+    const totalPrice = (Number(rawTotal) || 0).toFixed(2);
+    const status = rawStatus === "confirmed" ? "confirmed" : "pending";
+
+    const booking = await storage.createBooking({
+      userId: ownerUserId,
+      serviceAreaId: Number(serviceAreaId),
+      productSlug,
+      sessionDate,
+      startTime,
+      endTime,
+      participantCount: Number(participantCount),
+      customerAddress: customerAddress || "",
+      customerCity: customerCity || "",
+      customerState: customerState || "",
+      customerZip: customerZip || "",
+      contactName,
+      contactPhone,
+      contactEmail,
+      specialRequests: specialRequests || null,
+      totalPrice,
+      status,
+      orderId: null,
+    });
+
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "admin_booking_created",
+      entity: "booking",
+      entityId: String(booking.id),
+      metadata: { bookingNumber: booking.bookingNumber, serviceAreaId, sessionDate, startTime, participantCount, manual: true },
+    });
+
+    return res.status(201).json(booking);
+  } catch (error) {
+    console.error("[Admin Bookings] Manual create error:", error);
+    return res.status(500).json({ error: "Failed to create booking" });
+  }
+});
+
 app.get("/api/bookings", requireAuth, async (req: Request, res: Response) => {
   try {
     const user = await storage.getUser(req.session.userId!);

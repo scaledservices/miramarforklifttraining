@@ -35,9 +35,11 @@ import {
   Trash2,
   Share2,
   Link2,
+  Plus,
 } from "lucide-react";
 import PayLinkQRDialog from "@/components/admin/PayLinkQRDialog";
 import SigninQRDialog from "@/components/admin/SigninQRDialog";
+import NewBookingDialog from "@/components/admin/NewBookingDialog";
 import type { Booking, ServiceArea, BookingPhoto } from "@shared/schema";
 
 const statusColors: Record<string, string> = {
@@ -84,6 +86,7 @@ export default function AdminBookings() {
   const [completePromptOpen, setCompletePromptOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
   const [signinQrOpen, setSigninQrOpen] = useState(false);
+  const [newBookingOpen, setNewBookingOpen] = useState(false);
   const [photoLightbox, setPhotoLightbox] = useState<BookingPhoto | null>(null);
   const [captionInputs, setCaptionInputs] = useState<Record<number, string>>({});
   const [shareLinkCopied, setShareLinkCopied] = useState(false);
@@ -313,6 +316,10 @@ export default function AdminBookings() {
             Bookings
           </h1>
           <div className="flex items-center gap-2">
+            <Button size="sm" onClick={() => setNewBookingOpen(true)} data-testid="button-new-booking">
+              <Plus className="h-4 w-4 mr-1" />
+              New Booking
+            </Button>
             <Button
               variant={view === "list" ? "default" : "outline"}
               size="sm"
@@ -979,6 +986,8 @@ export default function AdminBookings() {
             sessionLabel={formatSession(selectedBooking)}
           />
         )}
+
+        <NewBookingDialog open={newBookingOpen} onOpenChange={setNewBookingOpen} />
 
         {/* Photo lightbox */}
         <Dialog open={!!photoLightbox} onOpenChange={() => setPhotoLightbox(null)}>
