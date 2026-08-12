@@ -33,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin, Calendar, Clock, Users, ChevronRight, ChevronLeft,
   CheckCircle, Loader2, AlertCircle, Phone, Mail, Building2,
-  ClipboardList, Shield,
+  ClipboardList, Shield, Minus, Plus,
 } from "lucide-react";
 
 type Step = 1 | 2 | 3 | 4;
@@ -662,8 +662,23 @@ export default function BookTraining() {
                     {t("bookTraining.selectCity")}
                   </h2>
                   <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.selectCityDesc")}</p>
+                  {serviceAreas === undefined ? (
+                    // Loading state: the area fetch hasn't resolved yet. Without
+                    // this the grid is empty on first paint (the "didn't load
+                    // until refresh" bug from the 2026-08-11 demo).
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-20 rounded-lg border-2 border-border bg-muted/40 animate-pulse" data-testid={`city-skeleton-${i}`} />
+                      ))}
+                    </div>
+                  ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" data-testid="city-options">
-                    {(serviceAreas ?? []).map((area) => {
+                    {(serviceAreas ?? [])
+                      // Only the three real facilities with a known mapping. This
+                      // drops QA/staging-only rows (e.g. "San Diego (Staging
+                      // Test)") that share the table but are not bookable cities.
+                      .filter((area) => SERVICE_AREA_FACILITY[area.slug] !== undefined)
+                      .map((area) => {
                       const areaFacility = getLocation(SERVICE_AREA_FACILITY[area.slug]);
                       const isSelected = serviceArea?.slug === area.slug;
                       return (
@@ -692,6 +707,7 @@ export default function BookTraining() {
                       );
                     })}
                   </div>
+                  )}
                   {serviceArea && facility && (
                     <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                       <div className="flex items-center gap-2">
@@ -1023,16 +1039,54 @@ export default function BookTraining() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="book-participants">{t("bookTraining.participantCount")} *</Label>
-                    <Input
-                      id="book-participants"
-                      type="number"
-                      inputMode="numeric"
-                      min={1}
-                      max={serviceArea?.availabilityRules?.maxParticipants ?? 10}
-                      value={participantCount}
-                      onChange={(e) => setParticipantCount(Math.min(serviceArea?.availabilityRules?.maxParticipants ?? 10, Math.max(1, parseInt(e.target.value) || 1)))}
-                      data-testid="input-booking-participants"
-                    />
+                    {/* Stepper (Alberto demo fix 2026-08-11): the old controlled
+                        number input re-parsed on every keystroke, so backspacing
+                        snapped back to 1 and typing "3" after "1" became "13".
+                        A − / count / + stepper with an editable display that only
+                        commits valid input on blur is unambiguous. */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label="Fewer participants"
+                        disabled={participantCount <= 1}
+                        onClick={() => setParticipantCount((c) => Math.max(1, c - 1))}
+                        data-testid="button-participants-minus"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </Button>
+                      <Input
+                        id="book-participants"
+                        type="text"
+                        inputMode="numeric"
+                        className="text-center font-semibold"
+                        key={participantCount}
+                        defaultValue={String(participantCount)}
+                        onBlur={(e) => {
+                          const max = serviceArea?.availabilityRules?.maxParticipants ?? 10;
+                          const n = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                          const next = isNaN(n) ? participantCount : Math.min(max, Math.max(1, n));
+                          setParticipantCount(next);
+                          e.target.value = String(next);
+                        }}
+                        data-testid="input-booking-participants"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label="More participants"
+                        disabled={participantCount >= (serviceArea?.availabilityRules?.maxParticipants ?? 10)}
+                        onClick={() => setParticipantCount((c) => Math.min(serviceArea?.availabilityRules?.maxParticipants ?? 10, c + 1))}
+                        data-testid="button-participants-plus"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {t("bookTraining.participantCountHint", { defaultValue: "Tap + or -, or type a number and tab away." })}
+                    </p>
                   </div>
                 </div>
 
