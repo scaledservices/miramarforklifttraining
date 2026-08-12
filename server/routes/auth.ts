@@ -95,19 +95,23 @@ app.get("/api/auth/me", async (req: Request, res: Response) => {
   return res.json({ user: sanitizeUser(user) });
 });
 
-// Dev-only: demo account list for the QA account-switcher banner. Registered
-// only outside production so the endpoint (and these credentials) can never
-// exist on a deployed environment. These accounts come from the local seed
-// script; the banner logs in through the normal /api/auth/login endpoint.
-if (process.env.NODE_ENV !== "production") {
+// QA account-switcher banner backend. The endpoint is enabled when EITHER:
+//   - NODE_ENV !== "production"  (local dev), OR
+//   - ENABLE_QA_ACCOUNT_SWITCHER === "true"  (staging only - set explicitly)
+// This keeps credentials off real production while letting staging show the
+// switcher for Alberto/Peter QA. Accounts are upserted by
+// scripts/seed-test-accounts.ts; login goes through the normal
+// /api/auth/login flow (real session, no auth bypass).
+if (process.env.NODE_ENV !== "production" || process.env.ENABLE_QA_ACCOUNT_SWITCHER === "true") {
   app.get("/api/dev/demo-accounts", (_req: Request, res: Response) => {
     return res.json({
       accounts: [
-        { role: "Admin", email: "admin@miramarforklift.com", password: "DemoPass!234" },
-        { role: "Crew Admin", email: "group@miramarforklift.com", password: "DemoPass!234" },
-        { role: "Individual", email: "user@miramarforklift.com", password: "DemoPass!234" },
-        { role: "Member", email: "member1@miramarforklift.com", password: "DemoPass!234" },
-        { role: "Certified", email: "certified@miramarforklift.com", password: "DemoPass!234" },
+        { role: "Alberto (Admin)", email: "training@miramarforklift.com", password: process.env.TEST_ACCOUNT_PASSWORD || "DemoPass!234" },
+        { role: "Admin", email: "admin@miramarforklift.com", password: process.env.TEST_ACCOUNT_PASSWORD || "DemoPass!234" },
+        { role: "Crew Admin", email: "group@miramarforklift.com", password: process.env.TEST_ACCOUNT_PASSWORD || "DemoPass!234" },
+        { role: "Individual", email: "user@miramarforklift.com", password: process.env.TEST_ACCOUNT_PASSWORD || "DemoPass!234" },
+        { role: "Member", email: "member1@miramarforklift.com", password: process.env.TEST_ACCOUNT_PASSWORD || "DemoPass!234" },
+        { role: "Certified", email: "certified@miramarforklift.com", password: process.env.TEST_ACCOUNT_PASSWORD || "DemoPass!234" },
       ],
     });
   });

@@ -27,7 +27,7 @@ export default function DemoBanner() {
 
   const { data: accountData } = useQuery<{ accounts: DemoAccount[] }>({
     queryKey: ["/api/dev/demo-accounts"],
-    enabled: import.meta.env.DEV && !dismissed,
+    enabled: !dismissed,
     staleTime: Infinity,
     retry: false,
   });
@@ -57,8 +57,14 @@ export default function DemoBanner() {
     onError: (err: Error) => setSwitchError(err.message),
   });
 
-  if (!import.meta.env.DEV) return null;
+  // Show only when the backend actually serves demo accounts (local dev, or
+  // staging with ENABLE_QA_ACCOUNT_SWITCHER=true). On real production the
+  // endpoint is unregistered, the query 404s, accounts stays empty, and the
+  // banner stays hidden.
   if (dismissed) return null;
+  if (accounts.length === 0) return null;
+
+  const envLabel = import.meta.env.DEV ? "Local dev" : "Staging (QA)";
 
   return (
     <div data-testid="demo-banner" className="bg-amber-500 text-black relative z-50">
@@ -66,7 +72,7 @@ export default function DemoBanner() {
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <AlertTriangle className="h-4 w-4 flex-shrink-0" />
           <span className="text-sm font-medium truncate">
-            Local dev - sandbox payments only.
+            {envLabel} - sandbox payments only.
             {user ? ` Logged in as ${user.name} (${user.role}).` : " Not logged in."}
           </span>
           <button
