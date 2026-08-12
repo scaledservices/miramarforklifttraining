@@ -52,9 +52,17 @@ these instantly. On staging it is enabled by `ENABLE_QA_ACCOUNT_SWITCHER=true`.
 ## Schema drift check (run before any DB-touching deploy)
 
 The 2026-08-11 demo broke because staging DB was behind the code. Before
-deploying schema-affecting work, confirm the target DB has all tables/columns
-the code expects. Quick check: compare `information_schema.tables` against the
-`pgTable` list in `shared/schema.ts`. Long-term: gate this in CI.
+deploying schema-affecting work, confirm the target DB matches the code at BOTH
+levels:
+1. **Tables** — every `pgTable("...")` in `shared/schema.ts` exists.
+2. **Columns** — every column on those tables exists. (The 2026-08-12 Today-page
+   500 was a missing COLUMN, `contacts.import_batch_id`, on an existing table —
+   a table-existence check alone passed and missed it.)
+
+Quick check: compare `information_schema.tables` AND `information_schema.columns`
+against `shared/schema.ts`. Long-term: gate this in CI (e.g. `drizzle-kit push`
+in a dry-run/diff mode against the target, or a migration runner that fails on
+unapplied drift).
 
 ## Automation path (later)
 

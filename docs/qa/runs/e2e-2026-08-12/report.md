@@ -52,6 +52,17 @@ charge). All test accounts share password `DemoPass!234`.
 
 ## Bugs found this run
 
+0. **(Found after the main run, during Alberto super_admin UAT) Admin "Today"
+   page returned "Failed to load today dashboard" (500).** Root cause: more
+   staging schema drift — this time at the COLUMN level, which my earlier
+   table-existence check missed. Staging was missing `contacts.import_batch_id`,
+   `companies.import_batch_id`/`source_era`, `training_events.import_batch_id`,
+   and the `system_logs` and `page_views` tables. These power Today, the logger,
+   and Analytics/Funnel. **Fixed:** added all missing columns + both tables;
+   verified `/api/admin/today`, `/api/admin/analytics/funnel`, and
+   `/api/admin/certifications` all return 200. **Lesson (now in README):** the
+   schema-drift check must compare COLUMNS, not just table existence.
+
 1. **(Note, not a regression) Photo-ID upsell location.** The "move photo-ID
    upsell above payment" change (commit 5486bca) applies to the **/checkout**
    page (online course cart). The **book-training payment step**
