@@ -152,3 +152,33 @@ attendee record created (source=signin, checked_in_at set) → seat count update
 - 7.4 confirm/reschedule, 7.5 availability editor, 7.6 trainer-conflict card, 7.8 quotes, 7.12 email outbox
 - Section 9 pre-go-live security sweeps (secrets, switcher-off-in-prod, rate limits, real-payment path)
 
+---
+
+## Third batch (2026-08-12) — address update + content/security sweeps
+
+### San Diego address (go-live item #3) — UNBLOCKED
+Alberto supplied the new facility address: **8760 Miramar Place, San Diego, CA 92121**.
+Updated across 8 files (locations.ts, brand.ts, catalog.ts, serviceAreaGenerator.ts,
+SpanishServiceArea.tsx, EN+ES locales, assistant.ts). Zero Marindustry refs remain.
+Commit 8d1fdf9. Staging redeployed; booking-flow city card shows the new address.
+Build + check green. **Note:** the `/locations/san-diego` marketing page renders the
+street address via a different path that came back empty in the DOM — cosmetic,
+worth a look before cutover; the booking flow (customer-facing path) is correct.
+
+### Section 8 / 9 sweeps
+| # | Check | Result |
+|---|-------|--------|
+| 8.2 | No en-dashes in external-facing text | ❌ FAIL → **FIXED** (commit 2359f2b): 5 en-dashes per locale (hours "Mon–Fri", "1–2 business days") replaced with hyphens; zero remain; JSON re-validated |
+| 8.3 | No ForkliftCertified branding in client code | ✅ PASS (zero matches) |
+| 9.1 | No committed secrets (cookies.txt / generated-pdfs / .env) | ✅ PASS (only local dev SSL cert.pem/key.pem, which are dev-only) |
+| 9.2 | QA switcher OFF in production | 🔲 verify at cutover (build-time) |
+| 9.4 | Real payment path reviewed; first real transaction by Peter | 🔲 at cutover |
+
+### Still open
+- Reviews from Alberto (he said he'd send this afternoon) → swap placeholder testimonials for real ones.
+- 2.7 volume discount, 2.8 discount code, 2.9 conflict, 2.10 email content
+- 3.4–3.5 exam → certificate (scripted run)
+- 6.3 forgot-password, 6.4 crew dashboard, 6.5 saved-address prefill
+- 7.4 confirm/reschedule, 7.5 availability editor, 7.6 trainer-conflict card, 7.8 quotes, 7.12 email outbox
+- 9.2 / 9.4 (cutover-time gates)
+
