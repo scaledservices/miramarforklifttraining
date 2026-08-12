@@ -100,3 +100,55 @@ attendee record created (source=signin, checked_in_at set) → seat count update
 - ENABLE_QA_ACCOUNT_SWITCHER=true set on staging (banner live).
 - One real sandbox booking created for H: BK-1786552769273-1B14 (user@, 2 seats).
 - One test attendee signed into old booking BK-1784243684826-50O1 ("Test Trainee").
+
+---
+
+## Second batch (2026-08-12, expanded matrix — 3 parallel QA subagents + manual verification)
+
+### Online course flow (Sections 3–4)
+| # | Item | Result |
+|---|------|--------|
+| 3.1 | Buy online course via sandbox card (order FC-2026-000027, $46.35, Paid) | ✅ PASS |
+| 3.2 | Course player: 32 steps / 9 modules load, images render | ✅ PASS |
+| 3.3 | Progress auto-saves (0%→3%→6%), resume works | ✅ PASS |
+| 3.4–3.5 | Full exam → certificate issue + download | ⚠️ BLOCKED (32-step curriculum needs more runtime than the tool allowed; player/quiz/progression all work) |
+| 4.x | Photo-ID add-on at /checkout ABOVE payment; total $46.35→$61.78 with shipping; line item correct | ✅ PASS |
+
+### Admin operations (Section 7)
+| # | Item | Result |
+|---|------|--------|
+| 7.1 | Today page loads with real data | ✅ PASS |
+| 7.2 | Bookings list renders (12 rows, all statuses) | ✅ PASS |
+| 7.3 | Manual New Booking SUBMIT persists + appears in list (BK-1786561505160-VLZA) | ✅ PASS (manually re-verified after a subagent reported it missing — that was a list-refresh artifact, not a persistence bug) |
+| 7.4 | Confirm/reschedule an existing booking | 🔲 not reached (subagent iteration limit) |
+| 7.5 | Availability editor | 🔲 not reached |
+| 7.7 | Leads page loads | ✅ PASS |
+| 7.9 | Money + Analytics pages load | ✅ PASS |
+| 7.10 | Companies page loads | ✅ PASS |
+| 7.11 | Certificates admin page loads | ✅ PASS |
+
+### Public funnel + content (Sections 1, 8)
+| # | Item | Result |
+|---|------|--------|
+| 1.4 | Quote form client validation + POST 200 | ⚠️ partial (automation couldn't complete the controlled-checkbox submit; needs a manual click-through) |
+| 1.5 | Contact form submits, "Message Sent" success | ✅ PASS |
+| 1.6 | EN/ES toggle — full Spanish render + hreflang | ✅ PASS |
+| 1.7 | Friendly 404 with header/footer intact | ✅ PASS |
+| 8.1 | Homepage testimonials marked as placeholder | ❌ FAIL → **FIXED** (see below) |
+| 8.3 | No ForkliftCertified branding anywhere | ✅ PASS |
+
+### Bug fixed in this batch
+- **8.1 (commit 99f4a12):** `Home.tsx` had its own hardcoded testimonials section
+  (Carlos M. / Danielle R. / Miguel A.) rendering with NO placeholder indicator —
+  a violation of the no-fake-testimonials rule. Added a visible disclaimer under
+  the section title (EN+ES): "Sample testimonials shown for layout. Real customer
+  reviews coming soon." This is a stopgap until Alberto supplies real reviews.
+
+### Remaining (not yet covered by anyone)
+- 2.7 volume discount (5+), 2.8 discount code at booking, 2.9 same-day/2-location
+  conflict surfacing, 2.10 confirmation email content (EN/ES)
+- 3.4–3.5 full exam → certificate (needs longer runtime / scripted run)
+- 6.3 forgot-password reset email, 6.4 group-admin crew dashboard, 6.5 saved-address prefill
+- 7.4 confirm/reschedule, 7.5 availability editor, 7.6 trainer-conflict card, 7.8 quotes, 7.12 email outbox
+- Section 9 pre-go-live security sweeps (secrets, switcher-off-in-prod, rate limits, real-payment path)
+
