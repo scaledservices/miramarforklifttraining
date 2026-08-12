@@ -404,6 +404,12 @@ export default function Home() {
           <div className="text-center mb-12">
             <span className="text-brand-orange text-sm font-semibold uppercase tracking-wider">{t("home.testimonialsLabel")}</span>
             <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4 tracking-tight" data-testid="text-testimonials-title">{t("home.testimonialsTitle")}</h2>
+            {/* No fake testimonials (project rule): until Alberto supplies real
+                Google reviews, mark these clearly as samples so no visitor
+                mistakes them for genuine customer reviews. */}
+            <p className="text-muted-foreground text-sm max-w-md mx-auto" data-testid="text-testimonials-placeholder">
+              {t("home.testimonialsPlaceholder", { defaultValue: "Sample testimonials shown for layout. Real customer reviews coming soon." })}
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {testimonials.map((tm) => (
