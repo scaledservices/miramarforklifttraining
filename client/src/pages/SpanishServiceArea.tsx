@@ -43,7 +43,7 @@ const CITY_DATA: Record<string, {
     state: "California",
     stateAbbrev: "CA",
     slug: "san-diego",
-    address: "6365 Marindustry Dr #A, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
     phone: brand.support.phone,
     hours: "Lunes a Viernes: 7:00 AM - 5:00 PM",
     heroImage: "/images/san-diego.jpg",

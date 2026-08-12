@@ -10,7 +10,7 @@ import { CITY_FACTS, type CityFacts, type FacilitySlug } from "./serviceAreaCity
 import type { ServiceAreaCity } from "./serviceAreas";
 
 export const FACILITY_INFO: Record<FacilitySlug, { name: string; address: string; stateAbbrev: string }> = {
-  "san-diego": { name: "San Diego", address: "6365 Marindustry Dr #A, San Diego, CA 92121", stateAbbrev: "CA" },
+  "san-diego": { name: "San Diego", address: "8760 Miramar Place, San Diego, CA 92121", stateAbbrev: "CA" },
   "las-vegas": { name: "Las Vegas", address: "3301 Martin Ave Suite A, Las Vegas, NV 89118", stateAbbrev: "NV" },
   fresno: { name: "Fresno", address: "3515 N. Sabre Drive, Fresno, CA 93727", stateAbbrev: "CA" },
 };

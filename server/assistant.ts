@@ -241,7 +241,7 @@ const DEMO_RESPONSES: { keywords: string[]; response: DemoResponse }[] = [
   {
     keywords: ["location", "where", "san diego", "las vegas", "address", "near me", "hands-on", "in person", "in-person"],
     response: {
-      content: "We offer hands-on forklift training at two locations:\n\n**San Diego, CA**\n- Address: 6365 Marindustry Dr #a, San Diego, CA 92121\n- Schedule: Monday, Wednesday, Friday (9:00 AM & 1:00 PM sessions)\n\n**Las Vegas, NV**\n- Schedule: Monday, Wednesday, Friday (9:00 AM & 1:00 PM sessions)\n\nBoth locations offer training in English and Spanish. Would you like to book a session?",
+      content: "We offer hands-on forklift training at two locations:\n\n**San Diego, CA**\n- Address: 8760 Miramar Place, San Diego, CA 92121\n- Schedule: Monday, Wednesday, Friday (9:00 AM & 1:00 PM sessions)\n\n**Las Vegas, NV**\n- Schedule: Monday, Wednesday, Friday (9:00 AM & 1:00 PM sessions)\n\nBoth locations offer training in English and Spanish. Would you like to book a session?",
       actions: [
         { type: "navigate", url: "/locations", label: "View All Locations" },
         { type: "navigate", url: "/book-training", label: "Book Training" },

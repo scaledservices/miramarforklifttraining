@@ -17,11 +17,11 @@ export const brand = {
   },
 
   address: {
-    street: "6365 Marindustry Dr #A",
+    street: "8760 Miramar Place",
     city: "San Diego",
     state: "CA",
     zip: "92121",
-    full: "6365 Marindustry Dr #A, San Diego, CA 92121",
+    full: "8760 Miramar Place, San Diego, CA 92121",
   },
 
   emails: {

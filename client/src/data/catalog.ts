@@ -360,7 +360,7 @@ const internalCatalog: InternalProduct[] = [
     featured: true,
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "scissor-aerial-sd",
@@ -390,7 +390,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: `Scissor and aerial/boom lift certification in San Diego for $200. Same-day ${industry.regulatory.body} certification with hands-on training.`,
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "reach-sd",
@@ -419,7 +419,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: `Reach truck operator certification in San Diego for $300. ${industry.regulatory.body}-compliant hands-on training with same-day certification.`,
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "order-picker-sd",
@@ -449,7 +449,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: `Order picker operator certification in San Diego for $300. ${industry.regulatory.body}-compliant hands-on training with same-day certification.`,
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "reach-forklift-sd",
@@ -460,7 +460,7 @@ const internalCatalog: InternalProduct[] = [
     category: "hands-on",
     location: "san-diego",
     shortDescription: "Dual-training combo: sit-down LPG forklift and reach truck certification in San Diego. Two certifications in one session.",
-    longDescription: "Boost your career with our Hands On Reach & Forklift Training, a comprehensive dual-training program designed to equip you with essential, hands-on skills for operating both sit-down LPG forklifts and reach trucks safely and efficiently. Get certified on two equipment types quickly and unlock exciting opportunities in warehousing and logistics. Training location is at 6365 Marindustry Dr #a, San Diego, CA 92121.",
+    longDescription: "Boost your career with our Hands On Reach & Forklift Training, a comprehensive dual-training program designed to equip you with essential, hands-on skills for operating both sit-down LPG forklifts and reach trucks safely and efficiently. Get certified on two equipment types quickly and unlock exciting opportunities in warehousing and logistics. Training location is at 8760 Miramar Place, San Diego, CA 92121.",
     duration: "3-4 hrs (beginners) / 1.5-2 hrs (experienced)",
     includes: [
       "Sit-down LPG forklift training",
@@ -478,7 +478,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: "Dual reach truck and forklift certification in San Diego for $490. Two certifications in one session with hands-on training.",
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "orderpicker-forklift-sd",
@@ -508,7 +508,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: "Dual order picker and forklift certification in San Diego for $490. Two certifications in one session with hands-on training.",
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "forklift-scissor-epj-sd",
@@ -538,7 +538,7 @@ const internalCatalog: InternalProduct[] = [
     equipmentCovered: ["Sit-down LPG Forklift", "Scissor Lift", "Electric Pallet Jack (EPJ)"],
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "all-in-one-sd",
@@ -570,7 +570,7 @@ const internalCatalog: InternalProduct[] = [
     equipmentCovered: ["Sit-down LPG Forklift", "Scissor Lift (JLG 1930)", "Order Picker / Reach Truck", "Electric Pallet Jack (EPJ)"],
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
 
   // ─── HANDS-ON: LAS VEGAS ─────────────────────────────────────────
@@ -1067,7 +1067,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: "Become a certified forklift trainer in San Diego for $750. Comprehensive program with all materials included.",
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "ttt-forklift-lv",
@@ -1107,7 +1107,7 @@ const internalCatalog: InternalProduct[] = [
     category: "trainer",
     location: "san-diego",
     shortDescription: "Become a certified scissor and aerial lift trainer in San Diego. Train and certify aerial lift operators at your facility.",
-    longDescription: `This program prepares individuals to train and certify aerial lift operators in compliance with ${industry.regulatory.body} regulations. Focusing on safety protocols, instructional techniques, and risk assessment to improve workplace safety and efficiency. Upon completion, you will be authorized to train and certify scissor lift and aerial lift operators at your workplace. Includes a binder with all materials. Training location is at 6365 Marindustry Dr #a, San Diego, CA 92121.`,
+    longDescription: `This program prepares individuals to train and certify aerial lift operators in compliance with ${industry.regulatory.body} regulations. Focusing on safety protocols, instructional techniques, and risk assessment to improve workplace safety and efficiency. Upon completion, you will be authorized to train and certify scissor lift and aerial lift operators at your workplace. Includes a binder with all materials. Training location is at 8760 Miramar Place, San Diego, CA 92121.`,
     duration: "2-4 hours",
     includes: [
       "Full instructor-led training",
@@ -1125,7 +1125,7 @@ const internalCatalog: InternalProduct[] = [
     metaDescription: `Become a certified scissor and aerial lift trainer in San Diego for $750. ${industry.regulatory.body}-compliant program with all materials.`,
     classSchedule: ["Monday 9:00 AM", "Monday 1:00 PM", "Wednesday 9:00 AM", "Wednesday 1:00 PM", "Friday 9:00 AM", "Friday 1:00 PM"],
     languages: ["English", "Spanish"],
-    address: "6365 Marindustry Dr #a, San Diego, CA 92121",
+    address: "8760 Miramar Place, San Diego, CA 92121",
   },
   {
     id: "ttt-scissor-lv",

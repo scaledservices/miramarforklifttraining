@@ -37,11 +37,11 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
     city: "San Diego",
     state: "CA",
     address: {
-      street: "6365 Marindustry Dr #A",
+      street: "8760 Miramar Place",
       city: "San Diego",
       state: "CA",
       zip: "92121",
-      full: "6365 Marindustry Dr #A, San Diego, CA 92121",
+      full: "8760 Miramar Place, San Diego, CA 92121",
     },
     phone: "(858) 901-0149",
     phoneTel: "+18589010149",
