@@ -165,6 +165,17 @@ Build + check green. **Note:** the `/locations/san-diego` marketing page renders
 street address via a different path that came back empty in the DOM — cosmetic,
 worth a look before cutover; the booking flow (customer-facing path) is correct.
 
+**Follow-up (2026-08-15): RESOLVED — false positive, no code change needed.**
+Re-investigated the "empty address" observation. Verified three ways:
+(1) `getLocation("san-diego").address.full` returns the correct string when executed
+in Node; (2) `LocationPage.tsx:174` renders `{loc.address.full}` directly with no
+empty-string fallback; (3) the live staging bundle (`index-Bb1Dud8O.js`) contains
+"8760 Miramar Place" (20 occurrences) and zero "Marindustry". Root cause of the
+original observation: it was captured before commit 8d1fdf9 was redeployed — the SPA
+mounts client-side, so a raw-HTML curl or a mid-deploy screenshot shows an empty
+`#root` where the address would be. The redeploy that same session resolved it.
+No bug exists; the marketing page renders the address correctly.
+
 ### Section 8 / 9 sweeps
 | # | Check | Result |
 |---|-------|--------|
