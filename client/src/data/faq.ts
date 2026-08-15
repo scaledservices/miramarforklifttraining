@@ -81,7 +81,7 @@ export const faqItems: FAQItem[] = [
   // ─── CONVERSATIONAL / AEO-STYLE FAQ (for voice search & AI overviews) ───
   {
     question: "How much does forklift certification cost?",
-    answer: "Online forklift certification costs $45 to $59 per person depending on group size. Hands-on training at our facility costs $200 to $300 per person depending on equipment type. Onsite training at your facility starts at $200 to $280 per person with volume discounts for 5 or more. Train the Trainer certification is $750.",
+    answer: "Online forklift certification costs $45 to $59 per person depending on group size. Hands-on training at our facility costs $280 to $650 per person depending on equipment type. Onsite training at your facility is custom-quoted with volume discounts for 5 or more. Train the Trainer certification is $750.",
     category: "general",
   },
   {
