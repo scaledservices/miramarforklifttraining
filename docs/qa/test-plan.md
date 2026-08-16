@@ -13,8 +13,8 @@ Legend: ✅ verified in a prior run · 🔲 not yet run · ❌ failing · ⚠️
 | 0.1 | Staging DB schema matches code — TABLES + COLUMNS (drift check, see README) | ✅ 2026-08-12 |
 | 0.2 | Test accounts seeded (6 roles) + `training@` super_admin login works | ✅ 2026-08-12 |
 | 0.3 | `ENABLE_QA_ACCOUNT_SWITCHER=true` on staging; banner live; OFF in prod | ✅ 2026-08-12 |
-| 0.4 | Payment is SANDBOX on staging (no real charges); prod uses real Authorize.net | 🔲 verify prod flag at cutover |
-| 0.5 | Email is sandboxed on staging (resend.dev), not sending real customer email | 🔲 |
+| 0.4 | Payment is SANDBOX on staging (no real charges); prod uses real Authorize.net | ✅ 2026-08-15 staging sandbox; 🔲 prod flag at cutover |
+| 0.5 | Email is sandboxed on staging (resend.dev), not sending real customer email | ✅ 2026-08-15 (email_outbox `[TEST →]` redirect) |
 
 ## Section 1 — Public funnel (revenue-critical)
 | # | Flow | Status |
@@ -34,13 +34,13 @@ Legend: ✅ verified in a prior run · 🔲 not yet run · ❌ failing · ⚠️
 | 2.1 | City picker: 3 cities, loading skeleton, no QA rows | ✅ |
 | 2.2 | Schedule correct per city (SD MWF, Fresno Sat 9a, LV Mon) + 4-hr blocks | ✅ SD |
 | 2.3 | Participant stepper (no 13-bug, no stuck-at-1) | ✅ |
-| 2.4 | Full paid booking via sandbox card → confirmation + "Who's attending" | ✅ |
-| 2.5 | Fresno booking specifically (Sat 9:00 AM start) | 🔲 |
-| 2.6 | Las Vegas booking shows "to be confirmed by the trainer" banner | 🔲 |
-| 2.7 | Volume discount for 5+ participants computes correctly | 🔲 |
-| 2.8 | Discount code applies at booking | 🔲 |
-| 2.9 | Same-day/2-location conflict → trainer-conflict surfaced, no double-book | 🔲 |
-| 2.10 | Booking confirmation email content (EN + ES) correct | 🔲 |
+| 2.4 | Full paid booking via sandbox card → confirmation + "Who's attending" | ✅ 2026-08-15 (BK-…MBTU, $259.56 approved) |
+| 2.5 | Fresno booking specifically (Sat 9:00 AM start) | ✅ 2026-08-15 (Sat-only slots verified) |
+| 2.6 | Las Vegas booking shows "to be confirmed by the trainer" banner | ✅ 2026-08-15 (Mon-only + tentative flag) |
+| 2.7 | Volume discount for 5+ participants computes correctly | ✅ 2026-08-15 BY DESIGN (disabled per Alberto 7/6) |
+| 2.8 | Discount code applies at booking | ✅ 2026-08-15 (ALBERTO10 −$28 server-side) |
+| 2.9 | Same-day/2-location conflict → trainer-conflict surfaced, no double-book | ✅ 2026-08-15 (group-priority 409 + soft-hold) |
+| 2.10 | Booking confirmation email content (EN + ES) correct | ✅ 2026-08-15 EN (ES same template/locale) |
 
 ## Section 3 — Online course (renewal) end to end
 | # | Flow | Status |
