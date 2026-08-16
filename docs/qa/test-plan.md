@@ -20,13 +20,13 @@ Legend: ✅ verified in a prior run · 🔲 not yet run · ❌ failing · ⚠️
 | # | Flow | Status |
 |---|------|--------|
 | 1.1 | Homepage loads; onsite "Get a quote"; hands-on $280; online $45 | ✅ |
-| 1.2 | Location pages (SD/LV/Fresno) load; correct address/SEO meta | 🔲 |
-| 1.3 | Service-area SEO pages render (a sample of cities) | 🔲 |
-| 1.4 | Request-a-quote form submits; lead lands in admin Leads | 🔲 |
-| 1.5 | Contact form submits; lands in admin | 🔲 |
-| 1.6 | EN/ES toggle works; ES pages render | 🔲 |
-| 1.7 | 404 / bad route shows a friendly page | 🔲 |
-| 1.8 | Mobile layout: home, book flow, checkout on a phone-width viewport | 🔲 |
+| 1.2 | Location pages (SD/LV/Fresno) load; correct address/SEO meta | ✅ 2026-08-15 (all 200, correct titles) |
+| 1.3 | Service-area SEO pages render (a sample of cities) | ✅ 2026-08-15 (LA/Bakersfield 200) |
+| 1.4 | Request-a-quote form submits; lead lands in admin Leads | ✅ 2026-08-15 (id=10 in admin) |
+| 1.5 | Contact form submits; lands in admin | ✅ 2026-08-15 (contact_submissions id=15) |
+| 1.6 | EN/ES toggle works; ES pages render | ✅ 2026-08-15 (/es 200) |
+| 1.7 | 404 / bad route shows a friendly page | ✅ 2026-08-15 (SPA NotFound view) |
+| 1.8 | Mobile layout: home, book flow, checkout on a phone-width viewport | 🔲 visual — Alberto spot-check in UAT |
 
 ## Section 2 — Booking (hands-on) end to end
 | # | Flow | Status |
@@ -102,7 +102,7 @@ Legend: ✅ verified in a prior run · 🔲 not yet run · ❌ failing · ⚠️
 | 8.1 | No fake testimonials (placeholder until Alberto's real reviews) | ✅ (still placeholder) |
 | 8.2 | No en-dashes in external-facing text | 🔲 sweep |
 | 8.3 | No ForkliftCertified branding anywhere | 🔲 sweep |
-| 8.4 | Meta/OG tags + sitemap + schema.org valid | 🔲 |
+| 8.4 | Meta/OG tags + sitemap + schema.org valid | ✅ 2026-08-15 (sitemap 300 URLs hreflang; robots; JSON-LD) |
 
 ## Section 9 — Security / safety (pre-go-live gates)
 | # | Check | Status |
