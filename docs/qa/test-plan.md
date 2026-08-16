@@ -67,8 +67,8 @@ Legend: ✅ verified in a prior run · 🔲 not yet run · ❌ failing · ⚠️
 | 5.1 | Admin shows "Class sign-in QR" (scannable) | ✅ |
 | 5.2 | Public sign-in page loads with class details | ✅ |
 | 5.3 | Sign-in persists attendee (source=signin, checked_in), decrements open seats | ✅ |
-| 5.4 | Duplicate name returns existing row (no double count) | 🔲 |
-| 5.5 | Sign-in blocked when seats full (409) | 🔲 |
+| 5.4 | Duplicate name returns existing row (no double count) | ✅ 2026-08-15 (case-insensitive, same id) |
+| 5.5 | Sign-in blocked when seats full (409) | ✅ 2026-08-15 (409 verified) |
 | 5.6 | Purchaser adds names post-booking (dashboard + confirmation) | ✅ |
 
 ## Section 6 — Customer dashboard + account
