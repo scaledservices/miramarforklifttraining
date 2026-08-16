@@ -76,9 +76,9 @@ Legend: ✅ verified in a prior run · 🔲 not yet run · ❌ failing · ⚠️
 |---|------|--------|
 | 6.1 | "Your upcoming training" — calendar + seat tracking | ✅ |
 | 6.2 | Register (clean error messages, no raw "400: {}") | ✅ |
-| 6.3 | Login / logout / forgot-password reset email | 🔲 |
-| 6.4 | Group admin: crew dashboard, seats, member cert status | 🔲 |
-| 6.5 | Profile: saved addresses prefill at checkout | 🔲 |
+| 6.3 | Login / logout / forgot-password reset email | ✅ 2026-08-15 (full E2E + single-use + session-kill) |
+| 6.4 | Group admin: crew dashboard, seats, member cert status | ⚠️ 2026-08-15 (endpoint 200; no seeded group on staging) |
+| 6.5 | Profile: saved addresses prefill at checkout | ✅ 2026-08-15 (mechanism verified; null until photo-ID enabled) |
 
 ## Section 7 — Admin (Alberto's daily tools)
 | # | Flow | Status |
