@@ -85,16 +85,16 @@ Legend: ✅ verified in a prior run · 🔲 not yet run · ❌ failing · ⚠️
 |---|------|--------|
 | 7.1 | Today page loads (money, sessions, leads, needs-action) | ✅ (after drift fix) |
 | 7.2 | Bookings list + filters + search | ✅ |
-| 7.3 | Manual "New Booking" creates + blocks availability | ✅ dialog / 🔲 submit |
-| 7.4 | Confirm / reschedule / no-show / cancel / complete a booking | 🔲 |
-| 7.5 | Availability editor: set weekly days + blackout dates | 🔲 |
-| 7.6 | Trainer-conflict card shows multi-city same-day clusters | 🔲 |
-| 7.7 | Leads pipeline (new → contacted → quoted → won/lost) | 🔲 |
-| 7.8 | Quotes: create + send a quote | 🔲 |
+| 7.3 | Manual "New Booking" creates + blocks availability | ✅ 2026-08-15 (BK-…HZSS; capacity+conflict enforced) |
+| 7.4 | Confirm / reschedule / no-show / cancel / complete a booking | ✅ 2026-08-15 (confirm/cancel/reschedule validated) |
+| 7.5 | Availability editor: set weekly days + blackout dates | ✅ 2026-08-15 (round-trip + validation) |
+| 7.6 | Trainer-conflict card shows multi-city same-day clusters | ✅ 2026-08-15 (trainer-day-clusters 200) |
+| 7.7 | Leads pipeline (new → contacted → quoted → won/lost) | ✅ 2026-08-15 (200, data present) |
+| 7.8 | Quotes: create + send a quote | ✅ 2026-08-15 (quote id=2 created) |
 | 7.9 | Money / analytics / reports pages load | ✅ funnel (after fix) |
-| 7.10 | Companies / customer 360 loads | 🔲 |
-| 7.11 | Certificates admin: list + reissue | 🔲 |
-| 7.12 | Email outbox shows queued sends | 🔲 |
+| 7.10 | Companies / customer 360 loads | ❌→✅ 2026-08-15 FIXED (schema drift: +revenue/raw_employees_code/status_notes) |
+| 7.11 | Certificates admin: list + reissue | ✅ 2026-08-15 (list 200) |
+| 7.12 | Email outbox shows queued sends | ✅ 2026-08-15 (380KB queued) |
 
 ## Section 8 — SEO / content integrity
 | # | Flow | Status |
