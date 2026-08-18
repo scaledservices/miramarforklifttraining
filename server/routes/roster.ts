@@ -203,8 +203,15 @@ async function resolveCompanyIdForUser(
   if (role === "admin" || role === "super_admin") {
     return null; // admin can operate on any company; expects companyId in request
   }
-  // group_admin: find a company they manage
+  // group_admin: prefer the group's directly-linked company (set at team
+  // purchase). This resolves immediately for new self-serve crews, before any
+  // certification exists.
   const groups = await storage.getGroupsByAdmin(userId);
+  for (const group of groups) {
+    if (group.companyId) return group.companyId;
+  }
+  // Legacy fallback: find a company via group members' certifications
+  // (crews created before the direct company link existed).
   for (const group of groups) {
     const members = await storage.listGroupMembers(group.id);
     for (const member of members) {

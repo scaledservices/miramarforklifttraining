@@ -495,9 +495,12 @@ async function buildOrder(
   for (const item of orderItems) {
     await storage.createOrderItem({ orderId: order.id, ...item, unitPrice: String(item.unitPrice) });
     const qty = item.quantity;
-    if (isTeamPurchase && qty > 1) {
-      await storage.createEnrollment({ userId, courseId: item.courseId, orderId: order.id, status: "active" });
-      for (let i = 1; i < qty; i++) {
+    if (isTeamPurchase) {
+      // Team/crew purchase: every seat starts unassigned. The crew admin is
+      // NOT auto-enrolled — they pick their own seat (or none) from the crew
+      // seat list. Auto-assigning the buyer consumed seat #1 and collided
+      // with invites ("seat already pending" 400).
+      for (let i = 0; i < qty; i++) {
         await storage.createEnrollment({ userId: undefined, courseId: item.courseId, orderId: order.id, status: "active" });
       }
     } else {
@@ -549,9 +552,32 @@ async function postPaymentProcessing(
   const user = await storage.getUser(userId);
   if (isTeamOrder && isTeamPurchase && !user?.role?.includes("group_admin")) {
     const groupName = `${user?.name || "Team"}'s Training Crew`;
-    const group = await storage.createGroup({ name: groupName, adminUserId: userId });
+    // Create the backing company so the compliance dashboard, roster, and
+    // audit binder can resolve a companyId immediately — without waiting for
+    // an issued certification (the old discovery path broke for new crews).
+    const company = await storage.createCompany({
+      name: user?.name ? `${user.name}'s Company` : "Training Crew Company",
+      email: user?.email || null,
+      phone: user?.phone || null,
+      leadSource: "self_serve_team_purchase",
+    });
+    const group = await storage.createGroup({ name: groupName, adminUserId: userId, companyId: company.id });
     await storage.updateUserRole(userId, "group_admin");
     await storage.updateOrderGroupId(orderId, group.id);
+  } else if (isTeamOrder && isTeamPurchase && user?.role?.includes("group_admin")) {
+    // Existing crew buying more seats: ensure their group has a company linked
+    // (backfills crews created before the company link existed).
+    const existingGroups = await storage.getGroupsByAdmin(userId);
+    const group = existingGroups[existingGroups.length - 1];
+    if (group && !group.companyId) {
+      const company = await storage.createCompany({
+        name: user?.name ? `${user.name}'s Company` : "Training Crew Company",
+        email: user?.email || null,
+        phone: user?.phone || null,
+        leadSource: "self_serve_team_purchase",
+      });
+      await storage.updateGroupCompanyId(group.id, company.id);
+    }
   }
 
   // Emails

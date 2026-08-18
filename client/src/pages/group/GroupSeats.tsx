@@ -10,12 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BookOpen, Loader2, UserMinus, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 import GroupLayout from "./GroupLayout";
 import { useTranslation } from "react-i18next";
 
 export default function GroupSeats() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [assignSelections, setAssignSelections] = useState<Record<number, string>>({});
   const [confirmUnassign, setConfirmUnassign] = useState<number | null>(null);
 
@@ -174,10 +176,17 @@ export default function GroupSeats() {
                                         .map((s: any) => s.userId)
                                     );
                                     const eligible = acceptedMembers.filter((m: any) => !membersWithCourse.has(m.userId));
-                                    if (eligible.length === 0) {
+                                    // The crew admin is assignable too (self-assign) — they are
+                                    // not a group "member" but should be able to take a seat.
+                                    const adminSelf =
+                                      user && !membersWithCourse.has(user.id)
+                                        ? [{ userId: user.id, name: `${user.name} (${t("groupSeats.you", "you")})`, isSelf: true }]
+                                        : [];
+                                    const allEligible = [...adminSelf, ...eligible];
+                                    if (allEligible.length === 0) {
                                       return <SelectItem value="none" disabled>{t("groupSeats.noEligibleMembers")}</SelectItem>;
                                     }
-                                    return eligible.map((m: any) => (
+                                    return allEligible.map((m: any) => (
                                       <SelectItem key={m.userId} value={String(m.userId)} data-testid={`option-member-${m.userId}`}>
                                         {m.name}
                                       </SelectItem>

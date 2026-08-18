@@ -103,10 +103,13 @@ export default function ComplianceDashboard() {
 
   const discoveredCompanyId = useMemo(() => {
     if (!isGroupAdmin) return null;
+    // Prefer the group's directly-linked company (set at team purchase) — this
+    // resolves for new crews before any certification exists.
+    if (group?.companyId) return group.companyId;
     const certs = groupCertsData?.certifications || [];
     const certWithCompany = certs.find((c: any) => c.companyId);
     return certWithCompany?.companyId ?? null;
-  }, [isGroupAdmin, groupCertsData]);
+  }, [isGroupAdmin, group, groupCertsData]);
 
   // Fetch roster
   const { data: rosterData, isLoading: rosterLoading } = useQuery<{

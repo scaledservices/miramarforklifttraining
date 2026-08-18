@@ -80,7 +80,16 @@ export default function GroupMembers() {
   });
 
   const allEnrollments = enrollmentsData?.enrollments || [];
-  const unassignedSeats = allEnrollments.filter((e: any) => !e.userId);
+  const allMembers = membersData?.members || [];
+  // Seats already reserved by a pending (not-yet-accepted) invite. Excluding
+  // these from the pre-assign dropdown makes the server's "seat already
+  // pending" 400 unreachable — prevention-first, not an error after the fact.
+  const reservedSeatIds = new Set<number>(
+    allMembers
+      .filter((m: any) => !m.acceptedAt && m.pendingEnrollmentId)
+      .map((m: any) => m.pendingEnrollmentId)
+  );
+  const unassignedSeats = allEnrollments.filter((e: any) => !e.userId && !reservedSeatIds.has(e.id));
   const assignedSeats = allEnrollments.filter((e: any) => e.userId);
 
   const uniqueUnassignedCourses = (() => {
@@ -205,8 +214,18 @@ export default function GroupMembers() {
       email: newEmail.trim(),
       name: newName.trim(),
     };
-    if (selectedSeat && selectedSeat !== "none") {
-      payload.enrollmentId = parseInt(selectedSeat);
+    // Prevention-first: when an unassigned seat exists, the invite MUST carry it
+    // so the member lands in their course on accept (not an empty dashboard).
+    // Default to the first available seat unless the admin explicitly chose one
+    // or explicitly chose "none".
+    const effectiveSeat =
+      selectedSeat && selectedSeat !== ""
+        ? selectedSeat
+        : unassignedSeats.length > 0
+          ? String(unassignedSeats[0].id)
+          : "none";
+    if (effectiveSeat !== "none") {
+      payload.enrollmentId = parseInt(effectiveSeat);
     }
     inviteMutation.mutate(payload);
   };
@@ -331,7 +350,10 @@ export default function GroupMembers() {
               {unassignedSeats.length > 0 && (
                 <div className="min-w-[200px]">
                   <label className="text-sm font-medium mb-1 block">{t("groupMembers.assignTrainingSeat")}</label>
-                  <Select value={selectedSeat} onValueChange={setSelectedSeat}>
+                  <Select
+                    value={selectedSeat || String(unassignedSeats[0]?.id || "none")}
+                    onValueChange={setSelectedSeat}
+                  >
                     <SelectTrigger data-testid="select-seat-preassign">
                       <SelectValue placeholder={t("common.optional")} />
                     </SelectTrigger>

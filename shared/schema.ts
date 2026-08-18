@@ -35,6 +35,10 @@ export const groups = pgTable("groups", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   adminUserId: integer("admin_user_id").notNull().references(() => users.id),
+  // Links a self-serve crew to its company record so the compliance dashboard,
+  // roster, and audit binder resolve a companyId without needing an issued
+  // certification first. Created at team-purchase time.
+  companyId: integer("company_id").references(() => companies.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
