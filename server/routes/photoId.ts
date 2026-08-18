@@ -3,12 +3,13 @@ import { z } from "zod";
 import { storage } from "../storage";
 import { db } from "../db";
 import { and, eq, isNull } from "drizzle-orm";
-import { photoIdEntitlements, payments } from "@shared/schema";
+import { photoIdEntitlements, payments, groupMembers } from "@shared/schema";
 import { requireAuth, payLimiter } from "./middleware";
 import { isAdminRole } from "@shared/roles";
 import { logger } from "../monitoring";
 import { resolveLocale } from "../locale-resolver";
-import { sendCardOrderReceipt } from "../email";
+import { sendCardOrderReceipt, sendPhotoIdFulfilledAlert, sendPhotoIdMemberRequest } from "../email";
+import { brand } from "@shared/config/brand";
 import { SHIPPING_RATES } from "../constants";
 
 /**
@@ -91,6 +92,83 @@ export function registerPhotoIdRoutes(app: Express) {
       return res.json({ entitlements });
     } catch (error) {
       logger.error("[PhotoId] List entitlements failed", { source: "server", metadata: { error: String(error) } });
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  /**
+   * POST /api/photo-id/request  (Flow 3, member-initiated)
+   * A certified member with no active card order and no claimable entitlement
+   * asks their crew admin to order a photo ID for them. Notifies the admin
+   * with a link to the order flow. No charge happens here - it is a request.
+   * Body: { certificationId }
+   */
+  app.post("/api/photo-id/request", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const certificationId = parseInt(String(req.body?.certificationId || "0"));
+      if (!certificationId) return res.status(400).json({ error: "certificationId required" });
+      const cert = await storage.getCertification(certificationId);
+      if (!cert) return res.status(404).json({ error: "Certification not found" });
+
+      const userId = req.session.userId!;
+      if (cert.userId !== userId) return res.status(403).json({ error: "You can only request a photo ID for your own certification" });
+
+      // Already has an active card order? Nothing to request.
+      const existing = await storage.getCertCardOrdersByCertification(certificationId);
+      const active = existing.find((co) => !["canceled", "refunded"].includes(co.status));
+      if (active) return res.status(409).json({ error: "A card order already exists for this certification" });
+
+      // Already has a claimable entitlement? They should just upload a photo.
+      const claimable = await db
+        .select()
+        .from(photoIdEntitlements)
+        .where(and(isNull(photoIdEntitlements.enrollmentId), eq(photoIdEntitlements.status, "awaiting_photo")));
+      for (const ent of claimable) {
+        if (await canConsumeEntitlement(ent, userId, cert.courseId, cert.userId)) {
+          return res.status(409).json({ error: "A photo ID is already available to you - just add your photo", entitlementId: ent.id });
+        }
+      }
+
+      // Find the crew admin for this member.
+      const memberUser = await storage.getUser(userId);
+      const course = await storage.getCourse(cert.courseId);
+      let adminUser: any = null;
+      const allGroupMembers = await db.select().from(groupMembers).where(eq(groupMembers.userId, userId));
+      for (const gm of allGroupMembers) {
+        const group = await storage.getGroup(gm.groupId);
+        if (group) {
+          adminUser = await storage.getUser(group.adminUserId);
+          if (adminUser) break;
+        }
+      }
+      if (!adminUser?.email) {
+        return res.status(404).json({ error: "No crew admin found for your account. Please contact support to order a photo ID." });
+      }
+
+      const baseUrl = process.env.SITE_URL || `https://${brand.domain}`;
+      const orderUrl = `${baseUrl}/order-cert-card/${certificationId}`;
+      const memberLocale = await resolveLocale({ userId });
+
+      await sendPhotoIdMemberRequest({
+        to: adminUser.email,
+        memberName: memberUser?.name || "A crew member",
+        courseName: course?.title || "",
+        orderUrl,
+        actorUserId: userId,
+        locale: memberLocale,
+      });
+
+      await storage.createAuditLog({
+        actorUserId: userId,
+        action: "photo_id_requested",
+        entity: "certifications",
+        entityId: String(certificationId),
+        metadata: { adminUserId: adminUser.id, adminEmail: adminUser.email },
+      });
+
+      return res.status(200).json({ success: true, adminNotified: true });
+    } catch (error) {
+      logger.error("[PhotoId] Member request failed", { source: "server", metadata: { error: String(error) } });
       return res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -215,6 +293,35 @@ export function registerPhotoIdRoutes(app: Express) {
         }
       } catch (emailErr) {
         console.error("[PhotoId] Receipt email error (non-fatal):", emailErr);
+      }
+
+      // Flow 2: notify the crew admin (the entitlement purchaser) and the
+      // operator (Alberto) that the card is paid + photo is in -> ready to
+      // print/mail. Non-fatal.
+      try {
+        const cardUser = await storage.getUser(cert.userId);
+        const course = await storage.getCourse(cert.courseId);
+        const recipients = new Set<string>();
+
+        // The crew admin who purchased this entitlement.
+        const purchaser = await storage.getUser(ent.purchasedByUserId);
+        if (purchaser?.email) recipients.add(purchaser.email);
+        // The operator (Alberto) — fulfills/prints/mails the card.
+        recipients.add(process.env.ADMIN_EMAIL || `admin@${brand.domain}`);
+
+        for (const to of recipients) {
+          await sendPhotoIdFulfilledAlert({
+            to,
+            memberName: cardUser?.name || "A member",
+            certNumber: cert.certificateNumber,
+            courseName: course?.title || "",
+            cardOrderId: cardOrder.id,
+            actorUserId: userId,
+            locale: "en",
+          });
+        }
+      } catch (fulfillErr) {
+        console.error("[PhotoId] Fulfilled-alert email error (non-fatal):", fulfillErr);
       }
 
       return res.status(201).json({ cardOrder });

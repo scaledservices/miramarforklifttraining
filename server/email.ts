@@ -381,6 +381,112 @@ export async function sendCardOrderReceipt(params: {
   });
 }
 
+/**
+ * Photo ID flow 1: crew admin ordered a photo ID for a member -> ask the member
+ * for their photo via a secure upload/camera link (deferred collection).
+ */
+export async function sendPhotoIdUploadRequest(params: {
+  to: string;
+  memberName: string;
+  purchaserName: string;
+  uploadUrl: string;
+  actorUserId?: number;
+  locale?: string;
+}) {
+  const loc = params.locale || "en";
+  const _ = (key: string) => emailT(loc, "photoIdUploadRequest", key);
+
+  return sendEmail({
+    to: params.to,
+    subject: _("subject"),
+    template: "photo_id_upload_request",
+    payload: { memberName: params.memberName, purchaserName: params.purchaserName, uploadUrl: params.uploadUrl },
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
+      <p>${_("body").replace("{{purchaserName}}", params.purchaserName)}</p>
+      <p>${_("instructions")}</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${params.uploadUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+      </div>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
+    `),
+    actorUserId: params.actorUserId,
+  });
+}
+
+/**
+ * Photo ID flow 2: a member's photo arrived and the card order is paid ->
+ * notify the crew admin and the operator (Alberto) so it can be printed/mailed.
+ * Sent per-recipient; caller passes the crew-admin and operator addresses.
+ */
+export async function sendPhotoIdFulfilledAlert(params: {
+  to: string;
+  memberName: string;
+  certNumber: string;
+  courseName: string;
+  cardOrderId: number;
+  actorUserId?: number;
+  locale?: string;
+}) {
+  const baseUrl = getSiteUrl();
+  const loc = params.locale || "en";
+  const _ = (key: string) => emailT(loc, "photoIdFulfilledAlert", key);
+  const orderUrl = `${baseUrl}${localePath(loc, "/dashboard")}`;
+
+  return sendEmail({
+    to: params.to,
+    subject: _("subject").replace("{{memberName}}", params.memberName).replace("{{certNumber}}", params.certNumber),
+    template: "photo_id_fulfilled_alert",
+    payload: { memberName: params.memberName, certNumber: params.certNumber, courseName: params.courseName, cardOrderId: params.cardOrderId },
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
+      <p>${_("body").replace("{{memberName}}", params.memberName)}</p>
+      <p><strong>${_("member")}</strong> ${params.memberName}</p>
+      <p><strong>${_("certificate")}</strong> ${params.certNumber}</p>
+      <p><strong>${_("course")}</strong> ${params.courseName}</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${orderUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+      </div>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
+    `),
+    actorUserId: params.actorUserId,
+  });
+}
+
+/**
+ * Photo ID flow 3: a member with no pre-purchased card requests one after
+ * completing their course -> notify the crew admin with a purchase opportunity.
+ */
+export async function sendPhotoIdMemberRequest(params: {
+  to: string;
+  memberName: string;
+  courseName: string;
+  orderUrl: string;
+  actorUserId?: number;
+  locale?: string;
+}) {
+  const loc = params.locale || "en";
+  const _ = (key: string) => emailT(loc, "photoIdMemberRequest", key);
+
+  return sendEmail({
+    to: params.to,
+    subject: _("subject").replace("{{memberName}}", params.memberName),
+    template: "photo_id_member_request",
+    payload: { memberName: params.memberName, courseName: params.courseName, orderUrl: params.orderUrl },
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
+      <p>${_("body").replace("{{memberName}}", params.memberName).replace("{{courseName}}", params.courseName)}</p>
+      <p><strong>${_("member")}</strong> ${params.memberName}</p>
+      <p><strong>${_("course")}</strong> ${params.courseName}</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${params.orderUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+      </div>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer")}</p>
+    `),
+    actorUserId: params.actorUserId,
+  });
+}
+
 export async function sendShippingNotification(params: {
   to: string;
   trackingNumber: string;
