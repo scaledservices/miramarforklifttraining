@@ -1020,7 +1020,8 @@
     "statusShipped": "Enviada",
     "orderFor": "Ordenar tarjeta con foto",
     "remind": "Recordar al miembro",
-    "uploadFor": "Subir su foto"
+    "uploadFor": "Subir su foto",
+    "viewPhotoId": "Ver tarjeta con foto"
   },
   "checkout": {
     "emptyCartTitle": "Tu Carrito Está Vacío",

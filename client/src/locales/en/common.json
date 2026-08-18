@@ -1020,7 +1020,8 @@
     "statusShipped": "Shipped",
     "orderFor": "Order Photo ID",
     "remind": "Remind member",
-    "uploadFor": "Upload photo for them"
+    "uploadFor": "Upload photo for them",
+    "viewPhotoId": "View Photo ID"
   },
   "checkout": {
     "emptyCartTitle": "Your Cart is Empty",

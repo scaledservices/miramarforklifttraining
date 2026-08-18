@@ -103,7 +103,11 @@ export default function Checkout() {
   // uploaded later from the dashboard (deferred collection, spec §1.3). The
   // server gates the add-on behind platform_settings.photo_id_addon_enabled
   // and re-prices it; this UI mirrors that math for display only.
-  const [photoIdChecked, setPhotoIdChecked] = useState(false);
+  // Default ON (margin driver — Alberto 2026-08-18 brief: "highlighted and
+  // perhaps defaulted at checkout"). A clear opt-out checkbox; if the user
+  // actively unchecks, we respect that and don't re-default.
+  const [photoIdChecked, setPhotoIdChecked] = useState(true);
+  const [photoIdUserToggled, setPhotoIdUserToggled] = useState(false);
   const [photoIdCount, setPhotoIdCount] = useState(1);
   const [photoIdShippingMethod, setPhotoIdShippingMethod] = useState<"standard" | "expedited">("standard");
   const [photoIdShipping, setPhotoIdShipping] = useState({ name: "", address: "", city: "", state: "", zip: "" });
@@ -112,6 +116,16 @@ export default function Checkout() {
   const PHOTO_ID_SHIPPING = { standard: 4.99, expedited: 9.99 } as const;
   const seatCount = items.reduce((n, i) => n + (i.quantity || 1), 0);
   const isTeamCart = items.some((i) => i.isTeamProduct) || seatCount > 1;
+
+  // For a team cart, default the photo-ID count to the full seat count (one
+  // card per member) — the highest-margin default and the common case. Only
+  // applies while the user hasn't manually changed the count.
+  useEffect(() => {
+    if (!photoIdUserToggled && isTeamCart && seatCount > 0) {
+      setPhotoIdCount(seatCount);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seatCount, isTeamCart]);
 
   // Prefill the add-on shipping address from the signed-in user's profile.
   useEffect(() => {
@@ -406,7 +420,7 @@ export default function Checkout() {
                     <Checkbox
                       id="photoIdAddon"
                       checked={photoIdChecked}
-                      onCheckedChange={(c) => setPhotoIdChecked(c === true)}
+                      onCheckedChange={(c) => { setPhotoIdUserToggled(true); setPhotoIdChecked(c === true); }}
                       data-testid="checkbox-photo-id-addon"
                     />
                     <Label htmlFor="photoIdAddon" className="text-sm leading-relaxed cursor-pointer">
@@ -432,7 +446,7 @@ export default function Checkout() {
                             min={1}
                             max={seatCount}
                             value={photoIdCount}
-                            onChange={(e) => setPhotoIdCount(Math.max(1, Math.min(seatCount, parseInt(e.target.value) || 1)))}
+                            onChange={(e) => { setPhotoIdUserToggled(true); setPhotoIdCount(Math.max(1, Math.min(seatCount, parseInt(e.target.value) || 1))); }}
                             className="w-20"
                             data-testid="input-photo-id-count"
                           />

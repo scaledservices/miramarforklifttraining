@@ -4,10 +4,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Download, CreditCard } from "lucide-react";
+import { Download, CreditCard, Eye, ImagePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 import GroupLayout from "./GroupLayout";
 import { useTranslation } from "react-i18next";
+
+type PhotoIdStatus = "not_ordered" | "photo_needed" | "ordered" | "shipped";
+interface PhotoIdCertStatus {
+  certificationId: number;
+  status: PhotoIdStatus;
+  entitlementId?: number;
+  cardOrderId?: number;
+}
 
 export default function GroupCertifications() {
   const { t } = useTranslation();
@@ -25,6 +34,17 @@ export default function GroupCertifications() {
   });
 
   const certifications = certsData?.certifications || [];
+
+  // Photo-ID status per certification (Order/View states). Source of truth:
+  // GET /api/groups/:id/photo-id-status (entitlement + cert_card_orders join).
+  const { data: photoIdData } = useQuery<{ members: { certifications: PhotoIdCertStatus[] }[] }>({
+    queryKey: ["/api/groups", group?.id, "photo-id-status"],
+    enabled: !!group?.id,
+  });
+  const photoIdByCert = new Map<number, PhotoIdCertStatus>();
+  for (const m of photoIdData?.members || []) {
+    for (const c of m.certifications) photoIdByCert.set(c.certificationId, c);
+  }
 
   const statusVariant = (status: string) => {
     switch (status) {
@@ -140,15 +160,53 @@ export default function GroupCertifications() {
                           >
                             <Download className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => toast({ title: t("groupCerts.walletCardTitle"), description: t("groupCerts.walletCardDesc") })}
-                            title={t("groupCerts.orderWalletCard")}
-                            data-testid={`button-wallet-card-${cert.id}`}
-                          >
-                            <CreditCard className="h-4 w-4" />
-                          </Button>
+                          {(() => {
+                            const ps = photoIdByCert.get(cert.id);
+                            const status: PhotoIdStatus = ps?.status || "not_ordered";
+                            if (status === "ordered" || status === "shipped") {
+                              // Already ordered + photo uploaded: view the card.
+                              return (
+                                <Link href={`/certifications/${cert.id}`}>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    title={t("teamPhotoId.viewPhotoId", "View Photo ID")}
+                                    data-testid={`button-view-photo-id-${cert.id}`}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                              );
+                            }
+                            if (status === "photo_needed" && ps?.entitlementId) {
+                              // Prepaid entitlement awaiting the member's photo.
+                              return (
+                                <Link href={`/order-cert-card/${cert.id}?entitlement=${ps.entitlementId}`}>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    title={t("teamPhotoId.uploadFor", "Upload photo for them")}
+                                    data-testid={`button-upload-photo-id-${cert.id}`}
+                                  >
+                                    <ImagePlus className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                              );
+                            }
+                            // not_ordered: send the admin to the pay flow for this cert.
+                            return (
+                              <Link href={`/order-cert-card/${cert.id}`}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  title={t("teamPhotoId.orderFor", "Order Photo ID")}
+                                  data-testid={`button-order-photo-id-${cert.id}`}
+                                >
+                                  <CreditCard className="h-4 w-4" />
+                                </Button>
+                              </Link>
+                            );
+                          })()}
                         </div>
                       </TableCell>
                     </TableRow>
