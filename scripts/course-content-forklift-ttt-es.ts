@@ -10,6 +10,7 @@ export const CANONICAL_COURSE_ES = {
 };
 
 const img = (name: string) => `/images/training/${name}`;
+const photo = (name: string) => `/images/training/photos/${name}`;
 
 const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
@@ -21,7 +22,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "Bienvenida y Marco Regulatorio OSHA" },
+      { type: "hero_image", src: photo("banners/train-the-trainer-hero.png"), alt: "Bienvenida y Marco Regulatorio OSHA" },
       { type: "heading", level: 2, text: "Bienvenida y Marco Regulatorio OSHA" },
       { type: "heading", level: 3, text: "Acerca de Este Curso" },
       { type: "paragraph", html: "¡Bienvenido a la Certificación Capacitar al Capacitador de Montacargas! Este curso lo prepara para convertirse en un <strong>instructor calificado de operadores de montacargas</strong> bajo OSHA 29 CFR 1910.178(l)(2)(iii). El curso toma aproximadamente <strong>2-3 horas</strong>." },
@@ -65,7 +66,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.png"), alt: "Responsabilidades del Empleador y Documentación" },
+      { type: "hero_image", src: photo("banners/osha-compliance.png"), alt: "Responsabilidades del Empleador y Documentación" },
       { type: "heading", level: 2, text: "Responsabilidades del Empleador y Documentación" },
       { type: "heading", level: 3, text: "Deber del Empleador (1910.178(l)(1))" },
       { type: "paragraph", html: "El empleador es responsable de asegurar que cada operador sea <strong>capacitado</strong>, <strong>evaluado</strong> y <strong>certificado</strong>. Esto incluye capacitación inicial, evaluación de competencia, recapacitación cuando sea necesaria, y re-evaluación al menos cada 3 años." },
@@ -104,7 +105,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "Cómo Aprenden los Adultos: Andragogía" },
+      { type: "hero_image", src: photo("banners/train-the-trainer-hero.png"), alt: "Cómo Aprenden los Adultos: Andragogía" },
       { type: "heading", level: 2, text: "Cómo Aprenden los Adultos: Andragogía" },
       { type: "heading", level: 3, text: "Teoría de Aprendizaje de Adultos" },
       { type: "paragraph", html: "Los adultos aprenden diferente que los niños. Principios clave (<strong>andragogía</strong>):" },
@@ -148,7 +149,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Estrategias de Evaluación" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Estrategias de Evaluación" },
       { type: "heading", level: 2, text: "Estrategias de Evaluación" },
       { type: "heading", level: 3, text: "Evaluación de Conocimiento" },
       { type: "paragraph", html: "Pruebe la comprensión mediante: <strong>exámenes escritos</strong>, <strong>preguntas orales</strong>, <strong>cuestionarios throughout</strong>, <strong>estudios de caso</strong>." },
@@ -186,7 +187,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "Diseñando Su Programa de Capacitación" },
+      { type: "hero_image", src: photo("banners/train-the-trainer-hero.png"), alt: "Diseñando Su Programa de Capacitación" },
       { type: "heading", level: 2, text: "Diseñando Su Programa de Capacitación" },
       { type: "heading", level: 3, text: "Evaluación de Necesidades" },
       { type: "paragraph", html: "Identifique: <strong>tipos de equipo</strong> en uso, <strong>condiciones del lugar de trabajo</strong>, <strong>niveles de experiencia</strong>, <strong>peligros específicos del sitio</strong>, <strong>requisitos regulatorios</strong>." },
@@ -224,7 +225,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Diseño de Ejercicios Prácticos" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Diseño de Ejercicios Prácticos" },
       { type: "heading", level: 2, text: "Diseño de Ejercicios Prácticos" },
       { type: "heading", level: 3, text: "Desarrollo Progresivo de Habilidades" },
       { type: "list", ordered: true, items: [
@@ -274,7 +275,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("forklift-hero.png"), alt: "Temas Relacionados con el Camión (1910.178(l)(3)(i))" },
+      { type: "hero_image", src: photo("banners/forklift-hero.png"), alt: "Temas Relacionados con el Camión (1910.178(l)(3)(i))" },
       { type: "heading", level: 2, text: "Temas Relacionados con el Camión (1910.178(l)(3)(i))" },
       { type: "heading", level: 3, text: "OSHA Requiere 13 Temas Relacionados con el Camión" },
       { type: "paragraph", html: "OSHA 1910.178(l)(3)(i) requiere capacitación en <strong>13 temas relacionados con el camión</strong> (A-M):" },
@@ -319,7 +320,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Temas Relacionados con el Lugar de Trabajo (1910.178(l)(3)(ii))" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Temas Relacionados con el Lugar de Trabajo (1910.178(l)(3)(ii))" },
       { type: "heading", level: 2, text: "Temas Relacionados con el Lugar de Trabajo (1910.178(l)(3)(ii))" },
       { type: "heading", level: 3, text: "OSHA Requiere 9 Temas del Lugar de Trabajo" },
       { type: "paragraph", html: "OSHA 1910.178(l)(3)(ii) requiere <strong>9 temas relacionados con el lugar de trabajo</strong> (A-I). Son específicos del sitio:" },
@@ -369,7 +370,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Conducción de Sesiones de Capacitación Práctica" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Conducción de Sesiones de Capacitación Práctica" },
       { type: "heading", level: 2, text: "Conducción de Sesiones de Capacitación Práctica" },
       { type: "heading", level: 3, text: "Configuración para el Éxito" },
       { type: "paragraph", html: "Área <strong>libre de peatones</strong>, montacargas en <strong>condiciones seguras</strong>, <strong>listas de evaluación</strong> listas, revisar <strong>procedimientos de emergencia</strong>." },
@@ -419,7 +420,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Conducción de la Evaluación del Operador" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Conducción de la Evaluación del Operador" },
       { type: "heading", level: 2, text: "Conducción de la Evaluación del Operador" },
       { type: "heading", level: 3, text: "Evaluación vs. Capacitación" },
       { type: "paragraph", html: "La capacitación y evaluación son <strong>actividades separadas</strong>. La evaluación determina si el operador es competente para operar independientemente. <strong>Observe sin coaching</strong>." },
@@ -462,7 +463,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.png"), alt: "Administrando Su Programa de Capacitación" },
+      { type: "hero_image", src: photo("banners/osha-compliance.png"), alt: "Administrando Su Programa de Capacitación" },
       { type: "heading", level: 2, text: "Administrando Su Programa de Capacitación" },
       { type: "heading", level: 3, text: "Gestión de Registros" },
       { type: "paragraph", html: "Mantenga: fecha de capacitación, currículo, resultados de evaluación, certificación, recapacitación, re-evaluación, reportes de incidentes." },
@@ -500,7 +501,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("pedestrian-safety.png"), alt: "Construyendo una Cultura de Seguridad" },
+      { type: "hero_image", src: photo("banners/pedestrian-safety.png"), alt: "Construyendo una Cultura de Seguridad" },
       { type: "heading", level: 2, text: "Construyendo una Cultura de Seguridad" },
       { type: "heading", level: 3, text: "El Rol del Instructor" },
       { type: "paragraph", html: "Como instructor, es un <strong>líder de seguridad</strong>. Su actitud y comportamiento establecen el tono. Lidere con el ejemplo." },
@@ -567,7 +568,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "¡Es un Instructor Certificado! ¿Qué Sigue?" },
+      { type: "hero_image", src: photo("banners/train-the-trainer-hero.png"), alt: "¡Es un Instructor Certificado! ¿Qué Sigue?" },
       { type: "heading", level: 2, text: "¡Es un Instructor Certificado! ¿Qué Sigue?" },
       { type: "heading", level: 3, text: "Su Certificación" },
       { type: "paragraph", html: "¡Felicitaciones por completar la Certificación Capacitar al Capacitador! Está calificado para <strong>capacitar y evaluar operadores de montacargas</strong> en sus instalaciones bajo OSHA 29 CFR 1910.178(l)(2)(iii)." },

@@ -10,6 +10,7 @@ export const CANONICAL_COURSE_ES = {
 };
 
 const img = (name: string) => `/images/training/${name}`;
+const photo = (name: string) => `/images/training/photos/${name}`;
 
 const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
@@ -21,7 +22,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Bienvenida y Marco Regulatorio de Elevadores Aéreos" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "Bienvenida y Marco Regulatorio de Elevadores Aéreos" },
       { type: "heading", level: 2, text: "Bienvenida y Marco Regulatorio de Elevadores Aéreos" },
       { type: "heading", level: 3, text: "Acerca de Este Curso" },
       { type: "paragraph", html: "¡Bienvenido a la Certificación Capacitar al Capacitador de Elevadores Aéreos y de Tijera! Este curso lo prepara para convertirse en un <strong>instructor calificado de operadores de elevadores aéreos y de tijera</strong>." },
@@ -53,7 +54,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.png"), alt: "Requisitos de Capacitación ANSI A92.24" },
+      { type: "hero_image", src: photo("banners/osha-compliance.png"), alt: "Requisitos de Capacitación ANSI A92.24" },
       { type: "heading", level: 2, text: "Requisitos de Capacitación ANSI A92.24" },
       { type: "heading", level: 3, text: "Quién Debe Ser Capacitado?" },
       { type: "paragraph", html: "ANSI A92.24 requiere capacitación para: <strong>operadores</strong>, <strong>ocupantes</strong>, <strong>supervisores</strong>, y <strong>personal de servicio</strong>." },
@@ -98,7 +99,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("train-the-trainer-hero.png"), alt: "Principios de Aprendizaje de Adultos para Elevadores Aéreos" },
+      { type: "hero_image", src: photo("banners/train-the-trainer-hero.png"), alt: "Principios de Aprendizaje de Adultos para Elevadores Aéreos" },
       { type: "heading", level: 2, text: "Principios de Aprendizaje de Adultos para Elevadores Aéreos" },
       { type: "heading", level: 3, text: "Principios Clave" },
       { type: "paragraph", html: "Los adultos aprenden mejor cuando la capacitación es <strong>relevante</strong>, <strong>basada en experiencia</strong> y <strong>centrada en problemas</strong>." },
@@ -148,7 +149,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Temas Relacionados con el Equipo" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "Temas Relacionados con el Equipo" },
       { type: "heading", level: 2, text: "Temas Relacionados con el Equipo" },
       { type: "heading", level: 3, text: "Conocimiento del Equipo" },
       { type: "paragraph", html: "Cubra: tipos de MEWPs, operación de tijera y pluma, controles, capacidad, estabilidad, protección contra caídas, inspección, controles de emergencia, estabilizadores." },
@@ -167,7 +168,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Temas Relacionados con el Lugar de Trabajo" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Temas Relacionados con el Lugar de Trabajo" },
       { type: "heading", level: 2, text: "Temas Relacionados con el Lugar de Trabajo" },
       { type: "heading", level: 3, text: "Temas Específicos del Sitio" },
       { type: "paragraph", html: "Condiciones de superficie, tráfico de peatones, peligros aéreos, clima, peligros eléctricos, protección contra caídas, atmósferas peligrosas, control de tráfico, rescate." },
@@ -212,7 +213,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("scissor-lift-hero.png"), alt: "Metodología de Capacitación Práctica para Elevadores Aéreos" },
+      { type: "hero_image", src: photo("banners/scissor-lift-hero.png"), alt: "Metodología de Capacitación Práctica para Elevadores Aéreos" },
       { type: "heading", level: 2, text: "Metodología de Capacitación Práctica para Elevadores Aéreos" },
       { type: "heading", level: 3, text: "Habilidades a Practicar" },
       { type: "paragraph", html: "Inspección pre-operación, controles, elevación/descenso, conducción, protección contra caídas, estabilizadores, descenso de emergencia, apagado." },
@@ -238,7 +239,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Evaluación de Operadores de Elevadores Aéreos" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Evaluación de Operadores de Elevadores Aéreos" },
       { type: "heading", level: 2, text: "Evaluación de Operadores de Elevadores Aéreos" },
       { type: "heading", level: 3, text: "Lista de Evaluación" },
       { type: "paragraph", html: "Inspección, protección contra caídas, controles, elevación, estabilizadores, condiciones de superficie, peligros aéreos, emergencias, apagado." },
@@ -280,7 +281,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.png"), alt: "Administrando Su Programa de Capacitación de Elevadores Aéreos" },
+      { type: "hero_image", src: photo("banners/osha-compliance.png"), alt: "Administrando Su Programa de Capacitación de Elevadores Aéreos" },
       { type: "heading", level: 2, text: "Administrando Su Programa de Capacitación de Elevadores Aéreos" },
       { type: "heading", level: 3, text: "Gestión de Registros" },
       { type: "paragraph", html: "Mantenga: registros de capacitación, listas de evaluación, registros de familiarización (por marca/modelo), planes de rescate, reportes de incidentes, recapacitación." },
@@ -343,7 +344,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "¡Es un Instructor Certificado de Elevadores Aéreos! ¿Qué Sigue?" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "¡Es un Instructor Certificado de Elevadores Aéreos! ¿Qué Sigue?" },
       { type: "heading", level: 2, text: "¡Es un Instructor Certificado de Elevadores Aéreos! ¿Qué Sigue?" },
       { type: "heading", level: 3, text: "Su Certificación" },
       { type: "paragraph", html: "¡Felicitaciones! Está calificado para <strong>capacitar y evaluar operadores de elevadores aéreos y de tijera</strong> bajo OSHA 29 CFR 1926.453, 1910.178(l)(2)(iii) y ANSI/SAIA A92." },

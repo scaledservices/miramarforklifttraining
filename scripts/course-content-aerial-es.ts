@@ -10,6 +10,7 @@ export const CANONICAL_COURSE_ES = {
 };
 
 const img = (name: string) => `/images/training/${name}`;
+const photo = (name: string) => `/images/training/photos/${name}`;
 
 const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
@@ -21,7 +22,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera" },
       { type: "heading", level: 2, text: "Bienvenido a la Certificación de Elevadores Aéreos y de Tijera" },
       { type: "heading", level: 3, text: "Acerca de Este Curso" },
       { type: "paragraph", html: "¡Bienvenido! Este curso en línea proporciona la porción de <strong>instrucción formal</strong> de la certificación de operador de elevadores aéreos y de tijera en cumplimiento con OSHA. El curso toma aproximadamente <strong>60-90 minutos</strong> para completar." },
@@ -52,7 +53,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.png"), alt: "Cumplimiento OSHA y ANSI: Lo Que Cubre Este Curso" },
+      { type: "hero_image", src: photo("banners/osha-compliance.png"), alt: "Cumplimiento OSHA y ANSI: Lo Que Cubre Este Curso" },
       { type: "heading", level: 2, text: "Cumplimiento OSHA y ANSI: Lo Que Cubre Este Curso" },
       { type: "heading", level: 3, text: "Regulaciones de OSHA" },
       { type: "paragraph", html: "Los elevadores aéreos están regulados bajo <strong>29 CFR 1926.453</strong> (elevadores aéreos en construcción) y <strong>29 CFR 1910.178</strong> (camiones industriales motorizados, que incluye elevadores de tijera bajo la aplicación de OSHA). OSHA requiere que los operadores reciban:" },
@@ -114,7 +115,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?" },
       { type: "heading", level: 2, text: "¿Qué es una Plataforma de Trabajo Móvil Elevadora (MEWP)?" },
       { type: "heading", level: 3, text: "Definición" },
       { type: "paragraph", html: "Una <strong>Plataforma de Trabajo Móvil Elevadora (MEWP)</strong> es una máquina utilizada para posicionar personal, herramientas y materiales en ubicaciones de trabajo elevadas. Los MEWPs incluyen elevadores aéreos, elevadores de tijera, elevadores de pluma y torres verticales. El término MEWP fue adoptado por ANSI en la revisión de 2020 de los estándares A92." },
@@ -152,7 +153,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("scissor-lift-hero.png"), alt: "Elevadores de Tijera: Operación y Componentes" },
+      { type: "hero_image", src: photo("banners/scissor-lift-hero.png"), alt: "Elevadores de Tijera: Operación y Componentes" },
       { type: "heading", level: 2, text: "Elevadores de Tijera: Operación y Componentes" },
       { type: "heading", level: 3, text: "¿Qué es un Elevador de Tijera?" },
       { type: "paragraph", html: "Un <strong>elevador de tijera</strong> es un MEWP del Grupo A que utiliza soportes tubulares cruzados (mecanismo de pantógrafo) para subir y bajar la plataforma verticalmente. Los elevadores de tijera proporcionan una plataforma de trabajo grande y estable ideal para tareas que requieren múltiples trabajadores y materiales a alturas moderadas." },
@@ -183,7 +184,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Elevadores de Pluma: Articulados y Telescópicos" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "Elevadores de Pluma: Articulados y Telescópicos" },
       { type: "heading", level: 2, text: "Elevadores de Pluma: Articulados y Telescópicos" },
       { type: "heading", level: 3, text: "Elevadores de Pluma Articulados" },
       { type: "paragraph", html: "Los <strong>elevadores de pluma articulados</strong> (plumas articuladas) tienen múltiples secciones articuladas que permiten que la plataforma alcance por encima y sobre obstáculos. El brazo articulado proporciona excelente maniobrabilidad. Clasificados como <strong>Grupo B</strong> porque la plataforma puede extenderse más allá de las líneas de volcadura." },
@@ -238,7 +239,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Lista de Inspección Pre-Operación" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Lista de Inspección Pre-Operación" },
       { type: "heading", level: 2, text: "Lista de Inspección Pre-Operación" },
       { type: "heading", level: 3, text: "Requisito de OSHA" },
       { type: "paragraph", html: "Bajo <strong>29 CFR 1926.453(a)(1)</strong>, los controles del elevador deben ser probados cada día antes de su uso para determinar que están en condiciones seguras de funcionamiento. Este es un requisito diario obligatorio." },
@@ -290,7 +291,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ppe-gloves.png"), alt: "Mantenimiento de Batería y Combustible" },
+      { type: "hero_image", src: photo("banners/ppe-gloves.png"), alt: "Mantenimiento de Batería y Combustible" },
       { type: "heading", level: 2, text: "Mantenimiento de Batería y Combustible" },
       { type: "heading", level: 3, text: "MEWPs Eléctricos" },
       { type: "paragraph", html: "Los MEWPs eléctricos usan baterías de ciclo profundo. El mantenimiento adecuado extiende la vida de la batería:" },
@@ -347,7 +348,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("stability-triangle.png"), alt: "Principios de Estabilidad del MEWP" },
+      { type: "hero_image", src: photo("banners/stability-triangle.png"), alt: "Principios de Estabilidad del MEWP" },
       { type: "heading", level: 2, text: "Principios de Estabilidad del MEWP" },
       { type: "heading", level: 3, text: "Líneas de Volcadura" },
       { type: "paragraph", html: "Cada MEWP tiene <strong>líneas de volcadura</strong> — el eje alrededor del cual el MEWP podría volcarse si el centro de gravedad se desplaza demasiado. Para MEWPs del Grupo A (tijera), las líneas son típicamente las ruedas o estabilizadores. Para el Grupo B (pluma), son las almohadillas de los estabilizadores o las posiciones de las ruedas." },
@@ -379,7 +380,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("load-center.png"), alt: "Capacidad Nominal y Límites de Carga" },
+      { type: "hero_image", src: photo("banners/load-center.png"), alt: "Capacidad Nominal y Límites de Carga" },
       { type: "heading", level: 2, text: "Capacidad Nominal y Límites de Carga" },
       { type: "heading", level: 3, text: "Placa de Capacidad del Fabricante" },
       { type: "paragraph", html: "Cada MEWP tiene una placa de <strong>capacidad nominal</strong> que especifica la carga máxima que la plataforma puede soportar. Esto incluye el peso combinado de todo el personal, herramientas y materiales. <strong>Nunca exceda esta clasificación.</strong>" },
@@ -418,7 +419,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pedestrian-safety.png"), alt: "Requisitos de Protección contra Caídas" },
+      { type: "hero_image", src: photo("banners/pedestrian-safety.png"), alt: "Requisitos de Protección contra Caídas" },
       { type: "heading", level: 2, text: "Requisitos de Protección contra Caídas" },
       { type: "heading", level: 3, text: "Norma de Protección contra Caídas de OSHA" },
       { type: "paragraph", html: "Bajo <strong>29 CFR 1926.453</strong>, los empleados siempre deben pararse firmemente en el piso de la canasta. Se debe usar un <strong>cinturón corporal</strong> y un <strong>arnés de seguridad</strong> adjunto a la pluma o canasta. Sin embargo, desde el 1 de enero de 1998, los cinturones corporales <strong>NO son aceptables</strong> como parte de un sistema personal de detención de caídas — se debe usar un <strong>arnés de cuerpo completo</strong>." },
@@ -454,7 +455,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.png"), alt: "Procedimientos de Operación Segura" },
+      { type: "hero_image", src: photo("banners/safe-driving.png"), alt: "Procedimientos de Operación Segura" },
       { type: "heading", level: 2, text: "Procedimientos de Operación Segura" },
       { type: "heading", level: 3, text: "Antes de Elevar" },
       { type: "paragraph", html: "Antes de subir la plataforma:" },
@@ -512,7 +513,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.png"), alt: "Peligros Eléctricos y Líneas de Energía" },
+      { type: "hero_image", src: photo("banners/osha-compliance.png"), alt: "Peligros Eléctricos y Líneas de Energía" },
       { type: "heading", level: 2, text: "Peligros Eléctricos y Líneas de Energía" },
       { type: "heading", level: 3, text: "Distancia Mínima de Líneas de Energía" },
       { type: "paragraph", html: "OSHA requiere distancias mínimas de líneas de energía:" },
@@ -557,7 +558,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Peligros Ambientales y del Lugar de Trabajo" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Peligros Ambientales y del Lugar de Trabajo" },
       { type: "heading", level: 2, text: "Peligros Ambientales y del Lugar de Trabajo" },
       { type: "heading", level: 3, text: "Condiciones Climáticas" },
       { type: "list", items: [
@@ -605,7 +606,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Controles de Emergencia y Descenso" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Controles de Emergencia y Descenso" },
       { type: "heading", level: 2, text: "Controles de Emergencia y Descenso" },
       { type: "heading", level: 3, text: "Sistema de Descenso de Emergencia" },
       { type: "paragraph", html: "Todos los MEWPs están equipados con <strong>sistemas de descenso de emergencia</strong> que permiten bajar la plataforma desde el suelo si el operador está incapacitado o los controles superiores fallan. Conozca dónde están estos controles antes de operar." },
@@ -630,7 +631,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pedestrian-safety.png"), alt: "Planificación y Procedimientos de Rescate" },
+      { type: "hero_image", src: photo("banners/pedestrian-safety.png"), alt: "Planificación y Procedimientos de Rescate" },
       { type: "heading", level: 2, text: "Planificación y Procedimientos de Rescate" },
       { type: "heading", level: 3, text: "Requisitos de Rescate ANSI A92.22" },
       { type: "paragraph", html: "ANSI A92.22 requiere que se desarrolle un <strong>plan de rescate</strong> antes del uso del MEWP. Debe abordar cómo se recuperará a un operador si no puede operar los controles." },
@@ -700,7 +701,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "¡Está Certificado! ¿Qué Sigue?" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "¡Está Certificado! ¿Qué Sigue?" },
       { type: "heading", level: 2, text: "¡Está Certificado! ¿Qué Sigue?" },
       { type: "heading", level: 3, text: "Su Certificado" },
       { type: "paragraph", html: "¡Felicitaciones por completar la porción de instrucción formal de su certificación de operador de elevadores aéreos y de tijera! Su certificado digital está disponible para descargar con número único y código QR." },

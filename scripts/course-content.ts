@@ -207,7 +207,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
-      { type: "hero_image", src: img("stability-triangle.png"), alt: "Top-down view of a forklift showing the stability triangle" },
+      { type: "hero_image", src: photo("banners/stability-triangle.png"), alt: "Top-down view of a forklift showing the stability triangle" },
       { type: "heading", level: 2, text: "Stability Triangle and Center of Gravity" },
       { type: "heading", level: 3, text: "What is the Stability Triangle?" },
       { type: "paragraph", html: "The <strong>stability triangle</strong> is the three-point base formed by the two front axle ends and the rear axle pivot point. As long as the combined center of gravity of the truck and its load stays within this triangle, the forklift remains stable." },
@@ -245,7 +245,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("load-center.png"), alt: "Diagram of load center distance and capacity" },
+      { type: "hero_image", src: photo("banners/load-center.png"), alt: "Diagram of load center distance and capacity" },
       { type: "heading", level: 2, text: "Rated Capacity & Data Plate" },
       { type: "heading", level: 3, text: "The Data Plate" },
       { type: "paragraph", html: "Every forklift has a manufacturer's <strong>data plate</strong> indicating the maximum lifting capacity at various load centers. Before lifting any load, verify your forklift is rated to handle its weight." },
@@ -356,7 +356,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Forklift inspection points diagram" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Forklift inspection points diagram" },
       { type: "heading", level: 2, text: "Maintenance and Repairs" },
       { type: "heading", level: 3, text: "Repair Before Use" },
       { type: "paragraph", html: "If a safety issue is identified during inspection, <strong>repairs must be made before the equipment is used</strong>. Never operate a forklift with known defects." },
@@ -377,7 +377,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ppe-gloves.png"), alt: "Required PPE for fueling: gloves, vest, hard hat, eye protection" },
+      { type: "hero_image", src: photo("banners/ppe-gloves.png"), alt: "Required PPE for fueling: gloves, vest, hard hat, eye protection" },
       { type: "heading", level: 2, text: "Fueling and Charging Safety (LPG / Electric)" },
       { type: "heading", level: 3, text: "Designated Areas Only" },
       { type: "paragraph", html: "Refueling and recharging must <strong>only occur in designated areas</strong> with proper ventilation. Never refuel in general work areas." },
@@ -423,7 +423,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.png"), alt: "Proper driving posture with seat belt, low load, and eyes forward" },
+      { type: "hero_image", src: photo("banners/safe-driving.png"), alt: "Proper driving posture with seat belt, low load, and eyes forward" },
       { type: "heading", level: 2, text: "Speed, Space, and Awareness" },
       { type: "heading", level: 3, text: "Speed Limits" },
       { type: "paragraph", html: "The maximum safe speed for operating a forklift is typically <strong>5 mph</strong>. Forklifts are designed to move heavy loads, not to race. Focus on working <strong>efficiently, not faster</strong>." },
@@ -448,7 +448,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Warehouse aisle with clearance zones" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Warehouse aisle with clearance zones" },
       { type: "heading", level: 2, text: "Intersections, Blind Spots, and Horn Use" },
       { type: "heading", level: 3, text: "Approach With Caution" },
       { type: "paragraph", html: "At every intersection, blind corner, or area with limited visibility: <strong>slow down, sound your horn, and look both ways</strong> before proceeding." },
@@ -504,7 +504,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.png"), alt: "Safe driving posture and smooth handling" },
+      { type: "hero_image", src: photo("banners/safe-driving.png"), alt: "Safe driving posture and smooth handling" },
       { type: "heading", level: 2, text: "Direction Changes and Smooth Handling" },
       { type: "heading", level: 3, text: "Complete Stop Before Direction Change" },
       { type: "paragraph", html: "Always come to a <strong>complete stop</strong> before changing from forward to reverse or vice versa. Abrupt direction changes can cause loads to shift or fall, and increase tip-over risk." },
@@ -527,7 +527,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ramps-slopes.png"), alt: "Forklift on a ramp with the load pointed upgrade" },
+      { type: "hero_image", src: photo("banners/ramps-slopes.png"), alt: "Forklift on a ramp with the load pointed upgrade" },
       { type: "heading", level: 2, text: "Ramps and Slopes" },
       { type: "heading", level: 3, text: "Loaded Travel on Ramps" },
       { type: "paragraph", html: "When traveling on a ramp <strong>with a load</strong>: keep the load pointed <strong>uphill</strong> (upgrade). This means driving forward up a ramp and in reverse down a ramp when loaded." },
@@ -628,7 +628,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("parking-shutdown.png"), alt: "Parked forklift with forks lowered, chocked wheel, and shutdown steps" },
+      { type: "hero_image", src: photo("banners/parking-shutdown.png"), alt: "Parked forklift with forks lowered, chocked wheel, and shutdown steps" },
       { type: "heading", level: 2, text: "Parking and Securing the Forklift" },
       { type: "heading", level: 3, text: "Parking Procedure" },
       { type: "paragraph", html: "Every shutdown follows the same sequence. Put the steps in order — you will do this at the end of every shift for the rest of your career." },
@@ -658,7 +658,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("parking-shutdown.png"), alt: "Forklift parked and secured" },
+      { type: "hero_image", src: photo("banners/parking-shutdown.png"), alt: "Forklift parked and secured" },
       { type: "heading", level: 2, text: "Unattended Forklift: When and What To Do" },
       { type: "heading", level: 3, text: "What 'Unattended' Means" },
       { type: "paragraph", html: "A forklift is considered <strong>unattended</strong> when the operator is <strong>more than 25 feet away</strong> from the vehicle AND the vehicle is <strong>out of their line of sight</strong>." },
@@ -712,7 +712,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Warehouse aisle showing site-specific clearances" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Warehouse aisle showing site-specific clearances" },
       { type: "heading", level: 2, text: "Site-Specific Training Matters" },
       { type: "heading", level: 3, text: "Every Workplace Is Different" },
       { type: "paragraph", html: "Every worksite has unique hazards: narrow aisles, specific pedestrian traffic patterns, loading docks, racking configurations, cold storage areas, outdoor areas, and more. Your supervisor must review <strong>site-specific policies</strong> with you before you operate at any new location." },

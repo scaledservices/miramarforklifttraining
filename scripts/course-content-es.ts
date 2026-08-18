@@ -192,7 +192,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
-      { type: "hero_image", src: img("stability-triangle.png"), alt: "Vista superior de un montacargas mostrando el triángulo de estabilidad" },
+      { type: "hero_image", src: photo("banners/stability-triangle.png"), alt: "Vista superior de un montacargas mostrando el triángulo de estabilidad" },
       { type: "heading", level: 2, text: "Triángulo de Estabilidad y Centro de Gravedad" },
       { type: "heading", level: 3, text: "¿Qué es el Triángulo de Estabilidad?" },
       { type: "paragraph", html: "El <strong>triángulo de estabilidad</strong> es la base de tres puntos formada por los dos extremos del eje delantero y el punto de pivote del eje trasero. Mientras el centro de gravedad combinado del camión y su carga se mantenga dentro de este triángulo, el montacargas permanece estable." },
@@ -230,7 +230,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("load-center.png"), alt: "Diagrama de la distancia del centro de carga y la capacidad" },
+      { type: "hero_image", src: photo("banners/load-center.png"), alt: "Diagrama de la distancia del centro de carga y la capacidad" },
       { type: "heading", level: 2, text: "Capacidad Nominal y Placa de Datos" },
       { type: "heading", level: 3, text: "La Placa de Datos" },
       { type: "paragraph", html: "Cada montacargas tiene una <strong>placa de datos</strong> del fabricante que indica la capacidad máxima de elevación a varios centros de carga. Antes de levantar cualquier carga, verifique que su montacargas esté clasificado para manejar su peso." },
@@ -341,7 +341,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Diagrama de puntos de inspección del montacargas" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Diagrama de puntos de inspección del montacargas" },
       { type: "heading", level: 2, text: "Mantenimiento y Reparaciones" },
       { type: "heading", level: 3, text: "Reparar Antes de Usar" },
       { type: "paragraph", html: "Si se identifica un problema de seguridad durante la inspección, <strong>las reparaciones deben hacerse antes de que se use el equipo</strong>. Nunca opere un montacargas con defectos conocidos." },
@@ -362,7 +362,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ppe-gloves.png"), alt: "EPP requerido para reabastecer: guantes, chaleco, casco, protección ocular" },
+      { type: "hero_image", src: photo("banners/ppe-gloves.png"), alt: "EPP requerido para reabastecer: guantes, chaleco, casco, protección ocular" },
       { type: "heading", level: 2, text: "Seguridad en Combustible y Carga (GLP / Eléctrico)" },
       { type: "heading", level: 3, text: "Solo en Áreas Designadas" },
       { type: "paragraph", html: "El reabastecimiento y la recarga <strong>solo deben ocurrir en áreas designadas</strong> con ventilación adecuada. Nunca reabastezca en áreas de trabajo generales." },
@@ -408,7 +408,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.png"), alt: "Postura de conducción correcta con cinturón de seguridad, carga baja y ojos al frente" },
+      { type: "hero_image", src: photo("banners/safe-driving.png"), alt: "Postura de conducción correcta con cinturón de seguridad, carga baja y ojos al frente" },
       { type: "heading", level: 2, text: "Velocidad, Espacio y Atención" },
       { type: "heading", level: 3, text: "Límites de Velocidad" },
       { type: "paragraph", html: "La velocidad máxima segura para operar un montacargas es típicamente de <strong>5 mph</strong>. Los montacargas están diseñados para mover cargas pesadas, no para correr. Concéntrese en trabajar de manera <strong>eficiente, no más rápida</strong>." },
@@ -433,7 +433,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Pasillo de almacén con zonas de espacio libre" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Pasillo de almacén con zonas de espacio libre" },
       { type: "heading", level: 2, text: "Intersecciones, Puntos Ciegos y Uso de la Bocina" },
       { type: "heading", level: 3, text: "Aproxímese con Precaución" },
       { type: "paragraph", html: "En cada intersección, esquina ciega o área con visibilidad limitada: <strong>reduzca la velocidad, toque la bocina y mire en ambas direcciones</strong> antes de proceder." },
@@ -489,7 +489,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.png"), alt: "Postura de conducción segura y manejo suave" },
+      { type: "hero_image", src: photo("banners/safe-driving.png"), alt: "Postura de conducción segura y manejo suave" },
       { type: "heading", level: 2, text: "Cambios de Dirección y Manejo Suave" },
       { type: "heading", level: 3, text: "Detención Completa Antes de Cambiar de Dirección" },
       { type: "paragraph", html: "Siempre llegue a una <strong>detención completa</strong> antes de cambiar de avance a reversa o viceversa. Los cambios de dirección abruptos pueden causar que las cargas se desplacen o caigan, y aumentan el riesgo de volcadura." },
@@ -512,7 +512,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ramps-slopes.png"), alt: "Montacargas en una rampa con la carga apuntando cuesta arriba" },
+      { type: "hero_image", src: photo("banners/ramps-slopes.png"), alt: "Montacargas en una rampa con la carga apuntando cuesta arriba" },
       { type: "heading", level: 2, text: "Operación en Rampas y Pendientes" },
       { type: "heading", level: 3, text: "Viaje con Carga en Rampas" },
       { type: "paragraph", html: "Al viajar en una rampa <strong>con carga</strong>: mantenga la carga apuntando <strong>cuesta arriba</strong>. Esto significa conducir hacia adelante al subir una rampa y en reversa al bajar una rampa cuando está cargado." },
@@ -613,7 +613,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("parking-shutdown.png"), alt: "Montacargas estacionado con horquillas bajadas, rueda calzada y pasos de apagado" },
+      { type: "hero_image", src: photo("banners/parking-shutdown.png"), alt: "Montacargas estacionado con horquillas bajadas, rueda calzada y pasos de apagado" },
       { type: "heading", level: 2, text: "Estacionamiento y Aseguramiento del Montacargas" },
       { type: "heading", level: 3, text: "Procedimiento de Estacionamiento" },
       { type: "paragraph", html: "Cada apagado sigue la misma secuencia. Ponga los pasos en orden — hará esto al final de cada turno por el resto de su carrera." },
@@ -643,7 +643,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("parking-shutdown.png"), alt: "Montacargas estacionado y asegurado" },
+      { type: "hero_image", src: photo("banners/parking-shutdown.png"), alt: "Montacargas estacionado y asegurado" },
       { type: "heading", level: 2, text: "Montacargas Desatendido: Cuándo y Qué Hacer" },
       { type: "heading", level: 3, text: "Qué Significa 'Desatendido'" },
       { type: "paragraph", html: "Un montacargas se considera <strong>desatendido</strong> cuando el operador está a <strong>más de 25 pies de distancia</strong> del vehículo Y el vehículo está <strong>fuera de su línea de visión</strong>." },
@@ -697,7 +697,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Pasillo de almacén mostrando espacios libres específicos del sitio" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Pasillo de almacén mostrando espacios libres específicos del sitio" },
       { type: "heading", level: 2, text: "La Importancia de la Capacitación Específica del Sitio" },
       { type: "heading", level: 3, text: "Cada Lugar de Trabajo es Diferente" },
       { type: "paragraph", html: "Cada lugar de trabajo tiene peligros únicos: pasillos estrechos, patrones de tráfico peatonal específicos, muelles de carga, configuraciones de estantería, áreas de almacenamiento frío, áreas exteriores y más. Su supervisor debe revisar las <strong>políticas específicas del sitio</strong> con usted antes de operar en cualquier nueva ubicación." },

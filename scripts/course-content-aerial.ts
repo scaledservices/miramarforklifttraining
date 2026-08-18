@@ -26,6 +26,7 @@ export const CANONICAL_COURSE = {
 };
 
 const img = (name: string) => `/images/training/${name}`;
+const photo = (name: string) => `/images/training/photos/${name}`;
 
 const blocks = (b: LessonBlock[]) => ({ blocks: b });
 
@@ -37,7 +38,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Welcome to Aerial & Scissor Lift Certification" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "Welcome to Aerial & Scissor Lift Certification" },
       { type: "heading", level: 2, text: "Welcome to Aerial & Scissor Lift Certification" },
       { type: "heading", level: 3, text: "About This Course" },
       { type: "paragraph", html: "Welcome! This online course provides the <strong>formal instruction</strong> portion of OSHA-compliant aerial lift and scissor lift operator certification. The course takes approximately <strong>60-90 minutes</strong> to complete." },
@@ -68,7 +69,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.png"), alt: "OSHA & ANSI Compliance: What This Course Covers" },
+      { type: "hero_image", src: photo("banners/osha-compliance.png"), alt: "OSHA & ANSI Compliance: What This Course Covers" },
       { type: "heading", level: 2, text: "OSHA & ANSI Compliance: What This Course Covers" },
       { type: "heading", level: 3, text: "OSHA Regulations" },
       { type: "paragraph", html: "Aerial lifts are regulated under <strong>29 CFR 1926.453</strong> (aerial lifts in construction) and <strong>29 CFR 1910.178</strong> (powered industrial trucks, which includes scissor lifts under OSHA enforcement). OSHA requires operators to receive:" },
@@ -130,7 +131,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "What is a Mobile Elevating Work Platform (MEWP)?" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "What is a Mobile Elevating Work Platform (MEWP)?" },
       { type: "heading", level: 2, text: "What is a Mobile Elevating Work Platform (MEWP)?" },
       { type: "heading", level: 3, text: "Definition" },
       { type: "paragraph", html: "A <strong>Mobile Elevating Work Platform (MEWP)</strong> is a machine used to position personnel, tools, and materials at elevated work locations. MEWPs include aerial lifts, scissor lifts, boom lifts, and vertical towers. The term MEWP was adopted by ANSI in the 2020 revision of the A92 standards." },
@@ -168,7 +169,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("scissor-lift-hero.png"), alt: "Scissor Lifts: Operation and Components" },
+      { type: "hero_image", src: photo("banners/scissor-lift-hero.png"), alt: "Scissor Lifts: Operation and Components" },
       { type: "heading", level: 2, text: "Scissor Lifts: Operation and Components" },
       { type: "heading", level: 3, text: "What is a Scissor Lift?" },
       { type: "paragraph", html: "A <strong>scissor lift</strong> is a Group A MEWP that uses crossed tubular supports (a pantograph mechanism) to raise and lower the platform vertically. Scissor lifts provide a large, stable working platform ideal for tasks requiring multiple workers and materials at moderate heights." },
@@ -200,7 +201,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "Boom Lifts: Articulating and Telescopic" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "Boom Lifts: Articulating and Telescopic" },
       { type: "heading", level: 2, text: "Boom Lifts: Articulating and Telescopic" },
       { type: "heading", level: 3, text: "Articulating Boom Lifts" },
       { type: "paragraph", html: "<strong>Articulating boom lifts</strong> (knuckle booms) have multiple hinged sections that allow the platform to reach up and over obstacles. The jointed arm provides excellent maneuverability for reaching over equipment, structures, or obstacles. These are classified as <strong>Group B</strong> MEWPs because the platform can extend beyond the tipping lines." },
@@ -258,7 +259,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Pre-Operation Inspection Checklist" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Pre-Operation Inspection Checklist" },
       { type: "heading", level: 2, text: "Pre-Operation Inspection Checklist" },
       { type: "heading", level: 3, text: "OSHA Requirement" },
       { type: "paragraph", html: "Under <strong>29 CFR 1926.453(a)(1)</strong>, lift controls shall be tested each day prior to use to determine that such controls are in safe working condition. This is a mandatory daily requirement." },
@@ -312,7 +313,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("ppe-gloves.png"), alt: "Battery and Fuel Maintenance" },
+      { type: "hero_image", src: photo("banners/ppe-gloves.png"), alt: "Battery and Fuel Maintenance" },
       { type: "heading", level: 2, text: "Battery and Fuel Maintenance" },
       { type: "heading", level: 3, text: "Battery-Powered MEWPs" },
       { type: "paragraph", html: "Electric MEWPs use deep-cycle batteries. Proper maintenance extends battery life and ensures safe operation:" },
@@ -372,7 +373,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("stability-triangle.png"), alt: "MEWP Stability Principles" },
+      { type: "hero_image", src: photo("banners/stability-triangle.png"), alt: "MEWP Stability Principles" },
       { type: "heading", level: 2, text: "MEWP Stability Principles" },
       { type: "heading", level: 3, text: "Tipping Lines" },
       { type: "paragraph", html: "Every MEWP has <strong>tipping lines</strong> — the axis around which the MEWP could tip if the center of gravity shifts too far. For Group A MEWPs (scissor lifts), the tipping lines are typically the wheels or outriggers. For Group B MEWPs (boom lifts), the tipping lines are the outrigger pads or wheel positions." },
@@ -410,7 +411,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("load-center.png"), alt: "Rated Capacity and Load Limits" },
+      { type: "hero_image", src: photo("banners/load-center.png"), alt: "Rated Capacity and Load Limits" },
       { type: "heading", level: 2, text: "Rated Capacity and Load Limits" },
       { type: "heading", level: 3, text: "Manufacturer's Capacity Rating" },
       { type: "paragraph", html: "Every MEWP has a manufacturer's <strong>rated capacity</strong> plate that specifies the maximum load the platform can safely carry. This includes the combined weight of all personnel, tools, and materials on the platform. <strong>Never exceed this rating.</strong>" },
@@ -449,7 +450,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pedestrian-safety.png"), alt: "Fall Protection Requirements" },
+      { type: "hero_image", src: photo("banners/pedestrian-safety.png"), alt: "Fall Protection Requirements" },
       { type: "heading", level: 2, text: "Fall Protection Requirements" },
       { type: "heading", level: 3, text: "OSHA Fall Protection Standard" },
       { type: "paragraph", html: "Under <strong>29 CFR 1926.453</strong>, employees shall always stand firmly on the floor of the basket. A <strong>body belt</strong> shall be worn and a <strong>lanyard</strong> attached to the boom or basket. However, since January 1, 1998, body belts are <strong>NOT acceptable</strong> as part of a personal fall arrest system — a <strong>full body harness</strong> must be used." },
@@ -498,7 +499,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("safe-driving.png"), alt: "Safe Operating Procedures" },
+      { type: "hero_image", src: photo("banners/safe-driving.png"), alt: "Safe Operating Procedures" },
       { type: "heading", level: 2, text: "Safe Operating Procedures" },
       { type: "heading", level: 3, text: "Before Elevating" },
       { type: "paragraph", html: "Before raising the platform:" },
@@ -566,7 +567,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("osha-compliance.png"), alt: "Electrical Hazards and Power Lines" },
+      { type: "hero_image", src: photo("banners/osha-compliance.png"), alt: "Electrical Hazards and Power Lines" },
       { type: "heading", level: 2, text: "Electrical Hazards and Power Lines" },
       { type: "heading", level: 3, text: "Power Line Clearance" },
       { type: "paragraph", html: "Working near overhead power lines is one of the most dangerous operations for MEWP operators. OSHA requires minimum clearance distances from power lines:" },
@@ -619,7 +620,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("warehouse-aisle.png"), alt: "Environmental and Workplace Hazards" },
+      { type: "hero_image", src: photo("banners/warehouse-aisle.png"), alt: "Environmental and Workplace Hazards" },
       { type: "heading", level: 2, text: "Environmental and Workplace Hazards" },
       { type: "heading", level: 3, text: "Weather Conditions" },
       { type: "paragraph", html: "Weather significantly affects MEWP safety:" },
@@ -689,7 +690,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
-      { type: "hero_image", src: img("pre-shift-checklist.png"), alt: "Emergency Controls and Lowering" },
+      { type: "hero_image", src: photo("banners/pre-shift-checklist.png"), alt: "Emergency Controls and Lowering" },
       { type: "heading", level: 2, text: "Emergency Controls and Lowering" },
       { type: "heading", level: 3, text: "Emergency Lowering System" },
       { type: "paragraph", html: "All MEWPs are equipped with <strong>emergency lowering</strong> systems that allow the platform to be lowered from the ground if the operator is incapacitated or if the upper controls fail. These may be manual valves, electric switches, or hydraulic pumps. Know where these controls are located before operating." },
@@ -720,7 +721,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
-      { type: "hero_image", src: img("pedestrian-safety.png"), alt: "Rescue Planning and Procedures" },
+      { type: "hero_image", src: photo("banners/pedestrian-safety.png"), alt: "Rescue Planning and Procedures" },
       { type: "heading", level: 2, text: "Rescue Planning and Procedures" },
       { type: "heading", level: 3, text: "ANSI A92.22 Rescue Requirements" },
       { type: "paragraph", html: "ANSI A92.22 requires that a <strong>rescue plan</strong> be developed before MEWP use begins. The plan must address how an operator will be retrieved from the platform if they are unable to operate the controls. The plan must be communicated to all relevant personnel." },
@@ -816,7 +817,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
-      { type: "hero_image", src: img("aerial-lift-hero.png"), alt: "You're Certified! What's Next" },
+      { type: "hero_image", src: photo("banners/aerial-lift-hero.png"), alt: "You're Certified! What's Next" },
       { type: "heading", level: 2, text: "You're Certified! What's Next" },
       { type: "heading", level: 3, text: "Your Certificate" },
       { type: "paragraph", html: "Congratulations on completing the formal instruction portion of your aerial and scissor lift operator certification! Your digital certificate is now available for download. It includes a unique certificate number and QR code that employers can use for instant verification." },
