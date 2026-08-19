@@ -1021,7 +1021,15 @@
     "orderFor": "Order Photo ID",
     "remind": "Remind member",
     "uploadFor": "Upload photo for them",
-    "viewPhotoId": "View Photo ID"
+    "viewPhotoId": "View Photo ID",
+    "orderDialogTitle": "Order a Photo ID",
+    "orderDialogDesc": "You are ordering a photo ID wallet card for {{name}}. They will be emailed a link to add their photo.",
+    "orderPlaced": "Photo ID ordered",
+    "orderPlacedDesc": "The member was emailed a link to add their photo.",
+    "addressRequired": "Enter the mailing address to continue to payment.",
+    "payAndOrder": "Pay {{amount}} & Order",
+    "placeOrder": "Place Order",
+    "orderFailed": "Could not place the photo ID order."
   },
   "checkout": {
     "emptyCartTitle": "Your Cart is Empty",

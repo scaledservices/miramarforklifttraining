@@ -1021,7 +1021,15 @@
     "orderFor": "Ordenar tarjeta con foto",
     "remind": "Recordar al miembro",
     "uploadFor": "Subir su foto",
-    "viewPhotoId": "Ver tarjeta con foto"
+    "viewPhotoId": "Ver tarjeta con foto",
+    "orderDialogTitle": "Ordenar una tarjeta con foto",
+    "orderDialogDesc": "Está ordenando una tarjeta de identificación con foto para {{name}}. Se le enviará un enlace para agregar su foto.",
+    "orderPlaced": "Tarjeta con foto ordenada",
+    "orderPlacedDesc": "Se envió al miembro un enlace para agregar su foto.",
+    "addressRequired": "Ingrese la dirección de envío para continuar al pago.",
+    "payAndOrder": "Pagar {{amount}} y ordenar",
+    "placeOrder": "Realizar pedido",
+    "orderFailed": "No se pudo realizar el pedido de la tarjeta con foto."
   },
   "checkout": {
     "emptyCartTitle": "Tu Carrito Está Vacío",

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { Download, CreditCard, Eye, ImagePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import GroupLayout from "./GroupLayout";
+import OrderPhotoIdDialog from "@/components/group/OrderPhotoIdDialog";
 import { useTranslation } from "react-i18next";
 
 type PhotoIdStatus = "not_ordered" | "photo_needed" | "ordered" | "shipped";
@@ -16,6 +18,12 @@ interface PhotoIdCertStatus {
   status: PhotoIdStatus;
   entitlementId?: number;
   cardOrderId?: number;
+}
+
+interface OrderTarget {
+  memberId: number;
+  memberName: string;
+  certificationId: number;
 }
 
 export default function GroupCertifications() {
@@ -41,10 +49,12 @@ export default function GroupCertifications() {
     queryKey: ["/api/groups", group?.id, "photo-id-status"],
     enabled: !!group?.id,
   });
-  const photoIdByCert = new Map<number, PhotoIdCertStatus>();
+  const photoIdByCert = new Map<number, PhotoIdCertStatus & { memberId?: number; memberName?: string }>();
   for (const m of photoIdData?.members || []) {
-    for (const c of m.certifications) photoIdByCert.set(c.certificationId, c);
+    for (const c of m.certifications) photoIdByCert.set(c.certificationId, { ...c, memberId: (m as any).userId, memberName: (m as any).name });
   }
+
+  const [orderTarget, setOrderTarget] = useState<OrderTarget | null>(null);
 
   const statusVariant = (status: string) => {
     switch (status) {
@@ -193,18 +203,21 @@ export default function GroupCertifications() {
                                 </Link>
                               );
                             }
-                            // not_ordered: send the admin to the pay flow for this cert.
+                            // not_ordered: the crew admin orders + pays for this member.
                             return (
-                              <Link href={`/order-cert-card/${cert.id}`}>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  title={t("teamPhotoId.orderFor", "Order Photo ID")}
-                                  data-testid={`button-order-photo-id-${cert.id}`}
-                                >
-                                  <CreditCard className="h-4 w-4" />
-                                </Button>
-                              </Link>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                title={t("teamPhotoId.orderFor", "Order Photo ID")}
+                                data-testid={`button-order-photo-id-${cert.id}`}
+                                onClick={() => setOrderTarget({
+                                  memberId: ps?.memberId || 0,
+                                  memberName: ps?.memberName || cert.userName || "",
+                                  certificationId: cert.id,
+                                })}
+                              >
+                                <CreditCard className="h-4 w-4" />
+                              </Button>
                             );
                           })()}
                         </div>
@@ -217,6 +230,17 @@ export default function GroupCertifications() {
           </CardContent>
         </Card>
       </div>
+
+      {orderTarget && group && (
+        <OrderPhotoIdDialog
+          open={!!orderTarget}
+          onOpenChange={(open) => { if (!open) setOrderTarget(null); }}
+          groupId={group.id}
+          memberId={orderTarget.memberId}
+          memberName={orderTarget.memberName}
+          certificationId={orderTarget.certificationId}
+        />
+      )}
     </GroupLayout>
   );
 }
