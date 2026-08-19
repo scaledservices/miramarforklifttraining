@@ -25,6 +25,19 @@ function getCertPath(certificateNumber: string): string {
   return `certificates/${certificateNumber}.pdf`;
 }
 
+// AI-generated official gold seal (replaces the older vector-drawn seal).
+// Resolved from the public images dir; falls back to the vector seal if absent.
+function getSealImagePath(): string | null {
+  const candidates = [
+    path.join(process.cwd(), "client/public/images/certificate-seal.png"),
+    path.join(process.cwd(), "dist/public/images/certificate-seal.png"),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
 const certLabels = {
   en: {
     certificateOfCompletion: "Certificate of Completion",
@@ -460,7 +473,15 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
     // ════════════════════════════════════════
     // OFFICIAL SEAL — bottom-left area
     // ════════════════════════════════════════
-    drawOfficialSeal(doc, 90, 535, 42, labels.officialSeal);
+    // Prefer the AI-generated embossed gold seal image; fall back to the
+    // vector-drawn seal if the asset is missing (keeps PDFs renderable).
+    const sealPath = getSealImagePath();
+    if (sealPath) {
+      const sealSize = 84; // ~ matches the old vector seal's 42px radius
+      doc.image(sealPath, 90 - sealSize / 2, 535 - sealSize / 2, { width: sealSize, height: sealSize });
+    } else {
+      drawOfficialSeal(doc, 90, 535, 42, labels.officialSeal);
+    }
 
     // ════════════════════════════════════════
     // QR CODE — bottom-right area, framed
