@@ -132,7 +132,9 @@
     "placeholderName": "Juan Pérez",
     "placeholderPhone": "(555) 123-4567",
     "emailInvalid": "Ingrese un correo electrónico válido",
-    "phoneInvalid": "Ingrese un número de teléfono de 10 dígitos"
+    "phoneInvalid": "Ingrese un número de teléfono de 10 dígitos",
+    "passwordOptional": "Contraseña (opcional)",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres"
   },
   "cart": {
     "title": "Carrito de Compras",
@@ -1853,6 +1855,7 @@
     "settingUp": "Creando su cuenta…",
     "bookingAs": "Reservando como {{name}} ({{email}})",
     "accountCreatedNote": "Creamos su cuenta automáticamente — un correo de bienvenida va en camino. Puede establecer una contraseña cuando quiera con \"Olvidé mi contraseña\".",
+    "passwordOptionalHint": "Establezca una contraseña ahora para crear su cuenta al reservar — o déjelo en blanco y créela después.",
     "existingAccountNote": "Buenas noticias — ya tiene una cuenta con este correo. Inicie sesión abajo para completar su compra.",
     "accountSetupRetryNote": "No pudimos crear su cuenta automáticamente. Cree una abajo para completar su compra — sus datos ya están completados."
   },

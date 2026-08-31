@@ -143,6 +143,12 @@ export default function BookTraining() {
   // step 4 shows the inline sign-in prefilled with that email instead.
   const [creatingAccount, setCreatingAccount] = useState(false);
   const [accountAutoCreated, setAccountAutoCreated] = useState(false);
+  // Optional password collected on the Details step (Alberto, 2026-08-18):
+  // when provided, the silent account creation uses it so the customer never
+  // has to do a separate password step; when blank we fall back to a
+  // generated temp password and the customer can set one later via
+  // "Forgot password" (prevention-first: no new required field).
+  const [accountPassword, setAccountPassword] = useState("");
   // 409 = email already registered → prefilled sign-in; anything else
   // (network/5xx) → prefilled sign-up so the user isn't asked for a password
   // to an account that doesn't exist.
@@ -389,7 +395,10 @@ export default function BookTraining() {
         await registerAccount({
           name: contactName.trim(),
           email: normalizeEmail(contactEmail),
-          password: generateTempPassword(),
+          // Customer-chosen password when they entered one on the Details
+          // step; otherwise a temp password they can replace via "Forgot
+          // password" (Alberto, 2026-08-18: collect password earlier).
+          password: accountPassword.trim().length >= 8 ? accountPassword : generateTempPassword(),
           phone: contactPhone || undefined,
           locale: i18n.language?.startsWith("es") ? "es" : "en",
         });
@@ -1003,6 +1012,27 @@ export default function BookTraining() {
                     )}
                   </div>
                 </div>
+
+                {!isAuthenticated && (
+                  <div className="space-y-1.5">
+                    <Label htmlFor="book-password">{t("form.passwordOptional")}</Label>
+                    <Input
+                      id="book-password"
+                      type="password"
+                      autoComplete="new-password"
+                      value={accountPassword}
+                      onChange={(e) => setAccountPassword(e.target.value)}
+                      placeholder={t("form.placeholderCreatePassword")}
+                      data-testid="input-booking-password"
+                    />
+                    {accountPassword.length > 0 && accountPassword.length < 8 && (
+                      <p className="text-xs text-destructive" data-testid="text-password-short">{t("form.passwordTooShort")}</p>
+                    )}
+                    {accountPassword.length === 0 && (
+                      <p className="text-xs text-muted-foreground" data-testid="text-password-optional-hint">{t("bookTraining.passwordOptionalHint")}</p>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <p className="text-sm font-medium mb-3">{t("bookTraining.trainingLocation")}</p>
