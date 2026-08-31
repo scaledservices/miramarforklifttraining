@@ -744,7 +744,9 @@ export default function BookTraining() {
                     </h2>
                     <p className="text-sm text-muted-foreground mb-4">{t("bookTraining.selectTrainingDesc")}</p>
 
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                    {/* Rows, not a grid (Peter, 2026-08-31): one full-width
+                        row per course is easier to scan on the booking step. */}
+                    <div className="flex flex-col gap-3">
                       {handsOnProducts.map((p) => {
                         const isSelected = selectedProducts.some((sp) => sp.id === p.id);
                         return (
