@@ -4,8 +4,8 @@ import path from "path";
 import fs from "fs";
 import { pdfStore } from "./pdf-store";
 import { db } from "./db";
-import { certifications, users, courses } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { certifications, users, courses, enrollments } from "@shared/schema";
+import { and, eq, desc } from "drizzle-orm";
 import { brand } from "@shared/config/brand";
 import { theme } from "@shared/config/theme";
 import { industry } from "@shared/config/industry";
@@ -46,6 +46,7 @@ const certLabels = {
     dateIssued: "Date Issued",
     expirationDate: "Expiration Date",
     certificateNumber: "Certificate Number",
+    dateOfTraining: "Date of Training",
     scanToVerify: "Scan to verify",
     verifyAt: "Verify at:",
     instructorTitle: "Qualified Field Instructor / Evaluator",
@@ -60,6 +61,7 @@ const certLabels = {
     dateIssued: "Fecha de Emisión",
     expirationDate: "Fecha de Vencimiento",
     certificateNumber: "Número de Certificado",
+    dateOfTraining: "Fecha de Capacitación",
     scanToVerify: "Escanear para verificar",
     verifyAt: "Verificar en:",
     instructorTitle: "Instructor de Campo / Evaluador",
@@ -281,6 +283,21 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
 
   if (!user || !course) throw new Error("User or course not found for certification");
 
+  // "Date of Training" — the completion date from the enrollment that earned
+  // this certificate (Alberto flag, 2026-08-18: generated certs were missing
+  // the training date). Latest completed enrollment for this user+course.
+  const [trainingEnrollment] = await db
+    .select({ completedAt: enrollments.completedAt })
+    .from(enrollments)
+    .where(
+      and(
+        eq(enrollments.userId, cert.userId),
+        eq(enrollments.courseId, cert.courseId)
+      )
+    )
+    .orderBy(desc(enrollments.completedAt))
+    .limit(1);
+
   const locale = (course.language === "es" ? "es" : "en") as keyof typeof certLabels;
   const labels = certLabels[locale];
   const dateLocale = locale === "es" ? "es-MX" : "en-US";
@@ -449,6 +466,17 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
     // Right: Expiration Date
     doc.fontSize(10).fillColor(textLight).text(labels.expirationDate.toUpperCase(), rightColX, datesY, { width: 220, align: "left", characterSpacing: 1 });
     doc.fontSize(14).fillColor(textDark).text(expiresDate, rightColX, datesY + 16, { width: 220, align: "left" });
+
+    // Center: Date of Training (enrollment completion date) — only render
+    // when we found one; older certs without an enrollment row keep the
+    // original two-column layout.
+    const trainingDate = trainingEnrollment?.completedAt
+      ? new Date(trainingEnrollment.completedAt).toLocaleDateString(dateLocale, { year: "numeric", month: "long", day: "numeric" })
+      : null;
+    if (trainingDate) {
+      doc.fontSize(10).fillColor(textLight).text(labels.dateOfTraining.toUpperCase(), 0, datesY, { align: "center", width: pageWidth, characterSpacing: 1 });
+      doc.fontSize(14).fillColor(textDark).text(trainingDate, 0, datesY + 16, { align: "center", width: pageWidth });
+    }
 
     // Certificate Number — centered below dates
     doc.fontSize(10).fillColor(textLight).text(labels.certificateNumber.toUpperCase(), 0, datesY + 42, { align: "center", width: pageWidth, characterSpacing: 1 });

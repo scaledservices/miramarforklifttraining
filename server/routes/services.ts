@@ -12,6 +12,7 @@ import { computeBookingPrice, BOOKING_DEPOSIT_RATE } from "@shared/config/bookin
 import { validateDiscountCode, computeDiscountAmount, recordDiscountRedemption } from "./discounts";
 import { createTransactionFromNonce, isAuthorizeNetConfigured, calculateCardSurcharge } from "../authorizeNetClient";
 import { isAdminRole } from "@shared/roles";
+import { eq } from "drizzle-orm";
 
 export function registerServiceRoutes(app: Express) {
 app.get("/api/documents", (_req: Request, res: Response) => {
@@ -263,13 +264,22 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         return res.status(400).json({ error: result.errorMessage || "Payment was declined" });
       }
 
-      const { payments: paymentsTable } = await import("@shared/schema");
+      const { payments: paymentsTable, platformSettings } = await import("@shared/schema");
+      // Earnings split (70/30 default, profit_split convention) — mirrors the
+      // online-course path in routes/authorizeNet.ts postPaymentProcessing.
+      // Computed on the full charged amount (what the customer paid).
+      const splitSetting = await db.select().from(platformSettings).where(eq(platformSettings.key, "profit_split"));
+      const split = (splitSetting[0]?.value as any) || { platformPercent: 70, partnerPercent: 30 };
+      const platformCut = Number((chargeAmount * split.platformPercent / 100).toFixed(2));
+      const partnerCut = Number((chargeAmount - platformCut).toFixed(2));
       await db.insert(paymentsTable).values({
         orderId: order.id,
         provider: "authorize_net",
         providerTransactionId: result.transactionId,
         amount: String(chargeAmount),
         status: "approved",
+        platformEarnings: String(platformCut),
+        partnerEarnings: String(partnerCut),
         rawResponse: { surcharge: depositSurcharge, principal: pricing.deposit },
       });
 

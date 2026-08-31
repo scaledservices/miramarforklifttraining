@@ -57,9 +57,9 @@ Legend: ✅ verified in a prior run · 🔲 not yet run · ❌ failing · ⚠️
 | # | Flow | Status |
 |---|------|--------|
 | 4.1 | Add-on appears above payment at /checkout | ✅ (code) |
-| 4.2 | Prepaid entitlement created on purchase; count capped at seats | 🔲 |
-| 4.3 | Post-completion photo upload works | 🔲 |
-| 4.4 | Non-prepaid: buy+upload button on completion | 🔲 |
+| 4.2 | Prepaid entitlement created on purchase; count capped at seats | ✅ 2026-08-15 code-verified (seat cap server-enforced) |
+| 4.3 | Post-completion photo upload works | 🔲 defer to go-live (flag OFF) |
+| 4.4 | Non-prepaid: buy+upload button on completion | 🔲 defer to go-live (flag OFF) |
 
 ## Section 5 — QR sign-in + attendees
 | # | Flow | Status |

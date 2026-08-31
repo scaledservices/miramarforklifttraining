@@ -781,25 +781,6 @@ export default function BookTraining() {
                     </div>
 
                     <AddonUpsell selectedProducts={selectedProducts} onToggle={toggleProduct} />
-
-                    <div className="mt-6 pt-6 border-t">
-                      <h3 className="font-medium text-foreground mb-3">{t("bookTraining.orSelectEquipment")}</h3>
-                      <div className="grid grid-cols-2 gap-2" data-testid="equipment-checkboxes">
-                        {EQUIPMENT_OPTIONS.map((eq) => (
-                          <label
-                            key={eq.value}
-                            className="flex items-center gap-2 cursor-pointer"
-                          >
-                            <Checkbox
-                              checked={selectedEquipment.includes(eq.value)}
-                              onCheckedChange={() => toggleEquipment(eq.value)}
-                              data-testid={`checkbox-equip-${eq.value.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
-                            />
-                            <span className="text-sm">{t(eq.key)}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
                   </div>
                 )}
               </div>

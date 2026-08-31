@@ -129,7 +129,10 @@ export default function OrderConfirmation() {
           </p>
           <div className="flex items-center gap-4 flex-wrap">
             {isGroupOrder ? (
-              <Link href="/group">
+              // Land crew purchasers directly on the seat-assignment screen —
+              // the next thing they need is distributing seats, not the dashboard
+              // (Alberto/Peter decision, 2026-08-18).
+              <Link href="/group/seats">
                 <Button className="bg-accent text-accent-foreground border-accent-border" data-testid="button-manage-group">
                   {t("cta.manageGroup")}
                   <ArrowRight className="w-4 h-4 ml-2" />
