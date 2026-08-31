@@ -23,6 +23,22 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
+    // Stale-chunk recovery: after a deploy, browsers holding the old page
+    // request lazy chunks (e.g. Dashboard-OLDHASH.js) that no longer exist.
+    // The message is always "Failed to fetch dynamically imported module".
+    // A single reload pulls fresh HTML with the new chunk names — do it
+    // automatically (guarded against loops) instead of stranding the user
+    // on the error page.
+    if (/Failed to fetch dynamically imported module/i.test(error?.message ?? "")) {
+      const RELOAD_FLAG = "chunk-reload-attempted";
+      if (!sessionStorage.getItem(RELOAD_FLAG)) {
+        sessionStorage.setItem(RELOAD_FLAG, "1");
+        window.location.reload();
+        return;
+      }
+      // Second failure after reload: fall through to the visible error page.
+      sessionStorage.removeItem(RELOAD_FLAG);
+    }
     reportClientError({
       message: `React render error: ${error.message}`,
       stack: `${error.stack ?? ""}\nComponent stack:${info.componentStack ?? ""}`,
