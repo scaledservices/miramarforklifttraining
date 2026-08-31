@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Loader2, UserMinus, ShoppingCart } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { BookOpen, Loader2, UserMinus, ShoppingCart, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +23,13 @@ export default function GroupSeats() {
   const { user } = useAuth();
   const [assignSelections, setAssignSelections] = useState<Record<number, string>>({});
   const [confirmUnassign, setConfirmUnassign] = useState<number | null>(null);
+  // "+ Add new member…" flow (Peter 2026-08-31): pick that option in the
+  // Assign-to dropdown -> dialog collects name+email -> invite endpoint with
+  // enrollmentId, which creates the member AND reserves the seat in one step.
+  const ADD_MEMBER = "__add_member__";
+  const [addMemberSeatId, setAddMemberSeatId] = useState<number | null>(null);
+  const [addMemberName, setAddMemberName] = useState("");
+  const [addMemberEmail, setAddMemberEmail] = useState("");
 
   const { data: groupsData, isLoading: groupsLoading } = useQuery<{ groups: any[] }>({
     queryKey: ["/api/groups"],
@@ -73,6 +83,38 @@ export default function GroupSeats() {
       setConfirmUnassign(null);
     },
   });
+
+  const addMemberMutation = useMutation({
+    mutationFn: async ({ email, name, enrollmentId }: { email: string; name: string; enrollmentId: number }) => {
+      const res = await apiRequest("POST", `/api/groups/${group.id}/invite`, { email, name, enrollmentId });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "members"] });
+      setAddMemberSeatId(null);
+      setAddMemberName("");
+      setAddMemberEmail("");
+      toast({ title: t("groupSeats.memberAdded"), description: t("groupSeats.memberAddedDesc") });
+    },
+    onError: (error: Error) => {
+      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
+    },
+  });
+
+  function handleSelectAssign(seatId: number, val: string) {
+    if (val === ADD_MEMBER) {
+      // Reset the dropdown display and open the add-member dialog instead.
+      setAssignSelections((prev) => {
+        const next = { ...prev };
+        delete next[seatId];
+        return next;
+      });
+      setAddMemberSeatId(seatId);
+      return;
+    }
+    setAssignSelections((prev) => ({ ...prev, [seatId]: val }));
+  }
 
   const allSeats = enrollmentsData?.enrollments || [];
   const unassignedSeats = allSeats.filter((e: any) => !e.userId);
@@ -163,12 +205,18 @@ export default function GroupSeats() {
                             <TableCell>
                               <Select
                                 value={assignSelections[seat.id] || ""}
-                                onValueChange={(val) => setAssignSelections((prev) => ({ ...prev, [seat.id]: val }))}
+                                onValueChange={(val) => handleSelectAssign(seat.id, val)}
                               >
                                 <SelectTrigger className="w-[200px]" data-testid={`select-assign-${seat.id}`}>
                                   <SelectValue placeholder={t("groupSeats.selectMember")} />
                                 </SelectTrigger>
                                 <SelectContent>
+                                  <SelectItem value={ADD_MEMBER} data-testid={`option-add-member-${seat.id}`}>
+                                    <span className="flex items-center gap-1.5 font-medium text-accent">
+                                      <UserPlus className="h-3.5 w-3.5" />
+                                      {t("groupSeats.addNewMember")}
+                                    </span>
+                                  </SelectItem>
                                   {(() => {
                                     const membersWithCourse = new Set(
                                       assignedSeats
@@ -290,6 +338,63 @@ export default function GroupSeats() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Add-member dialog: opened from the "+ Add new member…" dropdown
+          option. Submits to the group invite endpoint with enrollmentId,
+          so the invite carries the seat reservation atomically. */}
+      <Dialog open={addMemberSeatId !== null} onOpenChange={(open) => { if (!open) { setAddMemberSeatId(null); setAddMemberName(""); setAddMemberEmail(""); } }}>
+        <DialogContent className="max-w-md" data-testid="dialog-add-member">
+          <DialogHeader>
+            <DialogTitle>{t("groupSeats.addMemberTitle")}</DialogTitle>
+            <DialogDescription>{t("groupSeats.addMemberDesc")}</DialogDescription>
+          </DialogHeader>
+          <form
+            className="space-y-4 pt-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (addMemberSeatId && addMemberName.trim() && addMemberEmail.trim()) {
+                addMemberMutation.mutate({
+                  email: addMemberEmail.trim(),
+                  name: addMemberName.trim(),
+                  enrollmentId: addMemberSeatId,
+                });
+              }
+            }}
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="add-member-name">{t("groupSeats.memberName")} *</Label>
+              <Input
+                id="add-member-name"
+                value={addMemberName}
+                onChange={(e) => setAddMemberName(e.target.value)}
+                required
+                autoFocus
+                data-testid="input-add-member-name"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="add-member-email">{t("groupSeats.memberEmail")} *</Label>
+              <Input
+                id="add-member-email"
+                type="email"
+                value={addMemberEmail}
+                onChange={(e) => setAddMemberEmail(e.target.value)}
+                required
+                data-testid="input-add-member-email"
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={addMemberMutation.isPending || !addMemberName.trim() || !addMemberEmail.trim()}
+              data-testid="button-add-member-submit"
+            >
+              {addMemberMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <UserPlus className="h-4 w-4 mr-2" />}
+              {t("groupSeats.addAndAssign")}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </GroupLayout>
   );
 }
