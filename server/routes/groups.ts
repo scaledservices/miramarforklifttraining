@@ -507,10 +507,10 @@ app.get("/api/groups/:id/enrollments", requireAuth, async (req: Request, res: Re
     // surface the reservée on the seat row so the UI can show "reserved for
     // X (invite pending)" instead of looking unassigned (Peter 2026-08-31).
     const allMembers = await storage.listGroupMembers(group.id);
-    const pendingByEnrollment = new Map<number, { name: string; email: string }>();
+    const pendingByEnrollment = new Map<number, { memberId: number; name: string; email: string }>();
     for (const m of allMembers) {
       if (!m.acceptedAt && m.pendingEnrollmentId) {
-        pendingByEnrollment.set(m.pendingEnrollmentId, { name: m.name, email: m.email });
+        pendingByEnrollment.set(m.pendingEnrollmentId, { memberId: m.id, name: m.name, email: m.email });
       }
     }
     const allEnrollments: any[] = [];

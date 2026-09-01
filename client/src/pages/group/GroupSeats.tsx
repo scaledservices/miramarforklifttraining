@@ -105,6 +105,39 @@ export default function GroupSeats() {
     },
   });
 
+  // Pending-invite seat actions: resend the invitation email, or cancel the
+  // invite (removes the member row -> the seat becomes free again).
+  const resendInviteMutation = useMutation({
+    mutationFn: async (memberId: number) => {
+      const res = await apiRequest("POST", `/api/groups/${group.id}/members/${memberId}/resend`);
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: t("groupSeats.inviteResent"), description: t("groupSeats.inviteResentDesc") });
+    },
+    onError: (error: Error) => {
+      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const cancelInviteMutation = useMutation({
+    mutationFn: async (memberId: number) => {
+      const res = await apiRequest("DELETE", `/api/groups/${group.id}/members/${memberId}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "members"] });
+      setCancelInviteSeatId(null);
+      toast({ title: t("groupSeats.inviteCancelled"), description: t("groupSeats.inviteCancelledDesc") });
+    },
+    onError: (error: Error) => {
+      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const [cancelInviteSeatId, setCancelInviteSeatId] = useState<number | null>(null);
+
   const reassignMutation = useMutation({
     mutationFn: async ({ enrollmentId, userId }: { enrollmentId: number; userId: number }) => {
       const res = await apiRequest("POST", `/api/groups/${group.id}/reassign-seat`, { enrollmentId, userId });
@@ -138,6 +171,11 @@ export default function GroupSeats() {
 
   const allSeats = enrollmentsData?.enrollments || [];
   const unassignedSeats = allSeats.filter((e: any) => !e.userId);
+  // Pending-invite seats are technically "unassigned" (no userId yet) but
+  // reserved — count them separately so the badges don't read as free seats
+  // the admin can't touch (Peter 2026-09-01 confusion report).
+  const reservedSeats = unassignedSeats.filter((e: any) => e.pendingInvite);
+  const freeSeats = unassignedSeats.filter((e: any) => !e.pendingInvite);
   const assignedSeats = allSeats.filter((e: any) => e.userId);
   const acceptedMembers = (membersData?.members || []).filter((m: any) => m.acceptedAt && m.userId);
 
@@ -173,8 +211,13 @@ export default function GroupSeats() {
         <div className="flex items-center gap-3 flex-wrap">
           <Badge variant="secondary" data-testid="badge-unassigned-count">
             <BookOpen className="h-3 w-3 mr-1" />
-            {t("groupSeats.unassignedSeats", { count: unassignedSeats.length, plural: unassignedSeats.length !== 1 ? "s" : "" })}
+            {t("groupSeats.unassignedSeats", { count: freeSeats.length, plural: freeSeats.length !== 1 ? "s" : "" })}
           </Badge>
+          {reservedSeats.length > 0 && (
+            <Badge variant="outline" data-testid="badge-reserved-count">
+              {t("groupSeats.reservedSeats", { count: reservedSeats.length, plural: reservedSeats.length !== 1 ? "s" : "" })}
+            </Badge>
+          )}
           <Badge variant="secondary" data-testid="badge-assigned-count">
             {t("groupSeats.assignedSeatsCount", { count: assignedSeats.length, plural: assignedSeats.length !== 1 ? "s" : "" })}
           </Badge>
@@ -230,6 +273,7 @@ export default function GroupSeats() {
                               {seat.pendingInvite ? (
                                 <span className="text-sm" data-testid={`text-pending-for-${seat.id}`}>
                                   {t("groupSeats.reservedFor", { name: seat.pendingInvite.name })}
+                                  <span className="block text-xs text-muted-foreground">{t("groupSeats.awaitingAcceptance")}</span>
                                 </span>
                               ) : (
                               <Select
@@ -275,9 +319,42 @@ export default function GroupSeats() {
                             </TableCell>
                             <TableCell>
                               {seat.pendingInvite ? (
-                                <span className="text-xs text-muted-foreground" data-testid={`text-awaiting-${seat.id}`}>
-                                  {t("groupSeats.awaitingAcceptance")}
-                                </span>
+                                cancelInviteSeatId === seat.id ? (
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      disabled={cancelInviteMutation.isPending}
+                                      onClick={() => cancelInviteMutation.mutate(seat.pendingInvite.memberId)}
+                                      data-testid={`button-confirm-cancel-invite-${seat.id}`}
+                                    >
+                                      {cancelInviteMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : t("groupSeats.confirmCancelInvite")}
+                                    </Button>
+                                    <Button size="sm" variant="ghost" onClick={() => setCancelInviteSeatId(null)} data-testid={`button-abort-cancel-invite-${seat.id}`}>
+                                      {t("groupSeats.cancel")}
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      disabled={resendInviteMutation.isPending}
+                                      onClick={() => resendInviteMutation.mutate(seat.pendingInvite.memberId)}
+                                      data-testid={`button-resend-invite-${seat.id}`}
+                                    >
+                                      {resendInviteMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : t("groupSeats.resendInvite")}
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => setCancelInviteSeatId(seat.id)}
+                                      data-testid={`button-cancel-invite-${seat.id}`}
+                                    >
+                                      {t("groupSeats.cancelInvite")}
+                                    </Button>
+                                  </div>
+                                )
                               ) : (
                               <Button
                                 size="sm"
