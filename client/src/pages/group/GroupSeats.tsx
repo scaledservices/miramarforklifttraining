@@ -197,12 +197,21 @@ export default function GroupSeats() {
                               {seat.courseName}
                             </TableCell>
                             <TableCell>
-                              <Badge variant="secondary" data-testid={`badge-seat-status-${seat.id}`}>{t("groupSeats.badgeUnassigned")}</Badge>
+                              {seat.pendingInvite ? (
+                                <Badge variant="outline" data-testid={`badge-seat-pending-${seat.id}`}>{t("groupSeats.badgePendingInvite")}</Badge>
+                              ) : (
+                                <Badge variant="secondary" data-testid={`badge-seat-status-${seat.id}`}>{t("groupSeats.badgeUnassigned")}</Badge>
+                              )}
                             </TableCell>
                             <TableCell className="text-muted-foreground text-sm">
                               {seat.enrolledAt ? new Date(seat.enrolledAt).toLocaleDateString() : "-"}
                             </TableCell>
                             <TableCell>
+                              {seat.pendingInvite ? (
+                                <span className="text-sm" data-testid={`text-pending-for-${seat.id}`}>
+                                  {t("groupSeats.reservedFor", { name: seat.pendingInvite.name })}
+                                </span>
+                              ) : (
                               <Select
                                 value={assignSelections[seat.id] || ""}
                                 onValueChange={(val) => handleSelectAssign(seat.id, val)}
@@ -242,8 +251,14 @@ export default function GroupSeats() {
                                   })()}
                                 </SelectContent>
                               </Select>
+                              )}
                             </TableCell>
                             <TableCell>
+                              {seat.pendingInvite ? (
+                                <span className="text-xs text-muted-foreground" data-testid={`text-awaiting-${seat.id}`}>
+                                  {t("groupSeats.awaitingAcceptance")}
+                                </span>
+                              ) : (
                               <Button
                                 size="sm"
                                 disabled={!assignSelections[seat.id] || assignMutation.isPending}
@@ -255,6 +270,7 @@ export default function GroupSeats() {
                               >
                                 {assignMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : t("groupSeats.assign")}
                               </Button>
+                              )}
                             </TableCell>
                           </TableRow>
                         ))}

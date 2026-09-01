@@ -445,6 +445,16 @@ app.get("/api/groups/:id/enrollments", requireAuth, async (req: Request, res: Re
     if (!group || group.adminUserId !== req.session.userId) return res.status(403).json({ error: "Access denied" });
 
     const groupOrders = await storage.getOrdersByGroup(group.id);
+    // Pending invites holding a seat (pendingEnrollmentId, not yet accepted):
+    // surface the reservée on the seat row so the UI can show "reserved for
+    // X (invite pending)" instead of looking unassigned (Peter 2026-08-31).
+    const allMembers = await storage.listGroupMembers(group.id);
+    const pendingByEnrollment = new Map<number, { name: string; email: string }>();
+    for (const m of allMembers) {
+      if (!m.acceptedAt && m.pendingEnrollmentId) {
+        pendingByEnrollment.set(m.pendingEnrollmentId, { name: m.name, email: m.email });
+      }
+    }
     const allEnrollments: any[] = [];
     for (const order of groupOrders) {
       const orderEnrollmentList = await storage.getEnrollmentsByOrder(order.id);
@@ -472,6 +482,7 @@ app.get("/api/groups/:id/enrollments", requireAuth, async (req: Request, res: Re
           ...enrollment,
           courseName: course?.title || "Unknown",
           userName,
+          pendingInvite: pendingByEnrollment.get(enrollment.id) || null,
           progressPct,
           completedSteps,
           totalSteps,
