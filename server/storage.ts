@@ -123,6 +123,8 @@ export interface IStorage {
   getEnrollmentsByCourse(courseId: number): Promise<Enrollment[]>;
   updateEnrollmentStatus(id: number, status: Enrollment["status"]): Promise<Enrollment | undefined>;
   assignEnrollmentUser(enrollmentId: number, userId: number, assignedBy: number): Promise<Enrollment | undefined>;
+  reassignEnrollmentUser(enrollmentId: number, newUserId: number, assignedBy: number): Promise<Enrollment | undefined>;
+  getSeatTransferBlockReason(enrollmentId: number): Promise<string | null>;
   unassignEnrollmentUser(enrollmentId: number): Promise<Enrollment | undefined>;
   listUnassignedEnrollments(orderId: number): Promise<Enrollment[]>;
   getEnrollmentsByOrder(orderId: number): Promise<Enrollment[]>;
@@ -784,6 +786,20 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     if (existingAssignment.length > 0) throw new Error("Cannot assign: this member already has an active seat for this course");
 
+    await this.assertSeatTransferable(enrollmentId);
+
+    const [updated] = await db.update(enrollments)
+      .set({ userId, assignedByUserId: assignedBy, updatedAt: new Date() })
+      .where(eq(enrollments.id, enrollmentId))
+      .returning();
+    return updated;
+  }
+
+  // Seat-transfer guard shared by assign/unassign/reassign (2026-08-31).
+  // A seat becomes a named person's OSHA training record the moment it has
+  // real learning activity — progress past the intro, an exam attempt, or an
+  // issued certificate — and from then on it can never move to another person.
+  private async assertSeatTransferable(enrollmentId: number): Promise<void> {
     const hasExamAttempt = await db.select({ id: examAttempts.id }).from(examAttempts)
       .where(eq(examAttempts.enrollmentId, enrollmentId)).limit(1);
     if (hasExamAttempt.length > 0) throw new Error("Cannot reassign: learner has exam attempts");
@@ -802,36 +818,51 @@ export class DatabaseStorage implements IStorage {
       ))
       .limit(1);
     if (advancedProgress.length > 0) throw new Error("Cannot reassign: learner has completed steps beyond the introduction");
+  }
 
-    const [updated] = await db.update(enrollments)
-      .set({ userId, assignedByUserId: assignedBy, updatedAt: new Date() })
-      .where(eq(enrollments.id, enrollmentId))
-      .returning();
-    return updated;
+  // Non-throwing probe so the UI can disable the picker with the reason
+  // ("why") rather than failing at submit time (prevention-first).
+  async getSeatTransferBlockReason(enrollmentId: number): Promise<string | null> {
+    try {
+      await this.assertSeatTransferable(enrollmentId);
+      return null;
+    } catch (err: any) {
+      return err?.message || "Cannot reassign this seat";
+    }
+  }
+
+  async reassignEnrollmentUser(enrollmentId: number, newUserId: number, assignedBy: number): Promise<Enrollment | undefined> {
+    return db.transaction(async (tx) => {
+      const [enrollment] = await tx.select().from(enrollments).where(eq(enrollments.id, enrollmentId));
+      if (!enrollment) throw new Error("Enrollment not found");
+      if (!enrollment.userId) throw new Error("Seat is not currently assigned");
+      if (enrollment.userId === newUserId) throw new Error("Seat is already assigned to this member");
+
+      await this.assertSeatTransferable(enrollmentId);
+
+      const existingAssignment = await tx.select({ id: enrollments.id })
+        .from(enrollments)
+        .where(and(
+          eq(enrollments.userId, newUserId),
+          eq(enrollments.courseId, enrollment.courseId),
+          ne(enrollments.status, "revoked")
+        ))
+        .limit(1);
+      if (existingAssignment.length > 0) throw new Error("Cannot reassign: this member already has an active seat for this course");
+
+      const [updated] = await tx.update(enrollments)
+        .set({ userId: newUserId, assignedByUserId: assignedBy, updatedAt: new Date() })
+        .where(eq(enrollments.id, enrollmentId))
+        .returning();
+      return updated;
+    });
   }
 
   async unassignEnrollmentUser(enrollmentId: number): Promise<Enrollment | undefined> {
     const enrollment = await this.getEnrollment(enrollmentId);
     if (!enrollment) throw new Error("Enrollment not found");
 
-    const hasExamAttempt = await db.select({ id: examAttempts.id }).from(examAttempts)
-      .where(eq(examAttempts.enrollmentId, enrollmentId)).limit(1);
-    if (hasExamAttempt.length > 0) throw new Error("Cannot unassign: learner has exam attempts");
-
-    const hasCert = await db.select({ id: certifications.id }).from(certifications)
-      .where(eq(certifications.enrollmentId, enrollmentId)).limit(1);
-    if (hasCert.length > 0) throw new Error("Cannot unassign: certification already issued");
-
-    const advancedProgress = await db.select({ id: stepProgress.id })
-      .from(stepProgress)
-      .innerJoin(courseSteps, eq(stepProgress.stepId, courseSteps.id))
-      .where(and(
-        eq(stepProgress.enrollmentId, enrollmentId),
-        gt(courseSteps.stepOrder, 1),
-        ne(stepProgress.status, "not_started")
-      ))
-      .limit(1);
-    if (advancedProgress.length > 0) throw new Error("Cannot unassign: learner has completed steps beyond the introduction");
+    await this.assertSeatTransferable(enrollmentId);
 
     const [updated] = await db.update(enrollments)
       .set({ userId: null, assignedByUserId: null, updatedAt: new Date() })

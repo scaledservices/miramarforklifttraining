@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen, Loader2, UserMinus, ShoppingCart, UserPlus } from "lucide-react";
+import { BookOpen, Loader2, UserMinus, ShoppingCart, UserPlus, Repeat } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,6 +30,9 @@ export default function GroupSeats() {
   const [addMemberSeatId, setAddMemberSeatId] = useState<number | null>(null);
   const [addMemberName, setAddMemberName] = useState("");
   const [addMemberEmail, setAddMemberEmail] = useState("");
+  // One-step reassign: dialog holds the assigned seat being moved.
+  const [reassignSeat, setReassignSeat] = useState<any | null>(null);
+  const [reassignTarget, setReassignTarget] = useState("");
 
   const { data: groupsData, isLoading: groupsLoading } = useQuery<{ groups: any[] }>({
     queryKey: ["/api/groups"],
@@ -99,6 +102,23 @@ export default function GroupSeats() {
     },
     onError: (error: Error) => {
       toast({ title: t("common.error"), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const reassignMutation = useMutation({
+    mutationFn: async ({ enrollmentId, userId }: { enrollmentId: number; userId: number }) => {
+      const res = await apiRequest("POST", `/api/groups/${group.id}/reassign-seat`, { enrollmentId, userId });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "members"] });
+      setReassignSeat(null);
+      setReassignTarget("");
+      toast({ title: t("groupSeats.seatReassigned"), description: t("groupSeats.seatReassignedDesc") });
+    },
+    onError: (error: Error) => {
+      toast({ title: t("groupSeats.assignmentFailed"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -319,16 +339,38 @@ export default function GroupSeats() {
                                     {t("groupSeats.cancel")}
                                   </Button>
                                 </div>
-                              ) : (
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => setConfirmUnassign(seat.id)}
-                                  title={t("groupSeats.unassignSeat")}
-                                  data-testid={`button-unassign-${seat.id}`}
+                              ) : seat.reassignBlockReason ? (
+                                // Locked seats: unassign would fail for the same
+                                // reason — show WHY inline instead of dead
+                                // buttons (prevention-first).
+                                <span
+                                  className="text-xs text-muted-foreground max-w-[240px] inline-block"
+                                  title={seat.reassignBlockReason}
+                                  data-testid={`text-reassign-locked-${seat.id}`}
                                 >
-                                  <UserMinus className="h-4 w-4" />
-                                </Button>
+                                  {t("groupSeats.reassignLocked")}
+                                </span>
+                              ) : (
+                                <div className="flex items-center gap-1">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => { setReassignSeat(seat); setReassignTarget(""); }}
+                                    title={t("groupSeats.reassignSeat")}
+                                    data-testid={`button-reassign-${seat.id}`}
+                                  >
+                                    <Repeat className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => setConfirmUnassign(seat.id)}
+                                    title={t("groupSeats.unassignSeat")}
+                                    data-testid={`button-unassign-${seat.id}`}
+                                  >
+                                    <UserMinus className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               )}
                             </TableCell>
                           </TableRow>
@@ -409,6 +451,64 @@ export default function GroupSeats() {
               {t("groupSeats.addAndAssign")}
             </Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* One-step reassign dialog: pick the new member; the server moves the
+          seat atomically (no unclaimed gap). Members who already hold this
+          course are excluded; self is allowed. */}
+      <Dialog open={reassignSeat !== null} onOpenChange={(open) => { if (!open) { setReassignSeat(null); setReassignTarget(""); } }}>
+        <DialogContent className="max-w-md" data-testid="dialog-reassign-seat">
+          <DialogHeader>
+            <DialogTitle>{t("groupSeats.reassignTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("groupSeats.reassignDesc", { course: reassignSeat?.courseName ?? "", name: reassignSeat?.userName ?? "" })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <Select value={reassignTarget} onValueChange={setReassignTarget}>
+              <SelectTrigger data-testid="select-reassign-target">
+                <SelectValue placeholder={t("groupSeats.selectMember")} />
+              </SelectTrigger>
+              <SelectContent>
+                {(() => {
+                  if (!reassignSeat) return null;
+                  const membersWithCourse = new Set(
+                    assignedSeats
+                      .filter((s: any) => s.courseId === reassignSeat.courseId)
+                      .map((s: any) => s.userId)
+                  );
+                  const eligible = acceptedMembers.filter((m: any) => !membersWithCourse.has(m.userId));
+                  const adminSelf =
+                    user && !membersWithCourse.has(user.id)
+                      ? [{ userId: user.id, name: `${user.name} (${t("groupSeats.you", "you")})` }]
+                      : [];
+                  const allEligible = [...adminSelf, ...eligible];
+                  if (allEligible.length === 0) {
+                    return <SelectItem value="none" disabled>{t("groupSeats.noEligibleMembers")}</SelectItem>;
+                  }
+                  return allEligible.map((m: any) => (
+                    <SelectItem key={m.userId} value={String(m.userId)} data-testid={`option-reassign-${m.userId}`}>
+                      {m.name}
+                    </SelectItem>
+                  ));
+                })()}
+              </SelectContent>
+            </Select>
+            <Button
+              className="w-full"
+              disabled={!reassignTarget || reassignMutation.isPending}
+              onClick={() => {
+                if (reassignSeat && reassignTarget) {
+                  reassignMutation.mutate({ enrollmentId: reassignSeat.id, userId: parseInt(reassignTarget) });
+                }
+              }}
+              data-testid="button-reassign-confirm"
+            >
+              {reassignMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Repeat className="h-4 w-4 mr-2" />}
+              {t("groupSeats.reassignConfirm")}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </GroupLayout>

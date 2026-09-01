@@ -388,6 +388,64 @@ app.post("/api/groups/:id/assign-seat", requireAuth, async (req: Request, res: R
   }
 });
 
+// One-step reassign (Peter 2026-08-31): unassign + assign atomically so a
+// seat never sits unclaimed between the two operations. The transferability
+// rules are identical to unassign+assign — enforced in storage.
+app.post("/api/groups/:id/reassign-seat", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const group = await storage.getGroup(parseInt(req.params.id));
+    if (!group || group.adminUserId !== req.session.userId) return res.status(403).json({ error: "Access denied" });
+
+    const { enrollmentId, userId } = req.body;
+    if (!enrollmentId || !userId) return res.status(400).json({ error: "enrollmentId and userId are required" });
+
+    const existingEnrollment = await storage.getEnrollment(enrollmentId);
+    if (!existingEnrollment) return res.status(404).json({ error: "Enrollment not found" });
+    const enrollOrder = existingEnrollment.orderId ? await storage.getOrder(existingEnrollment.orderId) : null;
+    if (!enrollOrder || enrollOrder.groupId !== group.id) {
+      return res.status(403).json({ error: "Enrollment does not belong to this group" });
+    }
+
+    const previousUserId = existingEnrollment.userId;
+    const enrollment = await storage.reassignEnrollmentUser(enrollmentId, userId, req.session.userId!);
+
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "seat_reassigned",
+      entity: "enrollments",
+      entityId: String(enrollmentId),
+      metadata: { fromUserId: previousUserId, toUserId: userId, groupId: group.id },
+    });
+
+    // Notify the NEW seat holder (same email as assign-seat).
+    try {
+      const assignedUser = await storage.getUser(userId);
+      if (assignedUser && enrollment) {
+        const course = await storage.getCourse(enrollment.courseId);
+        const seatLocale = await resolveLocale({ userId, courseLanguage: course?.language });
+        await sendSeatAssignedNotification({
+          to: assignedUser.email,
+          memberName: assignedUser.name,
+          courseName: course?.title || "Forklift Certification",
+          groupName: group.name,
+          actorUserId: req.session.userId!,
+          locale: seatLocale,
+        });
+      }
+    } catch (emailErr) {
+      console.error("[Groups] Reassign email error (non-fatal):", emailErr);
+    }
+
+    return res.json({ enrollment });
+  } catch (error: any) {
+    const msg = error.message || "";
+    if (msg.includes("Cannot") || msg.includes("not found") || msg.includes("Not found") || msg.includes("already")) {
+      return res.status(400).json({ error: msg });
+    }
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.post("/api/groups/:id/unassign-seat", requireAuth, async (req: Request, res: Response) => {
   try {
     const group = await storage.getGroup(parseInt(req.params.id));
@@ -478,11 +536,19 @@ app.get("/api/groups/:id/enrollments", requireAuth, async (req: Request, res: Re
             }, new Date(0))
           : null;
 
+        // For assigned seats: whether a one-step reassign is possible, and if
+        // not, the human reason (drives the disabled "Reassign" option).
+        let reassignBlockReason: string | null = null;
+        if (enrollment.userId) {
+          reassignBlockReason = await storage.getSeatTransferBlockReason(enrollment.id);
+        }
+
         allEnrollments.push({
           ...enrollment,
           courseName: course?.title || "Unknown",
           userName,
           pendingInvite: pendingByEnrollment.get(enrollment.id) || null,
+          reassignBlockReason,
           progressPct,
           completedSteps,
           totalSteps,
