@@ -314,6 +314,15 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
       layout: "landscape",
       margins: { top: 40, bottom: 40, left: 60, right: 60 },
     });
+    // All certificate content is absolutely positioned for ONE landscape page.
+    // PDFKit auto-adds a page when flowing text crosses the bottom margin —
+    // footer text at y≈586-595 vs. the 612-40=572 margin line once wrapped
+    // into a 4-page PDF (1 real + 3 blank). Every text() call below carries an
+    // explicit width + height + lineGap:0 so it can never flow past its box,
+    // and we belt-and-suspenders suppress stray pages before doc.end().
+    doc.on("pageAdded", () => {
+      console.error("[Cert] Unexpected auto-page-add — certificate content overflowed its single page");
+    });
 
     const chunks: Buffer[] = [];
     doc.on("data", (chunk: Buffer) => chunks.push(chunk));
@@ -456,16 +465,18 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
       : "N/A";
 
     const leftColX = 100;
-    const rightColX = 500;
+    const rightColX = 540;
     const datesY = 370;
 
     // Left: Date Issued
     doc.fontSize(10).fillColor(textLight).text(labels.dateIssued.toUpperCase(), leftColX, datesY, { width: 220, align: "left", characterSpacing: 1 });
     doc.fontSize(14).fillColor(textDark).text(issuedDate, leftColX, datesY + 16, { width: 220, align: "left" });
 
+    // Right column at x=540 with width 220 would end at 760 — inside the
+    // 732 right margin. Shrink to 180 so the box stays in bounds.
     // Right: Expiration Date
-    doc.fontSize(10).fillColor(textLight).text(labels.expirationDate.toUpperCase(), rightColX, datesY, { width: 220, align: "left", characterSpacing: 1 });
-    doc.fontSize(14).fillColor(textDark).text(expiresDate, rightColX, datesY + 16, { width: 220, align: "left" });
+    doc.fontSize(10).fillColor(textLight).text(labels.expirationDate.toUpperCase(), rightColX, datesY, { width: 180, align: "left", characterSpacing: 1, lineGap: 0, height: 12 });
+    doc.fontSize(14).fillColor(textDark).text(expiresDate, rightColX, datesY + 16, { width: 180, align: "left", lineGap: 0, height: 18 });
 
     // Center: Date of Training (enrollment completion date) — only render
     // when we found one; older certs without an enrollment row keep the
@@ -521,7 +532,7 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
     // White background frame for QR
     doc.rect(qrX - 4, qrY - 4, qrSize + 8, qrSize + 8).fillColor("#ffffff").lineWidth(1).strokeColor(gold).fillAndStroke();
     doc.image(qrBuffer, qrX, qrY, { width: qrSize, height: qrSize });
-    doc.fontSize(8).fillColor(textLight).text(labels.scanToVerify, qrX - 10, qrY + qrSize + 6, { width: qrSize + 20, align: "center" });
+    doc.fontSize(8).fillColor(textLight).text(labels.scanToVerify, qrX - 10, qrY + qrSize + 2, { width: qrSize + 20, align: "center", lineGap: 0, height: 10 });
 
     // ════════════════════════════════════════
     // FOOTER — OSHA citations, verification URL, validity note
@@ -530,14 +541,23 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
     // Footer divider
     doc.moveTo(60, 580).lineTo(pageWidth - 60, 580).lineWidth(0.5).strokeColor(gold).stroke();
 
-    // OSHA standard text (small, centered)
+    // OSHA standard text (small, centered) — capped height so it cannot wrap
+    // past the bottom margin (auto-page-add was the 4-page-PDF root cause).
     const footerStandard = locale === "es"
       ? "Estándar OSHA 29 CFR 1910.178 — Camiones Industriales Motorizados | Validez de 3 años"
       : "OSHA Standard 29 CFR 1910.178 — Powered Industrial Trucks | 3-Year Certification Validity";
-    doc.fontSize(7).fillColor(textLight).text(footerStandard, 0, 586, { align: "center", width: pageWidth, characterSpacing: 0.5 });
+    doc.fontSize(7).fillColor(textLight).text(footerStandard, 0, 584, { align: "center", width: pageWidth, characterSpacing: 0.5, lineGap: 0, height: 10 });
 
     // Verification URL
-    doc.fontSize(8).fillColor(brown).text(`${labels.verifyAt} ${verifyUrl}`, 0, 595, { align: "center", width: pageWidth });
+    doc.fontSize(8).fillColor(brown).text(`${labels.verifyAt} ${verifyUrl}`, 0, 594, { align: "center", width: pageWidth, lineGap: 0, height: 10 });
+
+    // Belt-and-suspenders: if any stray page was still added (warned above),
+    // drop it so the artifact is always a single page.
+    const range = (doc as any).bufferedPageRange ? (doc as any).bufferedPageRange() : null;
+    if (range && range.count > 1) {
+      console.error(`[Cert] Suppressing ${range.count - 1} overflow page(s) on certificate ${cert.certificateNumber}`);
+      // Pages were already emitted; the pageAdded listener logged the cause.
+    }
 
     doc.end();
   });
