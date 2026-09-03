@@ -34,7 +34,29 @@ app.get("/api/certifications", requireAuth, async (req: Request, res: Response) 
 app.get("/api/certifications/:id", requireAuth, async (req: Request, res: Response) => {
   try {
     const cert = await storage.getCertification(parseInt(req.params.id as string));
-    if (!cert || cert.userId !== req.session.userId) return res.status(404).json({ error: "Certification not found" });
+    if (!cert) return res.status(404).json({ error: "Certification not found" });
+    // Owner always allowed; platform admins allowed; crew admins allowed when
+    // the certified user is a member of one of their groups (mirrors the
+    // /download route — crew admins land here via "Upload a photo for them").
+    const isOwner = cert.userId === req.session.userId;
+    if (!isOwner) {
+      const currentUser = await storage.getUser(req.session.userId!);
+      const isAdmin = currentUser ? isAdminRole(currentUser.role) : false;
+      let isGroupAdmin = false;
+      if (!isAdmin && currentUser?.role === "group_admin") {
+        const groups = await storage.getGroupsByAdmin(req.session.userId!);
+        for (const group of groups) {
+          const members = await storage.listGroupMembers(group.id);
+          if (members.some(m => m.userId === cert.userId)) {
+            isGroupAdmin = true;
+            break;
+          }
+        }
+      }
+      if (!isAdmin && !isGroupAdmin) {
+        return res.status(404).json({ error: "Certification not found" });
+      }
+    }
     // Surface any active (non-canceled/refunded) card order up-front so the order
     // page can render an "already ordered" state instead of letting the user fill
     // out payment details and hit a 409 after the fact (prevention over error).

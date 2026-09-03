@@ -173,6 +173,15 @@ const strings: Record<string, EmailStrings> = {
       cta: "Start Training",
       footer: "Complete your training to earn your {{regulatory}}-aligned forklift certification.",
     },
+    crewMemberCertified: {
+      subject: "Crew Member Certified: {{memberName}} - {{courseName}}",
+      heading: "Crew Member Certified",
+      greeting: "Hi {{adminName}},",
+      body: "<strong>{{memberName}}</strong> from <strong>{{groupName}}</strong> has completed <strong>{{courseName}}</strong> and earned their certification (Certificate #{{certificateNumber}}).",
+      verifyNote: "You can verify their certificate here:",
+      cta: "View Crew Dashboard",
+      footer: "Keep your crew's certifications current to stay {{regulatory}} compliant.",
+    },
     onsiteConfirmation: {
       subject: "We Received Your On-Site Training Request - {{brandName}}",
       heading: "We Received Your Request!",
@@ -435,6 +444,15 @@ const strings: Record<string, EmailStrings> = {
       startNow: "Puedes iniciar tu capacitación inmediatamente desde tu panel.",
       cta: "Iniciar Capacitación",
       footer: "Completa tu capacitación para obtener tu certificación de montacargas alineada con {{regulatory}}.",
+    },
+    crewMemberCertified: {
+      subject: "Miembro del Equipo Certificado: {{memberName}} - {{courseName}}",
+      heading: "Miembro del Equipo Certificado",
+      greeting: "Hola {{adminName}},",
+      body: "<strong>{{memberName}}</strong> de <strong>{{groupName}}</strong> ha completado <strong>{{courseName}}</strong> y obtuvo su certificación (Certificado #{{certificateNumber}}).",
+      verifyNote: "Puedes verificar su certificado aquí:",
+      cta: "Ver Panel del Equipo",
+      footer: "Mantén las certificaciones de tu equipo al día para cumplir con {{regulatory}}.",
     },
     onsiteConfirmation: {
       subject: "Recibimos Tu Solicitud de Capacitación en Sitio - {{brandName}}",

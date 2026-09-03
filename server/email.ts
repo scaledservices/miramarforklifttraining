@@ -961,6 +961,41 @@ export async function sendSeatAssignedNotification(params: {
   });
 }
 
+export async function sendCrewMemberCertifiedNotification(params: {
+  to: string;
+  adminName: string;
+  memberName: string;
+  courseName: string;
+  groupName: string;
+  certificateNumber: string;
+  actorUserId?: number;
+  locale?: string;
+}) {
+  const baseUrl = getSiteUrl();
+  const loc = params.locale || "en";
+  const _ = (key: string) => emailT(loc, "crewMemberCertified", key);
+  const dashUrl = `${baseUrl}${localePath(loc, "/dashboard")}`;
+  const verifyUrl = `${baseUrl}${localePath(loc, "/verify")}/${params.certificateNumber}`;
+
+  return sendEmail({
+    to: params.to,
+    subject: _("subject").replace("{{memberName}}", params.memberName).replace("{{courseName}}", params.courseName),
+    template: "crew_member_certified",
+    payload: params,
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
+      <p>${_("greeting").replace("{{adminName}}", params.adminName)}</p>
+      <p>${_("body").replace("{{memberName}}", params.memberName).replace("{{groupName}}", params.groupName).replace("{{courseName}}", params.courseName).replace("{{certificateNumber}}", params.certificateNumber)}</p>
+      <p>${_("verifyNote")} <a href="${verifyUrl}" style="color: ${theme.email.linkColor};">${verifyUrl}</a></p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${dashUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+      </div>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer").replace("{{regulatory}}", industry.regulatory.body)}</p>
+    `),
+    actorUserId: params.actorUserId,
+  });
+}
+
 export async function sendContactFormAdminAlert(params: {
   name: string;
   email: string;

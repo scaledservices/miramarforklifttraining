@@ -1,9 +1,54 @@
 import type { Express, Request, Response } from "express";
 import { storage } from "../storage";
 import { generateCertificatePdf } from "../certificate-pdf";
-import { sendCertificationEmail } from "../email";
+import { sendCertificationEmail, sendCrewMemberCertifiedNotification } from "../email";
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, omitExamAnswers, examSubmitLimiter } from "./middleware";
+
+/**
+ * Notify the crew admin(s) when one of their members earns a certification.
+ * Best-effort: failures are logged, never thrown — cert issuance must not
+ * fail because an admin notification could not send.
+ */
+async function notifyCrewAdminsOfCertification(opts: {
+  memberUserId: number;
+  memberName: string;
+  courseName: string;
+  certificateNumber: string;
+  courseLanguage?: string | null;
+}) {
+  try {
+    // Groups whose member list includes the certified user.
+    const { db } = await import("../db");
+    const { groupMembers, groups, users } = await import("@shared/schema");
+    const { eq, and, isNotNull } = await import("drizzle-orm");
+    const rows = await db
+      .select({ adminUserId: groups.adminUserId, groupName: groups.name })
+      .from(groupMembers)
+      .innerJoin(groups, eq(groups.id, groupMembers.groupId))
+      .where(and(eq(groupMembers.userId, opts.memberUserId), isNotNull(groupMembers.acceptedAt)));
+    const seen = new Set<number>();
+    for (const row of rows) {
+      if (seen.has(row.adminUserId)) continue;
+      seen.add(row.adminUserId);
+      const [admin] = await db.select().from(users).where(eq(users.id, row.adminUserId));
+      if (!admin?.email) continue;
+      const adminLocale = await resolveLocale({ userId: admin.id, courseLanguage: opts.courseLanguage ?? undefined });
+      await sendCrewMemberCertifiedNotification({
+        to: admin.email,
+        adminName: admin.name || admin.email,
+        memberName: opts.memberName,
+        courseName: opts.courseName,
+        groupName: row.groupName,
+        certificateNumber: opts.certificateNumber,
+        actorUserId: opts.memberUserId,
+        locale: adminLocale,
+      });
+    }
+  } catch (err) {
+    console.error("[Cert] Crew admin notification error:", err);
+  }
+}
 
 export function registerLmsRoutes(app: Express) {
 app.get("/api/courses", async (_req: Request, res: Response) => {
@@ -239,6 +284,13 @@ app.post("/api/course-player/:enrollmentId/content-complete", requireAuth, async
                 actorUserId: certUser.id,
                 locale: certLocale,
               });
+              await notifyCrewAdminsOfCertification({
+                memberUserId: certUser.id,
+                memberName: certUser.name,
+                courseName: certCourse.title,
+                certificateNumber: cert.certificateNumber,
+                courseLanguage: certCourse.language,
+              });
             }
           } catch (emailErr) {
             console.error("[Cert] Certification email error:", emailErr);
@@ -364,6 +416,13 @@ app.post("/api/course-player/:enrollmentId/exam-submit", examSubmitLimiter, requ
               certificationId: cert.id,
               actorUserId: certUser.id,
               locale: certLocale,
+            });
+            await notifyCrewAdminsOfCertification({
+              memberUserId: certUser.id,
+              memberName: certUser.name,
+              courseName: certCourse.title,
+              certificateNumber: cert.certificateNumber,
+              courseLanguage: certCourse.language,
             });
           }
         } catch (emailErr) {
