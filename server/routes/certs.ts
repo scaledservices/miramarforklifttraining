@@ -45,14 +45,17 @@ app.get("/api/certifications/:id", requireAuth, async (req: Request, res: Respon
       let isGroupAdmin = false;
       if (!isAdmin && currentUser?.role === "group_admin") {
         const groups = await storage.getGroupsByAdmin(req.session.userId!);
+        console.log(`[CertDebug] user=${req.session.userId} role=${currentUser?.role} groups=${groups.map(g=>g.id).join(',')} certUser=${cert.userId}`);
         for (const group of groups) {
           const members = await storage.listGroupMembers(group.id);
+          console.log(`[CertDebug] group=${group.id} members=${members.map(m=>`${m.userId}/${m.email}`).join(',')}`);
           if (members.some(m => m.userId === cert.userId)) {
             isGroupAdmin = true;
             break;
           }
         }
       }
+      console.log(`[CertDebug] isAdmin=${isAdmin} isGroupAdmin=${isGroupAdmin}`);
       if (!isAdmin && !isGroupAdmin) {
         return res.status(404).json({ error: "Certification not found" });
       }
