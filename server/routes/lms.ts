@@ -213,31 +213,43 @@ app.post("/api/course-player/:enrollmentId/content-complete", requireAuth, async
             console.error("[Cert] PDF generation error:", pdfErr);
           }
 
-          await storage.createAuditLog({
-            actorUserId: enrollment.userId!,
-            action: "certification_issued",
-            entity: "certifications",
-            entityId: String(cert.id),
-            metadata: { courseId: enrollment.courseId, certificateNumber: cert.certificateNumber },
-          });
-
-          const certUser = await storage.getUser(enrollment.userId!);
-          const certCourse = await storage.getCourse(enrollment.courseId);
-          if (certUser && certCourse) {
-            const certLocale = await resolveLocale({ userId: certUser.id, courseLanguage: certCourse.language });
-            await sendCertificationEmail({
-              to: certUser.email,
-              userName: certUser.name,
-              courseName: certCourse.title,
-              certificateNumber: cert.certificateNumber,
-              certificationId: cert.id,
-              actorUserId: certUser.id,
-              locale: certLocale,
+          try {
+            await storage.createAuditLog({
+              actorUserId: enrollment.userId!,
+              action: "certification_issued",
+              entity: "certifications",
+              entityId: String(cert.id),
+              metadata: { courseId: enrollment.courseId, certificateNumber: cert.certificateNumber },
             });
+          } catch (auditErr) {
+            console.error("[Cert] Audit log error:", auditErr);
+          }
+
+          try {
+            const certUser = await storage.getUser(enrollment.userId!);
+            const certCourse = await storage.getCourse(enrollment.courseId);
+            if (certUser && certCourse) {
+              const certLocale = await resolveLocale({ userId: certUser.id, courseLanguage: certCourse.language });
+              await sendCertificationEmail({
+                to: certUser.email,
+                userName: certUser.name,
+                courseName: certCourse.title,
+                certificateNumber: cert.certificateNumber,
+                certificationId: cert.id,
+                actorUserId: certUser.id,
+                locale: certLocale,
+              });
+            }
+          } catch (emailErr) {
+            console.error("[Cert] Certification email error:", emailErr);
           }
 
           return res.json({ completed: true, allComplete: true, certification: cert });
         }
+
+        // Self-heal: enrollment qualifies and a cert already exists (e.g. a prior
+        // request failed after issuing) — return it so the UI can show the certificate.
+        return res.json({ completed: true, allComplete: true, certification: existingCert });
       }
     }
 
@@ -327,27 +339,35 @@ app.post("/api/course-player/:enrollmentId/exam-submit", examSubmitLimiter, requ
           console.error("[Cert] PDF generation error:", pdfErr);
         }
 
-        await storage.createAuditLog({
-          actorUserId: enrollment.userId!,
-          action: "certification_issued",
-          entity: "certifications",
-          entityId: String(cert.id),
-          metadata: { courseId: enrollment.courseId, certificateNumber: cert.certificateNumber },
-        });
-
-        const certUser = await storage.getUser(enrollment.userId!);
-        const certCourse = await storage.getCourse(enrollment.courseId);
-        if (certUser && certCourse) {
-          const certLocale = await resolveLocale({ userId: certUser.id, courseLanguage: certCourse.language });
-          await sendCertificationEmail({
-            to: certUser.email,
-            userName: certUser.name,
-            courseName: certCourse.title,
-            certificateNumber: cert.certificateNumber,
-            certificationId: cert.id,
-            actorUserId: certUser.id,
-            locale: certLocale,
+        try {
+          await storage.createAuditLog({
+            actorUserId: enrollment.userId!,
+            action: "certification_issued",
+            entity: "certifications",
+            entityId: String(cert.id),
+            metadata: { courseId: enrollment.courseId, certificateNumber: cert.certificateNumber },
           });
+        } catch (auditErr) {
+          console.error("[Cert] Audit log error:", auditErr);
+        }
+
+        try {
+          const certUser = await storage.getUser(enrollment.userId!);
+          const certCourse = await storage.getCourse(enrollment.courseId);
+          if (certUser && certCourse) {
+            const certLocale = await resolveLocale({ userId: certUser.id, courseLanguage: certCourse.language });
+            await sendCertificationEmail({
+              to: certUser.email,
+              userName: certUser.name,
+              courseName: certCourse.title,
+              certificateNumber: cert.certificateNumber,
+              certificationId: cert.id,
+              actorUserId: certUser.id,
+              locale: certLocale,
+            });
+          }
+        } catch (emailErr) {
+          console.error("[Cert] Certification email error:", emailErr);
         }
 
         const updatedCert = await storage.getCertification(cert.id);
