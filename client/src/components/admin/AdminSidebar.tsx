@@ -14,7 +14,6 @@ import {
   CalendarDays,
   CalendarClock,
   Clock,
-  UserCheck,
   UserCog,
   Target,
   Building2,
@@ -63,12 +62,14 @@ const salesItems: NavItem[] = [
   { title: "Overview", url: "/admin/overview", icon: LayoutDashboard },
 ];
 
+// 2026-09-03 (Alberto): "Instructor Apps" hidden - Miramar hand-picks
+// trainers and does not run an open instructor funnel. The pages/routes stay
+// (existing applications remain reachable by URL); only the nav entry goes.
 const managementItems: NavItem[] = [
   { title: "Courses", url: "/admin/courses", icon: BookOpen },
   { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
   { title: "Enrollments", url: "/admin/enrollments", icon: GraduationCap },
   { title: "Card Orders", url: "/admin/card-orders", icon: CreditCard },
-  { title: "Instructor Apps", url: "/admin/instructor-applications", icon: UserCheck },
   { title: "Instructors", url: "/admin/instructors", icon: UserCog },
 ];
 
