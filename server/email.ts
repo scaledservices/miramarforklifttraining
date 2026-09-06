@@ -256,21 +256,34 @@ export async function sendOrderReceipt(params: {
   orderNumber: string;
   items: { title: string; quantity: number; unitPrice: number }[];
   total: number;
+  /** Photo ID add-on line (2026-09-03, Alberto): itemize the cards so the
+   * customer sees why the total exceeds seats x course price. */
+  photoIdAddOn?: { count: number; total: number };
+  /** Card processing fee portion of the total. */
+  surcharge?: number;
   actorUserId?: number;
   locale?: string;
 }) {
   const baseUrl = getSiteUrl();
   const loc = params.locale || "en";
   const _ = (key: string) => emailT(loc, "orderReceipt", key);
-  const itemRows = params.items.map(i =>
+  let itemRows = params.items.map(i =>
     `<tr><td style="padding: 8px; border-bottom: 1px solid #eee;">${i.title}</td><td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${i.quantity}</td><td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${i.unitPrice.toFixed(2)}</td></tr>`
   ).join("");
+  if (params.photoIdAddOn && params.photoIdAddOn.count > 0) {
+    itemRows +=
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #eee;">${_("photoIdLineItem")}</td><td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${params.photoIdAddOn.count}</td><td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${params.photoIdAddOn.total.toFixed(2)}</td></tr>`;
+  }
+  if (params.surcharge && params.surcharge > 0) {
+    itemRows +=
+      `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #777;">${_("cardFee")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;"></td><td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${params.surcharge.toFixed(2)}</td></tr>`;
+  }
 
   return sendEmail({
     to: params.to,
     subject: _("subject").replace("{{orderNumber}}", params.orderNumber),
     template: "order_receipt",
-    payload: { orderNumber: params.orderNumber, items: params.items, total: params.total },
+    payload: { orderNumber: params.orderNumber, items: params.items, total: params.total, photoIdAddOn: params.photoIdAddOn, surcharge: params.surcharge },
     html: wrap(loc, `
       <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont};">${_("heading")}</h2>
       <p>${_("body").replace("{{orderNumber}}", params.orderNumber)}</p>
@@ -583,6 +596,10 @@ export async function sendBookingConfirmation(params: {
   onsiteAddress: string;
   participantCount: number;
   totalPrice: number;
+  /** Final amount actually charged, fee inclusive (2026-09-03, Alberto). */
+  amountPaid?: number;
+  /** Card processing fee portion of amountPaid. */
+  cardFee?: number;
   actorUserId?: number;
   locale?: string;
 }) {
@@ -590,6 +607,18 @@ export async function sendBookingConfirmation(params: {
 
   const loc = params.locale || "en";
   const _ = (key: string) => emailT(loc, "bookingConfirmation", key);
+
+  // When a card payment was captured, show the fee-inclusive total the
+  // customer actually paid (matches their card statement), with the training
+  // price and card fee as the breakdown. Falls back to the plain total for
+  // unpaid/manual bookings.
+  const paidRows = params.amountPaid && params.amountPaid > 0
+    ? `
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainingPrice")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">$${params.totalPrice.toFixed(2)}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("cardFee")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">$${(params.cardFee ?? 0).toFixed(2)}</td></tr>
+        <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_("totalPaid")}</td><td style="padding: 8px; font-weight: bold; font-size: 18px; color: ${theme.email.headingColor};">$${params.amountPaid.toFixed(2)}</td></tr>`
+    : `
+        <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_("totalPrice")}</td><td style="padding: 8px; font-weight: bold; font-size: 18px; color: ${theme.email.headingColor};">$${params.totalPrice.toFixed(2)}</td></tr>`;
 
   return sendEmail({
     to: params.to,
@@ -604,6 +633,8 @@ export async function sendBookingConfirmation(params: {
       onsiteAddress: params.onsiteAddress,
       participantCount: params.participantCount,
       totalPrice: params.totalPrice,
+      amountPaid: params.amountPaid,
+      cardFee: params.cardFee,
     },
     html: wrap(loc, `
       <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
@@ -614,8 +645,7 @@ export async function sendBookingConfirmation(params: {
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("date")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("time")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("location")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.onsiteAddress}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("participants")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.participantCount}</td></tr>
-        <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_("totalPrice")}</td><td style="padding: 8px; font-weight: bold; font-size: 18px; color: ${theme.email.headingColor};">$${params.totalPrice.toFixed(2)}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("participants")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.participantCount}</td></tr>${paidRows}
       </table>
       <div style="background: ${theme.colors.background.light}; border-radius: 6px; padding: 16px; margin: 20px 0;">
         <p style="margin: 0 0 8px; font-weight: bold; color: ${theme.email.headingColor};">${_("cancellationPolicy")}</p>

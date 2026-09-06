@@ -21,6 +21,8 @@ const strings: Record<string, EmailStrings> = {
       thQty: "Qty",
       thPrice: "Price",
       total: "Total: ${{total}}",
+      photoIdLineItem: "Photo ID wallet card",
+      cardFee: "Card processing fee",
       cta: "You can start your training by visiting your <a href=\"{{dashboardUrl}}\" style=\"color: {{accentHex}};\">dashboard</a>.",
     },
     groupInvite: {
@@ -113,9 +115,14 @@ const strings: Record<string, EmailStrings> = {
       location: "Location",
       participants: "Participants",
       totalPrice: "Payment (Paid in Full)",
+      trainingPrice: "Training Total",
+      cardFee: "Card Processing Fee",
+      totalPaid: "Total Paid",
       cancellationPolicy: "Refund Requests",
       cancellationText: "All refund requests are handled on a case-by-case basis. Contact us at {{supportEmail}} or call (858) 901-0149 to discuss your situation.",
-      cta: "View My Bookings",
+      // 2026-09-03 (Alberto): push the purchaser toward naming their crew -
+      // those names feed the certificates. Was "View My Bookings".
+      cta: "Add Crew Members",
       footer: "If you have any questions about your booking, please contact our team.",
     },
     bookingCancellation: {
@@ -293,6 +300,8 @@ const strings: Record<string, EmailStrings> = {
       thQty: "Cant",
       thPrice: "Precio",
       total: "Total: ${{total}}",
+      photoIdLineItem: "Tarjeta de identificación con foto",
+      cardFee: "Cargo por procesamiento de tarjeta",
       cta: "Puedes iniciar tu capacitación visitando tu <a href=\"{{dashboardUrl}}\" style=\"color: {{accentHex}};\">panel</a>.",
     },
     groupInvite: {
@@ -385,9 +394,14 @@ const strings: Record<string, EmailStrings> = {
       location: "Ubicación",
       participants: "Participantes",
       totalPrice: "Precio Total",
+      trainingPrice: "Total de Capacitación",
+      cardFee: "Cargo por Procesamiento de Tarjeta",
+      totalPaid: "Total Pagado",
       cancellationPolicy: "Política de Cancelación",
       cancellationText: "Las cancelaciones realizadas al menos 48 horas antes de la sesión programada son elegibles para un reembolso completo. Las cancelaciones tardías pueden estar sujetas a una tarifa de cancelación. Contáctenos en {{supportEmail}} para asistencia.",
-      cta: "Ver Mis Reservas",
+      // 2026-09-03 (Alberto): dirigir al comprador a nombrar su equipo. Era
+      // "Ver Mis Reservas".
+      cta: "Agregar Miembros del Equipo",
       footer: "Si tienes alguna pregunta sobre tu reserva, por favor contacta a nuestro equipo.",
     },
     bookingCancellation: {

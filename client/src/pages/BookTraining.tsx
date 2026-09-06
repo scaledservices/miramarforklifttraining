@@ -14,7 +14,7 @@ import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
 import AddonUpsell from "@/components/booking/AddonUpsell";
 import AttendeeNamesForm from "@/components/booking/AttendeeNamesForm";
 import CardPaymentSection from "@/components/checkout/CardPaymentSection";
-import { computeBookingPrice, BOOKING_DEPOSIT_RATE } from "@shared/config/bookingPricing";
+import { computeBookingPrice, BOOKING_DEPOSIT_RATE, CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
 import { trackEvent } from "@/lib/analytics";
 import {
   formatUsPhone,
@@ -557,7 +557,7 @@ export default function BookTraining() {
       })()
     : bookingPricing;
   // depositWithSurcharge is the amount charged now = full total + 3% card surcharge.
-  const depositWithSurcharge = effectivePricing ? Number((effectivePricing.deposit * 1.03).toFixed(2)) : 0;
+  const depositWithSurcharge = effectivePricing ? Number((effectivePricing.deposit * (1 + CARD_SURCHARGE_RATE)).toFixed(2)) : 0;
   const dayNames = useMemo(() => getDayNames(i18n.language || "en"), [i18n.language]);
 
   if (submitted) {

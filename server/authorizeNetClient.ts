@@ -250,12 +250,15 @@ export async function refundTransaction(
   }
 }
 
+// The rate constant lives in shared/config/bookingPricing.ts so the client
+// display math and this server charge math can never disagree. Re-exported
+// here for the existing import sites.
+export { CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
+import { CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
+
 /**
- * Calculate the 3% card surcharge.
- * Miramar charges 3% for card payments (no fee for check/ACH).
- * Returns the surcharge amount.
+ * Calculate the card surcharge. Returns the surcharge amount.
  */
 export function calculateCardSurcharge(orderTotal: number): number {
-  const rate = 0.03;
-  return Number((orderTotal * rate).toFixed(2));
+  return Number((orderTotal * CARD_SURCHARGE_RATE).toFixed(2));
 }

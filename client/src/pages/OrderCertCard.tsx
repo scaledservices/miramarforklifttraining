@@ -27,6 +27,11 @@ import { formatCardNumber, digitsOnly } from "@/lib/inputFormat";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
+
+// Wallet card price (Alberto 2026-09-03: standardized to $24.99). Shipping
+// stays $4.99 standard / $9.99 expedited.
+const CARD_PRICE = 24.99;
 
 /**
  * Read a user-selected photo and downscale it to a small JPEG data URL so
@@ -258,10 +263,9 @@ export default function OrderCertCard() {
     if (prepaidEntitlement) setShippingMethod(prepaidEntitlement.shippingMethod);
   }, [prepaidEntitlement]);
 
-  const cardPrice = 9.99;
   const shippingCost = shippingMethod === "standard" ? 4.99 : 9.99;
-  const subtotal = cardPrice + shippingCost;
-  const surcharge = paymentConfig?.configured ? Number((subtotal * 0.03).toFixed(2)) : 0;
+  const subtotal = CARD_PRICE + shippingCost;
+  const surcharge = paymentConfig?.configured ? Number((subtotal * CARD_SURCHARGE_RATE).toFixed(2)) : 0;
   const total = Number((subtotal + surcharge).toFixed(2));
 
   // Pay-now path (no prepaid entitlement) — POST /api/cert-cards, unchanged.
@@ -758,7 +762,7 @@ export default function OrderCertCard() {
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between gap-2 text-sm">
                 <span>{t("orderCertCard.walletCard")}</span>
-                <span>$9.99</span>
+                <span>${CARD_PRICE.toFixed(2)}</span>
               </div>
               <div className="flex justify-between gap-2 text-sm">
                 <span>{t("orderCertCard.shipping")} ({shippingMethod === "standard" ? t("orderCertCard.standardShipping").toLowerCase() : t("orderCertCard.expeditedShipping").toLowerCase()})</span>
@@ -766,7 +770,7 @@ export default function OrderCertCard() {
               </div>
               {paymentConfig?.configured && surcharge > 0 && (
                 <div className="flex justify-between gap-2 text-sm">
-                  <span className="text-muted-foreground">{t("orderCertCard.cardFee", { defaultValue: "Card processing fee (3%)" })}</span>
+                  <span className="text-muted-foreground">{t("orderCertCard.cardFee", { pct: (CARD_SURCHARGE_RATE * 100).toFixed(1), defaultValue: `Card processing fee (${(CARD_SURCHARGE_RATE * 100).toFixed(1)}%)` })}</span>
                   <span className="text-orange-600">${surcharge.toFixed(2)}</span>
                 </div>
               )}

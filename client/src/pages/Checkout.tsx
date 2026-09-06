@@ -16,6 +16,7 @@ import { ShoppingCart, ArrowLeft, AlertCircle, Loader2, CreditCard, Lock, Phone,
 import CheckoutInlineAuth from "@/components/checkout/CheckoutInlineAuth";
 import { useTranslation } from "react-i18next";
 import { brand } from "@shared/config/brand";
+import { CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
 import { trackCheckoutContact } from "@/lib/analytics";
 import { formatCardNumber, digitsOnly } from "@/lib/inputFormat";
 
@@ -112,7 +113,7 @@ export default function Checkout() {
   const [photoIdShippingMethod, setPhotoIdShippingMethod] = useState<"standard" | "expedited">("standard");
   const [photoIdShipping, setPhotoIdShipping] = useState({ name: "", address: "", city: "", state: "", zip: "" });
 
-  const PHOTO_ID_PRICE = 9.99;
+  const PHOTO_ID_PRICE = 24.99;
   const PHOTO_ID_SHIPPING = { standard: 4.99, expedited: 9.99 } as const;
   const seatCount = items.reduce((n, i) => n + (i.quantity || 1), 0);
   const isTeamCart = items.some((i) => i.isTeamProduct) || seatCount > 1;
@@ -237,7 +238,7 @@ export default function Checkout() {
   const preSurchargeTotal = Number((discountedSubtotal + photoIdAddOnTotal).toFixed(2));
 
   // Calculate 3% card surcharge (on the discounted subtotal + add-on)
-  const surcharge = isConfigured ? Number((preSurchargeTotal * 0.03).toFixed(2)) : 0;
+  const surcharge = isConfigured ? Number((preSurchargeTotal * CARD_SURCHARGE_RATE).toFixed(2)) : 0;
   const totalWithSurcharge = Number((preSurchargeTotal + surcharge).toFixed(2));
 
   useEffect(() => {
@@ -598,7 +599,7 @@ export default function Checkout() {
                       </Label>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">{t("checkout.cardFeeNote", { defaultValue: "Includes 3% card processing fee" })}</span>
+                      <span className="text-muted-foreground">{t("checkout.cardFeeNote", { pct: (CARD_SURCHARGE_RATE * 100).toFixed(1), defaultValue: `Includes ${(CARD_SURCHARGE_RATE * 100).toFixed(1)}% card processing fee` })}</span>
                       <span className="font-medium text-muted-foreground">+${surcharge.toFixed(2)}</span>
                     </div>
                     <Button
@@ -795,7 +796,7 @@ export default function Checkout() {
                 )}
                 {isConfigured && surcharge > 0 && (
                   <div className="flex justify-between gap-2">
-                    <span className="text-muted-foreground">{t("checkout.cardFee", { defaultValue: "Card processing fee (3%)" })}</span>
+                    <span className="text-muted-foreground">{t("checkout.cardFee", { pct: (CARD_SURCHARGE_RATE * 100).toFixed(1), defaultValue: `Card processing fee (${(CARD_SURCHARGE_RATE * 100).toFixed(1)}%)` })}</span>
                     <span className="font-medium text-muted-foreground">${surcharge.toFixed(2)}</span>
                   </div>
                 )}

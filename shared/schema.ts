@@ -272,7 +272,7 @@ export const photoIdEntitlements = pgTable("photo_id_entitlements", {
   purchasedByUserId: integer("purchased_by_user_id").notNull().references(() => users.id),
   shippingMethod: text("shipping_method", { enum: ["standard", "expedited"] }).notNull(),
   shippingAddress: jsonb("shipping_address").notNull(),
-  // Per-ID charged share including its portion of the 3% surcharge.
+  // Per-ID charged share including its portion of the card surcharge.
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   status: text("status", { enum: ["awaiting_photo", "fulfilled", "refunded"] }).notNull().default("awaiting_photo"),
   certCardOrderId: integer("cert_card_order_id").references(() => certCardOrders.id),

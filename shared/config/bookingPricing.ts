@@ -3,6 +3,11 @@
 // catalog entries; update BOTH here and client/src/data/catalog.ts if a price
 // changes until catalog pricing is fully migrated to this map.
 
+// Card surcharge rate (2026-09-03, Alberto: raised 3% -> 3.5%). Shared so the
+// client display math and the server charge never disagree. The server's
+// calculateCardSurcharge re-exports/uses this same constant.
+export const CARD_SURCHARGE_RATE = 0.035;
+
 export const BOOKING_PRODUCT_PRICES: Record<string, number> = {
   "standard-forklift-certification-san-diego": 280,
   "scissor-aerial-boom-lift-certification-san-diego": 200,

@@ -13,6 +13,7 @@ import {
   createTransactionFromNonce,
   refundTransaction,
   calculateCardSurcharge,
+  CARD_SURCHARGE_RATE,
 } from "../authorizeNetClient";
 import { sendOrderReceipt, sendNewOrderAdminAlert } from "../email";
 import { resolveLocale } from "../locale-resolver";
@@ -21,8 +22,8 @@ import { logger, logPaymentError } from "../monitoring";
 import { requireAuth, payLimiter } from "./middleware";
 import { SHIPPING_RATES } from "../constants";
 
-// Photo ID wallet card pricing (matches certs.ts; Alberto demo decision).
-const PHOTO_ID_PRICE = 9.99;
+// Photo ID wallet card pricing (matches certs.ts; Alberto 2026-09-03: $24.99).
+const PHOTO_ID_PRICE = 24.99;
 
 interface PhotoIdAddOn {
   count: number;
@@ -176,7 +177,9 @@ export function registerAuthorizeNetRoutes(app: Express) {
             await recordDiscountRedemption({ codeId: discount.id, orderId: order.id, amountDiscounted: demoDiscount.discountAmount });
           }
 
-          await postPaymentProcessing(order.id, req.session.userId!, `demo-${Date.now()}`, demoTotal, isTeamPurchase);
+          await postPaymentProcessing(order.id, req.session.userId!, `demo-${Date.now()}`, demoTotal, isTeamPurchase,
+            addOn ? { count: addOn.count, total: demoAddOnTotal } : undefined,
+            demoSurcharge > 0 ? demoSurcharge : undefined);
 
           // Photo ID add-on: create entitlements + save shipping address even
           // when Authorize.net is not configured (demo/QA parity).
@@ -217,7 +220,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
       let total = discountResult.discountedTotal;
 
       // Photo ID add-on: server-priced, added AFTER discount (fixed cost,
-      // discounts never apply) and BEFORE the 3% surcharge (one surcharge
+      // discounts never apply) and BEFORE the card surcharge (one surcharge
       // line over the whole charge, same as course seats).
       let addOnTotal = 0;
       if (addOn) {
@@ -281,7 +284,9 @@ export function registerAuthorizeNetRoutes(app: Express) {
       }
 
       // Post-payment processing (earnings split, emails, audit log)
-      await postPaymentProcessing(order.id, req.session.userId!, result.transactionId!, total, isTeamPurchase);
+      await postPaymentProcessing(order.id, req.session.userId!, result.transactionId!, total, isTeamPurchase,
+        addOn ? { count: addOn.count, total: addOnTotal } : undefined,
+        surcharge > 0 ? surcharge : undefined);
 
       // Photo ID add-on: create entitlements + save the shipping address to
       // the buyer's profile (prefill for later purchases). Money already
@@ -419,9 +424,9 @@ async function createPhotoIdEntitlements(
   const buyerEnrollment = orderEnrollments.find((e) => e.userId === buyerUserId);
   const isTeamOrder = orderEnrollments.some((e) => e.userId === null);
 
-  // Surcharge is flat 3% over the pre-surcharge total, so the add-on's share
-  // is 3% of the add-on total.
-  const addOnSurchargeShare = Number((addOnTotal * 0.03).toFixed(2));
+  // Surcharge is flat over the pre-surcharge total, so the add-on's share
+  // is the surcharge rate applied to the add-on total.
+  const addOnSurchargeShare = Number((addOnTotal * CARD_SURCHARGE_RATE).toFixed(2));
   const perUnit = Number(((addOnTotal + addOnSurchargeShare) / addOn.count).toFixed(2));
 
   const rows: {
@@ -521,7 +526,9 @@ async function postPaymentProcessing(
   userId: number,
   transactionId: string,
   total: number,
-  isTeamPurchase: boolean
+  isTeamPurchase: boolean,
+  receiptPhotoIdAddOn?: { count: number; total: number },
+  receiptSurcharge?: number
 ): Promise<void> {
   const { payments: paymentsTable } = await import("@shared/schema");
   const { and: andOp } = await import("drizzle-orm");
@@ -595,6 +602,10 @@ async function postPaymentProcessing(
       orderNumber: (await storage.getOrder(orderId))?.orderNumber || "",
       items: courseLookup,
       total,
+      // 2026-09-03 (Alberto): itemize photo ID cards + card fee on the
+      // receipt so the total is self-explanatory.
+      photoIdAddOn: receiptPhotoIdAddOn,
+      surcharge: receiptSurcharge,
       actorUserId: userId,
       locale: orderLocale,
     });

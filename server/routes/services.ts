@@ -352,7 +352,13 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         endTime,
         onsiteAddress: `${customerAddress}, ${customerCity}, ${customerState} ${customerZip}`,
         participantCount,
+        // 2026-09-03 (Alberto): the customer sees the FINAL amount paid, fee
+        // inclusive - the email previously showed the pre-surcharge training
+        // total ($1,960 vs the $2,028.60 actually charged), which read as a
+        // discrepancy against the card statement.
         totalPrice: Number(totalPrice),
+        amountPaid: depositCharged > 0 ? depositCharged : undefined,
+        cardFee: depositSurcharge > 0 ? depositSurcharge : undefined,
         actorUserId: user.id,
         locale: bookingLocale,
       });

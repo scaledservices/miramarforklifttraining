@@ -259,9 +259,11 @@ app.post("/api/cert-cards", requireAuth, payLimiter, async (req: Request, res: R
     const shippingCost = SHIPPING_RATES[shippingMethod as keyof typeof SHIPPING_RATES];
     if (!shippingCost) return res.status(400).json({ error: "Invalid shipping method" });
 
-    const cardPrice = 9.99;
+    // Wallet card price (Alberto 2026-09-03: standardized to $24.99). Matches
+    // PHOTO_ID_PRICE in authorizeNet.ts and CARD_PRICE in OrderCertCard.tsx.
+    const cardPrice = 24.99;
     const subtotal = cardPrice + shippingCost;
-    // Same 3% card surcharge as course checkout (matches the client-side total).
+    // Same card surcharge as course checkout (matches the client-side total).
     const surcharge = calculateCardSurcharge(subtotal);
     const totalAmount = Number((subtotal + surcharge).toFixed(2));
 
