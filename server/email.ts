@@ -358,7 +358,7 @@ export async function sendCertificationEmail(params: {
       <p>${_("shareVerify")} <a href="${verifyUrl}" style="color: ${theme.email.linkColor};">${verifyUrl}</a></p>
       <p style="color: #999; font-size: 12px;">${_("pdfNote")}</p>
       <div style="background: ${theme.colors.background.light}; border-left: 4px solid ${theme.colors.primary.hex}; padding: 12px 16px; margin: 20px 0; border-radius: 4px;">
-        <p style="margin: 0; color: #4a5568; font-size: 13px;">${_("instructorCta")} <a href="${baseUrl}${localePath(loc, "/become-an-instructor")}" style="color: ${theme.email.linkColor}; text-decoration: none;">${_("learnMore")}</a></p>
+        <p style="margin: 0; color: #4a5568; font-size: 13px;">${_("instructorCta")}</p>
       </div>
     `),
     actorUserId: params.actorUserId,

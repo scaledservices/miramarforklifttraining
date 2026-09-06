@@ -40,7 +40,10 @@ const strings: Record<string, EmailStrings> = {
       cta: "View Your Certificate",
       shareVerify: "Share this verification link with your employer:",
       pdfNote: "Your certificate PDF is available for download when you sign in to your account.",
-      instructorCta: "<strong>Interested in teaching?</strong> Now that you're certified, you may qualify to join our instructor network.",
+      // 2026-09-03 (Alberto): replaced the instructor-network pitch - he
+      // hand-picks trainers and does not want an open funnel. Referral
+      // discount is the agreed 20% (one shared code, REFER20).
+      instructorCta: "<strong>Know someone who needs certification?</strong> Share code <strong>REFER20</strong> and they get 20% off their course.",
       learnMore: "Learn more",
     },
     cardOrderReceipt: {
@@ -319,7 +322,7 @@ const strings: Record<string, EmailStrings> = {
       cta: "Ver Tu Certificado",
       shareVerify: "Comparte este enlace de verificación con tu empleador:",
       pdfNote: "Tu certificado en PDF está disponible para descargar cuando inicies sesión en tu cuenta.",
-      instructorCta: "<strong>¿Interesado en enseñar?</strong> Ahora que estás certificado, puedes calificar para unirte a nuestra red de instructores.",
+      instructorCta: "<strong>¿Conoces a alguien que necesita certificarse?</strong> Comparte el código <strong>REFER20</strong> y obtiene 20% de descuento en su curso.",
       learnMore: "Más información",
     },
     cardOrderReceipt: {

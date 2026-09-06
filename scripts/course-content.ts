@@ -820,15 +820,18 @@ export const COURSE_STEPS: StepDef[] = [
         "Operator Permit / Authorization Form",
         "Site Attendance Sheet",
       ] },
-      { type: "heading", level: 3, text: "Wallet Card (Optional)" },
-      { type: "paragraph", html: "Want a professional, wallet-sized operator ID card? Order your physical card from your certification page. It makes it easy to show proof of training on the job." },
+      { type: "heading", level: 3, text: "Your Wallet Card" },
+      // 2026-09-03 (Alberto): the card is NOT optional - every completer gets
+      // one, shipped within 4-5 business days to the address the crew manager
+      // provided at purchase. The paid option is the PHOTO version ($24.99).
+      { type: "paragraph", html: "You will receive your wallet-sized operator ID card in the mail within <strong>4 to 5 business days</strong>, shipped to the address provided when your training was purchased. Want your photo on the card? Add a photo ID from your certification page for $24.99 - just upload a photo and we print and ship it." },
       { type: "heading", level: 3, text: "Stay Safe" },
       { type: "paragraph", html: "Your training doesn't end here. Continue to follow safe operating procedures every day. If you ever have questions or need a refresher, you can revisit this course at any time. Stay safe out there!" },
       { type: "callout", variant: "tip", text: "Bookmark your verification page link — employers can use it to instantly verify your certification." },
       { type: "key_takeaways", items: [
         "Download your certificate from your certification page",
         "Share the employer packet with your supervisor for practical evaluation",
-        "Consider ordering a wallet-sized operator ID card",
+        "Your wallet card arrives within 4 to 5 business days",
         "Re-evaluation is required at least every 3 years",
       ] },
     ]),

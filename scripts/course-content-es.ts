@@ -805,15 +805,18 @@ export const COURSE_STEPS_ES: StepDef[] = [
         "Formulario de Permiso / Autorización del Operador",
         "Hoja de Asistencia del Sitio",
       ] },
-      { type: "heading", level: 3, text: "Tarjeta de Billetera (Opcional)" },
-      { type: "paragraph", html: "¿Desea una tarjeta de identificación de operador profesional tamaño billetera? Ordene su tarjeta física desde su página de certificación. Facilita mostrar prueba de capacitación en el trabajo." },
+      { type: "heading", level: 3, text: "Su Tarjeta de Billetera" },
+      // 2026-09-03 (Alberto): la tarjeta NO es opcional - cada graduado recibe
+      // una, enviada dentro de 4-5 días hábiles a la dirección que el
+      // administrador del equipo proporcionó al comprar. Mirrors course-content.ts.
+      { type: "paragraph", html: "Recibirá su tarjeta de identificación de operador tamaño billetera por correo dentro de <strong>4 a 5 días hábiles</strong>, enviada a la dirección proporcionada cuando se compró su capacitación. ¿Desea su foto en la tarjeta? Agregue una tarjeta con foto desde su página de certificación por $24.99 - solo suba una foto y nosotros la imprimimos y enviamos." },
       { type: "heading", level: 3, text: "Manténgase Seguro" },
       { type: "paragraph", html: "Su capacitación no termina aquí. Continúe siguiendo los procedimientos de operación segura todos los días. Si alguna vez tiene preguntas o necesita una actualización, puede volver a visitar este curso en cualquier momento. ¡Manténgase seguro!" },
       { type: "callout", variant: "tip", text: "Guarde el enlace de su página de verificación — los empleadores pueden usarlo para verificar instantáneamente su certificación." },
       { type: "key_takeaways", items: [
         "Descargue su certificado desde su página de certificación",
         "Comparta el paquete del empleador con su supervisor para la evaluación práctica",
-        "Considere ordenar una tarjeta de identificación de operador tamaño billetera",
+        "Su tarjeta de billetera llegará dentro de 4 a 5 días hábiles",
         "La re-evaluación es requerida al menos cada 3 años",
       ] },
     ]),

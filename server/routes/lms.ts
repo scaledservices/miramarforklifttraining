@@ -18,15 +18,37 @@ async function notifyCrewAdminsOfCertification(opts: {
   courseLanguage?: string | null;
 }) {
   try {
-    // Groups whose member list includes the certified user.
+    // Groups whose member list includes the certified user. Two lookup paths
+    // (2026-09-03 debug: the manager got NO notification in the live
+    // walkthrough):
+    //  1. group_members.userId = member (accepted invites)
+    //  2. group_members.email = member's email (invite accepted with a
+    //     different address, or the userId link was never written)
     const { db } = await import("../db");
     const { groupMembers, groups, users } = await import("@shared/schema");
-    const { eq, and, isNotNull } = await import("drizzle-orm");
+    const { eq, and, isNotNull, or } = await import("drizzle-orm");
+
+    const [memberUser] = await db.select().from(users).where(eq(users.id, opts.memberUserId));
+    const memberEmail = memberUser?.email?.toLowerCase() || null;
+
+    const matchConditions = [eq(groupMembers.userId, opts.memberUserId)];
+    if (memberEmail) matchConditions.push(eq(groupMembers.email, memberEmail));
+
     const rows = await db
       .select({ adminUserId: groups.adminUserId, groupName: groups.name })
       .from(groupMembers)
       .innerJoin(groups, eq(groups.id, groupMembers.groupId))
-      .where(and(eq(groupMembers.userId, opts.memberUserId), isNotNull(groupMembers.acceptedAt)));
+      .where(and(
+        or(...matchConditions),
+        isNotNull(groupMembers.acceptedAt)
+      ));
+
+    if (rows.length === 0) {
+      // Visibility for the next live test: silence here is exactly how the
+      // 2026-09-03 bug hid. Log WHY no admin was notified.
+      console.warn(`[Cert] Crew admin notification: no accepted group_members row found for user ${opts.memberUserId} (${memberEmail ?? "no email"}) - manager will NOT be emailed`);
+    }
+
     const seen = new Set<number>();
     for (const row of rows) {
       if (seen.has(row.adminUserId)) continue;

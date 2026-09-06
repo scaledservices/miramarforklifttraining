@@ -38,6 +38,39 @@ function getSealImagePath(): string | null {
   return null;
 }
 
+// Official OSHA logo (Alberto 2026-09-03: certificates must carry the real
+// OSHA logo like the legacy certs did). Asset staged from the meeting
+// attachments; falls back gracefully when absent.
+function getOshaLogoPath(): string | null {
+  const candidates = [
+    path.join(process.cwd(), "client/public/images/osha-logo.jpg"),
+    path.join(process.cwd(), "dist/public/images/osha-logo.jpg"),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+// Script font for the signature lines (Great Vibes, OFL, google/fonts). A
+// realistic-looking signature was requested at the 2026-09-03 review; the
+// printed name/title still appears under each line.
+function getSignatureFontPath(): string | null {
+  const candidates = [
+    path.join(process.cwd(), "client/public/fonts/GreatVibes-Regular.ttf"),
+    path.join(process.cwd(), "dist/public/fonts/GreatVibes-Regular.ttf"),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+// Signatories printed on every certificate. Alberto Rawlins is the training
+// operator (left line); the compliance officer role is on the right.
+const SIGNATORY_LEFT = "Alberto Rawlins";
+const SIGNATORY_RIGHT = "M. Nemrow";
+
 const certLabels = {
   en: {
     certificateOfCompletion: "Certificate of Completion",
@@ -501,13 +534,27 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
     const sigLeftX = (pageWidth / 2 - sigLineW) / 2 + 30;
     const sigRightX = pageWidth / 2 + (pageWidth / 2 - sigLineW) / 2 - 30;
 
+    // Script signatures above each line (2026-09-03, Alberto: the certificate
+    // was missing signatures). Great Vibes renders a realistic-looking
+    // signature; the printed name + role still appear under each line.
+    const sigFontPath = getSignatureFontPath();
+    if (sigFontPath) {
+      doc.font(sigFontPath);
+      doc.fontSize(26).fillColor(darkBrown).text(SIGNATORY_LEFT, sigLeftX, sigY - 30, { width: sigLineW, align: "center", lineGap: 0, height: 30 });
+      doc.fontSize(26).fillColor(darkBrown).text(SIGNATORY_RIGHT, sigRightX, sigY - 30, { width: sigLineW, align: "center", lineGap: 0, height: 30 });
+      // pdfkit caches the custom font; switch back for everything after.
+      doc.font("Helvetica");
+    }
+
     // Left signature line
     doc.moveTo(sigLeftX, sigY).lineTo(sigLeftX + sigLineW, sigY).lineWidth(1).strokeColor(brown).stroke();
     doc.fontSize(9).fillColor(textLight).text(labels.instructorTitle, sigLeftX, sigY + 5, { width: sigLineW, align: "center", characterSpacing: 0.5 });
+    doc.fontSize(9).fillColor(textMedium).text(SIGNATORY_LEFT, sigLeftX, sigY + 15, { width: sigLineW, align: "center", lineGap: 0, height: 11 });
 
     // Right signature line
     doc.moveTo(sigRightX, sigY).lineTo(sigRightX + sigLineW, sigY).lineWidth(1).strokeColor(brown).stroke();
     doc.fontSize(9).fillColor(textLight).text(labels.complianceOfficer, sigRightX, sigY + 5, { width: sigLineW, align: "center", characterSpacing: 0.5 });
+    doc.fontSize(9).fillColor(textMedium).text(SIGNATORY_RIGHT, sigRightX, sigY + 15, { width: sigLineW, align: "center", lineGap: 0, height: 11 });
 
     // ════════════════════════════════════════
     // OFFICIAL SEAL — bottom-left area
@@ -520,6 +567,14 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
       doc.image(sealPath, 90 - sealSize / 2, 535 - sealSize / 2, { width: sealSize, height: sealSize });
     } else {
       drawOfficialSeal(doc, 90, 535, 42, labels.officialSeal);
+    }
+
+    // Official OSHA logo beside the seal (Alberto 2026-09-03: inspectors
+    // expect it on the certificate, as on the legacy site). Sits in the
+    // bottom-left band, clear of the footer divider at y=580.
+    const oshaLogoPath = getOshaLogoPath();
+    if (oshaLogoPath) {
+      doc.image(oshaLogoPath, 155, 505, { height: 60 });
     }
 
     // ════════════════════════════════════════
