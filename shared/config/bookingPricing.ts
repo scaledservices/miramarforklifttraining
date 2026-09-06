@@ -13,26 +13,26 @@ export const BOOKING_PRODUCT_PRICES: Record<string, number> = {
   "forklift-scissor-lift-epj-certification-san-diego": 550,
   "complete-equipment-certification-san-diego": 650,
   "standard-forklift-certification-las-vegas": 280,
-  "scissor-aerial-boom-lift-certification-las-vegas": 200,
   "reach-training-certification-las-vegas": 300,
   "order-picker-training-certification-las-vegas": 300,
   "reach-forklift-training-las-vegas": 490,
   "order-picker-forklift-training-las-vegas": 490,
-  "forklift-scissor-lift-epj-certification-las-vegas": 550,
-  "complete-equipment-certification-las-vegas": 650,
   "forklift-train-the-trainer-san-diego": 750,
   "forklift-train-the-trainer-las-vegas": 750,
   "scissor-aerial-train-the-trainer-san-diego": 750,
   "scissor-aerial-train-the-trainer-las-vegas": 750,
   "standard-forklift-certification-fresno": 280,
+  "forklift-train-the-trainer-fresno": 750,
+  "scissor-aerial-train-the-trainer-fresno": 750,
 };
 
 // ── Booking add-on upsell catalog ─────────────────────────────────
 // Keyed by BASE product slug. Each entry lists compatible add-on products
 // offered as an opt-in upsell during the self-serve booking flow. Add-on
 // slugs MUST exist in BOOKING_PRODUCT_PRICES above — the per-person price is
-// always looked up there, never duplicated here. Fresno intentionally has no
-// entry: it only offers standard forklift certification.
+// always looked up there, never duplicated here. Fresno and Las Vegas have
+// no add-on entry (2026-09-03): LV no longer offers scissor/aerial training
+// (equipment not at the office); Fresno offers only standard forklift.
 export interface BookingAddon {
   slug: string;
   name: string;
@@ -42,12 +42,6 @@ export const BOOKING_ADDONS: Record<string, BookingAddon[]> = {
   "standard-forklift-certification-san-diego": [
     {
       slug: "scissor-aerial-boom-lift-certification-san-diego",
-      name: "Standard Scissor & Aerial/Boom Lift Certification",
-    },
-  ],
-  "standard-forklift-certification-las-vegas": [
-    {
-      slug: "scissor-aerial-boom-lift-certification-las-vegas",
       name: "Standard Scissor & Aerial/Boom Lift Certification",
     },
   ],

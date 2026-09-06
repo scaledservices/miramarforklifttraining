@@ -158,14 +158,14 @@ export default function BookTraining() {
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>(() => {
     if (productSlug) {
-      const match = catalog.find((p) => p.slug === productSlug && p.category === "hands-on");
+      const match = catalog.find((p) => p.slug === productSlug && (p.category === "hands-on" || p.category === "trainer"));
       return match ? [match] : [];
     }
     const params = new URLSearchParams(window.location.search);
     const productsParam = params.get("products");
     if (productsParam) {
       const slugs = productsParam.split(",").map((s) => s.trim()).filter(Boolean);
-      return catalog.filter((p) => slugs.includes(p.slug) && p.category === "hands-on");
+      return catalog.filter((p) => slugs.includes(p.slug) && (p.category === "hands-on" || p.category === "trainer"));
     }
     return [];
   });
@@ -246,10 +246,16 @@ export default function BookTraining() {
   const customerState = facility?.address.state ?? "";
   const customerZip = facility?.address.zip ?? "";
 
+  // Hands-on courses AND Train-the-Trainer programs for the facility
+  // (2026-09-03, Alberto): TTT is bookable for Las Vegas and Fresno and is
+  // delivered at the customer's own facility, so it stays available even
+  // where the office lacks the equipment (e.g. scissor lifts in LV).
   const handsOnProducts = useMemo(
     () =>
       catalog.filter(
-        (p) => p.category === "hands-on" && (!facilitySlug || p.location === facilitySlug)
+        (p) =>
+          (p.category === "hands-on" || p.category === "trainer") &&
+          (!facilitySlug || p.location === facilitySlug)
       ),
     [facilitySlug]
   );

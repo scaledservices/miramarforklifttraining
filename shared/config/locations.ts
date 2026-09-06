@@ -69,11 +69,11 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
     city: "Las Vegas",
     state: "NV",
     address: {
-      street: "3301 Martin Ave Suite A",
+      street: "3301 W. Martin Ave Suite A",
       city: "Las Vegas",
       state: "NV",
       zip: "89118",
-      full: "3301 Martin Ave Suite A, Las Vegas, NV 89118",
+      full: "3301 W. Martin Ave Suite A, Las Vegas, NV 89118",
     },
     phone: "(858) 901-0149",
     phoneTel: "+18589010149",
@@ -86,8 +86,6 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
       "Reach Truck",
       "Order Picker",
       "Electric Pallet Jack (EPJ)",
-      "Scissor Lift",
-      "Aerial/Boom Lift",
     ],
     heroImage: "/images/las-vegas.jpg",
     seo: {
