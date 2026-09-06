@@ -13,7 +13,7 @@ import { isAuthorizeNetConfigured, createTransactionFromNonce, calculateCardSurc
 import { logger } from "../monitoring";
 
 // Photo ID wallet card pricing (matches certs.ts / authorizeNet.ts).
-const PHOTO_ID_PRICE = 9.99;
+const PHOTO_ID_PRICE = 24.99;
 
 export function registerGroupRoutes(app: Express) {
 app.get("/api/groups", requireAuth, async (req: Request, res: Response) => {
@@ -370,6 +370,7 @@ app.post("/api/groups/:id/assign-seat", requireAuth, async (req: Request, res: R
           memberName: assignedUser.name,
           courseName: course?.title || "Forklift Certification",
           groupName: group.name,
+          enrollmentId,
           actorUserId: req.session.userId!,
           locale: seatLocale,
         });
@@ -428,6 +429,7 @@ app.post("/api/groups/:id/reassign-seat", requireAuth, async (req: Request, res:
           memberName: assignedUser.name,
           courseName: course?.title || "Forklift Certification",
           groupName: group.name,
+          enrollmentId,
           actorUserId: req.session.userId!,
           locale: seatLocale,
         });

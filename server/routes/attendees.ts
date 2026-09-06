@@ -74,6 +74,11 @@ export function registerAttendeeRoutes(app: Express) {
       const created = [];
       for (const a of list) {
         if (!a.firstName && !a.lastName) continue; // skip fully blank rows
+        // 2026-09-03 (Alberto): backstop for the client-side rule - the name
+        // goes on the certification license, so both parts are required.
+        if (!(a.firstName || "").trim() || !(a.lastName || "").trim()) {
+          return res.status(400).json({ error: "First and last name are required for each attendee" });
+        }
         created.push(await storage.addBookingAttendee({
           bookingId,
           firstName: (a.firstName || "").trim() || null,

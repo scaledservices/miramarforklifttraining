@@ -74,8 +74,20 @@ export default function AttendeeNamesForm({ bookingId, participantCount }: Atten
     setRows(rows.filter((_, idx) => idx !== i));
   }
   function handleSave() {
+    // 2026-09-03 (Alberto): BOTH first and last name are required - the name
+    // collected here is what gets printed on the certification license, and
+    // crew members tend to enter just a first name ("George") when allowed.
     const filled = rows.filter((r) => r.firstName.trim() || r.lastName.trim());
     if (filled.length === 0) return;
+    const incomplete = filled.some((r) => !r.firstName.trim() || !r.lastName.trim());
+    if (incomplete) {
+      toast({
+        title: "First and last name required",
+        description: "Enter each attendee's full name exactly as it should appear on their certification.",
+        variant: "destructive",
+      });
+      return;
+    }
     saveMutation.mutate(filled);
   }
 
@@ -83,10 +95,10 @@ export default function AttendeeNamesForm({ bookingId, participantCount }: Atten
     <div className="text-left space-y-4" data-testid="attendee-names-form">
       <div className="flex items-center gap-2">
         <Users className="w-5 h-5 text-accent" />
-        <h3 className="font-semibold text-foreground">Who's attending? <span className="text-muted-foreground font-normal text-sm">(optional)</span></h3>
+        <h3 className="font-semibold text-foreground">Who's attending?</h3>
       </div>
       <p className="text-sm text-muted-foreground">
-        Add names now or later - trainees can also sign themselves in on the day with the class QR code.
+        Enter each attendee's full first and last name - this is exactly what will be printed on their certification. You can add names now or later; trainees can also sign themselves in on the day with the class QR code.
       </p>
 
       {isLoading ? (
@@ -110,9 +122,9 @@ export default function AttendeeNamesForm({ bookingId, participantCount }: Atten
             <div className="space-y-3">
               {rows.map((r, i) => (
                 <div key={i} className="grid grid-cols-2 gap-2 items-start rounded-md border p-3">
-                  <Input placeholder="First name" value={r.firstName} onChange={(e) => updateRow(i, { firstName: e.target.value })} data-testid={`input-attendee-first-${i}`} />
+                  <Input placeholder="First name *" value={r.firstName} onChange={(e) => updateRow(i, { firstName: e.target.value })} data-testid={`input-attendee-first-${i}`} />
                   <div className="flex gap-2">
-                    <Input placeholder="Last name" value={r.lastName} onChange={(e) => updateRow(i, { lastName: e.target.value })} data-testid={`input-attendee-last-${i}`} />
+                    <Input placeholder="Last name *" value={r.lastName} onChange={(e) => updateRow(i, { lastName: e.target.value })} data-testid={`input-attendee-last-${i}`} />
                     <Button type="button" variant="ghost" size="icon" onClick={() => removeRow(i)} aria-label="Remove" data-testid={`button-remove-attendee-${i}`}>
                       <Trash2 className="w-4 h-4" />
                     </Button>

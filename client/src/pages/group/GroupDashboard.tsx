@@ -50,7 +50,11 @@ export default function GroupDashboard() {
 
   const isLoading = groupsLoading || membersLoading || enrollmentsLoading || certsLoading;
 
-  const memberCount = membersData?.members?.length || 0;
+  // 2026-09-03 (Alberto, live walkthrough): the crew admin IS a member of the
+  // crew - buying 2 seats and inviting 1 person should read 2 members / 2
+  // enrollments, not 1/2. The members endpoint only lists invited members,
+  // so count the admin as +1 (they are not in group_members).
+  const memberCount = (membersData?.members?.length || 0) + 1;
   const totalEnrollments = enrollmentsData?.enrollments?.length || 0;
   const completedEnrollments = enrollmentsData?.enrollments?.filter((e: any) => e.status === "completed").length || 0;
   // Rate is over ASSIGNED seats — buying spare seats shouldn't drag the

@@ -965,12 +965,19 @@ export async function sendSeatAssignedNotification(params: {
   memberName: string;
   courseName: string;
   groupName: string;
+  /** Enrollment the seat maps to - the Start Training button links straight
+   * to the course player (2026-09-03: it used to dump the member on the
+   * generic dashboard, which Alberto flagged in the live walkthrough). */
+  enrollmentId?: number;
   actorUserId?: number;
   locale?: string;
 }) {
   const baseUrl = getSiteUrl();
   const loc = params.locale || "en";
   const _ = (key: string) => emailT(loc, "seatAssigned", key);
+  const startUrl = params.enrollmentId
+    ? `${baseUrl}/course/${params.enrollmentId}`
+    : `${baseUrl}${localePath(loc, "/dashboard")}`;
 
   return sendEmail({
     to: params.to,
@@ -983,7 +990,7 @@ export async function sendSeatAssignedNotification(params: {
       <p>${_("body").replace("{{courseName}}", params.courseName).replace("{{groupName}}", params.groupName)}</p>
       <p>${_("startNow")}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${baseUrl}${localePath(loc, "/dashboard")}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
+        <a href="${startUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("cta")}</a>
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">${_("footer").replace("{{regulatory}}", industry.regulatory.body)}</p>
     `),
