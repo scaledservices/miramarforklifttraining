@@ -4,6 +4,9 @@ import { StepDef } from "./course-content";
 export const CANONICAL_COURSE_ES = {
   title: "Certificación en Línea para Operador de Montacargas",
   slug: "certificacion-operador-montacargas-en-linea",
+  // 2026-09-03 bug: the seeder never set courses.language, so every ES course
+  // row defaulted to 'en' - Spanish certs/emails rendered in English.
+  language: "es",
   description: "Capacitación integral para operador de camiones industriales motorizados (montacargas) en cumplimiento con OSHA. Cubre instrucción formal, procedimientos de seguridad, manejo de cargas y documentación del empleador. Complete la capacitación en video, las verificaciones de conocimiento y apruebe el examen final para recibir su certificación reconocida por la industria. Nota: OSHA también requiere capacitación práctica y evaluación conducida por el empleador.",
   category: "forklift",
   price: "45.00",

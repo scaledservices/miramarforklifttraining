@@ -4,6 +4,7 @@ import { StepDef, QuestionDef } from "./course-content-forklift-ttt";
 export const CANONICAL_COURSE_ES = {
   title: "Certificación Capacitar al Capacitador de Montacargas",
   slug: "certificacion-capacitar-capacitador-montacargas-en-linea",
+  language: "es",
   description: "Certificación integral Capacitar al Capacitador en cumplimiento con OSHA para capacitación de operadores de montacargas. Cubre las calificaciones de instructor bajo OSHA 29 CFR 1910.178(l)(2)(iii), principios de aprendizaje de adultos, diseño de programas de capacitación, todos los temas requeridos por OSHA, metodología de capacitación práctica, evaluación de operadores, administración de programas y cultura de seguridad. Al completar, estará calificado para capacitar y evaluar operadores de montacargas en sus instalaciones.",
   category: "trainer",
   price: "150.00",

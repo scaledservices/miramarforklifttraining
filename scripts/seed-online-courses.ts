@@ -87,7 +87,12 @@ async function seedCourse(def: typeof CANONICAL_COURSE, steps: typeof COURSE_STE
   const existing = await db.select().from(courses).where(eq(courses.slug, def.slug));
   if (existing.length) {
     console.log(`[SEED] ${def.slug} already exists (id ${existing[0].id}) — updating price to ${def.price}`);
-    await db.update(courses).set({ price: def.price }).where(eq(courses.id, existing[0].id));
+    await db.update(courses).set({
+      price: def.price,
+      // Repair ES rows seeded before language was written (staging bug,
+      // 2026-09-03: all 4 ES courses had language='en').
+      language: (def as any).language === "es" ? "es" : "en",
+    }).where(eq(courses.id, existing[0].id));
     if (REFRESH) {
       await refreshSteps(existing[0].id, def.slug, steps);
     }
@@ -99,6 +104,10 @@ async function seedCourse(def: typeof CANONICAL_COURSE, steps: typeof COURSE_STE
     description: def.description,
     category: def.category,
     price: def.price,
+    // ES content defs carry language: "es" (2026-09-03: without this every ES
+    // course row defaulted to 'en' and Spanish certs/emails went out in
+    // English).
+    language: (def as any).language === "es" ? "es" : "en",
     isActive: true,
     thumbnailUrl: "/images/training/forklift-hero.svg",
   }).returning();

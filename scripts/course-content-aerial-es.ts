@@ -4,6 +4,7 @@ import { StepDef } from "./course-content-aerial";
 export const CANONICAL_COURSE_ES = {
   title: "Certificación en Línea para Operador de Elevadores Aéreos y de Tijera",
   slug: "certificacion-elevadores-aereos-tijera-en-linea",
+  language: "es",
   description: "Capacitación integral para operadores de elevadores aéreos y de tijera en cumplimiento con OSHA. Cubre los estándares 29 CFR 1926.453 y ANSI/SAIA A92. Incluye instrucción formal sobre tipos de equipo, inspección pre-operación, protección contra caídas, estabilidad, operación segura, peligros del lugar de trabajo y procedimientos de emergencia. Nota: OSHA también requiere capacitación práctica y evaluación en el equipo específico por parte del empleador.",
   category: "aerial",
   price: "59.00",

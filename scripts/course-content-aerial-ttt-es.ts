@@ -4,6 +4,7 @@ import { StepDef, QuestionDef } from "./course-content-aerial-ttt";
 export const CANONICAL_COURSE_ES = {
   title: "Certificación Capacitar al Capacitador de Elevadores Aéreos y de Tijera",
   slug: "certificacion-capacitar-capacitador-elevadores-aereos-en-linea",
+  language: "es",
   description: "Certificación integral Capacitar al Capacitador en cumplimiento con OSHA para capacitación de operadores de elevadores aéreos y de tijera. Combina metodología de capacitación con contenido específico de elevadores aéreos cubriendo OSHA 29 CFR 1926.453, 1910.178(l)(2)(iii) y estándares ANSI/SAIA A92. Al completar, estará calificado para capacitar y evaluar operadores de elevadores aéreos y de tijera en sus instalaciones.",
   category: "trainer",
   price: "150.00",
