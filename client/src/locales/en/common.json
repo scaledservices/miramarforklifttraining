@@ -1162,7 +1162,9 @@
     "tipLabel": "Tip",
     "warningLabel": "Warning",
     "keyTakeaways": "Key Takeaways",
-    "back": "Back"
+    "back": "Back",
+    "continueAfterExam": "Continue",
+    "missedReviewTitle": "Review the {{count}} question(s) you missed:"
   },
   "productCard": {
     "online": "Online",

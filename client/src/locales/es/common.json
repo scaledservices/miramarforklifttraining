@@ -1162,7 +1162,9 @@
     "tipLabel": "Consejo",
     "warningLabel": "Advertencia",
     "keyTakeaways": "Puntos Clave",
-    "back": "Atrás"
+    "back": "Atrás",
+    "continueAfterExam": "Continuar",
+    "missedReviewTitle": "Revise las {{count}} pregunta(s) que falló:"
   },
   "productCard": {
     "online": "En Línea",

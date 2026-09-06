@@ -79,7 +79,10 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
       setResult(data);
       if (data.passed) {
         fireTripleConfetti();
-        onComplete(data);
+        // 2026-09-03 (Alberto): do NOT advance immediately - the student
+        // must be able to review which questions they missed (he scored 96
+        // in the live test and could not see the one he got wrong). The
+        // Continue button on the results screen calls onComplete.
       }
     },
   });
@@ -164,32 +167,54 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
-          {result.graded.map((g, idx) => {
-            const question = questions.find((q) => q.id === g.questionId);
-            return (
-              <Card key={g.questionId} data-testid={`card-result-${g.questionId}`}>
-                <CardHeader className="pb-2 flex flex-row items-start gap-2">
-                  {g.correct ? (
-                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
-                  ) : (
-                    <X className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
-                  )}
-                  <CardTitle className="text-sm font-medium">
-                    {idx + 1}. {question?.question}
-                  </CardTitle>
-                </CardHeader>
-                {g.explanation && (
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground" data-testid={`text-explanation-${g.questionId}`}>
-                      {g.explanation}
-                    </p>
-                  </CardContent>
-                )}
-              </Card>
-            );
-          })}
-        </div>
+        {(() => {
+          // 2026-09-03 (Alberto): missed questions first, so the review the
+          // student asked for is the first thing they see. Correct answers
+          // follow collapsed below for completeness.
+          const missed = result.graded.filter((g) => !g.correct);
+          const correct = result.graded.filter((g) => g.correct);
+          const ordered = [...missed, ...correct];
+          return (
+            <div className="space-y-4">
+              {missed.length > 0 && (
+                <p className="text-sm font-medium text-foreground" data-testid="text-missed-count">
+                  {t("lms.missedReviewTitle", { count: missed.length, defaultValue: `Review the ${missed.length} question${missed.length === 1 ? "" : "s"} you missed:` })}
+                </p>
+              )}
+              {ordered.map((g) => {
+                const question = questions.find((q) => q.id === g.questionId);
+                const originalIdx = result.graded.findIndex((x) => x.questionId === g.questionId);
+                return (
+                  <Card key={g.questionId} data-testid={`card-result-${g.questionId}`} className={g.correct ? "" : "border-red-300 dark:border-red-800"}>
+                    <CardHeader className="pb-2 flex flex-row items-start gap-2">
+                      {g.correct ? (
+                        <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                      ) : (
+                        <X className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                      )}
+                      <CardTitle className="text-sm font-medium">
+                        {originalIdx + 1}. {question?.question}
+                      </CardTitle>
+                    </CardHeader>
+                    {g.explanation && (
+                      <CardContent className="pt-0">
+                        <p className="text-sm text-muted-foreground" data-testid={`text-explanation-${g.questionId}`}>
+                          {g.explanation}
+                        </p>
+                      </CardContent>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
+          );
+        })()}
+
+        {result.passed && (
+          <Button onClick={() => onComplete(result)} data-testid="button-continue-after-exam">
+            {t("lms.continueAfterExam", { defaultValue: "Continue" })}
+          </Button>
+        )}
 
         {!result.passed && result.attemptsRemaining > 0 && (
           <Button onClick={handleRetry} data-testid="button-retry-exam">
