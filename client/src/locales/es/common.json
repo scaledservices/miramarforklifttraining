@@ -866,7 +866,8 @@
     "viewEmployerDocs": "Ver Documentación del Empleador",
     "walletCardPrepaidTitle": "Su Tarjeta de Billetera",
     "walletCardPrepaidDesc": "Su tarjeta con foto ya está pagada. Suba su foto ahora para que podamos imprimirla y enviarla dentro de 4 a 5 días hábiles.",
-    "uploadPhotoCta": "Suba Su Foto"
+    "uploadPhotoCta": "Suba Su Foto",
+    "walletCardFulfilledDesc": "Su foto ha sido recibida y su tarjeta de billetera esta en preparacion. Se enviara dentro de 4 a 5 dias habiles."
   },
   "documents": {
     "fallbackTitle": "Versión en inglés",

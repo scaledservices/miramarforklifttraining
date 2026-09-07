@@ -579,7 +579,23 @@ app.post("/api/admin/certifications/:id/reissue", requireRole("admin", "super_ad
 app.get("/api/admin/card-orders", requireRole("admin", "super_admin"), async (_req: Request, res: Response) => {
   try {
     const cardOrders = await storage.listCertCardOrders();
-    return res.json({ cardOrders });
+    // Peter 2026-09-07: enrich each order with member name, cert number,
+    // course title, and the ID photo so Alberto can fulfill without clicking
+    // into separate records.
+    const enriched = [];
+    for (const o of cardOrders) {
+      const user = await storage.getUser(o.userId);
+      const cert = await storage.getCertification(o.certificationId);
+      const course = cert ? await storage.getCourse(cert.courseId) : null;
+      enriched.push({
+        ...o,
+        memberName: user?.name || "Unknown",
+        memberEmail: user?.email || "",
+        certificateNumber: cert?.certificateNumber || "",
+        courseTitle: course?.title || "",
+      });
+    }
+    return res.json({ cardOrders: enriched });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }

@@ -866,7 +866,8 @@
     "viewEmployerDocs": "View Employer Documentation",
     "walletCardPrepaidTitle": "Your Wallet Card",
     "walletCardPrepaidDesc": "Your photo ID card is paid. Upload your photo now so we can print and ship it within 4 to 5 business days.",
-    "uploadPhotoCta": "Upload Your Photo"
+    "uploadPhotoCta": "Upload Your Photo",
+    "walletCardFulfilledDesc": "Your photo has been received and your wallet card is being prepared. It will ship within 4 to 5 business days."
   },
   "documents": {
     "fallbackTitle": "English version",

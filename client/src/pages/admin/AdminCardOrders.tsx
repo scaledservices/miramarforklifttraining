@@ -25,6 +25,20 @@ interface CardOrder {
   trackingNumber: string | null;
   carrier: string | null;
   createdAt: string;
+  // Peter 2026-09-07: enriched server-side for the fulfillment queue.
+  memberName: string;
+  memberEmail: string;
+  certificateNumber: string;
+  courseTitle: string;
+  idPhoto: string | null;
+  shippingAddress: {
+    name?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+    country?: string;
+  } | null;
 }
 
 export default function AdminCardOrders() {
@@ -92,11 +106,12 @@ export default function AdminCardOrders() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>User ID</TableHead>
-                  <TableHead>Qty</TableHead>
+                  <TableHead>Photo</TableHead>
+                  <TableHead>Member</TableHead>
+                  <TableHead>Certificate</TableHead>
+                  <TableHead>Course</TableHead>
+                  <TableHead>Ship To</TableHead>
                   <TableHead>Total</TableHead>
-                  <TableHead>Shipping</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Tracking</TableHead>
                   <TableHead>Created</TableHead>
@@ -106,11 +121,37 @@ export default function AdminCardOrders() {
               <TableBody>
                 {cardOrders.map((order) => (
                   <TableRow key={order.id} data-testid={`row-card-order-${order.id}`}>
-                    <TableCell>{order.id}</TableCell>
-                    <TableCell>{order.userId}</TableCell>
-                    <TableCell>{order.quantity}</TableCell>
+                    <TableCell>
+                      {order.idPhoto ? (
+                        <img
+                          src={order.idPhoto}
+                          alt={order.memberName}
+                          className="h-10 w-10 rounded object-cover border"
+                          data-testid={`img-photo-${order.id}`}
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded bg-muted flex items-center justify-center text-muted-foreground text-xs">
+                          No photo
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium text-sm">{order.memberName}</div>
+                      <div className="text-xs text-muted-foreground">{order.memberEmail}</div>
+                    </TableCell>
+                    <TableCell className="text-sm">#{order.certificateNumber}</TableCell>
+                    <TableCell className="text-sm">{order.courseTitle}</TableCell>
+                    <TableCell className="text-xs">
+                      {order.shippingAddress ? (
+                        <div>
+                          {order.shippingAddress.address && <div>{order.shippingAddress.address}</div>}
+                          <div>
+                            {[order.shippingAddress.city, order.shippingAddress.state, order.shippingAddress.zip].filter(Boolean).join(", ")}
+                          </div>
+                        </div>
+                      ) : "--"}
+                    </TableCell>
                     <TableCell>${parseFloat(order.totalAmount).toFixed(2)}</TableCell>
-                    <TableCell>{order.shippingMethod}</TableCell>
                     <TableCell>
                       <Select
                         value={order.status}
@@ -148,7 +189,7 @@ export default function AdminCardOrders() {
                 ))}
                 {cardOrders.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
                       No card orders found
                     </TableCell>
                   </TableRow>
