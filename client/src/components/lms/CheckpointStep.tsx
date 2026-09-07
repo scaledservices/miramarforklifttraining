@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Check, X, HelpCircle, ChevronRight } from "lucide-react";
+import { Check, X, Lightbulb, ChevronRight } from "lucide-react";
 import { fireConfetti } from "@/lib/confetti";
 import { useTranslation } from "react-i18next";
 
@@ -65,10 +65,10 @@ export default function CheckpointStep({ step, questions, enrollmentId, onComple
 
   return (
     <div className="space-y-6" data-testid="checkpoint-step">
-      <div className="flex items-center gap-3">
-        <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-full">
-          <HelpCircle className="h-5 w-5 text-blue-600 dark:text-blue-300" />
-        </div>
+      {/* Peter 2026-09-07: unified with EmbeddedQuiz - orange Lightbulb icon
+          and "quick check" language for consistency across all quiz UIs. */}
+      <div className="flex items-center gap-2">
+        <Lightbulb className="h-5 w-5 text-[#FF7F00]" aria-hidden="true" />
         <div>
           <h2 className="text-lg font-semibold" data-testid="text-checkpoint-title">{step.title}</h2>
           <p className="text-sm text-muted-foreground">{t("lms.checkpointSubtitle")}</p>
