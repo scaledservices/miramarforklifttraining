@@ -33,6 +33,15 @@ export default function CertificationSuccess({ certification: propCert, enrollme
 
   const cert = propCert || data?.certifications?.find((c: any) => c.enrollmentId === enrollmentId);
 
+  // 2026-09-03 (Alberto): if the wallet card was already paid at checkout,
+  // this card is an UPLOAD step, not an upsell. Query the member's
+  // entitlements for this cert; any awaiting_photo row means prepaid.
+  const { data: entData } = useQuery<{ entitlements: any[] }>({
+    queryKey: [`/api/photo-id/entitlements?certificationId=${cert?.id}`],
+    enabled: !!cert?.id,
+  });
+  const prepaidEntitlement = (entData?.entitlements ?? []).find((e: any) => e.status === "awaiting_photo");
+
   return (
     <div className="max-w-2xl mx-auto text-center space-y-8 py-8" data-testid="certification-success">
       <div className="space-y-4">
@@ -104,14 +113,16 @@ export default function CertificationSuccess({ certification: propCert, enrollme
             <CreditCard className="h-5 w-5 text-accent" />
           </div>
           <div className="space-y-2 flex-1">
-            <h3 className="font-semibold">{t("certSuccess.walletCardTitle")}</h3>
+            <h3 className="font-semibold">
+              {prepaidEntitlement ? t("certSuccess.walletCardPrepaidTitle") : t("certSuccess.walletCardTitle")}
+            </h3>
             <p className="text-sm text-muted-foreground">
-              {t("certSuccess.walletCardDesc")}
+              {prepaidEntitlement ? t("certSuccess.walletCardPrepaidDesc") : t("certSuccess.walletCardDesc")}
             </p>
             {cert && (
-              <Link href={`/order-cert-card/${cert.id}`}>
+              <Link href={prepaidEntitlement ? `/order-cert-card/${cert.id}?entitlement=${prepaidEntitlement.id}` : `/order-cert-card/${cert.id}`}>
                 <Button variant="default" data-testid="button-order-wallet-card">
-                  {t("certSuccess.orderWalletCard")}
+                  {prepaidEntitlement ? t("certSuccess.uploadPhotoCta") : t("certSuccess.orderWalletCard")}
                 </Button>
               </Link>
             )}
@@ -129,7 +140,7 @@ export default function CertificationSuccess({ certification: propCert, enrollme
             <p className="text-sm text-muted-foreground">
               {t("certSuccess.instructorDesc")}
             </p>
-            <Link href="/become-an-instructor">
+            <Link href="/referral">
               <Button variant="outline" data-testid="button-become-instructor">
                 {t("certSuccess.learnMoreApply")}
               </Button>
