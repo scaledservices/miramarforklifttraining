@@ -10,8 +10,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import CardPaymentSection from "@/components/checkout/CardPaymentSection";
 import { Loader2 } from "lucide-react";
+import { CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
 
-const PHOTO_ID_PRICE = 9.99;
+// Keep in sync with PHOTO_ID_PRICE in server/routes/groups.ts and
+// server/routes/authorizeNet.ts — the server is authoritative for the charge.
+const PHOTO_ID_PRICE = 24.99;
 const SHIPPING_RATES = { standard: 4.99, expedited: 9.99 } as const;
 
 interface OrderPhotoIdDialogProps {
@@ -52,7 +55,7 @@ export default function OrderPhotoIdDialog({
     zip: saved?.zip || "",
   });
 
-  const chargeAmount = Number(((PHOTO_ID_PRICE + SHIPPING_RATES[shippingMethod]) * 1.03).toFixed(2));
+  const chargeAmount = Number(((PHOTO_ID_PRICE + SHIPPING_RATES[shippingMethod]) * (1 + CARD_SURCHARGE_RATE)).toFixed(2));
 
   const orderMutation = useMutation({
     mutationFn: async (paymentNonce: string | null) => {
