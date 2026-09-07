@@ -25,24 +25,17 @@ function getCertPath(certificateNumber: string): string {
   return `certificates/${certificateNumber}.pdf`;
 }
 
-// AI-generated official gold seal (replaces the older vector-drawn seal).
-// Resolved from the public images dir; falls back to the vector seal if absent.
-function getSealImagePath(): string | null {
-  const candidates = [
-    path.join(process.cwd(), "client/public/images/certificate-seal.png"),
-    path.join(process.cwd(), "dist/public/images/certificate-seal.png"),
-  ];
-  for (const p of candidates) {
-    if (fs.existsSync(p)) return p;
-  }
-  return null;
-}
+// (The gold "official seal" medallion was removed 2026-09-07 — the real OSHA
+// logo now sits where it was. getSealImagePath/drawOfficialSeal deleted with it.)
 
 // Official OSHA logo (Alberto 2026-09-03: certificates must carry the real
-// OSHA logo like the legacy certs did). Asset staged from the meeting
-// attachments; falls back gracefully when absent.
+// OSHA logo like the legacy certs did). The transparent-background PNG is
+// preferred — the earlier JPG rendered with a white/checkerboard box on the
+// certificate (Peter, 2026-09-07).
 function getOshaLogoPath(): string | null {
   const candidates = [
+    path.join(process.cwd(), "client/public/images/osha-logo.png"),
+    path.join(process.cwd(), "dist/public/images/osha-logo.png"),
     path.join(process.cwd(), "client/public/images/osha-logo.jpg"),
     path.join(process.cwd(), "dist/public/images/osha-logo.jpg"),
   ];
@@ -66,10 +59,10 @@ function getSignatureFontPath(): string | null {
   return null;
 }
 
-// Signatories printed on every certificate. Alberto Rawlins is the training
-// operator (left line); the compliance officer role is on the right.
-const SIGNATORY_LEFT = "Alberto Rawlins";
-const SIGNATORY_RIGHT = "M. Nemrow";
+// Signatory printed on every certificate. Alberto Rawlins is the training
+// operator and the ONLY signatory (Peter, 2026-09-07: remove the "Safety
+// Compliance Officer" second signature — one Alberto line, off-center).
+const SIGNATORY = "Alberto Rawlins";
 
 const certLabels = {
   en: {
@@ -83,8 +76,6 @@ const certLabels = {
     scanToVerify: "Scan to verify",
     verifyAt: "Verify at:",
     instructorTitle: "Qualified Field Instructor / Evaluator",
-    complianceOfficer: "Safety Compliance Officer",
-    officialSeal: "OFFICIAL SEAL",
     validUntil: "Valid for 3 years from date of issue",
   },
   es: {
@@ -98,8 +89,6 @@ const certLabels = {
     scanToVerify: "Escanear para verificar",
     verifyAt: "Verificar en:",
     instructorTitle: "Instructor de Campo / Evaluador",
-    complianceOfficer: "Oficial de Cumplimiento de Seguridad",
-    officialSeal: "SELLO OFICIAL",
     validUntil: "Válido por 3 años desde la fecha de emisión",
   },
 } as const;
@@ -139,126 +128,6 @@ function getComplianceText(course: { slug: string; title: string }, locale: "en"
     return "in accordance with OSHA Standard 29 CFR 1910.178 and ANSI/SIA A92";
   }
   return industry.regulatory.complianceText;
-}
-
-/**
- * Draw an official-looking gold seal at the given center coordinates.
- * Uses concentric circles, radial text, and a star motif.
- */
-function drawOfficialSeal(doc: PDFKit.PDFDocument, cx: number, cy: number, radius: number, label: string) {
-  const gold = theme.pdf.borderAccent;
-  const darkGold = "#B8860B";
-  const brown = theme.pdf.borderPrimary;
-
-  // Outer ring (gold, thick)
-  doc.save();
-  doc.circle(cx, cy, radius).lineWidth(3).strokeColor(gold).stroke();
-
-  // Inner ring (dark gold, thin)
-  doc.circle(cx, cy, radius - 6).lineWidth(1).strokeColor(darkGold).stroke();
-
-  // Innermost ring (brown, thin)
-  doc.circle(cx, cy, radius - 18).lineWidth(0.5).strokeColor(brown).stroke();
-
-  // Star at top of seal
-  drawStar(doc, cx, cy - radius + 24, 7, 3.5, 5, gold);
-
-  // Curved text along the top arc: "MIRAMAR FORKLIFT TRAINING"
-  const topText = "MIRAMAR FORKLIFT TRAINING";
-  drawCircularText(doc, cx, cy, radius - 12, topText, 200, 340, 10, brown);
-
-  // Curved text along the bottom arc: label (e.g. "OFFICIAL SEAL"),
-  // drawn inward so it reads upright along the bottom of the seal.
-  drawCircularText(doc, cx, cy, radius - 12, label, 20, 160, 9, brown, true);
-
-  // Center text
-  doc.fontSize(11).fillColor(brown).text("OSHA", cx - radius, cy - 10, {
-    width: radius * 2,
-    align: "center",
-  });
-  doc.fontSize(7).fillColor(brown).text("COMPLIANT", cx - radius, cy + 4, {
-    width: radius * 2,
-    align: "center",
-  });
-  doc.restore();
-}
-
-/**
- * Draw a star shape (n points) at the given center.
- */
-function drawStar(
-  doc: PDFKit.PDFDocument,
-  cx: number,
-  cy: number,
-  outerR: number,
-  innerR: number,
-  points: number,
-  color: string,
-) {
-  const total = points * 2;
-  const angleStep = Math.PI / points;
-  const startAngle = -Math.PI / 2; // point up
-
-  doc.save();
-  const pathPoints: [number, number][] = [];
-  for (let i = 0; i < total; i++) {
-    const r = i % 2 === 0 ? outerR : innerR;
-    const angle = startAngle + i * angleStep;
-    pathPoints.push([cx + r * Math.cos(angle), cy + r * Math.sin(angle)]);
-  }
-
-  doc.moveTo(pathPoints[0][0], pathPoints[0][1]);
-  for (let i = 1; i < pathPoints.length; i++) {
-    doc.lineTo(pathPoints[i][0], pathPoints[i][1]);
-  }
-  doc.closePath();
-  doc.fillColor(color);
-  doc.fill();
-  doc.restore();
-}
-
-/**
- * Draw text along a circular arc. Renders character-by-character with rotation.
- * angleStart/angleEnd define the arc in degrees (0 = right, 90 = bottom, 180 = left, 270 = top).
- */
-function drawCircularText(
-  doc: PDFKit.PDFDocument,
-  cx: number,
-  cy: number,
-  r: number,
-  text: string,
-  angleStart: number,
-  angleEnd: number,
-  fontSize: number,
-  color: string,
-  inward = false,
-) {
-  const chars = text.split("");
-  const totalAngle = angleEnd - angleStart;
-  const anglePerChar = totalAngle / (chars.length - 1 || 1);
-  const rad = (deg: number) => (deg * Math.PI) / 180;
-
-  doc.save();
-  doc.fillColor(color);
-  doc.fontSize(fontSize);
-
-  for (let i = 0; i < chars.length; i++) {
-    // For bottom-arc ("inward") text, walk the arc in reverse and rotate the
-    // glyphs the other way so the label reads left to right, right side up.
-    const angle = inward ? angleEnd - i * anglePerChar : angleStart + i * anglePerChar;
-    const x = cx + r * Math.cos(rad(angle));
-    const y = cy + r * Math.sin(rad(angle));
-    // `angle` is already in degrees (pdfkit's rotate() takes degrees). The
-    // previous code re-converted it as if it were radians, which scattered
-    // the seal's lettering into unreadable marks.
-    const rotation = inward ? angle - 90 : angle + 90;
-    doc.save();
-    doc.translate(x, y);
-    doc.rotate(rotation);
-    doc.text(chars[i], -fontSize / 2, -fontSize / 2, { align: "center", width: fontSize });
-    doc.restore();
-  }
-  doc.restore();
 }
 
 /**
@@ -527,54 +396,42 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
     doc.fontSize(13).fillColor(textDark).text(cert.certificateNumber, 0, datesY + 58, { align: "center", width: pageWidth, characterSpacing: 1 });
 
     // ════════════════════════════════════════
-    // SIGNATURE LINES — two across
+    // SIGNATURE — one line, left-of-center
     // ════════════════════════════════════════
+    // Peter, 2026-09-07: remove the "Safety Compliance Officer" second
+    // signature; a single Alberto line, kept left-of-center so it no longer
+    // crowds the certificate number in the middle.
     const sigY = 455;
     const sigLineW = 200;
-    const sigLeftX = (pageWidth / 2 - sigLineW) / 2 + 30;
-    const sigRightX = pageWidth / 2 + (pageWidth / 2 - sigLineW) / 2 - 30;
+    const sigX = 100;
 
-    // Script signatures above each line (2026-09-03, Alberto: the certificate
+    // Script signature above the line (2026-09-03, Alberto: the certificate
     // was missing signatures). Great Vibes renders a realistic-looking
-    // signature; the printed name + role still appear under each line.
+    // signature; the printed name + role still appear under the line.
     const sigFontPath = getSignatureFontPath();
     if (sigFontPath) {
       doc.font(sigFontPath);
-      doc.fontSize(26).fillColor(darkBrown).text(SIGNATORY_LEFT, sigLeftX, sigY - 30, { width: sigLineW, align: "center", lineGap: 0, height: 30 });
-      doc.fontSize(26).fillColor(darkBrown).text(SIGNATORY_RIGHT, sigRightX, sigY - 30, { width: sigLineW, align: "center", lineGap: 0, height: 30 });
+      doc.fontSize(26).fillColor(darkBrown).text(SIGNATORY, sigX, sigY - 30, { width: sigLineW, align: "center", lineGap: 0, height: 30 });
       // pdfkit caches the custom font; switch back for everything after.
       doc.font("Helvetica");
     }
 
-    // Left signature line
-    doc.moveTo(sigLeftX, sigY).lineTo(sigLeftX + sigLineW, sigY).lineWidth(1).strokeColor(brown).stroke();
-    doc.fontSize(9).fillColor(textLight).text(labels.instructorTitle, sigLeftX, sigY + 5, { width: sigLineW, align: "center", characterSpacing: 0.5 });
-    doc.fontSize(9).fillColor(textMedium).text(SIGNATORY_LEFT, sigLeftX, sigY + 15, { width: sigLineW, align: "center", lineGap: 0, height: 11 });
-
-    // Right signature line
-    doc.moveTo(sigRightX, sigY).lineTo(sigRightX + sigLineW, sigY).lineWidth(1).strokeColor(brown).stroke();
-    doc.fontSize(9).fillColor(textLight).text(labels.complianceOfficer, sigRightX, sigY + 5, { width: sigLineW, align: "center", characterSpacing: 0.5 });
-    doc.fontSize(9).fillColor(textMedium).text(SIGNATORY_RIGHT, sigRightX, sigY + 15, { width: sigLineW, align: "center", lineGap: 0, height: 11 });
+    doc.moveTo(sigX, sigY).lineTo(sigX + sigLineW, sigY).lineWidth(1).strokeColor(brown).stroke();
+    doc.fontSize(9).fillColor(textLight).text(labels.instructorTitle, sigX, sigY + 5, { width: sigLineW, align: "center", characterSpacing: 0.5 });
+    doc.fontSize(9).fillColor(textMedium).text(SIGNATORY, sigX, sigY + 15, { width: sigLineW, align: "center", lineGap: 0, height: 11 });
 
     // ════════════════════════════════════════
-    // OFFICIAL SEAL — bottom-left area
+    // OSHA LOGO — bottom band, center-left (replaces the gold seal medallion)
     // ════════════════════════════════════════
-    // Prefer the AI-generated embossed gold seal image; fall back to the
-    // vector-drawn seal if the asset is missing (keeps PDFs renderable).
-    const sealPath = getSealImagePath();
-    if (sealPath) {
-      const sealSize = 84; // ~ matches the old vector seal's 42px radius
-      doc.image(sealPath, 90 - sealSize / 2, 535 - sealSize / 2, { width: sealSize, height: sealSize });
-    } else {
-      drawOfficialSeal(doc, 90, 535, 42, labels.officialSeal);
-    }
-
-    // Official OSHA logo beside the seal (Alberto 2026-09-03: inspectors
-    // expect it on the certificate, as on the legacy site). Sits in the
-    // bottom-left band, clear of the footer divider at y=580.
+    // Peter, 2026-09-07: drop the gold "OFFICIAL SEAL" medallion entirely and
+    // put the real OSHA logo where it was, larger, on its transparent PNG so
+    // no checkerboard background shows. Centered in the space between the
+    // signature block (right edge x=300) and the QR frame (x≈657).
     const oshaLogoPath = getOshaLogoPath();
     if (oshaLogoPath) {
-      doc.image(oshaLogoPath, 155, 505, { height: 60 });
+      const oshaW = 150;
+      const oshaX = 300 + (657 - 300 - oshaW) / 2;
+      doc.image(oshaLogoPath, oshaX, 478, { width: oshaW });
     }
 
     // ════════════════════════════════════════
