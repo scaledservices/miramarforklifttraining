@@ -27,7 +27,7 @@ async function insertQuestions(stepId: number, questions: NonNullable<(typeof CO
     const q = questions[j];
     await db.insert(examQuestions).values({
       stepId,
-      questionOrder: j + 1,
+      order: j + 1,
       question: q.question,
       type: q.type,
       options: q.options,
