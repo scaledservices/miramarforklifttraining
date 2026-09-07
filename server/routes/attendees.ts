@@ -79,19 +79,112 @@ export function registerAttendeeRoutes(app: Express) {
         if (!(a.firstName || "").trim() || !(a.lastName || "").trim()) {
           return res.status(400).json({ error: "First and last name are required for each attendee" });
         }
-        created.push(await storage.addBookingAttendee({
+        const attendee = await storage.addBookingAttendee({
           bookingId,
           firstName: (a.firstName || "").trim() || null,
           lastName: (a.lastName || "").trim() || null,
           email: (a.email || "").trim() || null,
           phone: (a.phone || "").trim() || null,
           source,
-        }));
+        });
+        created.push(attendee);
+
+        // Peter 2026-09-07: notify the attendee by email when they're added
+        // to a booking (if email provided). Bilingual based on user preference.
+        if (attendee.email) {
+          try {
+            const { sendAttendeeAddedNotification } = await import("../email");
+            const area = await storage.getServiceAreaById(booking.serviceAreaId);
+            const locale = user.locale || "en";
+            await sendAttendeeAddedNotification({
+              to: attendee.email,
+              attendeeName: `${attendee.firstName} ${attendee.lastName}`,
+              bookingNumber: booking.bookingNumber,
+              sessionDate: booking.sessionDate,
+              startTime: booking.startTime,
+              endTime: booking.endTime,
+              location: booking.customerAddress
+                ? `${booking.customerAddress}, ${booking.customerCity}, ${booking.customerState} ${booking.customerZip}`
+                : area?.name || "Training location TBD",
+              locale,
+              actorUserId: user.id,
+            });
+          } catch (emailErr) {
+            console.error("[Attendees] Notification email failed (non-blocking):", emailErr);
+          }
+        }
       }
       return res.status(201).json({ created, added: created.length });
     } catch (error) {
       console.error("[Attendees] Create error:", error);
       return res.status(500).json({ error: "Failed to save attendees" });
+    }
+  });
+
+  // Peter 2026-09-07: purchaser (or admin) edits an existing attendee
+  app.patch("/api/bookings/:id/attendees/:attendeeId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const bookingId = Number(req.params.id);
+      const attendeeId = Number(req.params.attendeeId);
+      const booking = await storage.getBookingById(bookingId);
+      if (!booking) return res.status(404).json({ error: "Booking not found" });
+
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) return res.status(401).json({ error: "User not found" });
+      const isAdmin = ["admin", "super_admin"].includes(user.role);
+      if (!isAdmin && booking.userId !== user.id) {
+        return res.status(403).json({ error: "Not your booking" });
+      }
+
+      const attendee = await storage.getAttendeesForBooking(bookingId);
+      const target = attendee.find((a) => a.id === attendeeId);
+      if (!target) return res.status(404).json({ error: "Attendee not found" });
+
+      const { firstName, lastName, email, phone } = req.body;
+      if (firstName !== undefined && !(firstName || "").trim()) {
+        return res.status(400).json({ error: "First name is required" });
+      }
+      if (lastName !== undefined && !(lastName || "").trim()) {
+        return res.status(400).json({ error: "Last name is required" });
+      }
+
+      const updated = await storage.updateBookingAttendee(attendeeId, {
+        firstName: firstName !== undefined ? (firstName || "").trim() : target.firstName,
+        lastName: lastName !== undefined ? (lastName || "").trim() : target.lastName,
+        email: email !== undefined ? (email || "").trim() || null : target.email,
+        phone: phone !== undefined ? (phone || "").trim() || null : target.phone,
+      });
+      return res.json(updated);
+    } catch (error) {
+      console.error("[Attendees] Update error:", error);
+      return res.status(500).json({ error: "Failed to update attendee" });
+    }
+  });
+
+  // Peter 2026-09-07: purchaser (or admin) removes an attendee
+  app.delete("/api/bookings/:id/attendees/:attendeeId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const bookingId = Number(req.params.id);
+      const attendeeId = Number(req.params.attendeeId);
+      const booking = await storage.getBookingById(bookingId);
+      if (!booking) return res.status(404).json({ error: "Booking not found" });
+
+      const user = await storage.getUser(req.session.userId!);
+      if (!user) return res.status(401).json({ error: "User not found" });
+      const isAdmin = ["admin", "super_admin"].includes(user.role);
+      if (!isAdmin && booking.userId !== user.id) {
+        return res.status(403).json({ error: "Not your booking" });
+      }
+
+      const attendees = await storage.getAttendeesForBooking(bookingId);
+      const target = attendees.find((a) => a.id === attendeeId);
+      if (!target) return res.status(404).json({ error: "Attendee not found" });
+
+      await storage.deleteBookingAttendee(attendeeId);
+      return res.json({ ok: true, deleted: attendeeId });
+    } catch (error) {
+      console.error("[Attendees] Delete error:", error);
+      return res.status(500).json({ error: "Failed to delete attendee" });
     }
   });
 

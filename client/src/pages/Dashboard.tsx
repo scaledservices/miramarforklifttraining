@@ -7,9 +7,57 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BookOpen, Clock, PlayCircle, Award, GraduationCap, Gift } from "lucide-react";
+import { BookOpen, Clock, PlayCircle, Award, GraduationCap, Gift, CalendarDays } from "lucide-react";
 import { Redirect } from "wouter";
 import DashboardBookings from "@/components/dashboard/DashboardBookings";
+import type { Booking } from "@shared/schema";
+
+// Peter 2026-09-07: empty state that respects hands-on bookings.
+// If the customer has upcoming onsite/hands-on training, we show a
+// confirmation-style message instead of "you haven't enrolled in any courses."
+function BookingsEmptyState({ t }: { t: any }) {
+  const { data: bookings } = useQuery<Booking[]>({
+    queryKey: ["/api/bookings"],
+  });
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const upcoming = (bookings ?? []).filter(
+    (b) => b.status !== "cancelled" && new Date(`${b.sessionDate}T12:00:00`) >= today
+  );
+
+  if (upcoming.length > 0) {
+    return (
+      <Card data-testid="empty-enrollments-with-bookings">
+        <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
+          <CalendarDays className="h-16 w-16 text-primary" />
+          <h2 className="text-xl font-semibold text-center" data-testid="text-empty-title">
+            {t("dashboard.noCoursesWithBookings")}
+          </h2>
+          <p className="text-muted-foreground text-center max-w-md">
+            {t("dashboard.noCoursesWithBookingsDesc")}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card data-testid="empty-enrollments">
+      <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
+        <BookOpen className="h-16 w-16 text-muted-foreground" />
+        <h2 className="text-xl font-semibold" data-testid="text-empty-title">{t("dashboard.noCourses")}</h2>
+        <p className="text-muted-foreground text-center max-w-md">
+          {t("dashboard.noCoursesDesc")}
+        </p>
+        <Link href="/online-forklift-certification">
+          <Button data-testid="button-browse-courses">
+            {t("cta.browseCourses")}
+          </Button>
+        </Link>
+      </CardContent>
+    </Card>
+  );
+}
 
 interface EnrollmentWithCourse {
   id: number;
@@ -97,20 +145,11 @@ export default function Dashboard() {
             ))}
           </div>
         ) : enrollments.length === 0 ? (
-          <Card data-testid="empty-enrollments">
-            <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
-              <BookOpen className="h-16 w-16 text-muted-foreground" />
-              <h2 className="text-xl font-semibold" data-testid="text-empty-title">{t("dashboard.noCourses")}</h2>
-              <p className="text-muted-foreground text-center max-w-md">
-                {t("dashboard.noCoursesDesc")}
-              </p>
-              <Link href="/online-forklift-certification">
-                <Button data-testid="button-browse-courses">
-                  {t("cta.browseCourses")}
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+          // Peter 2026-09-07: hide "no courses" empty state when the customer
+          // has upcoming hands-on bookings (DashboardBookings above). Onsite
+          // customers shouldn't see "You haven't enrolled in any courses yet"
+          // when they have real training scheduled.
+          <BookingsEmptyState t={t} />
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {enrollments.map((enrollment) => {

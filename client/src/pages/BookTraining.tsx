@@ -221,9 +221,13 @@ export default function BookTraining() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [companyName, setCompanyName] = useState("");
-  // Facility bookings train at the chosen center - the booking address is the
-  // facility's own address, not a freeform customer address (Alberto weekly
-  // review 2026-07-23). Derived below once `facility` is known.
+  // Peter 2026-09-07: Train-the-Trainer is delivered at the CUSTOMER'S
+  // facility (not the Miramar training center), so for TTT bookings we
+  // collect the customer facility address instead of defaulting to ours.
+  const [tttAddress, setTttAddress] = useState("");
+  const [tttCity, setTttCity] = useState("");
+  const [tttState, setTttState] = useState("");
+  const [tttZip, setTttZip] = useState("");
   const [participantCount, setParticipantCount] = useState(1);
   const [specialRequests, setSpecialRequests] = useState("");
 
@@ -240,11 +244,16 @@ export default function BookTraining() {
   const facilitySlug = serviceArea ? SERVICE_AREA_FACILITY[serviceArea.slug] : undefined;
   const facility = facilitySlug ? getLocation(facilitySlug) : undefined;
 
-  // The booking's address is the selected facility's address (facility-only flow).
-  const customerAddress = facility?.address.street ?? "";
-  const customerCity = facility?.address.city ?? "";
-  const customerState = facility?.address.state ?? "";
-  const customerZip = facility?.address.zip ?? "";
+  // Peter 2026-09-07: TTT is delivered at the customer's facility. When any
+  // trainer-category product is in the selection, use the customer-entered
+  // facility address; hands-on bookings keep the facility-only flow.
+  const isTttBooking = selectedProducts.some((p) => p.category === "trainer");
+
+  // The booking's address: TTT → customer's facility; hands-on → our center.
+  const customerAddress = isTttBooking ? tttAddress.trim() : (facility?.address.street ?? "");
+  const customerCity = isTttBooking ? tttCity.trim() : (facility?.address.city ?? "");
+  const customerState = isTttBooking ? tttState.trim() : (facility?.address.state ?? "");
+  const customerZip = isTttBooking ? tttZip.trim() : (facility?.address.zip ?? "");
 
   // Hands-on courses AND Train-the-Trainer programs for the facility
   // (2026-09-03, Alberto): TTT is bookable for Las Vegas and Fresno and is
@@ -386,7 +395,10 @@ export default function BookTraining() {
     contactName.trim().length >= 2 &&
     isValidEmail(contactEmail) &&
     isValidUsPhone(contactPhone) &&
-    participantCount >= 1;
+    participantCount >= 1 &&
+    // TTT needs the customer facility address before payment (Alberto
+    // 2026-09-03 meeting: trainer shows up at their site).
+    (!isTttBooking || (tttAddress.trim().length >= 4 && tttCity.trim().length >= 2 && tttState.trim().length === 2 && /^\d{5}$/.test(tttZip.trim())));
 
   async function goNext() {
     if (step >= 4) return;
@@ -1044,14 +1056,78 @@ export default function BookTraining() {
 
                 <div>
                   <p className="text-sm font-medium mb-3">{t("bookTraining.trainingLocation")}</p>
-                  {facility && (
-                    <div className="flex items-start gap-2 rounded-lg border bg-muted/50 px-4 py-3" data-testid="text-facility-address-step3">
-                      <MapPin className="w-4 h-4 text-brand-dark shrink-0 mt-0.5" />
-                      <div className="text-sm">
-                        <span className="font-semibold block">{facility.displayName}</span>
-                        <span className="text-muted-foreground">{facility.address.full}</span>
+                  {isTttBooking ? (
+                    // Peter 2026-09-07: TTT happens at the customer's facility —
+                    // collect the address here so the trainer knows where to go.
+                    <div className="rounded-lg border bg-muted/30 p-4 space-y-3" data-testid="ttt-facility-address-form">
+                      <p className="text-sm text-muted-foreground">{t("bookTraining.tttAddressDesc")}</p>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="ttt-address">{t("bookTraining.tttStreetAddress")} *</Label>
+                        <Input
+                          id="ttt-address"
+                          type="text"
+                          autoComplete="street-address"
+                          value={tttAddress}
+                          onChange={(e) => setTttAddress(e.target.value)}
+                          placeholder="1234 Industrial Pkwy"
+                          data-testid="input-ttt-address"
+                        />
                       </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                          <Label htmlFor="ttt-city">{t("form.city")} *</Label>
+                          <Input
+                            id="ttt-city"
+                            type="text"
+                            autoComplete="address-level2"
+                            value={tttCity}
+                            onChange={(e) => setTttCity(e.target.value)}
+                            placeholder="Las Vegas"
+                            data-testid="input-ttt-city"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="ttt-state">{t("form.state")} *</Label>
+                          <Input
+                            id="ttt-state"
+                            type="text"
+                            autoComplete="address-level1"
+                            maxLength={2}
+                            value={tttState}
+                            onChange={(e) => setTttState(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
+                            placeholder="NV"
+                            data-testid="input-ttt-state"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="ttt-zip">{t("form.zip")} *</Label>
+                          <Input
+                            id="ttt-zip"
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="postal-code"
+                            maxLength={5}
+                            value={tttZip}
+                            onChange={(e) => setTttZip(e.target.value.replace(/\D/g, ""))}
+                            placeholder="89101"
+                            data-testid="input-ttt-zip"
+                          />
+                        </div>
+                      </div>
+                      {isTttBooking && tttZip.length > 0 && !/^\d{5}$/.test(tttZip.trim()) && (
+                        <p className="text-xs text-destructive" data-testid="text-ttt-zip-invalid">{t("form.zipInvalid")}</p>
+                      )}
                     </div>
+                  ) : (
+                    facility && (
+                      <div className="flex items-start gap-2 rounded-lg border bg-muted/50 px-4 py-3" data-testid="text-facility-address-step3">
+                        <MapPin className="w-4 h-4 text-brand-dark shrink-0 mt-0.5" />
+                        <div className="text-sm">
+                          <span className="font-semibold block">{facility.displayName}</span>
+                          <span className="text-muted-foreground">{facility.address.full}</span>
+                        </div>
+                      </div>
+                    )
                   )}
                 </div>
 
@@ -1162,7 +1238,14 @@ export default function BookTraining() {
                       </span>
                       <span className="text-muted-foreground">{t("bookTraining.serviceAreaLabel")}</span>
                       <span className="font-medium text-foreground">{serviceArea?.name}</span>
-                      {facility && (
+                      {isTttBooking ? (
+                        <>
+                          <span className="text-muted-foreground">{t("bookTraining.trainingLocation")}</span>
+                          <span className="font-medium text-foreground" data-testid="text-review-ttt-address">
+                            {customerAddress}, {customerCity}, {customerState} {customerZip}
+                          </span>
+                        </>
+                      ) : facility && (
                         <>
                           <span className="text-muted-foreground">{t("requestQuote.facilityAddressTitle")}</span>
                           <span className="font-medium text-foreground" data-testid="text-review-facility-address">

@@ -1527,6 +1527,61 @@ export async function sendAbandonedCheckoutReminder(params: {
 }
 
 
+export async function sendAttendeeAddedNotification(params: {
+  to: string;
+  attendeeName: string;
+  bookingNumber: string;
+  sessionDate: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  actorUserId?: number;
+  locale?: string;
+}) {
+  const baseUrl = getSiteUrl();
+  const loc = params.locale || "en";
+  const es = loc === "es";
+
+  return sendEmail({
+    to: params.to,
+    subject: es
+      ? `Has sido registrado para capacitación - ${params.bookingNumber}`
+      : `You're registered for training - ${params.bookingNumber}`,
+    template: "attendee_added",
+    payload: params,
+    html: wrap(loc, `
+      <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">
+        ${es ? "Registro de Capacitación Confirmado" : "Training Registration Confirmed"}
+      </h2>
+      <p>${es
+        ? `Hola ${params.attendeeName}, has sido registrado como asistente para una sesión de capacitación.`
+        : `Hi ${params.attendeeName}, you've been registered as an attendee for a training session.`}</p>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${es ? "Reserva" : "Booking"}</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${es ? "Fecha" : "Date"}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${es ? "Hora" : "Time"}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
+        <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${es ? "Ubicación" : "Location"}</td><td style="padding: 8px;">${params.location}</td></tr>
+      </table>
+      <div style="background: ${theme.email.successBg}; border-left: 4px solid ${theme.email.successBorder}; padding: 16px; margin: 20px 0; border-radius: 4px;">
+        <p style="margin: 0; font-weight: bold; color: ${theme.email.successText};">
+          ${es ? "Qué traer" : "What to bring"}
+        </p>
+        <ul style="margin: 8px 0 0; color: ${theme.colors.text.dark}; font-size: 13px;">
+          <li>${es ? "Identificación con foto" : "Photo ID"}</li>
+          <li>${es ? "Calzado de seguridad (botas con punta de acero si las tienes)" : "Safety footwear (steel-toe boots if you have them)"}</li>
+          <li>${es ? "Ropa de trabajo cómoda" : "Comfortable work clothes"}</li>
+        </ul>
+      </div>
+      <p style="color: ${theme.colors.text.muted}; font-size: 13px;">
+        ${es
+          ? "¿Preguntas? Contacta a tu empleador o llámanos."
+          : "Questions? Contact your employer or give us a call."}
+      </p>
+    `),
+    actorUserId: params.actorUserId,
+  });
+}
+
 export async function sendBalanceDueEmail(params: {
   to: string;
   contactName: string;

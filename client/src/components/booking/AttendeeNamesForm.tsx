@@ -4,7 +4,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Users, Plus, Trash2, Loader2, CheckCircle2 } from "lucide-react";
+import { Users, Plus, Trash2, Loader2, CheckCircle2, Pencil, X } from "lucide-react";
 import type { BookingAttendee } from "@shared/schema";
 
 interface AttendeeNamesFormProps {
@@ -32,10 +32,14 @@ interface DraftRow {
  * purchase, so entry is OPTIONAL and can be done/edited any time after
  * booking. Saved to booking_attendees; trainees can also self-register via
  * the on-site QR sign-in (source="signin").
+ *
+ * Peter 2026-09-07: added edit + delete for saved attendees (not just add).
  */
 export default function AttendeeNamesForm({ bookingId, participantCount }: AttendeeNamesFormProps) {
   const { toast } = useToast();
   const [rows, setRows] = useState<DraftRow[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editRow, setEditRow] = useState<DraftRow>({ firstName: "", lastName: "", email: "", phone: "" });
 
   const { data, isLoading } = useQuery<AttendeesResponse>({
     queryKey: ["/api/bookings", bookingId, "attendees"],
@@ -60,6 +64,34 @@ export default function AttendeeNamesForm({ bookingId, participantCount }: Atten
     },
     onError: (err: Error) => {
       toast({ title: "Could not save attendees", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data: patch }: { id: number; data: Partial<DraftRow> }) => {
+      const res = await apiRequest("PATCH", `/api/bookings/${bookingId}/attendees/${id}`, patch);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bookings", bookingId, "attendees"] });
+      setEditingId(null);
+      toast({ title: "Attendee updated" });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Could not update attendee", description: err.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/bookings/${bookingId}/attendees/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bookings", bookingId, "attendees"] });
+      toast({ title: "Attendee removed" });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Could not remove attendee", description: err.message, variant: "destructive" });
     },
   });
 
@@ -91,6 +123,34 @@ export default function AttendeeNamesForm({ bookingId, participantCount }: Atten
     saveMutation.mutate(filled);
   }
 
+  function startEdit(a: BookingAttendee) {
+    setEditingId(a.id);
+    setEditRow({
+      firstName: a.firstName || "",
+      lastName: a.lastName || "",
+      email: a.email || "",
+      phone: a.phone || "",
+    });
+  }
+
+  function handleUpdate() {
+    if (!editingId) return;
+    if (!editRow.firstName.trim() || !editRow.lastName.trim()) {
+      toast({
+        title: "First and last name required",
+        description: "Enter each attendee's full name exactly as it should appear on their certification.",
+        variant: "destructive",
+      });
+      return;
+    }
+    updateMutation.mutate({ id: editingId, data: editRow });
+  }
+
+  function handleDelete(id: number) {
+    if (!confirm("Remove this attendee? This cannot be undone.")) return;
+    deleteMutation.mutate(id);
+  }
+
   return (
     <div className="text-left space-y-4" data-testid="attendee-names-form">
       <div className="flex items-center gap-2">
@@ -108,11 +168,40 @@ export default function AttendeeNamesForm({ bookingId, participantCount }: Atten
           {saved.length > 0 && (
             <ul className="space-y-1.5">
               {saved.map((a) => (
-                <li key={a.id} className="flex items-center gap-2 text-sm rounded-md border bg-muted/40 px-3 py-2" data-testid={`attendee-saved-${a.id}`}>
-                  <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0" />
-                  <span className="font-medium">{[a.firstName, a.lastName].filter(Boolean).join(" ") || "Unnamed"}</span>
-                  {a.email && <span className="text-muted-foreground truncate">· {a.email}</span>}
-                  {a.source === "signin" && <span className="ml-auto text-xs text-muted-foreground shrink-0">signed in</span>}
+                <li key={a.id} className="rounded-md border bg-muted/40 px-3 py-2" data-testid={`attendee-saved-${a.id}`}>
+                  {editingId === a.id ? (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input placeholder="First name *" value={editRow.firstName} onChange={(e) => setEditRow({ ...editRow, firstName: e.target.value })} data-testid={`edit-attendee-first-${a.id}`} />
+                        <Input placeholder="Last name *" value={editRow.lastName} onChange={(e) => setEditRow({ ...editRow, lastName: e.target.value })} data-testid={`edit-attendee-last-${a.id}`} />
+                      </div>
+                      <Input placeholder="Email (optional)" type="email" value={editRow.email} onChange={(e) => setEditRow({ ...editRow, email: e.target.value })} data-testid={`edit-attendee-email-${a.id}`} />
+                      <div className="flex gap-2">
+                        <Button type="button" size="sm" onClick={handleUpdate} disabled={updateMutation.isPending} data-testid={`button-save-edit-${a.id}`}>
+                          {updateMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null}
+                          Save
+                        </Button>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)} data-testid={`button-cancel-edit-${a.id}`}>
+                          <X className="w-4 h-4 mr-1" />Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0" />
+                      <span className="font-medium">{[a.firstName, a.lastName].filter(Boolean).join(" ") || "Unnamed"}</span>
+                      {a.email && <span className="text-muted-foreground truncate">· {a.email}</span>}
+                      {a.source === "signin" && <span className="text-xs text-muted-foreground shrink-0">signed in</span>}
+                      <div className="ml-auto flex gap-1">
+                        <Button type="button" variant="ghost" size="icon" onClick={() => startEdit(a)} aria-label="Edit" data-testid={`button-edit-attendee-${a.id}`}>
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => handleDelete(a.id)} disabled={deleteMutation.isPending} aria-label="Remove" data-testid={`button-delete-attendee-${a.id}`}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

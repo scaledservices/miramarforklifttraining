@@ -1514,6 +1514,15 @@ export class DatabaseStorage implements IStorage {
     return row;
   }
 
+  async updateBookingAttendee(id: number, data: Partial<InsertBookingAttendee>): Promise<BookingAttendee> {
+    const [row] = await db.update(bookingAttendees).set(data).where(eq(bookingAttendees.id, id)).returning();
+    return row;
+  }
+
+  async deleteBookingAttendee(id: number): Promise<void> {
+    await db.delete(bookingAttendees).where(eq(bookingAttendees.id, id));
+  }
+
   async getAttendeeCountsForBookings(bookingIds: number[]): Promise<Record<number, number>> {
     if (bookingIds.length === 0) return {};
     const rows = await db.select({
