@@ -55,7 +55,8 @@ export default function GroupMembers() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [newEmail, setNewEmail] = useState("");
-  const [newName, setNewName] = useState("");
+  const [newFirstName, setNewFirstName] = useState("");
+  const [newLastName, setNewLastName] = useState("");
   const [selectedSeat, setSelectedSeat] = useState("");
   const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
   const [bulkText, setBulkText] = useState("");
@@ -130,7 +131,7 @@ export default function GroupMembers() {
   }
 
   const inviteMutation = useMutation({
-    mutationFn: async (data: { email: string; name: string; enrollmentId?: number }) => {
+    mutationFn: async (data: { email: string; name: string; firstName?: string; lastName?: string; enrollmentId?: number }) => {
       const res = await apiRequest("POST", `/api/groups/${group.id}/invite`, data);
       return res.json();
     },
@@ -139,7 +140,8 @@ export default function GroupMembers() {
       queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "enrollments"] });
       toast({ title: t("groupMembers.invitationSent"), description: t("groupMembers.invitationSentDesc") });
       setNewEmail("");
-      setNewName("");
+      setNewFirstName("");
+      setNewLastName("");
       setSelectedSeat("");
     },
     onError: (error: Error) => {
@@ -209,10 +211,12 @@ export default function GroupMembers() {
 
   const handleInvite = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newEmail.trim() || !newName.trim()) return;
-    const payload: { email: string; name: string; enrollmentId?: number } = {
+    if (!newEmail.trim() || !newFirstName.trim() || !newLastName.trim()) return;
+    const payload: { email: string; name: string; firstName?: string; lastName?: string; enrollmentId?: number } = {
       email: newEmail.trim(),
-      name: newName.trim(),
+      name: `${newFirstName.trim()} ${newLastName.trim()}`.trim(),
+      firstName: newFirstName.trim(),
+      lastName: newLastName.trim(),
     };
     // Prevention-first: when an unassigned seat exists, the invite MUST carry it
     // so the member lands in their course on accept (not an empty dashboard).
@@ -328,17 +332,24 @@ export default function GroupMembers() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleInvite} className="flex items-end gap-3 flex-wrap" data-testid="form-invite">
-              <div className="flex-1 min-w-[200px]">
-                <label className="text-sm font-medium mb-1 block">{t("groupMembers.nameLabel")}</label>
+              <div className="flex-1 min-w-[150px]">
+                <label className="text-sm font-medium mb-1 block">{t("groupSeats.memberFirstName")}</label>
                 <Input
-                  placeholder={t("groupMembers.namePlaceholder")}
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  data-testid="input-member-name"
+                  value={newFirstName}
+                  onChange={(e) => setNewFirstName(e.target.value)}
+                  data-testid="input-member-first-name"
+                />
+              </div>
+              <div className="flex-1 min-w-[150px]">
+                <label className="text-sm font-medium mb-1 block">{t("groupSeats.memberLastName")}</label>
+                <Input
+                  value={newLastName}
+                  onChange={(e) => setNewLastName(e.target.value)}
+                  data-testid="input-member-last-name"
                 />
               </div>
               <div className="flex-1 min-w-[200px]">
-                <label className="text-sm font-medium mb-1 block">{t("groupMembers.emailLabel")}</label>
+                <label className="text-sm font-medium mb-1 block">{t("groupSeats.memberEmail")}</label>
                 <Input
                   type="email"
                   placeholder={t("groupMembers.emailPlaceholder")}

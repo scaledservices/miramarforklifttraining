@@ -357,6 +357,9 @@ app.get("/api/auth/invite-info", async (req: Request, res: Response) => {
     return res.json({
       email: member.email,
       name: member.name,
+      // Peter 2026-09-07: separate first/last for invite prefill (nullable for legacy rows).
+      firstName: member.firstName ?? null,
+      lastName: member.lastName ?? null,
       groupName: group?.name || "Unknown Crew",
       inviterName: inviter?.name || "Your team admin",
       accepted: !!member.acceptedAt,

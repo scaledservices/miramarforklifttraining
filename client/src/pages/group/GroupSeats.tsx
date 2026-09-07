@@ -28,7 +28,9 @@ export default function GroupSeats() {
   // enrollmentId, which creates the member AND reserves the seat in one step.
   const ADD_MEMBER = "__add_member__";
   const [addMemberSeatId, setAddMemberSeatId] = useState<number | null>(null);
-  const [addMemberName, setAddMemberName] = useState("");
+  // Peter 2026-09-07: first/last name separate so invite prefill works.
+  const [addMemberFirstName, setAddMemberFirstName] = useState("");
+  const [addMemberLastName, setAddMemberLastName] = useState("");
   const [addMemberEmail, setAddMemberEmail] = useState("");
   // One-step reassign: dialog holds the assigned seat being moved.
   const [reassignSeat, setReassignSeat] = useState<any | null>(null);
@@ -88,15 +90,16 @@ export default function GroupSeats() {
   });
 
   const addMemberMutation = useMutation({
-    mutationFn: async ({ email, name, enrollmentId }: { email: string; name: string; enrollmentId: number }) => {
-      const res = await apiRequest("POST", `/api/groups/${group.id}/invite`, { email, name, enrollmentId });
+    mutationFn: async ({ email, firstName, lastName, enrollmentId }: { email: string; firstName: string; lastName: string; enrollmentId: number }) => {
+      const res = await apiRequest("POST", `/api/groups/${group.id}/invite`, { email, name: `${firstName} ${lastName}`.trim(), firstName, lastName, enrollmentId });
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "enrollments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/groups", group?.id, "members"] });
       setAddMemberSeatId(null);
-      setAddMemberName("");
+      setAddMemberFirstName("");
+      setAddMemberLastName("");
       setAddMemberEmail("");
       toast({ title: t("groupSeats.memberAdded"), description: t("groupSeats.memberAddedDesc") });
     },
@@ -477,7 +480,7 @@ export default function GroupSeats() {
       {/* Add-member dialog: opened from the "+ Add new member…" dropdown
           option. Submits to the group invite endpoint with enrollmentId,
           so the invite carries the seat reservation atomically. */}
-      <Dialog open={addMemberSeatId !== null} onOpenChange={(open) => { if (!open) { setAddMemberSeatId(null); setAddMemberName(""); setAddMemberEmail(""); } }}>
+      <Dialog open={addMemberSeatId !== null} onOpenChange={(open) => { if (!open) { setAddMemberSeatId(null); setAddMemberFirstName(""); setAddMemberLastName(""); setAddMemberEmail(""); } }}>
         <DialogContent className="max-w-md" data-testid="dialog-add-member">
           <DialogHeader>
             <DialogTitle>{t("groupSeats.addMemberTitle")}</DialogTitle>
@@ -487,24 +490,35 @@ export default function GroupSeats() {
             className="space-y-4 pt-2"
             onSubmit={(e) => {
               e.preventDefault();
-              if (addMemberSeatId && addMemberName.trim() && addMemberEmail.trim()) {
+              if (addMemberSeatId && addMemberFirstName.trim() && addMemberLastName.trim() && addMemberEmail.trim()) {
                 addMemberMutation.mutate({
                   email: addMemberEmail.trim(),
-                  name: addMemberName.trim(),
+                  firstName: addMemberFirstName.trim(),
+                  lastName: addMemberLastName.trim(),
                   enrollmentId: addMemberSeatId,
                 });
               }
             }}
           >
             <div className="space-y-1.5">
-              <Label htmlFor="add-member-name">{t("groupSeats.memberName")} *</Label>
+              <Label htmlFor="add-member-first-name">{t("groupSeats.memberFirstName")} *</Label>
               <Input
-                id="add-member-name"
-                value={addMemberName}
-                onChange={(e) => setAddMemberName(e.target.value)}
+                id="add-member-first-name"
+                value={addMemberFirstName}
+                onChange={(e) => setAddMemberFirstName(e.target.value)}
                 required
                 autoFocus
-                data-testid="input-add-member-name"
+                data-testid="input-add-member-first-name"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="add-member-last-name">{t("groupSeats.memberLastName")} *</Label>
+              <Input
+                id="add-member-last-name"
+                value={addMemberLastName}
+                onChange={(e) => setAddMemberLastName(e.target.value)}
+                required
+                data-testid="input-add-member-last-name"
               />
             </div>
             <div className="space-y-1.5">
@@ -521,7 +535,7 @@ export default function GroupSeats() {
             <Button
               type="submit"
               className="w-full"
-              disabled={addMemberMutation.isPending || !addMemberName.trim() || !addMemberEmail.trim()}
+              disabled={addMemberMutation.isPending || !addMemberFirstName.trim() || !addMemberLastName.trim() || !addMemberEmail.trim()}
               data-testid="button-add-member-submit"
             >
               {addMemberMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <UserPlus className="h-4 w-4 mr-2" />}

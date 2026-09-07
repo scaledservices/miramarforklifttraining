@@ -26,13 +26,16 @@ export default function AcceptInvite() {
   const [emailMismatchConfirmed, setEmailMismatchConfirmed] = useState(false);
 
   const [authMode, setAuthMode] = useState<"register" | "login">("register");
-  const [name, setName] = useState("");
+  // Peter 2026-09-07: prefill from invite first/last; no phone field for crew members.
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
 
   const { data: inviteInfo, isLoading: inviteInfoLoading } = useQuery<{
     email: string;
     name: string;
+    firstName?: string | null;
+    lastName?: string | null;
     groupName: string;
     inviterName: string;
     accepted: boolean;
@@ -49,8 +52,14 @@ export default function AcceptInvite() {
   });
 
   useEffect(() => {
-    if (inviteInfo?.name && !name) {
-      setName(inviteInfo.name);
+    if (inviteInfo) {
+      if (inviteInfo.firstName && !firstName) setFirstName(inviteInfo.firstName);
+      if (inviteInfo.lastName && !lastName) setLastName(inviteInfo.lastName);
+      if (!inviteInfo.firstName && inviteInfo.name && !firstName) {
+        const parts = inviteInfo.name.trim().split(/\s+/);
+        setFirstName(parts[0] || "");
+        setLastName(parts.slice(1).join(" ") || "");
+      }
     }
   }, [inviteInfo]);
 
@@ -93,7 +102,9 @@ export default function AcceptInvite() {
     e.preventDefault();
     try {
       if (authMode === "register") {
-        await register({ name, email: invitedEmail, password, phone: phone || undefined });
+        // Peter 2026-09-07: combine first/last into the existing single `name` field on the user account.
+        const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+        await register({ name: fullName, email: invitedEmail, password });
         toast({ title: t("invite.accountCreated"), description: t("invite.welcomeTo", { brand: brand.name }) });
       } else {
         await login({ email: invitedEmail, password });
@@ -175,30 +186,30 @@ export default function AcceptInvite() {
 
             <form onSubmit={handleAuthSubmit} className="space-y-3" data-testid="form-auth-invite">
               {authMode === "register" && (
-                <>
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <Label htmlFor="invite-name">{t("invite.fullName")}</Label>
+                    <Label htmlFor="invite-first-name">{t("invite.firstName")}</Label>
                     <Input
-                      id="invite-name"
-                      placeholder={t("invite.yourName")}
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      id="invite-first-name"
+                      placeholder={t("invite.yourFirstName")}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
                       required
-                      data-testid="input-invite-name"
+                      data-testid="input-invite-first-name"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="invite-phone">{t("invite.phoneOptional")}</Label>
+                    <Label htmlFor="invite-last-name">{t("invite.lastName")}</Label>
                     <Input
-                      id="invite-phone"
-                      type="tel"
-                      placeholder="+1 (555) 000-0000"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      data-testid="input-invite-phone"
+                      id="invite-last-name"
+                      placeholder={t("invite.yourLastName")}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                      data-testid="input-invite-last-name"
                     />
                   </div>
-                </>
+                </div>
               )}
               <div className="space-y-1">
                 <Label htmlFor="invite-email">{t("invite.emailLabel")}</Label>

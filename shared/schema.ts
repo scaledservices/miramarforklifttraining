@@ -48,6 +48,11 @@ export const groupMembers = pgTable("group_members", {
   userId: integer("user_id").references(() => users.id),
   email: text("email").notNull(),
   name: text("name").notNull(),
+  // Crew member first/last name (Peter, 2026-09-07): collected separately at
+  // invite time so the sign-up form can prefill them. `name` remains the
+  // display fallback for legacy rows.
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   inviteToken: uuid("invite_token").notNull().unique().defaultRandom(),
   invitedAt: timestamp("invited_at").notNull().defaultNow(),
   acceptedAt: timestamp("accepted_at"),

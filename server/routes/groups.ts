@@ -105,7 +105,7 @@ app.post("/api/groups/:id/invite", requireAuth, async (req: Request, res: Respon
     const group = await storage.getGroup(parseInt(req.params.id));
     if (!group || group.adminUserId !== req.session.userId) return res.status(403).json({ error: "Access denied" });
 
-    const { email, name, enrollmentId } = req.body;
+    const { email, name, firstName, lastName, enrollmentId } = req.body;
     if (!email || !name) return res.status(400).json({ error: "Email and name are required" });
 
     const existing = await storage.getGroupMemberByGroupAndEmail(group.id, email.trim());
@@ -149,6 +149,10 @@ app.post("/api/groups/:id/invite", requireAuth, async (req: Request, res: Respon
       groupId: group.id,
       email: email.trim().toLowerCase(),
       name,
+      // Peter 2026-09-07: store first/last separately for invite prefill.
+      // Fall back to splitting `name` when the client didn't send them.
+      firstName: firstName || name.split(" ")[0] || null,
+      lastName: lastName || (name.includes(" ") ? name.substring(name.indexOf(" ") + 1) : null),
       invitedByUserId: req.session.userId!,
       pendingEnrollmentId: enrollmentId || null,
     });
