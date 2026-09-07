@@ -42,7 +42,7 @@ export default function TeamPhotoIdStatus({ groupId }: { groupId: number }) {
 
   const remindMutation = useMutation({
     mutationFn: async ({ memberId }: { memberId: number }) => {
-      const res = await apiRequest("POST", `/api/groups/${groupId}/members/${memberId}/remind`, {});
+      const res = await apiRequest("POST", `/api/groups/${groupId}/members/${memberId}/remind-photo-id`, {});
       return res.json();
     },
     onSuccess: () => {

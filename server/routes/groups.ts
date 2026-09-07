@@ -285,6 +285,74 @@ app.post("/api/groups/:id/members/:memberId/reissue", requireAuth, async (req: R
   }
 });
 
+// Send photo-ID upload request email to a member (used by the "Remind" button
+// in TeamPhotoIdStatus — must send the photo-specific email, not the generic
+// training reminder)
+app.post("/api/groups/:id/members/:memberId/remind-photo-id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const group = await storage.getCourseGroup(parseInt(req.params.id));
+    if (!group) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    const isAdmin = req.session.userRole === "admin" || req.session.userRole === "super_admin";
+    if (group.managerId !== req.session.userId && !isAdmin) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const member = await storage.getCourseGroupMember(parseInt(req.params.memberId));
+    if (!member || member.groupId !== group.id) {
+      return res.status(404).json({ error: "Member not found" });
+    }
+
+    const memberEmail = member.memberEmail || (await getUserEmail(member.userId));
+    if (!memberEmail) {
+      return res.status(400).json({ error: "Member has no email address" });
+    }
+
+    // Check if member already has photo upload access (token already issued)
+    let entitlements: any[] = [];
+    if (member.userId) {
+      try {
+        entitlements = await getPhotoIdEntitlementsForUser(member.userId);
+      } catch { /* user may not exist */ }
+    }
+    const hasAccess = entitlements.some((e: any) =>
+      e.status === "paid" || e.status === "issued" || e.status === "photo_uploaded"
+    );
+    if (!hasAccess) {
+      return res.status(400).json({ error: "Member has no photo ID entitlement — issue one first" });
+    }
+
+    const token = crypto.randomUUID();
+    await db.insert(photoIdUploadTokens).values({
+      token,
+      email: memberEmail,
+      groupId: group.id,
+      groupMemberId: member.id,
+      expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
+    });
+
+    const [cert] = await db
+      .select()
+      .from(certifications)
+      .where(eq(certifications.id, group.certificationId));
+
+    await sendPhotoIdUploadRequest({
+      to: memberEmail,
+      groupMemberId: member.id,
+      memberName: `${member.firstName || ""} ${member.lastName || ""}`.trim() || "Team Member",
+      certificationName: cert?.courseName || "Forklift Certification",
+      uploadToken: token,
+    });
+
+    res.json({ success: true, message: "Photo upload request sent" });
+  } catch (error) {
+    console.error("Send photo ID reminder error:", error);
+    res.status(500).json({ error: "Failed to send photo upload request" });
+  }
+});
+
 app.post("/api/groups/:id/members/:memberId/remind", requireAuth, async (req: Request, res: Response) => {
   try {
     const group = await storage.getGroup(parseInt(req.params.id));
