@@ -113,8 +113,11 @@ export default function Checkout() {
   const [photoIdShippingMethod, setPhotoIdShippingMethod] = useState<"standard" | "expedited">("standard");
   const [photoIdShipping, setPhotoIdShipping] = useState({ name: "", address: "", city: "", state: "", zip: "" });
 
-  const PHOTO_ID_PRICE = 24.99;
-  const PHOTO_ID_SHIPPING = { standard: 4.99, expedited: 9.99 } as const;
+  const PHOTO_ID_PRICE = 25.0;
+  // 2026-09-07 (Alberto): flat $25 per card, standard USPS shipping INCLUDED.
+  // No shipping-method choice remains in the UI; retained only so the server
+  // payload shape stays compatible.
+  const PHOTO_ID_SHIPPING = { standard: 0, expedited: 0 } as const;
   const seatCount = items.reduce((n, i) => n + (i.quantity || 1), 0);
   const isTeamCart = items.some((i) => i.isTeamProduct) || seatCount > 1;
 
@@ -123,6 +126,11 @@ export default function Checkout() {
   // applies while the user hasn't manually changed the count.
   useEffect(() => {
     if (!photoIdUserToggled && isTeamCart && seatCount > 0) {
+      setPhotoIdCount(seatCount);
+    }
+    // 2026-09-07 (Alberto): card count ALWAYS tracks seat count — no quantity
+    // selector. One card per seat, automatically.
+    if (seatCount > 0 && photoIdCount !== seatCount) {
       setPhotoIdCount(seatCount);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -426,7 +434,7 @@ export default function Checkout() {
                     />
                     <Label htmlFor="photoIdAddon" className="text-sm leading-relaxed cursor-pointer">
                       <span className="font-semibold text-base">{t("checkout.photoId.addTitle", { defaultValue: "Add a Photo ID wallet card" })}</span>{" "}
-                      <span className="text-muted-foreground">— {t("checkout.photoId.priceNote", { defaultValue: "$9.99 + shipping" })}</span>
+                      <span className="text-muted-foreground">— {t("checkout.photoId.priceNote", { defaultValue: "$25 each, shipping included" })}</span>
                       <span className="block text-xs text-muted-foreground mt-0.5">
                         {t("checkout.photoId.upsellTagline", { defaultValue: "A durable photo ID card your crew can show on any job site." })}
                       </span>
@@ -439,39 +447,12 @@ export default function Checkout() {
                         {t("checkout.photoId.mailNote", { defaultValue: "Alberto mails your printed wallet card after you finish. Add the address below." })}{" "}
                         {isTeamCart && t("checkout.photoId.oneAddress", { defaultValue: "All cards ship to one address; hand them out to your crew." })}
                       </p>
-                      {isTeamCart && (
-                        <div className="flex items-center gap-3">
-                          <Label className="text-sm whitespace-nowrap">{t("checkout.photoId.countLabel", { defaultValue: "How many photo IDs?" })}</Label>
-                          <Input
-                            type="number"
-                            min={1}
-                            max={seatCount}
-                            value={photoIdCount}
-                            onChange={(e) => { setPhotoIdUserToggled(true); setPhotoIdCount(Math.max(1, Math.min(seatCount, parseInt(e.target.value) || 1))); }}
-                            className="w-20"
-                            data-testid="input-photo-id-count"
-                          />
-                        </div>
-                      )}
-                      <RadioGroup
-                        value={photoIdShippingMethod}
-                        onValueChange={(v: string) => setPhotoIdShippingMethod(v as "standard" | "expedited")}
-                        className="flex gap-4"
-                        data-testid="radio-photo-id-shipping"
-                      >
-                        <div className="flex items-center gap-2">
-                          <RadioGroupItem value="standard" id="ship-std" />
-                          <Label htmlFor="ship-std" className="text-sm cursor-pointer">
-                            {t("checkout.photoId.standard", { defaultValue: "Standard" })} ${PHOTO_ID_SHIPPING.standard.toFixed(2)}
-                          </Label>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <RadioGroupItem value="expedited" id="ship-exp" />
-                          <Label htmlFor="ship-exp" className="text-sm cursor-pointer">
-                            {t("checkout.photoId.expedited", { defaultValue: "Expedited" })} ${PHOTO_ID_SHIPPING.expedited.toFixed(2)}
-                          </Label>
-                        </div>
-                      </RadioGroup>
+                      {/* 2026-09-07 (Alberto): count tracks seat count automatically
+                          (no selector) and shipping is always standard USPS included
+                          in the flat $25 — no method choice. */}
+                      <p className="text-xs text-muted-foreground">
+                        {t("checkout.photoId.shippingNote", { defaultValue: "Standard USPS shipping, 4-5 business days. One card per seat." })}
+                      </p>
                       <div className="space-y-2">
                         <p className="text-xs font-medium">{t("checkout.shipping.whyTitle", { defaultValue: "Where should we mail the wallet card?" })}</p>
                         <Input placeholder={t("orderCertCard.name", { defaultValue: "Full name" })} value={photoIdShipping.name} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, name: e.target.value })} data-testid="input-photo-id-ship-name" />
@@ -786,7 +767,10 @@ export default function Checkout() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between gap-2">
                   <span className="text-muted-foreground">{t("checkout.subtotal", { defaultValue: "Subtotal" })}</span>
-                  <span className="font-medium">${totalPrice.toFixed(2)}</span>
+                  {/* 2026-09-07 (Alberto): subtotal must INCLUDE the photo-ID
+                      add-on. Previously showed only course seats ($90) while the
+                      card line item rendered above it, reading as a math error. */}
+                  <span className="font-medium">${preSurchargeTotal.toFixed(2)}</span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between gap-2">

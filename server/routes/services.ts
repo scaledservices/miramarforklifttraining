@@ -378,6 +378,9 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         participantCount,
         specialRequests: specialRequests || null,
         actorUserId: user.id,
+        // 2026-09-07 (Alberto): show the actual charged amount so Alberto can
+        // triage booking emails by revenue.
+        amountPaid: depositCharged > 0 ? Number(depositCharged) : Number(totalPrice),
       });
     } catch (emailErr) {
       console.error("[Booking] Email error (non-fatal):", emailErr);

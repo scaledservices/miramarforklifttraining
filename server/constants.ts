@@ -1,8 +1,11 @@
 import { brand } from "@shared/config/brand";
 
 export const SHIPPING_RATES = {
-  standard: 4.99,
-  expedited: 9.99,
+  // 2026-09-07 (Alberto): shipping is INCLUDED in the flat $25 card price
+  // (standard USPS, 4-5 business days). No separate shipping charge remains;
+  // the key is retained for payload/schema compatibility only.
+  standard: 0,
+  expedited: 0,
 } as const;
 
 export const PASSWORD_RESET_TTL_MINUTES = 60;

@@ -13,7 +13,7 @@ import { isAuthorizeNetConfigured, createTransactionFromNonce, calculateCardSurc
 import { logger } from "../monitoring";
 
 // Photo ID wallet card pricing (matches certs.ts / authorizeNet.ts).
-const PHOTO_ID_PRICE = 24.99;
+const PHOTO_ID_PRICE = 25.0;
 
 export function registerGroupRoutes(app: Express) {
 app.get("/api/groups", requireAuth, async (req: Request, res: Response) => {

@@ -14,8 +14,10 @@ import { CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
 
 // Keep in sync with PHOTO_ID_PRICE in server/routes/groups.ts and
 // server/routes/authorizeNet.ts — the server is authoritative for the charge.
-const PHOTO_ID_PRICE = 24.99;
-const SHIPPING_RATES = { standard: 4.99, expedited: 9.99 } as const;
+const PHOTO_ID_PRICE = 25.0;
+// 2026-09-07 (Alberto): shipping included in the flat $25 — kept at 0 for
+// payload compatibility only.
+const SHIPPING_RATES = { standard: 0, expedited: 0 } as const;
 
 interface OrderPhotoIdDialogProps {
   open: boolean;

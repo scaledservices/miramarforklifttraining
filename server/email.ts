@@ -1123,6 +1123,8 @@ export async function sendBookingAdminNotificationToAll(params: {
   participantCount: number;
   specialRequests?: string | null;
   actorUserId?: number;
+  /** 2026-09-07 (Alberto): total charged, so admin can triage by revenue. */
+  amountPaid?: number;
 }) {
   const recipients = await getAdminEmails("booking_new");
   const baseUrl = getSiteUrl();
@@ -1130,6 +1132,10 @@ export async function sendBookingAdminNotificationToAll(params: {
 
   const specialRequestsRow = params.specialRequests
     ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Special Requests</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.specialRequests}</td></tr>`
+    : "";
+
+  const amountPaidRow = params.amountPaid != null && params.amountPaid > 0
+    ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Total Paid</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; color: ${theme.email.headingColor};">$${params.amountPaid.toFixed(2)}</td></tr>`
     : "";
 
   for (const to of recipients) {
@@ -1151,6 +1157,7 @@ export async function sendBookingAdminNotificationToAll(params: {
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Time</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Address</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.customerAddress}<br>${params.customerCity}, ${params.customerState} ${params.customerZip}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Participants</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.participantCount}</td></tr>
+          ${amountPaidRow}
           ${specialRequestsRow}
         </table>
         <div style="text-align: center; margin: 30px 0;">

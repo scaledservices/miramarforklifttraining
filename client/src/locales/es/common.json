@@ -979,7 +979,7 @@
     "issuedOn": "Emitido el {{date}}",
     "expiresOn": "Vence el {{date}}",
     "cardDescription": "Una tarjeta profesional y duradera tamaño billetera con los detalles de tu certificación. Lleva la prueba de tu certificación de montacargas en todo momento.",
-    "cardPrice": "Precio de la tarjeta: $24.99",
+    "cardPrice": "Precio de la tarjeta: $25.00 (envío incluido)",
     "shippingAddressTitle": "Dirección de Envío",
     "fullName": "Nombre Completo",
     "firstName": "Nombre",
@@ -1103,7 +1103,8 @@
     "subtotal": "Subtotal",
     "photoId": {
       "addTitle": "Incluir foto en la(s) tarjeta(s) de identificación",
-      "priceNote": "$24.99 + envío",
+      "priceNote": "$25 cada una, envío incluido",
+      "shippingNote": "Envío estándar USPS, 4-5 días hábiles. Una tarjeta por asiento.",
       "mailNote": "Alberto envia su tarjeta impresa cuando termine. Agregue la direccion abajo.",
       "oneAddress": "Todas las tarjetas se envian a una sola direccion; distribuyalas a su equipo.",
       "countLabel": "Cuantas tarjetas con foto?",

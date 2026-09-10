@@ -979,7 +979,7 @@
     "issuedOn": "Issued {{date}}",
     "expiresOn": "Expires {{date}}",
     "cardDescription": "A professional, durable wallet-sized card with your certification details. Carry proof of your forklift certification at all times.",
-    "cardPrice": "Card price: $24.99",
+    "cardPrice": "Card price: $25.00 (shipping included)",
     "shippingAddressTitle": "Shipping Address",
     "fullName": "Full Name",
     "firstName": "First Name",
@@ -1103,7 +1103,8 @@
     "subtotal": "Subtotal",
     "photoId": {
       "addTitle": "Include photo on wallet card(s)",
-      "priceNote": "$24.99 + shipping",
+      "priceNote": "$25 each, shipping included",
+      "shippingNote": "Standard USPS shipping, 4-5 business days. One card per seat.",
       "mailNote": "Alberto mails your printed wallet card after you finish. Add the address below.",
       "oneAddress": "All cards ship to one address; hand them out to your crew.",
       "countLabel": "How many photo IDs?",

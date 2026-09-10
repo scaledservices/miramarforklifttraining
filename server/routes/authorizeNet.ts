@@ -22,8 +22,9 @@ import { logger, logPaymentError } from "../monitoring";
 import { requireAuth, payLimiter } from "./middleware";
 import { SHIPPING_RATES } from "../constants";
 
-// Photo ID wallet card pricing (matches certs.ts; Alberto 2026-09-03: $24.99).
-const PHOTO_ID_PRICE = 24.99;
+// Photo ID wallet card pricing (Alberto 2026-09-07: flat $25 per card,
+// standard USPS shipping included — no separate shipping charge).
+const PHOTO_ID_PRICE = 25.0;
 
 interface PhotoIdAddOn {
   count: number;

@@ -29,9 +29,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
 
-// Wallet card price (Alberto 2026-09-03: standardized to $24.99). Shipping
-// stays $4.99 standard / $9.99 expedited.
-const CARD_PRICE = 24.99;
+// Wallet card price (Alberto 2026-09-07: flat $25, standard USPS shipping
+// included — no separate shipping charge).
+const CARD_PRICE = 25.0;
 
 /**
  * Read a user-selected photo and downscale it to a small JPEG data URL so
@@ -263,7 +263,7 @@ export default function OrderCertCard() {
     if (prepaidEntitlement) setShippingMethod(prepaidEntitlement.shippingMethod);
   }, [prepaidEntitlement]);
 
-  const shippingCost = shippingMethod === "standard" ? 4.99 : 9.99;
+  const shippingCost = 0; // 2026-09-07 (Alberto): shipping included in flat $25
   const subtotal = CARD_PRICE + shippingCost;
   const surcharge = paymentConfig?.configured ? Number((subtotal * CARD_SURCHARGE_RATE).toFixed(2)) : 0;
   const total = Number((subtotal + surcharge).toFixed(2));

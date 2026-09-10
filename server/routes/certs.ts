@@ -257,11 +257,14 @@ app.post("/api/cert-cards", requireAuth, payLimiter, async (req: Request, res: R
     }
 
     const shippingCost = SHIPPING_RATES[shippingMethod as keyof typeof SHIPPING_RATES];
-    if (!shippingCost) return res.status(400).json({ error: "Invalid shipping method" });
+    // 2026-09-07: shipping is $0 (included in the flat $25) — `!shippingCost`
+    // would wrongly reject the valid 0 rate. Only undefined (bad key) is invalid.
+    if (shippingCost === undefined) return res.status(400).json({ error: "Invalid shipping method" });
 
-    // Wallet card price (Alberto 2026-09-03: standardized to $24.99). Matches
-    // PHOTO_ID_PRICE in authorizeNet.ts and CARD_PRICE in OrderCertCard.tsx.
-    const cardPrice = 24.99;
+    // Wallet card price (Alberto 2026-09-07: flat $25, shipping included).
+    // Matches PHOTO_ID_PRICE in authorizeNet.ts and CARD_PRICE in
+    // OrderCertCard.tsx.
+    const cardPrice = 25.0;
     const subtotal = cardPrice + shippingCost;
     // Same card surcharge as course checkout (matches the client-side total).
     const surcharge = calculateCardSurcharge(subtotal);
