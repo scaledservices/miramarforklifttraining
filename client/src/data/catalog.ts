@@ -829,8 +829,8 @@ const internalCatalog: InternalProduct[] = [
     slug: "scissor-aerial-train-the-trainer-san-diego",
     category: "trainer",
     location: "san-diego",
-    shortDescription: "Become a certified scissor and aerial lift trainer in San Diego. Train and certify aerial lift operators at your facility.",
-    longDescription: `This program prepares individuals to train and certify aerial lift operators in compliance with ${industry.regulatory.body} regulations. Focusing on safety protocols, instructional techniques, and risk assessment to improve workplace safety and efficiency. Upon completion, you will be authorized to train and certify scissor lift and aerial lift operators at your workplace. Includes a binder with all materials. Training location is at 8760 Miramar Place, San Diego, CA 92121.`,
+    shortDescription: "Become a certified scissor and aerial lift trainer in San Diego. Train and certify scissor and aerial lift operators at your facility.",
+    longDescription: `This program prepares individuals to train and certify scissor and aerial lift operators in compliance with ${industry.regulatory.body} regulations. Focusing on safety protocols, instructional techniques, and risk assessment to improve workplace safety and efficiency. Upon completion, you will be authorized to train and certify scissor lift and aerial lift operators at your workplace. Includes a binder with all materials. Training location is at 8760 Miramar Place, San Diego, CA 92121.`,
     duration: "2-4 hours",
     includes: [
       "Full instructor-led training",
@@ -858,8 +858,8 @@ const internalCatalog: InternalProduct[] = [
     slug: "scissor-aerial-train-the-trainer-las-vegas",
     category: "trainer",
     location: "las-vegas",
-    shortDescription: "Become a certified scissor and aerial lift trainer in Las Vegas. Train and certify aerial lift operators at your facility.",
-    longDescription: `This program prepares individuals to train and certify aerial lift operators in compliance with ${industry.regulatory.body} regulations. Focusing on safety protocols, instructional techniques, and risk assessment to improve workplace safety and efficiency. Upon completion, you will be authorized to train and certify scissor lift and aerial lift operators at your workplace. Includes a binder with all materials.`,
+    shortDescription: "Become a certified scissor and aerial lift trainer in Las Vegas. Train and certify scissor and aerial lift operators at your facility.",
+    longDescription: `This program prepares individuals to train and certify scissor and aerial lift operators in compliance with ${industry.regulatory.body} regulations. Focusing on safety protocols, instructional techniques, and risk assessment to improve workplace safety and efficiency. Upon completion, you will be authorized to train and certify scissor lift and aerial lift operators at your workplace. Includes a binder with all materials.`,
     duration: "2-4 hours",
     includes: [
       "Full instructor-led training",
@@ -916,8 +916,8 @@ const internalCatalog: InternalProduct[] = [
     slug: "scissor-aerial-train-the-trainer-fresno",
     category: "trainer",
     location: "fresno",
-    shortDescription: "Become a certified scissor and aerial lift trainer in Fresno. Train and certify aerial lift operators at your facility.",
-    longDescription: `This program prepares individuals to train and certify aerial lift operators in compliance with ${industry.regulatory.body} regulations. Focusing on safety protocols, instructional techniques, and risk assessment to improve workplace safety and efficiency. Upon completion, you will be authorized to train and certify scissor lift and aerial lift operators at your workplace. Includes a binder with all materials.`,
+    shortDescription: "Become a certified scissor and aerial lift trainer in Fresno. Train and certify scissor and aerial lift operators at your facility.",
+    longDescription: `This program prepares individuals to train and certify scissor and aerial lift operators in compliance with ${industry.regulatory.body} regulations. Focusing on safety protocols, instructional techniques, and risk assessment to improve workplace safety and efficiency. Upon completion, you will be authorized to train and certify scissor lift and aerial lift operators at your workplace. Includes a binder with all materials.`,
     duration: "2-4 hours",
     includes: [
       "Full instructor-led training",

@@ -458,8 +458,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
   },
   "ttt-scissor-sd": {
     title: "Certificación Capacitar al Capacitador de Elevador de Tijera y Pluma",
-    shortDescription: "Conviértase en un instructor certificado de elevador de tijera y pluma en San Diego. Capacite y certifique operadores de elevadores aéreos en sus instalaciones.",
-    longDescription: `Este programa prepara a individuos para capacitar y certificar operadores de elevadores aéreos en cumplimiento con las regulaciones de ${industry.regulatory.body}. Enfocado en protocolos de seguridad, técnicas de instrucción y evaluación de riesgos para mejorar la seguridad y eficiencia en el lugar de trabajo. Al completar, estará autorizado para capacitar y certificar operadores de elevadores de tijera y pluma en su lugar de trabajo. Incluye un folder con todos los materiales.`,
+    shortDescription: "Conviértase en un instructor certificado de elevador de tijera y pluma en San Diego. Capacite y certifique operadores de elevadores de tijera y aéreos en sus instalaciones.",
+    longDescription: `Este programa prepara a individuos para capacitar y certificar operadores de elevadores de tijera y aéreos en cumplimiento con las regulaciones de ${industry.regulatory.body}. Enfocado en protocolos de seguridad, técnicas de instrucción y evaluación de riesgos para mejorar la seguridad y eficiencia en el lugar de trabajo. Al completar, estará autorizado para capacitar y certificar operadores de elevadores de tijera y pluma en su lugar de trabajo. Incluye un folder con todos los materiales.`,
     duration: "2-4 horas",
     includes: [
       "Capacitación completa dirigida por instructor",
@@ -474,8 +474,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
   },
   "ttt-scissor-lv": {
     title: "Certificación Capacitar al Capacitador de Elevador de Tijera y Pluma",
-    shortDescription: "Conviértase en un instructor certificado de elevador de tijera y pluma en Las Vegas. Capacite y certifique operadores de elevadores aéreos en sus instalaciones.",
-    longDescription: `Este programa prepara a individuos para capacitar y certificar operadores de elevadores aéreos en cumplimiento con las regulaciones de ${industry.regulatory.body}. Enfocado en protocolos de seguridad, técnicas de instrucción y evaluación de riesgos para mejorar la seguridad y eficiencia en el lugar de trabajo. Al completar, estará autorizado para capacitar y certificar operadores de elevadores de tijera y pluma en su lugar de trabajo. Incluye un folder con todos los materiales.`,
+    shortDescription: "Conviértase en un instructor certificado de elevador de tijera y pluma en Las Vegas. Capacite y certifique operadores de elevadores de tijera y aéreos en sus instalaciones.",
+    longDescription: `Este programa prepara a individuos para capacitar y certificar operadores de elevadores de tijera y aéreos en cumplimiento con las regulaciones de ${industry.regulatory.body}. Enfocado en protocolos de seguridad, técnicas de instrucción y evaluación de riesgos para mejorar la seguridad y eficiencia en el lugar de trabajo. Al completar, estará autorizado para capacitar y certificar operadores de elevadores de tijera y pluma en su lugar de trabajo. Incluye un folder con todos los materiales.`,
     duration: "2-4 horas",
     includes: [
       "Capacitación completa dirigida por instructor",
