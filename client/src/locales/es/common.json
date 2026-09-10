@@ -1179,7 +1179,9 @@
     "keyTakeaways": "Puntos Clave",
     "back": "Atrás",
     "continueAfterExam": "Continuar",
-    "missedReviewTitle": "Revise las {{count}} pregunta(s) que falló:"
+    "missedReviewTitle": "Revise las {{count}} pregunta(s) que falló:",
+    "correctAnswer": "Correcta",
+    "yourAnswer": "Tu respuesta"
   },
   "productCard": {
     "online": "En Línea",

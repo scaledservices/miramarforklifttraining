@@ -204,7 +204,14 @@ export async function generateCertificatePdf(certificationId: number): Promise<s
   const labels = certLabels[locale];
   const dateLocale = locale === "es" ? "es-MX" : "en-US";
 
-  const certBaseUrl = process.env.CERTIFICATE_BASE_URL || `https://${brand.domain}`;
+  // 2026-09-07 (Alberto): QR code pointed at the bare company domain
+  // (miramarforklift.com), which has no /verify route — the training app lives
+  // on SITE_URL (training subdomain / Railway host). Resolve SITE_URL first,
+  // same as email.ts getSiteUrl(), so the QR lands on the live verify page.
+  const certBaseUrl =
+    process.env.CERTIFICATE_BASE_URL ||
+    process.env.SITE_URL ||
+    (process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : `https://${brand.domain}`);
   const verifyUrl = `${certBaseUrl}/verify/${cert.certificateNumber}`;
 
   const qrDataUrl = await QRCode.toDataURL(verifyUrl, { width: 150, margin: 1, color: { dark: theme.pdf.borderPrimary, light: "#ffffff" } });

@@ -22,6 +22,9 @@ interface Question {
 interface GradedQuestion {
   questionId: number;
   userAnswer: any;
+  // 2026-09-07 (Alberto): server grader now returns this so the review screen
+  // can highlight correct-vs-chosen options without exposing answers pre-submit.
+  correctAnswer?: any;
   correct: boolean;
   explanation: string | null;
 }
@@ -59,10 +62,21 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
   // not clustered on the same letter (QA found long runs of "B"). Answers
   // are submitted as option TEXT, not indices, so display order is purely
   // cosmetic and the server-side grader is unaffected.
+  //
+  // 2026-09-07 (Alberto): NEVER shuffle True/False questions. Shuffling them
+  // produced "False / True" ordering, which reads as a bug. T/F must always
+  // be True first, False second.
+  const isTrueFalse = (opts: string[]) =>
+    opts.length === 2 && opts.every((o) => /^(true|false)$/i.test(o.trim()));
+  const orderOptions = (opts: string[]) =>
+    isTrueFalse(opts)
+      ? [...opts].sort((a, b) => (/^true$/i.test(a.trim()) ? -1 : 0) - (/^true$/i.test(b.trim()) ? -1 : 0))
+      : [...opts].sort(() => Math.random() - 0.5);
+
   const [shuffledOptions, setShuffledOptions] = useState<Record<number, string[]>>(() => {
     const map: Record<number, string[]> = {};
     for (const q of questions) {
-      map[q.id] = [...q.options].sort(() => Math.random() - 0.5);
+      map[q.id] = orderOptions(q.options);
     }
     return map;
   });
@@ -107,7 +121,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
     setShuffledOptions(() => {
       const map: Record<number, string[]> = {};
       for (const q of questions) {
-        map[q.id] = [...q.options].sort(() => Math.random() - 0.5);
+        map[q.id] = orderOptions(q.options);
       }
       return map;
     });
@@ -168,22 +182,36 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
         </Card>
 
         {(() => {
-          // 2026-09-03 (Alberto): missed questions first, so the review the
-          // student asked for is the first thing they see. Correct answers
-          // follow collapsed below for completeness.
-          const missed = result.graded.filter((g) => !g.correct);
-          const correct = result.graded.filter((g) => g.correct);
-          const ordered = [...missed, ...correct];
+          // 2026-09-07 (Alberto): show ALL questions in their original
+          // sequence (missed question #22 must appear between 21 and 23, not
+          // floated to the top), and render every answer option with the
+          // user's selection and the correct answer both highlighted. The
+          // missed-count header stays as a summary banner above the list.
+          const missedCount = result.graded.filter((g) => !g.correct).length;
+
+          const normalizeTF = (opts: string[]) =>
+            opts.length === 2 && opts.every((o) => /^(true|false)$/i.test(o.trim()))
+              ? [...opts].sort((a, b) => (/^true$/i.test(a.trim()) ? -1 : 0) - (/^true$/i.test(b.trim()) ? -1 : 0))
+              : opts;
+
           return (
             <div className="space-y-4">
-              {missed.length > 0 && (
+              {missedCount > 0 && (
                 <p className="text-sm font-medium text-foreground" data-testid="text-missed-count">
-                  {t("lms.missedReviewTitle", { count: missed.length, defaultValue: `Review the ${missed.length} question${missed.length === 1 ? "" : "s"} you missed:` })}
+                  {t("lms.missedReviewTitle", { count: missedCount, defaultValue: `Review the ${missedCount} question${missedCount === 1 ? "" : "s"} you missed:` })}
                 </p>
               )}
-              {ordered.map((g) => {
+              {result.graded.map((g, gi) => {
                 const question = questions.find((q) => q.id === g.questionId);
-                const originalIdx = result.graded.findIndex((x) => x.questionId === g.questionId);
+                if (!question) return null;
+                // g.correctAnswer is provided by the server grader (the GET
+                // endpoint strips correctAnswers for security — pre-submit).
+                const correctAnswer: any = g.correctAnswer;
+                const isCorrectOpt = (opt: string) =>
+                  Array.isArray(correctAnswer) ? correctAnswer.includes(opt) : correctAnswer === opt;
+                const isUserOpt = (opt: string) =>
+                  Array.isArray(g.userAnswer) ? g.userAnswer.includes(opt) : g.userAnswer === opt;
+                const displayOptions = normalizeTF(question.options);
                 return (
                   <Card key={g.questionId} data-testid={`card-result-${g.questionId}`} className={g.correct ? "" : "border-red-300 dark:border-red-800"}>
                     <CardHeader className="pb-2 flex flex-row items-start gap-2">
@@ -193,16 +221,45 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                         <X className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
                       )}
                       <CardTitle className="text-sm font-medium">
-                        {originalIdx + 1}. {question?.question}
+                        {gi + 1}. {question.question}
                       </CardTitle>
                     </CardHeader>
-                    {g.explanation && (
-                      <CardContent className="pt-0">
-                        <p className="text-sm text-muted-foreground" data-testid={`text-explanation-${g.questionId}`}>
+                    <CardContent className="pt-0 space-y-1.5">
+                      {displayOptions.map((opt, oi) => {
+                        const correct = isCorrectOpt(opt);
+                        const chosen = isUserOpt(opt);
+                        return (
+                          <div
+                            key={oi}
+                            data-testid={`review-opt-${g.questionId}-${oi}`}
+                            className={
+                              "flex items-center gap-2 rounded px-2 py-1 text-sm " +
+                              (correct
+                                ? "bg-green-50 dark:bg-green-950 text-green-800 dark:text-green-200 font-medium"
+                                : chosen
+                                  ? "bg-red-50 dark:bg-red-950 text-red-800 dark:text-red-200 line-through"
+                                  : "text-muted-foreground")
+                            }
+                          >
+                            {correct ? (
+                              <Check className="h-4 w-4 shrink-0 text-green-600" />
+                            ) : chosen ? (
+                              <X className="h-4 w-4 shrink-0 text-red-600" />
+                            ) : (
+                              <span className="h-4 w-4 shrink-0" />
+                            )}
+                            <span>{opt}</span>
+                            {correct && <span className="ml-auto text-xs font-normal">{t("lms.correctAnswer", { defaultValue: "Correct" })}</span>}
+                            {!correct && chosen && <span className="ml-auto text-xs font-normal">{t("lms.yourAnswer", { defaultValue: "Your answer" })}</span>}
+                          </div>
+                        );
+                      })}
+                      {g.explanation && (
+                        <p className="text-sm text-muted-foreground pt-1" data-testid={`text-explanation-${g.questionId}`}>
                           {g.explanation}
                         </p>
-                      </CardContent>
-                    )}
+                      )}
+                    </CardContent>
                   </Card>
                 );
               })}

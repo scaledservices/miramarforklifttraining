@@ -1179,7 +1179,9 @@
     "keyTakeaways": "Key Takeaways",
     "back": "Back",
     "continueAfterExam": "Continue",
-    "missedReviewTitle": "Review the {{count}} question(s) you missed:"
+    "missedReviewTitle": "Review the {{count}} question(s) you missed:",
+    "correctAnswer": "Correct",
+    "yourAnswer": "Your answer"
   },
   "productCard": {
     "online": "Online",

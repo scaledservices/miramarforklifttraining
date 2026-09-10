@@ -367,6 +367,10 @@ app.post("/api/course-player/:enrollmentId/exam-submit", examSubmitLimiter, requ
       graded.push({
         questionId: q.id,
         userAnswer,
+        // 2026-09-07 (Alberto): include correctAnswer so the review screen can
+        // highlight right-vs-wrong options. Safe here — this payload only
+        // exists after the student has submitted and their score is locked.
+        correctAnswer,
         correct: isCorrect,
         explanation: q.explanation,
       });
