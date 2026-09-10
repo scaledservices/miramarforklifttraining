@@ -261,12 +261,25 @@ export async function sendOrderReceipt(params: {
   photoIdAddOn?: { count: number; total: number };
   /** Card processing fee portion of the total. */
   surcharge?: number;
+  /** 2026-09-07 (Alberto): team purchase - show a Manage Crew button so the
+   * crew admin lands on the seat-assignment dashboard, not just the generic
+   * customer dashboard. */
+  isTeamPurchase?: boolean;
   actorUserId?: number;
   locale?: string;
 }) {
   const baseUrl = getSiteUrl();
   const loc = params.locale || "en";
   const _ = (key: string) => emailT(loc, "orderReceipt", key);
+  const crewUrl = `${baseUrl}/group`;
+  // Team purchases: crew admin manages seats from /group, so swap the CTA to
+  // a Manage Crew button. Individual buyers keep the training dashboard link.
+  const crewCta = params.isTeamPurchase
+    ? `<p>${_("ctaCrewNote")}</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${crewUrl}" style="background: ${theme.email.buttonBg}; color: ${theme.email.buttonText}; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">${_("ctaManageCrew")}</a>
+      </div>`
+    : `<p>${_("cta").replace("{{accentHex}}", theme.email.linkColor).replace("{{dashboardUrl}}", `${baseUrl}${localePath(loc, "/dashboard")}`)}</p>`;
   let itemRows = params.items.map(i =>
     `<tr><td style="padding: 8px; border-bottom: 1px solid #eee;">${i.title}</td><td style="padding: 8px; border-bottom: 1px solid #eee; text-align: center;">${i.quantity}</td><td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">$${i.unitPrice.toFixed(2)}</td></tr>`
   ).join("");
@@ -292,7 +305,7 @@ export async function sendOrderReceipt(params: {
         <tbody>${itemRows}</tbody>
       </table>
       <p style="font-size: 18px; font-weight: bold; color: ${theme.email.headingColor}; text-align: right;">${_("total").replace("{{total}}", params.total.toFixed(2))}</p>
-      <p>${_("cta").replace("{{accentHex}}", theme.email.linkColor).replace("{{dashboardUrl}}", `${baseUrl}${localePath(loc, "/dashboard")}`)}</p>
+      ${crewCta}
     `),
     actorUserId: params.actorUserId,
   });
@@ -1573,11 +1586,11 @@ export async function sendAttendeeAddedNotification(params: {
         <p style="margin: 0; font-weight: bold; color: ${theme.email.successText};">
           ${es ? "Qué traer" : "What to bring"}
         </p>
-        <ul style="margin: 8px 0 0; color: ${theme.colors.text.dark}; font-size: 13px;">
-          <li>${es ? "Identificación con foto" : "Photo ID"}</li>
-          <li>${es ? "Calzado de seguridad (botas con punta de acero si las tienes)" : "Safety footwear (steel-toe boots if you have them)"}</li>
-          <li>${es ? "Ropa de trabajo cómoda" : "Comfortable work clothes"}</li>
-        </ul>
+        <p style="margin: 8px 0 0; color: ${theme.colors.text.dark}; font-size: 13px;">
+          ${es
+            ? "Trae una identificación con foto y ropa de trabajo cómoda. Cuando la capacitación sea en tu empresa, cumple con los requisitos de equipo de protección personal (EPP) de tu compañía."
+            : "Bring a photo ID and comfortable work clothes. When training is at your company, comply with your company's personal protective equipment (PPE) requirements."}
+        </p>
       </div>
       <p style="color: ${theme.colors.text.muted}; font-size: 13px;">
         ${es

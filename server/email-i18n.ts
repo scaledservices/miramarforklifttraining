@@ -24,6 +24,10 @@ const strings: Record<string, EmailStrings> = {
       photoIdLineItem: "Photo ID wallet card",
       cardFee: "Card processing fee",
       cta: "You can start your training by visiting your <a href=\"{{dashboardUrl}}\" style=\"color: {{accentHex}};\">dashboard</a>.",
+      // 2026-09-07 (Alberto): team buyers manage/assign seats from the crew
+      // dashboard - surface a direct Manage Crew button on their receipt.
+      ctaManageCrew: "Manage Crew & Assign Seats",
+      ctaCrewNote: "You bought seats for your crew. Assign them to members from your crew dashboard:",
     },
     groupInvite: {
       subject: "You've been invited to join {{groupName}} on {{brandName}}",
@@ -306,6 +310,10 @@ const strings: Record<string, EmailStrings> = {
       photoIdLineItem: "Tarjeta de identificación con foto",
       cardFee: "Cargo por procesamiento de tarjeta",
       cta: "Puedes iniciar tu capacitación visitando tu <a href=\"{{dashboardUrl}}\" style=\"color: {{accentHex}};\">panel</a>.",
+      // 2026-09-07 (Alberto): el comprador del equipo gestiona/asigna asientos
+      // desde el panel del equipo - botón directo en su recibo.
+      ctaManageCrew: "Administrar Equipo y Asignar Asientos",
+      ctaCrewNote: "Compraste asientos para tu equipo. Asígnalos a los miembros desde el panel de tu equipo:",
     },
     groupInvite: {
       subject: "Has sido invitado a unirte a {{groupName}} en {{brandName}}",

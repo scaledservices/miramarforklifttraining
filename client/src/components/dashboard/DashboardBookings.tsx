@@ -115,10 +115,20 @@ export default function DashboardBookings() {
                     <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
                       <MapPin className="w-3.5 h-3.5" />{areaName(b.serviceAreaId)} · {b.productSlug}
                     </p>
+                    {/* 2026-09-07 (Alberto): show the actual training address so
+                        the customer knows where to go / where the trainer arrives. */}
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {b.customerAddress}, {b.customerCity}, {b.customerState} {b.customerZip}
+                    </p>
                   </div>
                   <Badge variant="secondary" className="shrink-0 flex items-center gap-1">
                     <Users className="w-3 h-3" />{b.participantCount} seat{b.participantCount === 1 ? "" : "s"}
                   </Badge>
+                </div>
+                {/* 2026-09-07 (Alberto): "what to expect" summary so attendees know
+                    how to prepare and what the session looks like. */}
+                <div className="rounded-md bg-muted/40 border px-3 py-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">What to expect:</span> approximately 3-4 hours — a 1-hour presentation and kit review, followed by the hands-on practical. Bring a photo ID; at a company site, follow your company's PPE requirements.
                 </div>
                 <AttendeeNamesForm bookingId={b.id} participantCount={b.participantCount} />
               </CardContent>

@@ -607,6 +607,7 @@ async function postPaymentProcessing(
       // receipt so the total is self-explanatory.
       photoIdAddOn: receiptPhotoIdAddOn,
       surcharge: receiptSurcharge,
+      isTeamPurchase,
       actorUserId: userId,
       locale: orderLocale,
     });
