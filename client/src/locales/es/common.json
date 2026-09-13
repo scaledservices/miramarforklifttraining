@@ -1912,7 +1912,10 @@
     "accountCreatedNote": "Creamos su cuenta automáticamente — un correo de bienvenida va en camino. Puede establecer una contraseña cuando quiera con \"Olvidé mi contraseña\".",
     "passwordOptionalHint": "Establezca una contraseña ahora para crear su cuenta al reservar — o déjelo en blanco y créela después.",
     "existingAccountNote": "Buenas noticias — ya tiene una cuenta con este correo. Inicie sesión abajo para completar su compra.",
-    "accountSetupRetryNote": "No pudimos crear su cuenta automáticamente. Cree una abajo para completar su compra — sus datos ya están completados."
+    "accountSetupRetryNote": "No pudimos crear su cuenta automáticamente. Cree una abajo para completar su compra — sus datos ya están completados.",
+    "onsiteSessionBase": "Sesion de capacitacion en su sitio",
+    "travelFee": "Cargo por desplazamiento (~{{miles}} mi)",
+    "travelWaived": "Cargo por desplazamiento exento (3+ participantes)"
   },
   "businessPage": {
     "heroTitle": "Capacitación de Montacargas para Tu Empresa",

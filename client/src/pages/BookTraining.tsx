@@ -553,7 +553,13 @@ export default function BookTraining() {
   // Authoritative pricing (full payment, no volume discount) from the shared
   // module the server also charges from — null when only custom equipment is
   // selected. With BOOKING_DEPOSIT_RATE = 1.0, deposit = total, balance = 0.
-  const bookingPricing = computeBookingPrice(selectedProducts.map((pr) => pr.slug), participantCount);
+  // On-site/TTT: pass the customer site ZIP so the flat-session distance tier
+  // (and the 3+ travel-fee waiver) matches what the server will charge.
+  const bookingPricing = computeBookingPrice(
+    selectedProducts.map((pr) => pr.slug),
+    participantCount,
+    isTttBooking ? tttZip : undefined
+  );
   // Promo discount preview — same clamping rules as the server (percent capped
   // at 100, fixed never below $0); full payment is charged on the discounted total.
   const discountAmount = bookingPricing && appliedDiscount
@@ -1305,10 +1311,37 @@ export default function BookTraining() {
                 {isAuthenticated && bookingPricing && (
                   <div className="space-y-3">
                     <div className="bg-primary/10 border border-primary/40 rounded-xl p-4 text-sm space-y-1.5" data-testid="deposit-summary">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">{t("booking.trainingTotal")}</span>
-                        <span className="font-medium">${bookingPricing.total.toFixed(2)}</span>
-                      </div>
+                      {bookingPricing.flatSession ? (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">{t("bookTraining.onsiteSessionBase")}</span>
+                            <span className="font-medium">${(bookingPricing.total - (bookingPricing.travelFee ?? 0)).toFixed(2)}</span>
+                          </div>
+                          {(bookingPricing.travelFee ?? 0) > 0 && (
+                            <div className="flex justify-between" data-testid="row-travel-fee">
+                              <span className="text-muted-foreground">
+                                {t("bookTraining.travelFee", { miles: bookingPricing.distanceMiles ?? 0 })}
+                              </span>
+                              <span className="font-medium">+${(bookingPricing.travelFee ?? 0).toFixed(2)}</span>
+                            </div>
+                          )}
+                          {bookingPricing.travelWaived && (
+                            <div className="flex justify-between text-brand-green" data-testid="row-travel-waived">
+                              <span>{t("bookTraining.travelWaived")}</span>
+                              <span>$0.00</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">{t("booking.trainingTotal")}</span>
+                            <span className="font-medium">${bookingPricing.total.toFixed(2)}</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">{t("booking.trainingTotal")}</span>
+                          <span className="font-medium">${bookingPricing.total.toFixed(2)}</span>
+                        </div>
+                      )}
                       {appliedDiscount && discountAmount > 0 && (
                         <div className="flex justify-between text-brand-green" data-testid="row-promo-discount">
                           <span>{t("bookTraining.promoDiscount", { code: appliedDiscount.code })}</span>
