@@ -76,6 +76,16 @@ export default function CoursePlayer() {
   const [certData, setCertData] = useState<any>(null);
   const [, navigate] = useLocation();
 
+  // 2026-09-07 (Alberto): when the wallet card was prepaid at checkout, the
+  // completion modal should push photo upload FIRST - the cert view is
+  // secondary. Query entitlements for this cert; an awaiting_photo row means
+  // the photo step is still owed.
+  const { data: modalEntData } = useQuery<{ entitlements: any[] }>({
+    queryKey: [`/api/photo-id/entitlements?certificationId=${certData?.id}`],
+    enabled: !!certData?.id,
+  });
+  const prepaidAwaitingPhoto = (modalEntData?.entitlements ?? []).find((e: any) => e.status === "awaiting_photo");
+
   const { data: stepsData, isLoading: stepsLoading, refetch: refetchSteps } = useQuery<{
     steps: StepWithProgress[];
     enrollment: EnrollmentData;
@@ -514,8 +524,22 @@ export default function CoursePlayer() {
           )}
 
           <div className="flex flex-col gap-3 mt-2">
+            {certData && prepaidAwaitingPhoto && (
+              <Button
+                className="w-full"
+                onClick={() => {
+                  setShowCompletionModal(false);
+                  navigate(`/order-cert-card/${certData.id}?entitlement=${prepaidAwaitingPhoto.id}`);
+                }}
+                data-testid="button-upload-photo"
+              >
+                <Award className="h-4 w-4 mr-2" />
+                {t("certSuccess.uploadPhotoCta")}
+              </Button>
+            )}
             {certData && (
               <Button
+                variant={prepaidAwaitingPhoto ? "outline" : "default"}
                 className="w-full"
                 onClick={() => {
                   setShowCompletionModal(false);

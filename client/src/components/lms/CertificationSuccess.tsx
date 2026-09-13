@@ -36,21 +36,14 @@ export default function CertificationSuccess({ certification: propCert, enrollme
   // 2026-09-03 (Alberto): if the wallet card was already paid at checkout,
   // this card is an UPLOAD step, not an upsell. Query the member's
   // entitlements for this cert; any awaiting_photo row means prepaid.
-  // Peter 2026-09-07: also fetch whether this enrollment came from a crew
-  // purchase - crew members never pay for cards (admin handles ordering).
+  // 2026-09-07: the post-completion purchase CTA was removed entirely - only
+  // prepaid upload / fulfillment prompts remain below.
   const { data: entData } = useQuery<{ entitlements: any[] }>({
     queryKey: [`/api/photo-id/entitlements?certificationId=${cert?.id}`],
     enabled: !!cert?.id,
   });
-  const { data: enrollData } = useQuery<{ enrollment: any }>({
-    queryKey: [`/api/enrollments/${enrollmentId}`],
-    enabled: !!enrollmentId,
-  });
   const prepaidEntitlement = (entData?.entitlements ?? []).find((e: any) => e.status === "awaiting_photo");
   const fulfilledEntitlement = (entData?.entitlements ?? []).find((e: any) => e.status === "fulfilled");
-  // Crew seat = enrollment has a groupId (assigned via crew purchase). Those
-  // members get upload-only UX (prepaid) or no card section at all.
-  const isCrewSeat = !!enrollData?.enrollment?.groupId;
 
   return (
     <div className="max-w-2xl mx-auto text-center space-y-8 py-8" data-testid="certification-success">
@@ -117,10 +110,11 @@ export default function CertificationSuccess({ certification: propCert, enrollme
         </Link>
       </div>
 
-      {/* Peter 2026-09-07: wallet-card section rules for crew members -
-          prepaid -> upload-only prompt; not prepaid -> hide entirely (admin
-          handles ordering). Individuals keep the purchase/upsell flow. */}
-      {(!isCrewSeat || prepaidEntitlement || fulfilledEntitlement) && (
+      {/* Peter 2026-09-07: wallet-card section shows ONLY a prepaid upload or
+          fulfillment prompt. The post-completion "Add Photo ID" purchase CTA is
+          removed - Alberto does not want an order/upsell section here. Crew
+          members likewise see only prepaid upload (or nothing). */}
+      {(prepaidEntitlement || fulfilledEntitlement) && (
       <Card className="text-left" data-testid="card-wallet-upsell">
         <CardContent className="py-6 flex items-start gap-4">
           <div className="h-10 w-10 rounded-md bg-accent/20 flex items-center justify-center shrink-0">
@@ -128,19 +122,17 @@ export default function CertificationSuccess({ certification: propCert, enrollme
           </div>
           <div className="space-y-2 flex-1">
             <h3 className="font-semibold">
-              {prepaidEntitlement ? t("certSuccess.walletCardPrepaidTitle") : fulfilledEntitlement ? t("certSuccess.walletCardPrepaidTitle") : t("certSuccess.walletCardTitle")}
+              {t("certSuccess.walletCardPrepaidTitle")}
             </h3>
             <p className="text-sm text-muted-foreground">
               {prepaidEntitlement
                 ? t("certSuccess.walletCardPrepaidDesc")
-                : fulfilledEntitlement
-                  ? t("certSuccess.walletCardFulfilledDesc")
-                  : t("certSuccess.walletCardDesc")}
+                : t("certSuccess.walletCardFulfilledDesc")}
             </p>
-            {cert && !fulfilledEntitlement && (
-              <Link href={prepaidEntitlement ? `/order-cert-card/${cert.id}?entitlement=${prepaidEntitlement.id}` : `/order-cert-card/${cert.id}`}>
+            {cert && prepaidEntitlement && (
+              <Link href={`/order-cert-card/${cert.id}?entitlement=${prepaidEntitlement.id}`}>
                 <Button variant="default" data-testid="button-order-wallet-card">
-                  {prepaidEntitlement ? t("certSuccess.uploadPhotoCta") : t("certSuccess.orderWalletCard")}
+                  {t("certSuccess.uploadPhotoCta")}
                 </Button>
               </Link>
             )}
