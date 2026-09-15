@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCurrentLocale, getRawLocationPath } from "@/hooks/useLocaleLocation";
 import { getAlternateLocalePath, setStoredLocale, type Locale } from "@/lib/locale";
+import { apiRequest } from "@/lib/queryClient";
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",
@@ -20,6 +21,10 @@ export default function LanguageSwitcher({ className = "" }: { className?: strin
   function switchTo(locale: Locale) {
     if (locale === currentLocale) return;
     setStoredLocale(locale);
+    // Persist the choice to the user's profile (2026-09-13) so the course
+    // language follows the account at checkout, not just the URL prefix.
+    // Fire-and-forget: a logged-out visitor gets a 401 we safely ignore.
+    apiRequest("POST", "/api/auth/locale", { locale }).catch(() => {});
     const rawPath = getRawLocationPath();
     const suffix = window.location.search + window.location.hash;
     const newPath = getAlternateLocalePath(rawPath, locale);

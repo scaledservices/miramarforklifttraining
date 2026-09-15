@@ -479,8 +479,20 @@ async function buildOrder(
   const orderItems = [];
   let total = 0;
 
+  // Language follows the account (2026-09-13): if the request didn't carry an
+  // explicit "es" locale, fall back to the user's stored profile locale. This
+  // closes the gap where an ES-funnel buyer reached checkout with a stale EN
+  // client locale and would otherwise be enrolled in the English course.
+  let effectiveLocale = locale;
+  if (effectiveLocale !== "es") {
+    try {
+      const u = await storage.getUser(userId);
+      if (u?.locale === "es") effectiveLocale = "es";
+    } catch {}
+  }
+
   for (const item of items) {
-    const slug = resolveCourseSlug(item.courseSlug, locale);
+    const slug = resolveCourseSlug(item.courseSlug, effectiveLocale);
     const course = await storage.getCourseBySlug(slug);
     if (!course) throw new Error(`Course not found: ${item.courseSlug}`);
     // Flat per-seat pricing for any quantity (July 2026 decision: no automated

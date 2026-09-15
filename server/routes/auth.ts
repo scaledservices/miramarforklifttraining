@@ -95,6 +95,27 @@ app.get("/api/auth/me", async (req: Request, res: Response) => {
   return res.json({ user: sanitizeUser(user) });
 });
 
+// Persist the user's language choice to their profile (2026-09-13). The
+// top-bar language switcher calls this so the course language follows the
+// ACCOUNT, not just the current URL prefix. Checkout's buildOrder falls back
+// to users.locale when the request locale is missing/EN, closing the gap where
+// an ES-funnel buyer reached payment with a stale EN client locale and got
+// enrolled in the English course.
+app.post("/api/auth/locale", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const { locale } = req.body;
+    if (locale !== "en" && locale !== "es") {
+      return res.status(400).json({ error: "locale must be 'en' or 'es'" });
+    }
+    const user = await storage.updateUser(req.session.userId!, { locale });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    return res.json({ user: sanitizeUser(user) });
+  } catch (error) {
+    console.error("[Auth] Set locale error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // QA account-switcher banner backend. The endpoint is enabled when EITHER:
 //   - NODE_ENV !== "production"  (local dev), OR
 //   - ENABLE_QA_ACCOUNT_SWITCHER === "true"  (staging only - set explicitly)
