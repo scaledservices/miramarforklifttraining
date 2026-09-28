@@ -1,3 +1,4 @@
+import { acceptCardData } from "@shared/accept-card-data";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -118,13 +119,7 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
     };
 
     const secureData = {
-      cardData: {
-        cardNumber,
-        month: cardForm.month,
-        year: cardForm.year.length === 2 ? `20${cardForm.year}` : cardForm.year,
-        cardCode: cardForm.cardCode,
-        zip: cardForm.zip || undefined,
-      },
+      cardData: acceptCardData(cardForm),
       authData: {
         apiLoginID: paymentConfig.apiLoginID,
         clientKey: paymentConfig.clientKey,

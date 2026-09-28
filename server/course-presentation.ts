@@ -35,6 +35,12 @@ export function presentStep<T extends {title:string;type:string;config:any}>(slu
   const config = ['lesson','content','download'].includes(step.type) ? m.target.config : step.config;
   return {...step,title:m.target.title,config};
 }
+/** Graded-review explanation in the viewer's language (display only). */
+export function presentExplanation(slug:string, step:{title:string;type:string}, q:{question:string;explanation:string|null}, locale:string): string|null {
+  const m = match(slug,step,locale);
+  const index = m?.source.questions?.findIndex(x => x.question === q.question) ?? -1;
+  return (index >= 0 ? m?.target.questions?.[index]?.explanation : undefined) ?? q.explanation;
+}
 export function presentQuestion<T extends {question:string;options:any}>(slug:string, step:{title:string;type:string}, question:T, locale:string) {
   const m = match(slug,step,locale);
   const index = m?.source.questions?.findIndex(q => q.question === question.question) ?? -1;

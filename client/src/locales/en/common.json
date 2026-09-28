@@ -113,6 +113,7 @@
     "backTo": "Back to {{page}}"
   },
   "form": {
+    "companyName": "Company Name (optional)",
     "name": "Name",
     "fullName": "Full Name",
     "firstName": "First Name",
@@ -550,6 +551,9 @@
     "minRemaining": "~{{minutes}} min remaining"
   },
   "order": {
+    "discount": "Discount",
+    "photoIds": "Photo ID cards ({{count}})",
+    "totalPaid": "Total paid",
     "confirmed": "Order Confirmed",
     "confirmedDesc": "Thank you for your purchase! Your order has been placed successfully.",
     "notFound": "Order Not Found",

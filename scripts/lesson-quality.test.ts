@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {existsSync,readFileSync} from 'node:fs';
 import {COURSE_STEPS} from './course-content';
 import {COURSE_STEPS_ES} from './course-content-es';
-test('all bilingual lessons use reviewed visuals, not synthetic scene banners',()=>{
+test('bilingual lessons keep technical diagrams; banners are decorative headers only (Peter 2026-09-28)',()=>{
  for(const steps of [COURSE_STEPS,COURSE_STEPS_ES]){
   const blocks=steps.flatMap(s=>s.config.blocks||[]);
-  assert.equal(blocks.some((b:any)=>b.src?.includes('/photos/')),false);
+  assert.equal(blocks.some((b:any)=>b.type!=='hero_image'&&b.src?.includes('/photos/banners/')),false);
   assert.ok(blocks.some((b:any)=>b.type==='technical_diagram'&&b.kind==='stability'));
   assert.ok(blocks.some((b:any)=>b.type==='technical_diagram'&&b.kind==='ramps'));
   assert.ok(blocks.some((b:any)=>b.type==='technical_diagram'&&b.kind==='load-center'));

@@ -113,6 +113,7 @@
     "backTo": "Volver a {{page}}"
   },
   "form": {
+    "companyName": "Nombre de la Empresa (opcional)",
     "name": "Nombre",
     "fullName": "Nombre Completo",
     "firstName": "Nombre",
@@ -550,6 +551,9 @@
     "minRemaining": "~{{minutes}} min restantes"
   },
   "order": {
+    "discount": "Descuento",
+    "photoIds": "Tarjetas con foto ({{count}})",
+    "totalPaid": "Total pagado",
     "confirmed": "Pedido Confirmado",
     "confirmedDesc": "¡Gracias por tu compra! Tu pedido ha sido realizado exitosamente.",
     "notFound": "Pedido No Encontrado",

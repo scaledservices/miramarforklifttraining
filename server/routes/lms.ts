@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { storage } from "../storage";
 import { generateCertificatePdf } from "../certificate-pdf";
 import { sendCertificationEmail, sendCrewMemberCertifiedNotification } from "../email";
-import { presentStep, presentQuestion } from "../course-presentation";
+import { presentStep, presentQuestion, presentExplanation } from "../course-presentation";
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, omitExamAnswers, examSubmitLimiter } from "./middleware";
 
@@ -362,6 +362,8 @@ app.post("/api/course-player/:enrollmentId/exam-submit", examSubmitLimiter, requ
     }
 
     const questions = await storage.getExamQuestions(stepId);
+    const submitCourse = await storage.getCourse(enrollment.courseId);
+    const submitLocale = req.body.locale === "es" ? "es" : req.body.locale === "en" ? "en" : submitCourse?.language || "en";
     let correct = 0;
     const graded: any[] = [];
 
@@ -378,7 +380,7 @@ app.post("/api/course-player/:enrollmentId/exam-submit", examSubmitLimiter, requ
         // exists after the student has submitted and their score is locked.
         correctAnswer,
         correct: isCorrect,
-        explanation: q.explanation,
+        explanation: presentExplanation(submitCourse?.slug || "", step, q, submitLocale),
       });
     }
 

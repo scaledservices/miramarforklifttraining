@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle, ArrowRight, BookOpen, Users } from "lucide-react";
 import { fireConfetti, fireTripleConfetti } from "@/lib/confetti";
+import { orderPaymentSummary } from "@shared/order-payment-summary";
 
 export default function OrderConfirmation() {
   const { t } = useTranslation();
@@ -23,7 +24,7 @@ export default function OrderConfirmation() {
     queryClient.invalidateQueries({ queryKey: ["/api/groups"] });
   }, []);
 
-  const { data, isLoading, error } = useQuery<{ order: any; items: any[]; enrollments: any[] }>({
+  const { data, isLoading, error } = useQuery<{ order: any; items: any[]; enrollments: any[]; payment?: { amountPaid: number | null; discount: number; photoIdCount: number; photoIdTotal: number } }>({
     queryKey: ["/api/orders", orderId],
   });
 
@@ -61,6 +62,9 @@ export default function OrderConfirmation() {
   }
 
   const { order, items, enrollments } = data;
+  const itemsSubtotal = items.reduce((n: number, i: any) => n + parseFloat(i.unitPrice) * i.quantity, 0);
+  const pay = data.payment;
+  const summary = orderPaymentSummary({ itemsSubtotal, discount: pay?.discount ?? 0, photoIdTotal: pay?.photoIdTotal ?? 0, amountPaid: pay?.amountPaid ?? parseFloat(order.total) });
   const isGroupOrder = !!order.groupId;
   const firstEnrollment = enrollments && enrollments.length > 0 ? enrollments[0] : null;
 
@@ -105,9 +109,32 @@ export default function OrderConfirmation() {
 
           <Separator className="my-4" />
 
+          <div className="space-y-2 text-sm">
+            {(pay?.discount ?? 0) > 0 && (
+              <div className="flex justify-between gap-2 text-green-700 dark:text-green-400">
+                <span>{t("order.discount", { defaultValue: "Discount" })}</span>
+                <span data-testid="text-order-discount">-${pay!.discount.toFixed(2)}</span>
+              </div>
+            )}
+            {(pay?.photoIdCount ?? 0) > 0 && (
+              <div className="flex justify-between gap-2">
+                <span>{t("order.photoIds", { count: pay!.photoIdCount, defaultValue: `Photo ID cards (${pay!.photoIdCount})` })}</span>
+                <span data-testid="text-order-photo-ids">${pay!.photoIdTotal.toFixed(2)}</span>
+              </div>
+            )}
+            {summary.cardFee > 0 && (
+              <div className="flex justify-between gap-2 text-muted-foreground">
+                <span>{t("checkout.cardFee", { pct: "3.0", defaultValue: "Card processing fee (3.0%)" })}</span>
+                <span data-testid="text-order-card-fee">${summary.cardFee.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+
+          <Separator className="my-4" />
+
           <div className="flex justify-between gap-2 font-bold text-lg">
-            <span>{t("common.total")}</span>
-            <span data-testid="text-order-total">${parseFloat(order.total).toFixed(2)}</span>
+            <span>{t("order.totalPaid", { defaultValue: "Total paid" })}</span>
+            <span data-testid="text-order-total">${summary.totalPaid.toFixed(2)}</span>
           </div>
         </CardContent>
       </Card>

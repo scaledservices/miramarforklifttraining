@@ -54,7 +54,7 @@ interface ExamStepProps {
 }
 
 export default function ExamStep({ step, questions, enrollmentId, onComplete }: ExamStepProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [result, setResult] = useState<ExamResult | null>(null);
   const config = step.config as any;
@@ -84,6 +84,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
       const res = await apiRequest("POST", `/api/course-player/${enrollmentId}/exam-submit`, {
         stepId: step.id,
         answers,
+        locale: i18n.language.startsWith("es") ? "es" : "en",
       });
       return res.json();
     },

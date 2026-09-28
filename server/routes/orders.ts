@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
-import { platformSettings } from "@shared/schema";
+import { platformSettings, payments, discountRedemptions, photoIdEntitlements } from "@shared/schema";
 import { isAdminRole } from "@shared/roles";
 import { sendOrderReceipt, sendNewOrderAdminAlert } from "../email";
 import { generateInvoicePdf } from "../invoice-pdf";
@@ -118,7 +118,16 @@ app.get("/api/orders/:id", requireAuth, async (req: Request, res: Response) => {
     if (!order || order.userId !== req.session.userId) return res.status(404).json({ error: "Order not found" });
     const items = await storage.getOrderItems(order.id);
     const orderEnrollments = await storage.getEnrollmentsByOrder(order.id);
-    return res.json({ order, items, enrollments: orderEnrollments });
+    // What the card was actually charged (includes the card processing fee).
+    const paid = await db.select().from(payments).where(eq(payments.orderId, order.id));
+    const approved = paid.filter(p => p.status === "approved");
+    const amountPaid = approved.length ? Number(approved.reduce((n, p) => n + Number(p.amount), 0).toFixed(2)) : null;
+    const redemptions = await db.select().from(discountRedemptions).where(eq(discountRedemptions.orderId, order.id));
+    const discount = Number(redemptions.reduce((n, r) => n + Number(r.amountDiscounted), 0).toFixed(2));
+    const ents = await db.select().from(photoIdEntitlements).where(eq(photoIdEntitlements.orderId, order.id));
+    // Entitlement amounts include their fee share; the fee-free add-on price is $25 each.
+    const photoIdCount = ents.length;
+    return res.json({ order, items, enrollments: orderEnrollments, payment: { amountPaid, discount, photoIdCount, photoIdTotal: Number((photoIdCount * 25).toFixed(2)) } });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }

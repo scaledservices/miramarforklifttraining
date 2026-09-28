@@ -29,7 +29,7 @@ interface CheckpointStepProps {
 }
 
 export default function CheckpointStep({ step, questions, enrollmentId, onComplete }: CheckpointStepProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const [graded, setGraded] = useState<any[]>([]);
@@ -42,6 +42,7 @@ export default function CheckpointStep({ step, questions, enrollmentId, onComple
       const res = await apiRequest("POST", `/api/course-player/${enrollmentId}/exam-submit`, {
         stepId: step.id,
         answers,
+        locale: i18n.language.startsWith("es") ? "es" : "en",
       });
       return res.json();
     },

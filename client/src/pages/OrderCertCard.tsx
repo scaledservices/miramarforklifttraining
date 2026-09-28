@@ -1,3 +1,4 @@
+import { acceptCardData } from "@shared/accept-card-data";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useSearch } from "wouter";
@@ -407,13 +408,7 @@ export default function OrderCertCard() {
 
         setIsProcessing(true);
         const secureData: AcceptSecureData = {
-          cardData: {
-            cardNumber,
-            month: cardForm.month,
-            year: cardForm.year.length === 2 ? `20${cardForm.year}` : cardForm.year,
-            cardCode: cardForm.cardCode,
-            zip: effectiveBilling.zip || undefined,
-          },
+          cardData: acceptCardData({ ...cardForm, zip: effectiveBilling.zip }),
           authData: {
             apiLoginID: paymentConfig.apiLoginID,
             clientKey: paymentConfig.clientKey,

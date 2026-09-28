@@ -95,6 +95,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/ppe-workers-scene.png","alt":"Workers in full PPE standing in front of a forklift"},
       {
         "type": "heading",
         "level": 2,
@@ -165,6 +166,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/forklift-lifting-scene.png","alt":"Forklift raising a palletized load to a rack while a spotter watches"},
       {
         "type": "heading",
         "level": 2,
@@ -369,6 +371,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/operator-at-controls-scene.png","alt":"Operator seated at forklift controls wearing hi-vis vest and seat belt"},
       {
         "type": "heading",
         "level": 2,
@@ -438,6 +441,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/stability-triangle.png","alt":"Top-down view of a forklift showing the stability triangle"},
       { type: "heading", level: 2, text: "Stability Triangle and Center of Gravity" },
       {"type": "technical_diagram", "kind": "stability"},
       { type: "heading", level: 3, text: "What is the Stability Triangle?" },
@@ -466,6 +470,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/load-center.png","alt":"Diagram of load center distance and capacity"},
       {
         "type": "heading",
         "level": 2,
@@ -534,6 +539,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/forklift-lifting-scene.png","alt":"Forklift placing a pallet on a rack level"},
       {
         "type": "heading",
         "level": 2,
@@ -646,6 +652,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/pre-inspection-scene.png","alt":"Operator inspecting forklift forks with a checklist before a shift"},
       {
         "type": "heading",
         "level": 2,
@@ -740,6 +747,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/pre-shift-checklist.png","alt":"Forklift inspection points diagram"},
       { type: "heading", level: 2, text: "Maintenance and Repairs" },
       { type: "heading", level: 3, text: "Repair Before Use" },
       { type: "paragraph", html: "If a safety issue is identified during inspection, <strong>repairs must be made before the equipment is used</strong>. Never operate a forklift with known defects." },
@@ -760,6 +768,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/ppe-gloves.png","alt":"Required PPE for fueling: gloves, vest, hard hat, eye protection"},
       {
         "type": "heading",
         "level": 2,
@@ -830,6 +839,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/safe-driving.png","alt":"Proper driving posture with seat belt, low load, and eyes forward"},
       {
         "type": "heading",
         "level": 2,
@@ -877,6 +887,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/warehouse-aisle.png","alt":"Warehouse aisle with clearance zones"},
       { type: "heading", level: 2, text: "Intersections, Blind Spots, and Horn Use" },
       { type: "heading", level: 3, text: "Approach With Caution" },
       { type: "paragraph", html: "At every intersection, blind corner, or area with limited visibility: <strong>slow down, sound your horn, and look both ways</strong> before proceeding." },
@@ -898,6 +909,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/pedestrian-crossing-scene.png","alt":"Forklift yielding to a pedestrian in a marked walkway"},
       { type: "heading", level: 2, text: "Pedestrian Right of Way" },
       { type: "heading", level: 3, text: "Pedestrians Always Have Priority" },
       { type: "paragraph", html: "Pedestrians <strong>always have the right of way</strong>. Never drive toward a person near a fixed object. Always ensure people are clear before moving." },
@@ -930,6 +942,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/safe-driving.png","alt":"Safe driving posture and smooth handling"},
       { type: "heading", level: 2, text: "Direction Changes and Smooth Handling" },
       { type: "heading", level: 3, text: "Complete Stop Before Direction Change" },
       { type: "paragraph", html: "Always come to a <strong>complete stop</strong> before changing from forward to reverse or vice versa. Abrupt direction changes can cause loads to shift or fall, and increase tip-over risk." },
@@ -952,6 +965,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/ramps-slopes.png","alt":"Forklift on a ramp with the load pointed upgrade"},
       {
         "type": "heading",
         "level": 2,
@@ -1044,6 +1058,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/dock-loading-scene.png","alt":"Forklift entering a trailer over a dock plate at a loading dock"},
       {
         "type": "heading",
         "level": 2,
@@ -1087,6 +1102,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/aerial-lift-scene.png","alt":"Worker in a harness on an elevated platform with a ground guard below"},
       {
         "type": "heading",
         "level": 2,
@@ -1129,6 +1145,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/parking-shutdown.png","alt":"Parked forklift with forks lowered, chocked wheel, and shutdown steps"},
       { type: "heading", level: 2, text: "Parking and Securing the Forklift" },
       { type: "heading", level: 3, text: "Parking Procedure" },
       { type: "paragraph", html: "Every shutdown follows the same sequence. Put the steps in order — you will do this at the end of every shift for the rest of your career." },
@@ -1158,6 +1175,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/parking-shutdown.png","alt":"Forklift parked and secured"},
       {
         "type": "heading",
         "level": 2,
@@ -1232,6 +1250,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/warehouse-aisle.png","alt":"Warehouse aisle showing site-specific clearances"},
       {
         "type": "heading",
         "level": 2,
@@ -1410,6 +1429,7 @@ export const COURSE_STEPS: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/ppe-workers-scene.png","alt":"Team of certified workers in PPE in front of a forklift"},
       { type: "heading", level: 2, text: "Formal Instruction Complete: What's Next" },
       { type: "heading", level: 3, text: "Your Certificate" },
       { type: "paragraph", html: "Congratulations on completing the formal instruction portion of your forklift operator certification! Your formal-instruction completion record is available once the course is completed. This is not employer authorization to operate. It includes a unique certificate number and QR code that employers can use for instant verification." },

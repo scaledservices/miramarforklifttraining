@@ -1,3 +1,4 @@
+import { entitlementBelongsToMember } from "@shared/photo-id-entitlement";
 import type { Express, Request, Response } from "express";
 import { z } from "zod";
 import { storage } from "../storage";
@@ -34,19 +35,16 @@ async function canConsumeEntitlement(
   ent: EntitlementRow,
   userId: number,
   certificationCourseId: number,
-  certificationUserId: number
+  certificationUserId: number,
+  certificationEnrollmentId?: number | null
 ): Promise<boolean> {
-  // Buyer always may (they paid). Individual entitlements are pre-linked.
-  if (ent.purchasedByUserId === userId) return true;
-  // The certified member may claim an unclaimed team entitlement from an
-  // order whose course matches their certification.
-  if (certificationUserId === userId && ent.enrollmentId === null) {
-    const order = await storage.getOrder(ent.orderId);
-    if (!order) return false;
-    const orderEnrollments = await storage.getEnrollmentsByOrder(order.id);
-    return orderEnrollments.some((e) => e.courseId === certificationCourseId);
-  }
-  return false;
+  // 2026-09-28: a member may only claim an ID bought on THEIR OWN order.
+  // Previously any unclaimed ID for the same course matched, so a crew
+  // member whose admin never bought IDs was shown "upload your photo"
+  // against another company's prepaid ID (and never offered a purchase).
+  const enrollment = certificationEnrollmentId ? await storage.getEnrollment(certificationEnrollmentId) : undefined;
+  const memberOrderId = enrollment && enrollment.courseId === certificationCourseId ? enrollment.orderId : null;
+  return entitlementBelongsToMember(ent, { userId, certUserId: certificationUserId, memberOrderId });
 }
 
 export function registerPhotoIdRoutes(app: Express) {
@@ -78,7 +76,7 @@ export function registerPhotoIdRoutes(app: Express) {
           .from(photoIdEntitlements)
           .where(and(isNull(photoIdEntitlements.enrollmentId), eq(photoIdEntitlements.status, "awaiting_photo")));
         for (const ent of unclaimed) {
-          if (await canConsumeEntitlement(ent, userId, cert.courseId, cert.userId)) claimable.push(ent);
+          if (await canConsumeEntitlement(ent, userId, cert.courseId, cert.userId, cert.enrollmentId)) claimable.push(ent);
         }
       }
 
@@ -124,7 +122,7 @@ export function registerPhotoIdRoutes(app: Express) {
         .from(photoIdEntitlements)
         .where(and(isNull(photoIdEntitlements.enrollmentId), eq(photoIdEntitlements.status, "awaiting_photo")));
       for (const ent of claimable) {
-        if (await canConsumeEntitlement(ent, userId, cert.courseId, cert.userId)) {
+        if (await canConsumeEntitlement(ent, userId, cert.courseId, cert.userId, cert.enrollmentId)) {
           return res.status(409).json({ error: "A photo ID is already available to you - just add your photo", entitlementId: ent.id });
         }
       }
@@ -198,7 +196,7 @@ export function registerPhotoIdRoutes(app: Express) {
       if (!cert) return res.status(404).json({ error: "Certification not found" });
 
       const userId = req.session.userId!;
-      const allowed = await canConsumeEntitlement(ent, userId, cert.courseId, cert.userId);
+      const allowed = await canConsumeEntitlement(ent, userId, cert.courseId, cert.userId, cert.enrollmentId);
       // Group admins may also upload on behalf of their members (spec 2.3).
       let adminOverride = false;
       if (!allowed) {

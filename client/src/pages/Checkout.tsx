@@ -1,3 +1,4 @@
+import { acceptCardData } from "@shared/accept-card-data";
 import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -335,13 +336,7 @@ export default function Checkout() {
     setPaymentError(null);
 
     const secureData: AcceptSecureData = {
-      cardData: {
-        cardNumber,
-        month: cardForm.month,
-        year: cardForm.year.length === 2 ? `20${cardForm.year}` : cardForm.year,
-        cardCode: cardForm.cardCode,
-        zip: cardForm.zip || undefined,
-      },
+      cardData: acceptCardData(cardForm),
       authData: {
         apiLoginID: paymentConfig.apiLoginID,
         clientKey: paymentConfig.clientKey,

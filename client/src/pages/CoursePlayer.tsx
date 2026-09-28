@@ -538,6 +538,20 @@ export default function CoursePlayer() {
                 {t("certSuccess.uploadPhotoCta")}
               </Button>
             )}
+            {certData && !prepaidAwaitingPhoto && modalEntData && (
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  setShowCompletionModal(false);
+                  navigate(`/order-cert-card/${certData.id}`);
+                }}
+                data-testid="button-buy-photo-id"
+              >
+                <Award className="h-4 w-4 mr-2" />
+                {t("walletCard.addPhoto")}
+              </Button>
+            )}
             {certData && (
               <Button
                 variant={prepaidAwaitingPhoto ? "outline" : "default"}

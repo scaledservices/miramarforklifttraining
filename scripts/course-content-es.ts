@@ -82,6 +82,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/ppe-workers-scene.png","alt":"Trabajadores con EPP completo frente a un montacargas"},
       {
         "type": "heading",
         "level": 2,
@@ -153,6 +154,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/forklift-lifting-scene.png","alt":"Montacargas elevando una carga en tarima hacia una estantería mientras un ayudante observa"},
       {
         "type": "heading",
         "level": 2,
@@ -357,6 +359,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/operator-at-controls-scene.png","alt":"Operador sentado en los controles del montacargas con chaleco de alta visibilidad y cinturón de seguridad"},
       {
         "type": "heading",
         "level": 2,
@@ -426,6 +429,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/stability-triangle.png","alt":"Vista superior de un montacargas mostrando el triángulo de estabilidad"},
       { type: "heading", level: 2, text: "Triángulo de Estabilidad y Centro de Gravedad" },
       {"type": "technical_diagram", "kind": "stability"},
       { type: "heading", level: 3, text: "¿Qué es el Triángulo de Estabilidad?" },
@@ -454,6 +458,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/load-center.png","alt":"Diagrama de la distancia del centro de carga y la capacidad"},
       {
         "type": "heading",
         "level": 2,
@@ -522,6 +527,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/forklift-lifting-scene.png","alt":"Montacargas colocando una tarima en un nivel de estantería"},
       {
         "type": "heading",
         "level": 2,
@@ -634,6 +640,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 6,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/pre-inspection-scene.png","alt":"Operador inspeccionando las horquillas del montacargas con una lista de verificación antes de un turno"},
       {
         "type": "heading",
         "level": 2,
@@ -728,6 +735,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/pre-shift-checklist.png","alt":"Diagrama de puntos de inspección del montacargas"},
       { type: "heading", level: 2, text: "Mantenimiento y Reparaciones" },
       { type: "heading", level: 3, text: "Reparar Antes de Usar" },
       { type: "paragraph", html: "Si se identifica un problema de seguridad durante la inspección, <strong>las reparaciones deben hacerse antes de que se use el equipo</strong>. Nunca opere un montacargas con defectos conocidos." },
@@ -748,6 +756,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/ppe-gloves.png","alt":"EPP requerido para reabastecer: guantes, chaleco, casco, protección ocular"},
       {
         "type": "heading",
         "level": 2,
@@ -818,6 +827,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/safe-driving.png","alt":"Postura de conducción correcta con cinturón de seguridad, carga baja y ojos al frente"},
       {
         "type": "heading",
         "level": 2,
@@ -865,6 +875,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/warehouse-aisle.png","alt":"Pasillo de almacén con zonas de espacio libre"},
       { type: "heading", level: 2, text: "Intersecciones, Puntos Ciegos y Uso de la Bocina" },
       { type: "heading", level: 3, text: "Aproxímese con Precaución" },
       { type: "paragraph", html: "En cada intersección, esquina ciega o área con visibilidad limitada: <strong>reduzca la velocidad, toque la bocina y mire en ambas direcciones</strong> antes de proceder." },
@@ -886,6 +897,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/pedestrian-crossing-scene.png","alt":"Montacargas cediendo el paso a un peatón en un carril peatonal marcado"},
       { type: "heading", level: 2, text: "Derecho de Paso de los Peatones" },
       { type: "heading", level: 3, text: "Los Peatones Siempre Tienen Prioridad" },
       { type: "paragraph", html: "Los peatones <strong>siempre tienen el derecho de paso</strong>. Nunca conduzca hacia una persona que esté cerca de un objeto fijo. Siempre asegúrese de que las personas estén fuera del camino antes de moverse." },
@@ -918,6 +930,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/safe-driving.png","alt":"Postura de conducción segura y manejo suave"},
       { type: "heading", level: 2, text: "Cambios de Dirección y Manejo Suave" },
       { type: "heading", level: 3, text: "Detención Completa Antes de Cambiar de Dirección" },
       { type: "paragraph", html: "Siempre llegue a una <strong>detención completa</strong> antes de cambiar de avance a reversa o viceversa. Los cambios de dirección abruptos pueden causar que las cargas se desplacen o caigan, y aumentan el riesgo de volcadura." },
@@ -940,6 +953,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/ramps-slopes.png","alt":"Montacargas en una rampa con la carga apuntando cuesta arriba"},
       {
         "type": "heading",
         "level": 2,
@@ -1032,6 +1046,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 5,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/dock-loading-scene.png","alt":"Montacargas entrando a un remolque sobre una placa de muelle en un muelle de carga"},
       {
         "type": "heading",
         "level": 2,
@@ -1075,6 +1090,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/aerial-lift-scene.png","alt":"Trabajador con arnés en una plataforma elevada con un vigilante en el suelo"},
       {
         "type": "heading",
         "level": 2,
@@ -1117,6 +1133,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/parking-shutdown.png","alt":"Montacargas estacionado con horquillas bajadas, rueda calzada y pasos de apagado"},
       { type: "heading", level: 2, text: "Estacionamiento y Aseguramiento del Montacargas" },
       { type: "heading", level: 3, text: "Procedimiento de Estacionamiento" },
       { type: "paragraph", html: "Cada apagado sigue la misma secuencia. Ponga los pasos en orden — hará esto al final de cada turno por el resto de su carrera." },
@@ -1146,6 +1163,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/parking-shutdown.png","alt":"Montacargas estacionado y asegurado"},
       {
         "type": "heading",
         "level": 2,
@@ -1220,6 +1238,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 4,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/banners/warehouse-aisle.png","alt":"Pasillo de almacén mostrando espacios libres específicos del sitio"},
       {
         "type": "heading",
         "level": 2,
@@ -1396,6 +1415,7 @@ export const COURSE_STEPS_ES: StepDef[] = [
     type: "lesson",
     estimatedMinutes: 3,
     config: blocks([
+      {"type":"hero_image","src":"/images/training/photos/ppe-workers-scene.png","alt":"Equipo de trabajadores certificados con EPP frente a un montacargas"},
       { type: "heading", level: 2, text: "Instrucción teórica completada: ¿Qué sigue?" },
       { type: "heading", level: 3, text: "Su Certificado" },
       { type: "paragraph", html: "¡Felicitaciones por completar la porción de instrucción formal de su certificación de operador de montacargas! Su constancia de instrucción teórica estará disponible al completar el curso. No sustituye la autorización del empleador para operar. Incluye un número de certificado único y código QR que los empleadores pueden usar para verificación instantánea." },
