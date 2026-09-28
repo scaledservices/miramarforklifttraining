@@ -33,6 +33,7 @@ interface CardOrder {
   idPhoto: string | null;
   shippingAddress: {
     name?: string;
+    companyName?: string;
     address?: string;
     city?: string;
     state?: string;
@@ -144,6 +145,8 @@ export default function AdminCardOrders() {
                     <TableCell className="text-xs">
                       {order.shippingAddress ? (
                         <div>
+                          {order.shippingAddress.companyName && <div>{order.shippingAddress.companyName}</div>}
+                          {order.shippingAddress.name && <div>{order.shippingAddress.name}</div>}
                           {order.shippingAddress.address && <div>{order.shippingAddress.address}</div>}
                           <div>
                             {[order.shippingAddress.city, order.shippingAddress.state, order.shippingAddress.zip].filter(Boolean).join(", ")}

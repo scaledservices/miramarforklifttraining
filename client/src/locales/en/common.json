@@ -1,4 +1,9 @@
 {
+  "walletCard": {
+    "statusUnavailable": "We could not check your card status. Please refresh before ordering.",
+    "optionalPhoto": "Want your photo on your card? Add a photo ID for $25, including standard shipping. Any card processing fee is shown at checkout.",
+    "addPhoto": "Add a photo ID"
+  },
   "nav": {
     "trainingPrograms": "Training Programs",
     "onlineTraining": "Online Training",
@@ -1128,6 +1133,8 @@
     "accountReady": "Your account is ready — proceeding to payment."
   },
   "lms": {
+    "answered": "answered",
+    "nextUnanswered": "Next unanswered",
     "checkpointComplete": "Knowledge Check Complete",
     "checkpointAlreadyDone": "You've already completed this knowledge check.",
     "checkpointSubtitle": "Quick knowledge check — no pressure, just reinforcement!",

@@ -1,4 +1,9 @@
 {
+  "walletCard": {
+    "statusUnavailable": "No pudimos consultar el estado de su tarjeta. Actualice la página antes de hacer un pedido.",
+    "optionalPhoto": "¿Quiere su foto en la tarjeta? Agregue una identificación con foto por $25, con envío estándar incluido. La comisión de pago con tarjeta se muestra al pagar.",
+    "addPhoto": "Agregar identificación con foto"
+  },
   "nav": {
     "trainingPrograms": "Programas de Capacitación",
     "onlineTraining": "Capacitación en Línea",
@@ -1128,6 +1133,8 @@
     "accountReady": "Tu cuenta está lista — procediendo al pago."
   },
   "lms": {
+    "answered": "respondidas",
+    "nextUnanswered": "Siguiente sin responder",
     "checkpointComplete": "Evaluación de Conocimiento Completada",
     "checkpointAlreadyDone": "Ya has completado esta evaluación de conocimiento.",
     "checkpointSubtitle": "Evaluación rápida de conocimiento — ¡sin presión, solo refuerzo!",

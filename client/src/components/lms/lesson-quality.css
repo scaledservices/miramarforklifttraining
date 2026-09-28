@@ -1,0 +1,33 @@
+.lesson-renderer{font-size:1rem;line-height:1.8;color:var(--tw-prose-body);max-width:78ch;margin-inline:auto}
+.lesson-renderer h2{font-family:'Roboto Slab',serif;font-size:clamp(1.7rem,3vw,2.35rem);line-height:1.25;letter-spacing:-.035em;margin:0 0 1.5rem;padding-bottom:1.1rem;border-bottom:3px solid #e4b536}
+.lesson-renderer h3{font-size:1.15rem;line-height:1.4;margin-top:2rem;margin-bottom:.7rem;letter-spacing:-.015em}
+.lesson-renderer p{margin-block:.85rem}.lesson-renderer li{padding-left:.25rem;margin-block:.55rem}
+.lesson-renderer .lesson-hero-image{max-height:none;aspect-ratio:2.3;object-fit:contain;border-radius:12px;margin-bottom:.5rem;background:#edf1f3}
+.lesson-renderer figure figcaption{font-size:.75rem;text-align:left;font-style:normal;line-height:1.5;margin:8px 0 28px;color:#566871}
+.technical-diagram,.hotspot-study{margin:2rem 0;padding:1.25rem;border:1px solid #cbd8de;border-radius:16px;background:#fff;color:#233944;box-shadow:0 8px 24px #20353e06}
+.technical-heading>span{font-size:.65rem;font-weight:800;letter-spacing:.15em;color:#526c78}
+.technical-heading h3{margin:.45rem 0 1rem;font-size:1.2rem;color:#20353e}
+.technical-diagram svg{width:100%;height:auto;display:block;border-radius:10px;margin:1rem 0}
+.technical-diagram svg text{font:15px 'Roboto',sans-serif;fill:#243944}
+.diagram-controls,.hotspot-labels{display:flex;flex-wrap:wrap;gap:8px}
+.diagram-controls button,.hotspot-labels button{font-size:.875rem;line-height:1.4;padding:11px 14px;min-height:44px;border:1px solid #bacbd2;border-radius:8px;background:#f7fafb;color:#243944;text-align:left}
+.diagram-controls button[aria-pressed=true],.hotspot-labels button[aria-pressed=true]{background:#233944;color:white;border-color:#233944}
+.diagram-result{padding:14px 16px;background:#edf7f3;border-left:4px solid #00785e;min-height:80px;font-size:.95rem;line-height:1.65;color:#194c3f}
+.diagram-note{font-size:.8rem!important;line-height:1.6;color:#536b75}
+.hotspot-labels{margin-top:14px}.hotspot-labels span{font-weight:800;margin-right:8px}
+.hotspot-explanation{padding:16px;margin-top:14px;min-height:110px;border-radius:10px;background:#eef4f6;line-height:1.6;color:#243944}
+.hotspot-explanation p{margin:6px 0 0}
+.hotspot-study .hotspot-marker{animation:none;width:36px;height:36px;background:#fff;color:#1d3642;border:2px solid #1d3642;box-shadow:0 2px 6px #0003}
+.hotspot-study .hotspot-marker-active{background:#ffc326;color:#18282f;transform:translate(-50%,-50%)}
+.lesson-renderer button:focus-visible{outline:3px solid #047b68;outline-offset:3px}
+.lesson-renderer .flip-card-inner{display:grid;min-height:10rem;height:auto}
+.lesson-renderer .flip-card-front,.lesson-renderer .flip-card-back{position:relative;grid-area:1/1;min-height:10rem;height:auto;overflow-wrap:anywhere}
+.lesson-renderer .flip-card-back{background:#edf5f3;color:#174b3f}.lesson-renderer .flip-card-text{font-size:.875rem;line-height:1.55}
+.lesson-renderer .embedded-quiz,.lesson-renderer [data-testid=scenario-player]{border-radius:14px;box-shadow:none}
+.lesson-renderer .embedded-quiz-option,.lesson-renderer .scenario-choice{min-height:48px;padding:14px;font-size:.95rem;line-height:1.6}
+.lesson-renderer .key-takeaways{margin-top:2rem;border-radius:12px;background:#eff7f3;border:1px solid #caddd2}
+.lesson-renderer .callout{border-radius:10px;line-height:1.7}
+.dark .lesson-renderer{color:#e2e8ec}.dark .technical-diagram,.dark .hotspot-study{background:#16252c;border-color:#3c535f;color:#e8eef1}
+.dark .technical-heading h3{color:#e8eef1}.dark .technical-heading>span,.dark .diagram-note{color:#b9cbd4}
+@media(max-width:640px){.technical-diagram,.hotspot-study{padding:12px}.technical-diagram svg text{font-size:17px}.hotspot-labels{display:grid;grid-template-columns:1fr 1fr}.hotspot-labels button{font-size:.78rem;padding:9px}.hotspot-study .hotspot-marker{width:28px;height:28px}.lesson-renderer{font-size:1rem;line-height:1.75}.diagram-controls button{flex:1;font-size:.8rem;padding:10px 6px}}
+@media(prefers-reduced-motion:reduce){.lesson-renderer *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

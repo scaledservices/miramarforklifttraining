@@ -63,6 +63,7 @@ export default function Register() {
   const params = searchParams;
   const prefillEmail = params.get("email") || "";
   const [name, setName] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState(prefillEmail);
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
@@ -76,7 +77,7 @@ export default function Register() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      const result = await register({ name, email, password, phone: phone || undefined, locale: i18n.language === "es" ? "es" : "en" });
+      const result = await register({ name, companyName: companyName.trim() || undefined, email, password, phone: phone || undefined, locale: i18n.language === "es" ? "es" : "en" });
       toast({ title: t("auth.accountCreated"), description: t("auth.welcomeTo", { brand: brand.name }) });
       const dest = getRedirectPath(result.user);
       setLocation(dest);
@@ -169,6 +170,10 @@ export default function Register() {
                   data-testid="input-name"
                 />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="company">{t("form.companyName")}</Label>
+              <Input id="company" autoComplete="organization" maxLength={200} value={companyName} onChange={e => setCompanyName(e.target.value)} data-testid="input-register-company" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">{t("form.email")}</Label>

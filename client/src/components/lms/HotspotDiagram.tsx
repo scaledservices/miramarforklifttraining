@@ -1,85 +1,26 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { X } from "lucide-react";
-import type { HotspotDiagramBlock } from "@shared/lesson-blocks";
+import { useId, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { HotspotDiagramBlock } from '@shared/lesson-blocks';
 
-interface HotspotDiagramProps {
-  block: HotspotDiagramBlock;
-}
-
-/**
- * Image with numbered hotspot pins. Tap/click or keyboard-activate a pin to
- * reveal its label + description in a popover anchored INSIDE the diagram
- * frame - never in document flow, so the lesson footer (Continue button) is
- * never pushed out of view when a pin opens.
- */
-export default function HotspotDiagram({ block }: HotspotDiagramProps) {
-  const { t } = useTranslation();
-  const [active, setActive] = useState<number | null>(null);
-  const [visited, setVisited] = useState<Set<number>>(new Set());
-
-  const toggle = (i: number) => {
-    setActive((prev) => (prev === i ? null : i));
-    setVisited((prev) => new Set(prev).add(i));
-  };
-
-  const activeSpot = active !== null ? block.hotspots[active] : null;
-  // Keep the popover inside the frame: pins on the left half open to the
-  // right and vice versa; vertically it hugs the top or bottom edge.
-  const panelSide = activeSpot && activeSpot.x > 50 ? "left-3" : "right-3";
-  const panelVert = activeSpot && activeSpot.y > 50 ? "bottom-3" : "top-3";
-
-  return (
-    <div className="my-6" data-testid="hotspot-diagram">
-      <p className="text-xs text-muted-foreground mb-2">{t("lms.hotspotHint")}</p>
-      <div className="relative rounded-lg overflow-hidden border bg-muted/30">
-        <img src={block.src} alt={block.alt} className="w-full h-auto block" />
-        {block.hotspots.map((spot, i) => (
-          <button
-            key={i}
-            type="button"
-            className={`hotspot-marker ${active === i ? "hotspot-marker-active" : ""} ${visited.has(i) ? "hotspot-marker-visited" : ""}`}
-            style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
-            onClick={() => toggle(i)}
-            aria-expanded={active === i}
-            aria-label={`${i + 1}. ${spot.label}`}
-            data-testid={`hotspot-pin-${i}`}
-          >
-            {i + 1}
-          </button>
-        ))}
-        <div aria-live="polite">
-          {activeSpot && (
-            <div
-              className={`absolute ${panelSide} ${panelVert} z-10 max-w-[min(20rem,80%)] p-3 rounded-lg border border-[#FFC326]/60 bg-black/85 text-white shadow-lg backdrop-blur-sm flex items-start gap-2.5`}
-              data-testid="hotspot-detail"
-            >
-              <span className="shrink-0 w-6 h-6 rounded-full bg-[#FFC326] text-black text-xs font-bold flex items-center justify-center mt-0.5">
-                {active! + 1}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm">{activeSpot.label}</p>
-                <p className="text-sm text-white/80 mt-1">{activeSpot.description}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActive(null)}
-                className="shrink-0 p-1 rounded hover:bg-white/20"
-                aria-label={t("lms.close")}
-                data-testid="hotspot-detail-close"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-      {block.caption && (
-        <p className="text-xs text-muted-foreground mt-2 text-center italic">{block.caption}</p>
-      )}
-      <p className="text-xs text-muted-foreground mt-2" data-testid="hotspot-progress">
-        {t("lms.hotspotProgress", { visited: visited.size, total: block.hotspots.length })}
-      </p>
-    </div>
-  );
+export default function HotspotDiagram({block}:{block:HotspotDiagramBlock}) {
+ const {t}=useTranslation();const id=useId();
+ const [active,setActive]=useState<number|null>(null);
+ const [visited,setVisited]=useState<Set<number>>(new Set());
+ function open(i:number){setActive(i);setVisited(v=>new Set(v).add(i));}
+ const spot=active===null?null:block.hotspots[active];
+ return <section className="hotspot-study not-prose" data-testid="hotspot-diagram">
+  <p className="text-sm text-muted-foreground mb-3">{t('lms.hotspotHint')}</p>
+  <div className="relative rounded-xl border overflow-hidden bg-slate-50">
+   <img src={block.src} alt={block.alt} className="w-full h-auto block" />
+   {block.hotspots.map((s,i)=><button key={i} type="button" className={`hotspot-marker ${active===i?'hotspot-marker-active':''} ${visited.has(i)?'hotspot-marker-visited':''}`} style={{left:`${s.x}%`,top:`${s.y}%`}} onClick={()=>open(i)} aria-expanded={active===i} aria-controls={`${id}-detail`} aria-label={`${i+1}. ${s.label}`} data-testid={`hotspot-pin-${i}`}>{i+1}</button>)}
+  </div>
+  <div className="hotspot-labels" role="group" aria-label={t('lms.hotspotHint')}>
+   {block.hotspots.map((s,i)=><button type="button" key={i} onClick={()=>open(i)} aria-pressed={active===i} aria-controls={`${id}-detail`}><span>{i+1}</span>{s.label}</button>)}
+  </div>
+  <div id={`${id}-detail`} className="hotspot-explanation" aria-live="polite" data-testid="hotspot-detail">
+   {spot?<><strong>{spot.label}</strong><p>{spot.description}</p></>:<p>{t('lms.hotspotHint')}</p>}
+  </div>
+  {block.caption&&<p className="text-sm text-muted-foreground mt-3">{block.caption}</p>}
+  <p className="text-xs text-muted-foreground mt-3" data-testid="hotspot-progress">{t('lms.hotspotProgress',{visited:visited.size,total:block.hotspots.length})}</p>
+ </section>;
 }

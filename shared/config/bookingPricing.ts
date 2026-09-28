@@ -80,8 +80,6 @@ export const VOLUME_DISCOUNT_RATE = 0;
 // of booking. Deposit-only bookings will not be offered."
 export const BOOKING_DEPOSIT_RATE = 1.0;
 
-import { computeTttQuote } from "./tttPricing";
-
 export interface BookingPriceBreakdown {
   perPerson: number;
   participantCount: number;
@@ -90,61 +88,12 @@ export interface BookingPriceBreakdown {
   total: number;
   deposit: number;
   balance: number;
-  // On-site/TTT flat-session fields (2026-09-07): present only when the
-  // selection is a trainer-category (flat per session) product. sessionPrice
-  // is the distance-tiered flat charge; perPerson is 0 for these.
-  flatSession?: boolean;
-  travelFee?: number;
-  distanceMiles?: number | null;
-  travelWaived?: boolean;
 }
 
-// On-site/Train-the-Trainer slugs are FLAT PER SESSION (per trainer trip), not
-// per person (2026-09-07, Alberto). Charging these per-head would multiply the
-// session fee by the attendee count - a real overcharge bug. Distance tier is
-// applied via computeTttQuote when the customer site ZIP is known.
-const TTT_SESSION_SLUGS = new Set([
-  "forklift-train-the-trainer-san-diego",
-  "forklift-train-the-trainer-las-vegas",
-  "forklift-train-the-trainer-fresno",
-  "scissor-aerial-train-the-trainer-san-diego",
-  "scissor-aerial-train-the-trainer-las-vegas",
-  "scissor-aerial-train-the-trainer-fresno",
-]);
-
-export function isTttSessionSlug(slug: string): boolean {
-  return TTT_SESSION_SLUGS.has(slug);
-}
-
-// siteZip is optional: when omitted (or unresolvable) the session bills at the
-// $750 base tier and the office confirms any travel fee manually.
-export function computeBookingPrice(
-  productSlugs: string[],
-  participantCount: number,
-  siteZip?: string
-): BookingPriceBreakdown | null {
+// Facility bookings use catalog prices per attendee. Customer-site work is quoted separately.
+export function computeBookingPrice(productSlugs: string[], participantCount: number): BookingPriceBreakdown | null {
   if (!Array.isArray(productSlugs) || productSlugs.length === 0) return null;
   if (!Number.isInteger(participantCount) || participantCount < 1) return null;
-
-  // Flat-session (on-site/TTT) path: ignore per-person multiplication.
-  if (productSlugs.length === 1 && isTttSessionSlug(productSlugs[0])) {
-    const quote = computeTttQuote(siteZip ?? "", participantCount);
-    const total = round2(quote.sessionPrice);
-    const deposit = round2(total * BOOKING_DEPOSIT_RATE);
-    return {
-      perPerson: 0,
-      participantCount,
-      subtotal: total,
-      volumeDiscount: 0,
-      total,
-      deposit,
-      balance: round2(total - deposit),
-      flatSession: true,
-      travelFee: quote.travelFee,
-      distanceMiles: quote.miles,
-      travelWaived: quote.travelWaived,
-    };
-  }
 
   let perPerson = 0;
   for (const slug of productSlugs) {

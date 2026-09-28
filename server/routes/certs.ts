@@ -65,7 +65,7 @@ app.get("/api/certifications/:id", requireAuth, async (req: Request, res: Respon
     // out payment details and hit a 409 after the fact (prevention over error).
     const cardOrders = await storage.getCertCardOrdersByCertification(cert.id);
     const active = cardOrders.find(
-      (co) => co.userId === req.session.userId! && !["canceled", "refunded"].includes(co.status)
+      (co) => co.userId === cert.userId && !["canceled", "refunded"].includes(co.status)
     );
     const existingCardOrder = active
       ? { id: active.id, status: active.status, createdAt: active.createdAt }

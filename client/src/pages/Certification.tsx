@@ -1,3 +1,4 @@
+import WalletCardStatus from "@/components/lms/WalletCardStatus";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "wouter";
@@ -180,24 +181,7 @@ export default function Certification() {
         </CardContent>
       </Card>
 
-      <Card data-testid="card-wallet-upsell">
-        <CardContent className="py-6 flex items-start gap-4">
-          <div className="h-10 w-10 rounded-md bg-accent/20 flex items-center justify-center shrink-0">
-            <CreditCard className="h-5 w-5 text-accent" />
-          </div>
-          <div className="space-y-2 flex-1">
-            <h3 className="font-semibold">{t("certification.walletCardTitle")}</h3>
-            <p className="text-sm text-muted-foreground">
-              {t("certification.walletCardDesc")}
-            </p>
-            <Link href={`/order-cert-card/${certId}`}>
-              <Button data-testid="button-order-wallet-card">
-                {t("certification.orderPhysicalCard")}
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+      <WalletCardStatus certificationId={certId} />
 
       {/* "Become an Instructor" CTA removed per QA 2026-07-22: instructor
           program is shelved. Route /become-an-instructor still exists but is

@@ -1,6 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { Lightbulb, AlertTriangle, ClipboardList } from "lucide-react";
 import type { LessonBlock } from "@shared/lesson-blocks";
+import TechnicalDiagram from "./TechnicalDiagram";
+import "./lesson-quality.css";
 import HotspotDiagram from "./HotspotDiagram";
 import FlipCardGroup from "./FlipCardGroup";
 import EmbeddedQuiz from "./EmbeddedQuiz";
@@ -15,6 +17,8 @@ function BlockRenderer({ block, index }: { block: LessonBlock; index: number }) 
   const { t } = useTranslation();
 
   switch (block.type) {
+    case "technical_diagram":
+      return <TechnicalDiagram kind={block.kind} />;
     case "hero_image":
       return (
         <figure className="m-0">
@@ -119,13 +123,14 @@ function BlockRenderer({ block, index }: { block: LessonBlock; index: number }) 
  * lessons are handled by ContentStep directly, not here.
  */
 export default function InteractiveLesson({ blocks }: InteractiveLessonProps) {
+  const { i18n } = useTranslation();
   return (
     <div
       className="lesson-renderer prose prose-sm md:prose-base max-w-none dark:prose-invert"
       data-testid="interactive-lesson"
     >
       {blocks.map((block, i) => (
-        <BlockRenderer key={i} block={block} index={i} />
+        <BlockRenderer key={`${i18n.language}-${i}-${JSON.stringify(block)}`} block={block} index={i} />
       ))}
     </div>
   );

@@ -18,6 +18,8 @@ interface CheckpointStepProps {
   questions: {
     id: number;
     question: string;
+    displayQuestion?: string;
+    displayOptions?: Record<string, string>;
     type: string;
     options: string[];
     order: number;
@@ -92,7 +94,7 @@ export default function CheckpointStep({ step, questions, enrollmentId, onComple
               data-testid={`checkpoint-question-${qi}`}
             >
               <p className="font-medium mb-3">
-                {qi + 1}. {q.question}
+                {qi + 1}. {q.displayQuestion ?? q.question}
               </p>
 
               <RadioGroup
@@ -105,7 +107,7 @@ export default function CheckpointStep({ step, questions, enrollmentId, onComple
                   <div key={oi} className="flex items-center gap-2">
                     <RadioGroupItem value={opt} id={`q${q.id}-o${oi}`} />
                     <Label htmlFor={`q${q.id}-o${oi}`} className="cursor-pointer text-sm">
-                      {opt}
+                      {q.displayOptions?.[opt] ?? opt}
                     </Label>
                   </div>
                 ))}

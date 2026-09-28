@@ -111,7 +111,7 @@ export default function Checkout() {
   const [photoIdUserToggled, setPhotoIdUserToggled] = useState(false);
   const [photoIdCount, setPhotoIdCount] = useState(1);
   const [photoIdShippingMethod, setPhotoIdShippingMethod] = useState<"standard" | "expedited">("standard");
-  const [photoIdShipping, setPhotoIdShipping] = useState({ name: "", address: "", city: "", state: "", zip: "" });
+  const [photoIdShipping, setPhotoIdShipping] = useState({ name: "", companyName: "", address: "", city: "", state: "", zip: "" });
 
   const PHOTO_ID_PRICE = 25.0;
   // 2026-09-07 (Alberto): flat $25 per card, standard USPS shipping INCLUDED.
@@ -139,10 +139,10 @@ export default function Checkout() {
   // Prefill the add-on shipping address from the signed-in user's profile.
   useEffect(() => {
     const saved = (user as any)?.savedShippingAddress;
-    if (saved && !photoIdShipping.name) {
+    if (user && !photoIdShipping.name) {
       setPhotoIdShipping({
-        name: saved.name || "", address: saved.address || "", city: saved.city || "",
-        state: saved.state || "", zip: saved.zip || "",
+        name: saved?.name || user.name || "", companyName: saved?.companyName || "", address: saved?.address || "", city: saved?.city || "",
+        state: saved?.state || "", zip: saved?.zip || "",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -456,6 +456,7 @@ export default function Checkout() {
                       <div className="space-y-2">
                         <p className="text-xs font-medium">{t("checkout.shipping.whyTitle", { defaultValue: "Where should we mail the wallet card?" })}</p>
                         <Input placeholder={t("orderCertCard.name", { defaultValue: "Full name" })} value={photoIdShipping.name} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, name: e.target.value })} data-testid="input-photo-id-ship-name" />
+                        <Input aria-label={t("form.companyName")} placeholder={t("form.companyName")} autoComplete="organization" maxLength={200} value={photoIdShipping.companyName} onChange={e => setPhotoIdShipping({ ...photoIdShipping, companyName: e.target.value })} data-testid="input-photo-id-ship-company" />
                         <Input placeholder={t("orderCertCard.address", { defaultValue: "Street address" })} value={photoIdShipping.address} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, address: e.target.value })} data-testid="input-photo-id-ship-address" />
                         <div className="grid grid-cols-3 gap-2">
                           <Input placeholder={t("orderCertCard.city", { defaultValue: "City" })} value={photoIdShipping.city} onChange={(e) => setPhotoIdShipping({ ...photoIdShipping, city: e.target.value })} data-testid="input-photo-id-ship-city" />

@@ -66,7 +66,8 @@ interface EnrollmentData {
 }
 
 export default function CoursePlayer() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const contentLocale = i18n.language.startsWith("es") ? "es" : "en";
   const [, params] = useRoute("/course/:enrollmentId");
   const enrollmentId = params?.enrollmentId;
   const [activeStepId, setActiveStepId] = useState<number | null>(null);
@@ -90,7 +91,7 @@ export default function CoursePlayer() {
     steps: StepWithProgress[];
     enrollment: EnrollmentData;
   }>({
-    queryKey: ["/api/course-player", enrollmentId, "steps"],
+    queryKey: ["/api/course-player", enrollmentId, `steps?locale=${contentLocale}`],
     enabled: !!enrollmentId,
   });
 
@@ -118,7 +119,7 @@ export default function CoursePlayer() {
   }, [activeStepId]);
 
   const { data: stepDetail, isLoading: stepLoading, error: stepError } = useQuery<StepDetail>({
-    queryKey: ["/api/course-player", enrollmentId, "step", String(activeStepId)],
+    queryKey: ["/api/course-player", enrollmentId, "step", `${activeStepId}?locale=${contentLocale}`],
     enabled: !!enrollmentId && !!activeStepId && !showCertSuccess,
   });
 

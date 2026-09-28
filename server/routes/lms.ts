@@ -2,6 +2,7 @@ import type { Express, Request, Response } from "express";
 import { storage } from "../storage";
 import { generateCertificatePdf } from "../certificate-pdf";
 import { sendCertificationEmail, sendCrewMemberCertifiedNotification } from "../email";
+import { presentStep, presentQuestion } from "../course-presentation";
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, omitExamAnswers, examSubmitLimiter } from "./middleware";
 
@@ -164,9 +165,11 @@ app.get("/api/course-player/:enrollmentId/steps", requireAuth, async (req: Reque
     const progress = await storage.getStepProgress(enrollment.id);
     const progressMap = new Map(progress.map(p => [p.stepId, p]));
 
+    const course = await storage.getCourse(enrollment.courseId);
+    const locale = req.query.locale === "es" ? "es" : req.query.locale === "en" ? "en" : course?.language || "en";
     const stepsWithProgress = steps.map(step => ({
-      ...step,
-      config: step.type === "exam" ? omitExamAnswers(step.config) : step.config,
+      ...presentStep(course?.slug || "", step, locale),
+      config: step.type === "exam" || step.type === "checkpoint" ? omitExamAnswers(step.config) : presentStep(course?.slug || "", step, locale).config,
       progress: progressMap.get(step.id) || { status: "not_started" },
     }));
 
@@ -208,7 +211,10 @@ app.get("/api/course-player/:enrollmentId/step/:stepId", requireAuth, async (req
       }));
     }
 
-    return res.json({ step: { ...step, config: (step.type === "exam" || step.type === "checkpoint") ? omitExamAnswers(step.config) : step.config }, questions });
+    const course = await storage.getCourse(enrollment.courseId);
+    const locale = req.query.locale === "es" ? "es" : req.query.locale === "en" ? "en" : course?.language || "en";
+    const shown = presentStep(course?.slug || "", step, locale);
+    return res.json({ step: { ...shown, config: (step.type === "exam" || step.type === "checkpoint") ? omitExamAnswers(step.config) : shown.config }, questions: questions.map(q => presentQuestion(course?.slug || "", step, q, locale)) });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }

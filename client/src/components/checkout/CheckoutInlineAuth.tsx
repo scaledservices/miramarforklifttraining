@@ -39,6 +39,7 @@ export default function CheckoutInlineAuth({
   const [mode, setMode] = useState<AuthMode>(defaultMode);
 
   const [name, setName] = useState(defaultName);
+  const [companyName, setCompanyName] = useState("");
   const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState(defaultPhone);
@@ -65,6 +66,7 @@ export default function CheckoutInlineAuth({
           email,
           password,
           phone: phone || undefined,
+          companyName: companyName.trim() || undefined,
           locale: i18n.language?.startsWith("es") ? "es" : "en",
         });
         toast({ title: t("auth.accountCreated"), description: t("checkoutAuth.accountReady") });
@@ -215,6 +217,12 @@ export default function CheckoutInlineAuth({
               </div>
             )}
 
+            {mode === "register" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="checkout-company">{t("form.companyName")}</Label>
+                <Input id="checkout-company" autoComplete="organization" maxLength={200} value={companyName} onChange={e => setCompanyName(e.target.value)} data-testid="input-checkout-company" />
+              </div>
+            )}
             <div className="space-y-1.5">
               <Label htmlFor="checkout-email">{t("form.email")}</Label>
               <div className="relative">

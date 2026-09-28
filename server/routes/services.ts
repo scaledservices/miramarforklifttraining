@@ -200,9 +200,7 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
     // sums every slug per person. The full selection is also persisted in
     // bookings.productSlug as the joined display string sent by the client.
     const productSlugs: string[] = Array.isArray(req.body.productSlugs) ? req.body.productSlugs : [];
-    // On-site/TTT: customerZip (the customer site ZIP) drives the distance-tiered
-    // flat session price. For hands-on it's the facility ZIP and unused by pricing.
-    let pricing = computeBookingPrice(productSlugs, Number(participantCount), customerZip);
+    let pricing = computeBookingPrice(productSlugs, Number(participantCount));
 
     // Optional promo code: validated and priced server-side (never trust the
     // client's discounted numbers), mirroring the online-checkout integration

@@ -19,6 +19,7 @@ interface LessonBlocksEditorProps {
 }
 
 const BLOCK_TEMPLATES: Record<LessonBlock["type"], LessonBlock> = {
+  technical_diagram: { type: "technical_diagram", kind: "stability" },
   hero_image: { type: "hero_image", src: "/images/training/", alt: "" },
   image: { type: "image", src: "/images/training/", alt: "", caption: "" },
   heading: { type: "heading", level: 3, text: "" },
@@ -35,6 +36,7 @@ const BLOCK_TEMPLATES: Record<LessonBlock["type"], LessonBlock> = {
 
 function blockSummary(block: LessonBlock): string {
   switch (block.type) {
+    case "technical_diagram": return block.kind;
     case "hero_image":
     case "image":
       return block.src;
@@ -107,6 +109,8 @@ function LinesField({ label, items, onChange, testId }: { label: string; items: 
 function BlockFields({ block, onChange, index }: { block: LessonBlock; onChange: (b: LessonBlock) => void; index: number }) {
   const set = (patch: any) => onChange({ ...block, ...patch });
   switch (block.type) {
+    case "technical_diagram":
+      return <div className="space-y-2"><Label htmlFor={`diagram-kind-${index}`}>Technical diagram</Label><select id={`diagram-kind-${index}`} className="border rounded p-2 w-full bg-background" value={block.kind} onChange={e=>set({kind:e.target.value})}><option value="stability">Stability triangle</option><option value="ramps">Ramp direction</option><option value="load-center">Load center</option></select></div>;
     case "hero_image":
     case "image":
       return (

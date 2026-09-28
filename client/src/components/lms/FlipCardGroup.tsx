@@ -41,11 +41,11 @@ export default function FlipCardGroup({ block }: FlipCardGroupProps) {
               data-testid={`flip-card-${i}`}
             >
               <span className="flip-card-inner">
-                <span className="flip-card-front">
+                <span className="flip-card-front" aria-hidden={isFlipped}>
                   <span className="flip-card-text">{card.front}</span>
                   <RotateCw className="h-4 w-4 opacity-50 shrink-0" aria-hidden="true" />
                 </span>
-                <span className="flip-card-back">
+                <span className="flip-card-back" aria-hidden={!isFlipped}>
                   <span className="flip-card-text">{card.back}</span>
                 </span>
               </span>

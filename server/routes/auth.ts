@@ -13,7 +13,7 @@ import { pool } from "../db";
 export async function registerAuthRoutes(app: Express) {
 app.post("/api/auth/register", async (req: Request, res: Response) => {
   try {
-    const { email, password, name, phone, locale: reqLocale } = req.body;
+    const { email, password, name, phone, companyName, locale: reqLocale } = req.body;
     if (!email || !password || !name) {
       return res.status(400).json({ error: "Email, password, and name are required" });
     }
@@ -30,9 +30,12 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
       return res.status(409).json({ error: "An account with this email already exists" });
     }
 
+    if (companyName !== undefined && (typeof companyName !== "string" || companyName.trim().length > 200)) {
+      return res.status(400).json({ error: "Company name must be at most 200 characters" });
+    }
     const regLocale = (reqLocale === "es") ? "es" : "en";
     const passwordHash = await hashPassword(password);
-    const user = await storage.createUser({ email, passwordHash, name, phone, role: "individual", locale: regLocale });
+    const user = await storage.createUser({ email, passwordHash, name, phone, role: "individual", locale: regLocale, savedShippingAddress: companyName?.trim() ? { name, companyName: companyName.trim() } : null });
 
     req.session.userId = user.id;
 

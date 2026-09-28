@@ -147,7 +147,13 @@ export interface ScenarioBlock {
   nodes?: ScenarioNode[];
 }
 
+export interface TechnicalDiagramBlock {
+  type: "technical_diagram";
+  kind: "stability" | "ramps" | "load-center";
+}
+
 export type LessonBlock =
+  | TechnicalDiagramBlock
   | HeroImageBlock
   | ImageBlock
   | HeadingBlock
@@ -166,6 +172,7 @@ export interface LessonBlocksConfig {
 }
 
 export const LESSON_BLOCK_TYPES: LessonBlock["type"][] = [
+  "technical_diagram",
   "hero_image",
   "image",
   "heading",

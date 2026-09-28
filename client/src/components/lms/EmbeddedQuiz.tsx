@@ -1,3 +1,4 @@
+import { practiceCorrect, practiceAnswers } from "@shared/practice-answers";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -8,15 +9,7 @@ interface EmbeddedQuizProps {
   block: EmbeddedQuizBlock;
 }
 
-function isCorrect(q: QuizQuestion, selected: string[]): boolean {
-  const correct = q.correctAnswers.split(",").map((s) => s.trim()).filter(Boolean);
-  if (q.type === "mcq_multi") {
-    return (
-      correct.length === selected.length && correct.every((c) => selected.includes(c))
-    );
-  }
-  return selected.length === 1 && selected[0] === correct[0];
-}
+const isCorrect = practiceCorrect;
 
 /**
  * Inline knowledge check graded client-side with immediate feedback.
@@ -68,7 +61,7 @@ export default function EmbeddedQuiz({ block }: EmbeddedQuizProps) {
               <div className="space-y-1.5" role={multi ? "group" : "radiogroup"} aria-label={q.question}>
                 {q.options.map((opt, oi) => {
                   const chosen = selected.includes(opt);
-                  const correctOpts = q.correctAnswers.split(",").map((s) => s.trim());
+                  const correctOpts = practiceAnswers(q);
                   const showCorrect = isGraded && correctOpts.includes(opt);
                   const showWrong = isGraded && chosen && !correctOpts.includes(opt);
                   return (
@@ -77,6 +70,15 @@ export default function EmbeddedQuiz({ block }: EmbeddedQuizProps) {
                       type="button"
                       role={multi ? "checkbox" : "radio"}
                       aria-checked={chosen}
+                      tabIndex={multi || chosen || (selected.length === 0 && oi === 0) ? 0 : -1}
+                      onKeyDown={(e)=>{
+                        if(multi || isGraded || !["ArrowDown","ArrowRight","ArrowUp","ArrowLeft","Home","End"].includes(e.key)) return;
+                        e.preventDefault();
+                        const next=e.key==="Home"?0:e.key==="End"?q.options.length-1:(oi+(["ArrowDown","ArrowRight"].includes(e.key)?1:-1)+q.options.length)%q.options.length;
+                        select(qi,q.options[next],false);
+                        const parent=e.currentTarget.parentElement;
+                        parent?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[next]?.focus();
+                      }}
                       disabled={isGraded}
                       onClick={() => select(qi, opt, multi)}
                       className={`embedded-quiz-option ${chosen ? "embedded-quiz-option-selected" : ""} ${showCorrect ? "embedded-quiz-option-correct" : ""} ${showWrong ? "embedded-quiz-option-wrong" : ""}`}
@@ -92,6 +94,7 @@ export default function EmbeddedQuiz({ block }: EmbeddedQuizProps) {
                   );
                 })}
               </div>
+              {isGraded && <Button type="button" size="sm" variant="ghost" onClick={()=>{setGraded(prev=>{const next={...prev};delete next[qi];return next;});setAnswers(prev=>({...prev,[qi]:[]}));}}>{t("lms.tryAgain")}</Button>}
               <div aria-live="polite">
                 {isGraded ? (
                   <div

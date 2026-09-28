@@ -141,11 +141,6 @@ export default function OrderCertCard() {
   // Prepaid branch (spec 2.1): arriving with ?entitlement=N means the card
   // was paid at course checkout. No payment step; the photo consumes the
   // entitlement and creates the fulfillment row.
-  const [prepaidEntitlement, setPrepaidEntitlement] = useState<PhotoIdEntitlement | null>(null);
-
-  const STEPS = prepaidEntitlement
-    ? [t("orderCertCard.stepPhoto"), t("orderCertCard.stepDone")]
-    : [t("orderCertCard.stepPhoto"), t("orderCertCard.stepReview"), t("orderCertCard.stepDone")];
 
   const [step, setStep] = useState(0);
   const [shipping, setShipping] = useState<Address>(EMPTY_ADDRESS);
@@ -219,32 +214,27 @@ export default function OrderCertCard() {
   const existingCardOrder = data?.existingCardOrder ?? null;
 
   // Claimable prepaid entitlements for this cert (Chunk 2 fulfillment).
-  const { data: entitlementsData } = useQuery<{ entitlements: PhotoIdEntitlement[] }>({
-    queryKey: ["/api/photo-id/entitlements", certId],
+  const { data: entitlementsData, isLoading: entitlementsLoading, error: entitlementsError } = useQuery<{ entitlements: PhotoIdEntitlement[] }>({
+    queryKey: [`/api/photo-id/entitlements?certificationId=${certId}`],
     enabled: certId > 0,
   });
 
-  // Resolve the entitlement to use: explicit ?entitlement= param wins;
-  // otherwise auto-pick the single claimable row so a member following a
-  // dashboard prompt lands straight in the prepaid flow.
-  useEffect(() => {
-    const list = entitlementsData?.entitlements ?? [];
-    if (entitlementIdParam > 0) {
-      const found = list.find((e) => e.id === entitlementIdParam);
-      if (found) setPrepaidEntitlement(found);
-    } else if (list.length === 1) {
-      setPrepaidEntitlement(list[0]);
-    }
-  }, [entitlementsData, entitlementIdParam]);
+  const prepaidEntitlement = (entitlementsData?.entitlements ?? []).find(e =>
+    e.status === "awaiting_photo" && (!entitlementIdParam || e.id === entitlementIdParam)
+  ) ?? null;
+
+  const STEPS = prepaidEntitlement
+    ? [t("orderCertCard.stepPhoto"), t("orderCertCard.stepDone")]
+    : [t("orderCertCard.stepPhoto"), t("orderCertCard.stepReview"), t("orderCertCard.stepDone")];
 
   // Prefill shipping from the saved profile address (spec 3.3) — default,
   // not a lock. Entitlement address wins over the profile address.
   const { data: meData } = useQuery<{ user: any }>({ queryKey: ["/api/auth/me"] });
   useEffect(() => {
-    if (shippingPrefilled) return;
+    if (shippingPrefilled || entitlementsLoading) return;
     const fromEntitlement = prepaidEntitlement?.shippingAddress;
     const fromProfile = meData?.user?.savedShippingAddress;
-    const saved = fromEntitlement || fromProfile;
+    const saved = fromEntitlement || fromProfile || (meData?.user ? { name: meData.user.name } : null);
     if (saved && typeof saved === "object" && saved.name) {
       setShipping({
         name: saved.name || "",
@@ -256,7 +246,7 @@ export default function OrderCertCard() {
       });
       setShippingPrefilled(true);
     }
-  }, [meData, prepaidEntitlement, shippingPrefilled]);
+  }, [meData, prepaidEntitlement, shippingPrefilled, entitlementsLoading]);
 
   // Prepaid: shipping method comes from the entitlement (paid at checkout).
   useEffect(() => {
@@ -318,7 +308,7 @@ export default function OrderCertCard() {
     },
   });
 
-  if (isLoading) {
+  if (isLoading || entitlementsLoading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 space-y-6" data-testid="loading-order-card">
         <Skeleton className="h-10 w-64" />
@@ -327,7 +317,7 @@ export default function OrderCertCard() {
     );
   }
 
-  if (error || !cert) {
+  if (error || entitlementsError || !cert) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 text-center space-y-4" data-testid="error-order-card">
         <AlertTriangle className="h-12 w-12 text-destructive mx-auto" />
@@ -587,43 +577,8 @@ export default function OrderCertCard() {
               </div>
             </div>
 
-            {/* Shipping tier folds into review as a compact radio (spec 2.2) */}
-            <div className="space-y-2" data-testid="section-shipping-method">
-              <p className="font-medium">{t("orderCertCard.shippingMethodTitle")}</p>
-              <button
-                type="button"
-                className={`w-full text-left p-3 rounded-md border transition-colors ${
-                  shippingMethod === "standard" ? "border-accent bg-accent/10" : "border-border"
-                }`}
-                onClick={() => setShippingMethod("standard")}
-                data-testid="button-shipping-standard"
-              >
-                <div className="flex items-center gap-3">
-                  <Truck className="h-5 w-5 text-muted-foreground" />
-                  <div className="flex-1">
-                    <p className="font-semibold">{t("orderCertCard.standardShipping")}</p>
-                    <p className="text-sm text-muted-foreground">{t("orderCertCard.standardDays")}</p>
-                  </div>
-                  <p className="font-semibold">$4.99</p>
-                </div>
-              </button>
-              <button
-                type="button"
-                className={`w-full text-left p-3 rounded-md border transition-colors ${
-                  shippingMethod === "expedited" ? "border-accent bg-accent/10" : "border-border"
-                }`}
-                onClick={() => setShippingMethod("expedited")}
-                data-testid="button-shipping-expedited"
-              >
-                <div className="flex items-center gap-3">
-                  <Zap className="h-5 w-5 text-muted-foreground" />
-                  <div className="flex-1">
-                    <p className="font-semibold">{t("orderCertCard.expeditedShipping")}</p>
-                    <p className="text-sm text-muted-foreground">{t("orderCertCard.expeditedDays")}</p>
-                  </div>
-                  <p className="font-semibold">$9.99</p>
-                </div>
-              </button>
+            <div className="rounded-md bg-muted p-3 text-sm" data-testid="section-shipping-method">
+              {t("checkout.photoId.shippingNote")}
             </div>
 
             {/* Payment */}

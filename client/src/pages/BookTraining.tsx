@@ -221,13 +221,6 @@ export default function BookTraining() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [companyName, setCompanyName] = useState("");
-  // Peter 2026-09-07: Train-the-Trainer is delivered at the CUSTOMER'S
-  // facility (not the Miramar training center), so for TTT bookings we
-  // collect the customer facility address instead of defaulting to ours.
-  const [tttAddress, setTttAddress] = useState("");
-  const [tttCity, setTttCity] = useState("");
-  const [tttState, setTttState] = useState("");
-  const [tttZip, setTttZip] = useState("");
   const [participantCount, setParticipantCount] = useState(1);
   const [specialRequests, setSpecialRequests] = useState("");
 
@@ -244,21 +237,13 @@ export default function BookTraining() {
   const facilitySlug = serviceArea ? SERVICE_AREA_FACILITY[serviceArea.slug] : undefined;
   const facility = facilitySlug ? getLocation(facilitySlug) : undefined;
 
-  // Peter 2026-09-07: TTT is delivered at the customer's facility. When any
-  // trainer-category product is in the selection, use the customer-entered
-  // facility address; hands-on bookings keep the facility-only flow.
-  const isTttBooking = selectedProducts.some((p) => p.category === "trainer");
+  // All self-serve bookings take place at the selected Miramar facility.
+  // Training at the customer's site stays in the separate quote flow.
+  const customerAddress = facility?.address.street ?? "";
+  const customerCity = facility?.address.city ?? "";
+  const customerState = facility?.address.state ?? "";
+  const customerZip = facility?.address.zip ?? "";
 
-  // The booking's address: TTT → customer's facility; hands-on → our center.
-  const customerAddress = isTttBooking ? tttAddress.trim() : (facility?.address.street ?? "");
-  const customerCity = isTttBooking ? tttCity.trim() : (facility?.address.city ?? "");
-  const customerState = isTttBooking ? tttState.trim() : (facility?.address.state ?? "");
-  const customerZip = isTttBooking ? tttZip.trim() : (facility?.address.zip ?? "");
-
-  // Hands-on courses AND Train-the-Trainer programs for the facility
-  // (2026-09-03, Alberto): TTT is bookable for Las Vegas and Fresno and is
-  // delivered at the customer's own facility, so it stays available even
-  // where the office lacks the equipment (e.g. scissor lifts in LV).
   const handsOnProducts = useMemo(
     () =>
       catalog.filter(
@@ -396,9 +381,7 @@ export default function BookTraining() {
     isValidEmail(contactEmail) &&
     isValidUsPhone(contactPhone) &&
     participantCount >= 1 &&
-    // TTT needs the customer facility address before payment (Alberto
-    // 2026-09-03 meeting: trainer shows up at their site).
-    (!isTttBooking || (tttAddress.trim().length >= 4 && tttCity.trim().length >= 2 && tttState.trim().length === 2 && /^\d{5}$/.test(tttZip.trim())));
+    !!facility;
 
   async function goNext() {
     if (step >= 4) return;
@@ -553,12 +536,8 @@ export default function BookTraining() {
   // Authoritative pricing (full payment, no volume discount) from the shared
   // module the server also charges from — null when only custom equipment is
   // selected. With BOOKING_DEPOSIT_RATE = 1.0, deposit = total, balance = 0.
-  // On-site/TTT: pass the customer site ZIP so the flat-session distance tier
-  // (and the 3+ travel-fee waiver) matches what the server will charge.
   const bookingPricing = computeBookingPrice(
-    selectedProducts.map((pr) => pr.slug),
-    participantCount,
-    isTttBooking ? tttZip : undefined
+    selectedProducts.map((pr) => pr.slug), participantCount
   );
   // Promo discount preview — same clamping rules as the server (percent capped
   // at 100, fixed never below $0); full payment is charged on the discounted total.
@@ -1062,78 +1041,14 @@ export default function BookTraining() {
 
                 <div>
                   <p className="text-sm font-medium mb-3">{t("bookTraining.trainingLocation")}</p>
-                  {isTttBooking ? (
-                    // Peter 2026-09-07: TTT happens at the customer's facility —
-                    // collect the address here so the trainer knows where to go.
-                    <div className="rounded-lg border bg-muted/30 p-4 space-y-3" data-testid="ttt-facility-address-form">
-                      <p className="text-sm text-muted-foreground">{t("bookTraining.tttAddressDesc")}</p>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="ttt-address">{t("bookTraining.tttStreetAddress")} *</Label>
-                        <Input
-                          id="ttt-address"
-                          type="text"
-                          autoComplete="street-address"
-                          value={tttAddress}
-                          onChange={(e) => setTttAddress(e.target.value)}
-                          placeholder="1234 Industrial Pkwy"
-                          data-testid="input-ttt-address"
-                        />
+                  {facility && (
+                    <div className="flex items-start gap-2 rounded-lg border bg-muted/50 px-4 py-3" data-testid="text-facility-address-step3">
+                      <MapPin className="w-4 h-4 text-brand-dark shrink-0 mt-0.5" />
+                      <div className="text-sm">
+                        <span className="font-semibold block">{facility.displayName}</span>
+                        <span className="text-muted-foreground">{facility.address.full}</span>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                          <Label htmlFor="ttt-city">{t("form.city")} *</Label>
-                          <Input
-                            id="ttt-city"
-                            type="text"
-                            autoComplete="address-level2"
-                            value={tttCity}
-                            onChange={(e) => setTttCity(e.target.value)}
-                            placeholder="Las Vegas"
-                            data-testid="input-ttt-city"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label htmlFor="ttt-state">{t("form.state")} *</Label>
-                          <Input
-                            id="ttt-state"
-                            type="text"
-                            autoComplete="address-level1"
-                            maxLength={2}
-                            value={tttState}
-                            onChange={(e) => setTttState(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
-                            placeholder="NV"
-                            data-testid="input-ttt-state"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label htmlFor="ttt-zip">{t("form.zip")} *</Label>
-                          <Input
-                            id="ttt-zip"
-                            type="text"
-                            inputMode="numeric"
-                            autoComplete="postal-code"
-                            maxLength={5}
-                            value={tttZip}
-                            onChange={(e) => setTttZip(e.target.value.replace(/\D/g, ""))}
-                            placeholder="89101"
-                            data-testid="input-ttt-zip"
-                          />
-                        </div>
-                      </div>
-                      {isTttBooking && tttZip.length > 0 && !/^\d{5}$/.test(tttZip.trim()) && (
-                        <p className="text-xs text-destructive" data-testid="text-ttt-zip-invalid">{t("form.zipInvalid")}</p>
-                      )}
                     </div>
-                  ) : (
-                    facility && (
-                      <div className="flex items-start gap-2 rounded-lg border bg-muted/50 px-4 py-3" data-testid="text-facility-address-step3">
-                        <MapPin className="w-4 h-4 text-brand-dark shrink-0 mt-0.5" />
-                        <div className="text-sm">
-                          <span className="font-semibold block">{facility.displayName}</span>
-                          <span className="text-muted-foreground">{facility.address.full}</span>
-                        </div>
-                      </div>
-                    )
                   )}
                 </div>
 
@@ -1244,14 +1159,7 @@ export default function BookTraining() {
                       </span>
                       <span className="text-muted-foreground">{t("bookTraining.serviceAreaLabel")}</span>
                       <span className="font-medium text-foreground">{serviceArea?.name}</span>
-                      {isTttBooking ? (
-                        <>
-                          <span className="text-muted-foreground">{t("bookTraining.trainingLocation")}</span>
-                          <span className="font-medium text-foreground" data-testid="text-review-ttt-address">
-                            {customerAddress}, {customerCity}, {customerState} {customerZip}
-                          </span>
-                        </>
-                      ) : facility && (
+                      {facility && (
                         <>
                           <span className="text-muted-foreground">{t("requestQuote.facilityAddressTitle")}</span>
                           <span className="font-medium text-foreground" data-testid="text-review-facility-address">
@@ -1311,37 +1219,10 @@ export default function BookTraining() {
                 {isAuthenticated && bookingPricing && (
                   <div className="space-y-3">
                     <div className="bg-primary/10 border border-primary/40 rounded-xl p-4 text-sm space-y-1.5" data-testid="deposit-summary">
-                      {bookingPricing.flatSession ? (
-                        <>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">{t("bookTraining.onsiteSessionBase")}</span>
-                            <span className="font-medium">${(bookingPricing.total - (bookingPricing.travelFee ?? 0)).toFixed(2)}</span>
-                          </div>
-                          {(bookingPricing.travelFee ?? 0) > 0 && (
-                            <div className="flex justify-between" data-testid="row-travel-fee">
-                              <span className="text-muted-foreground">
-                                {t("bookTraining.travelFee", { miles: bookingPricing.distanceMiles ?? 0 })}
-                              </span>
-                              <span className="font-medium">+${(bookingPricing.travelFee ?? 0).toFixed(2)}</span>
-                            </div>
-                          )}
-                          {bookingPricing.travelWaived && (
-                            <div className="flex justify-between text-brand-green" data-testid="row-travel-waived">
-                              <span>{t("bookTraining.travelWaived")}</span>
-                              <span>$0.00</span>
-                            </div>
-                          )}
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">{t("booking.trainingTotal")}</span>
-                            <span className="font-medium">${bookingPricing.total.toFixed(2)}</span>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">{t("booking.trainingTotal")}</span>
-                          <span className="font-medium">${bookingPricing.total.toFixed(2)}</span>
-                        </div>
-                      )}
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">{t("booking.trainingTotal")}</span>
+                        <span className="font-medium">${bookingPricing.total.toFixed(2)}</span>
+                      </div>
                       {appliedDiscount && discountAmount > 0 && (
                         <div className="flex justify-between text-brand-green" data-testid="row-promo-discount">
                           <span>{t("bookTraining.promoDiscount", { code: appliedDiscount.code })}</span>
@@ -1521,7 +1402,7 @@ export default function BookTraining() {
                         <span className="font-bold text-lg text-foreground">${totalEstimate.toFixed(2)}</span>
                       </div>
                     )}
-                    {bookingPricing && (
+                    {bookingPricing && step === 4 && (
                       <div className="flex justify-between mt-1 text-sm">
                         <span className="text-muted-foreground">{t("booking.payNow")}</span>
                         <span className="font-semibold">${depositWithSurcharge.toFixed(2)}</span>

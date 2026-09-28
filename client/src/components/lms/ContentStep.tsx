@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import WalletCardStatus from "./WalletCardStatus";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -29,6 +31,9 @@ export default function ContentStep({ step, enrollmentId, onComplete, hasPrev, h
   const config = step.config as any;
   const blocks: LessonBlock[] | null =
     Array.isArray(config?.blocks) && config.blocks.length > 0 ? config.blocks : null;
+  const isCompletion = /congratulations|felicitaciones/i.test(step.title);
+  const { data: certs } = useQuery<{certifications:{id:number;enrollmentId:number}[]}>({queryKey:["/api/certifications"],enabled:isCompletion});
+  const cert = certs?.certifications.find(c=>c.enrollmentId===enrollmentId);
   const htmlContent = config?.html_content || config?.htmlContent || config?.content || "";
 
   const markComplete = useMutation({
@@ -53,7 +58,13 @@ export default function ContentStep({ step, enrollmentId, onComplete, hasPrev, h
       )}
 
       {blocks ? (
-        <InteractiveLesson blocks={blocks} />
+        <>
+          {isCompletion && cert ? (() => {
+            const walletIndex = blocks.findIndex(b => b.type === "heading" && /wallet card|tarjeta de bolsillo/i.test(b.text));
+            const split = walletIndex >= 0 ? walletIndex + 2 : blocks.length;
+            return <><InteractiveLesson blocks={blocks.slice(0,split)} /><WalletCardStatus certificationId={cert.id} /><InteractiveLesson blocks={blocks.slice(split)} /></>;
+          })() : <InteractiveLesson blocks={blocks} />}
+        </>
       ) : htmlContent ? (
         <div
           className="lesson-renderer prose prose-sm md:prose-base max-w-none dark:prose-invert"

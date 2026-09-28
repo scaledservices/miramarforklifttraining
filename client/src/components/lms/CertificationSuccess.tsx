@@ -1,3 +1,4 @@
+import WalletCardStatus from "./WalletCardStatus";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,18 +33,6 @@ export default function CertificationSuccess({ certification: propCert, enrollme
   });
 
   const cert = propCert || data?.certifications?.find((c: any) => c.enrollmentId === enrollmentId);
-
-  // 2026-09-03 (Alberto): if the wallet card was already paid at checkout,
-  // this card is an UPLOAD step, not an upsell. Query the member's
-  // entitlements for this cert; any awaiting_photo row means prepaid.
-  // 2026-09-07: the post-completion purchase CTA was removed entirely - only
-  // prepaid upload / fulfillment prompts remain below.
-  const { data: entData } = useQuery<{ entitlements: any[] }>({
-    queryKey: [`/api/photo-id/entitlements?certificationId=${cert?.id}`],
-    enabled: !!cert?.id,
-  });
-  const prepaidEntitlement = (entData?.entitlements ?? []).find((e: any) => e.status === "awaiting_photo");
-  const fulfilledEntitlement = (entData?.entitlements ?? []).find((e: any) => e.status === "fulfilled");
 
   return (
     <div className="max-w-2xl mx-auto text-center space-y-8 py-8" data-testid="certification-success">
@@ -110,36 +99,7 @@ export default function CertificationSuccess({ certification: propCert, enrollme
         </Link>
       </div>
 
-      {/* Peter 2026-09-07: wallet-card section shows ONLY a prepaid upload or
-          fulfillment prompt. The post-completion "Add Photo ID" purchase CTA is
-          removed - Alberto does not want an order/upsell section here. Crew
-          members likewise see only prepaid upload (or nothing). */}
-      {(prepaidEntitlement || fulfilledEntitlement) && (
-      <Card className="text-left" data-testid="card-wallet-upsell">
-        <CardContent className="py-6 flex items-start gap-4">
-          <div className="h-10 w-10 rounded-md bg-accent/20 flex items-center justify-center shrink-0">
-            <CreditCard className="h-5 w-5 text-accent" />
-          </div>
-          <div className="space-y-2 flex-1">
-            <h3 className="font-semibold">
-              {t("certSuccess.walletCardPrepaidTitle")}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {prepaidEntitlement
-                ? t("certSuccess.walletCardPrepaidDesc")
-                : t("certSuccess.walletCardFulfilledDesc")}
-            </p>
-            {cert && prepaidEntitlement && (
-              <Link href={`/order-cert-card/${cert.id}?entitlement=${prepaidEntitlement.id}`}>
-                <Button variant="default" data-testid="button-order-wallet-card">
-                  {t("certSuccess.uploadPhotoCta")}
-                </Button>
-              </Link>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-      )}
+      {cert && <WalletCardStatus certificationId={cert.id} />}
 
       <Card className="text-left" data-testid="card-instructor-cta">
         <CardContent className="py-6 flex items-start gap-4">

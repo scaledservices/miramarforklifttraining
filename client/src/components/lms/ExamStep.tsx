@@ -1,3 +1,4 @@
+import { orderExamOptions } from "@shared/exam-options";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -14,6 +15,8 @@ import { useTranslation } from "react-i18next";
 interface Question {
   id: number;
   question: string;
+  displayQuestion?: string;
+  displayOptions?: Record<string, string>;
   type: "mcq_single" | "mcq_multi";
   options: string[];
   order: number;
@@ -66,12 +69,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
   // 2026-09-07 (Alberto): NEVER shuffle True/False questions. Shuffling them
   // produced "False / True" ordering, which reads as a bug. T/F must always
   // be True first, False second.
-  const isTrueFalse = (opts: string[]) =>
-    opts.length === 2 && opts.every((o) => /^(true|false)$/i.test(o.trim()));
-  const orderOptions = (opts: string[]) =>
-    isTrueFalse(opts)
-      ? [...opts].sort((a, b) => (/^true$/i.test(a.trim()) ? -1 : 0) - (/^true$/i.test(b.trim()) ? -1 : 0))
-      : [...opts].sort(() => Math.random() - 0.5);
+  const orderOptions = orderExamOptions;
 
   const [shuffledOptions, setShuffledOptions] = useState<Record<number, string[]>>(() => {
     const map: Record<number, string[]> = {};
@@ -189,10 +187,6 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
           // missed-count header stays as a summary banner above the list.
           const missedCount = result.graded.filter((g) => !g.correct).length;
 
-          const normalizeTF = (opts: string[]) =>
-            opts.length === 2 && opts.every((o) => /^(true|false)$/i.test(o.trim()))
-              ? [...opts].sort((a, b) => (/^true$/i.test(a.trim()) ? -1 : 0) - (/^true$/i.test(b.trim()) ? -1 : 0))
-              : opts;
 
           return (
             <div className="space-y-4">
@@ -211,7 +205,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                   Array.isArray(correctAnswer) ? correctAnswer.includes(opt) : correctAnswer === opt;
                 const isUserOpt = (opt: string) =>
                   Array.isArray(g.userAnswer) ? g.userAnswer.includes(opt) : g.userAnswer === opt;
-                const displayOptions = normalizeTF(question.options);
+                const displayOptions = shuffledOptions[question.id] ?? question.options;
                 return (
                   <Card key={g.questionId} data-testid={`card-result-${g.questionId}`} className={g.correct ? "" : "border-red-300 dark:border-red-800"}>
                     <CardHeader className="pb-2 flex flex-row items-start gap-2">
@@ -221,7 +215,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                         <X className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
                       )}
                       <CardTitle className="text-sm font-medium">
-                        {gi + 1}. {question.question}
+                        {gi + 1}. {question.displayQuestion ?? question.question}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-0 space-y-1.5">
@@ -248,7 +242,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                             ) : (
                               <span className="h-4 w-4 shrink-0" />
                             )}
-                            <span>{opt}</span>
+                            <span>{question.displayOptions?.[opt] ?? opt}</span>
                             {correct && <span className="ml-auto text-xs font-normal">{t("lms.correctAnswer", { defaultValue: "Correct" })}</span>}
                             {!correct && chosen && <span className="ml-auto text-xs font-normal">{t("lms.yourAnswer", { defaultValue: "Your answer" })}</span>}
                           </div>
@@ -299,12 +293,16 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
         </p>
       </div>
 
+      <div className="rounded-lg border bg-muted/30 p-4 flex items-center justify-between gap-3" aria-live="polite">
+        <span>{Object.keys(answers).length} / {questions.length} {t("lms.answered", {defaultValue: "answered"})}</span>
+        <button type="button" className="underline text-sm" onClick={()=>{const q=questions.find(q=>!answers[q.id]);if(q){const target=document.querySelector<HTMLButtonElement>(`[data-testid="card-question-${q.id}"] button`);target?.focus({preventScroll:true});target?.scrollIntoView({block:"center",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});}}}>{t("lms.nextUnanswered", {defaultValue:"Next unanswered"})}</button>
+      </div>
       <div className="space-y-6">
         {questions.map((q, idx) => (
           <Card key={q.id} data-testid={`card-question-${q.id}`}>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium">
-                {idx + 1}. {q.question}
+                {idx + 1}. {q.displayQuestion ?? q.question}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -312,6 +310,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                 <RadioGroup
                   value={answers[q.id] || ""}
                   onValueChange={(val) => handleSingleAnswer(q.id, val)}
+                  aria-label={q.displayQuestion ?? q.question}
                   data-testid={`radio-group-${q.id}`}
                 >
                   {(shuffledOptions[q.id] ?? q.options).map((option, oi) => (
@@ -322,7 +321,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                         data-testid={`radio-${q.id}-${oi}`}
                       />
                       <Label htmlFor={`q${q.id}-o${oi}`} className="cursor-pointer flex-1">
-                        {option}
+                        {q.displayOptions?.[option] ?? option}
                       </Label>
                     </div>
                   ))}
@@ -340,7 +339,7 @@ export default function ExamStep({ step, questions, enrollmentId, onComplete }: 
                           data-testid={`checkbox-${q.id}-${oi}`}
                         />
                         <Label htmlFor={`q${q.id}-o${oi}`} className="cursor-pointer flex-1">
-                          {option}
+                          {q.displayOptions?.[option] ?? option}
                         </Label>
                       </div>
                     );

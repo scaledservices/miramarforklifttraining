@@ -53,14 +53,14 @@ export default function DragDropExercise({ block }: DragDropExerciseProps) {
 
   const placeOnTarget = (targetId: string, itemId?: string) => {
     const id = itemId ?? selected;
-    if (!id || checked) return;
+    if (!id || checked || !byId[id] || !block.targets?.some(t => t.id === targetId)) return;
     setPlacements((prev) => ({ ...prev, [id]: targetId }));
     setSelected(null);
   };
 
   const addToSequence = (itemId: string) => {
     if (checked) return;
-    setSequence((prev) => [...prev, itemId]);
+    setSequence((prev) => prev.includes(itemId) ? prev : [...prev, itemId]);
   };
 
   const removeFromSequence = (itemId: string) => {
