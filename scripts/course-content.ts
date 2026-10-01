@@ -1,4 +1,5 @@
 import type { LessonBlock } from "@shared/lesson-blocks";
+import { FORKLIFT_SAFETY_VIDEO, REQUIRED_WATCH_PERCENTAGE } from "./course-videos";
 
 export interface StepDef {
   title: string;
@@ -1374,6 +1375,19 @@ export const COURSE_STEPS: StepDef[] = [
   },
 
   // ═══ MODULE 8: Final Exam + Completion ═══
+  // 2026-09-28 (Alberto): required safety video before the final exam, same
+  // video the legacy site shows. Exam stays locked until it is watched.
+  {
+    module: "Final Exam & Completion",
+    title: "Required Video: Forklift Safety",
+    type: "video",
+    estimatedMinutes: 28,
+    config: {
+      video_url: FORKLIFT_SAFETY_VIDEO.en,
+      min_watch_percentage: REQUIRED_WATCH_PERCENTAGE,
+      description: "Watch this forklift safety video before your final exam. It reviews the key topics from this course. The final exam unlocks once you have watched the video.",
+    },
+  },
   {
     module: "Final Exam & Completion",
     title: "Final Exam: Forklift Operator Certification",

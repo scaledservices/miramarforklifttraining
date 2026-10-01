@@ -72,12 +72,14 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://js.authorize.net", "https://jstest.authorize.net", "https://maps.googleapis.com"],
+      // youtube.com + s.ytimg.com: YouTube IFrame Player API (course video
+      // step tracks real watch time before unlocking the final exam).
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://js.authorize.net", "https://jstest.authorize.net", "https://maps.googleapis.com", "https://www.youtube.com", "https://s.ytimg.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
       imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
       connectSrc: ["'self'", "https://api.authorize.net", "https://apitest.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net", "wss:", "ws:"],
-      frameSrc: ["'self'", "https://accept.authorize.net", "https://test.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net"],
+      frameSrc: ["'self'", "https://accept.authorize.net", "https://test.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net", "https://www.youtube-nocookie.com", "https://www.youtube.com"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
@@ -85,6 +87,12 @@ app.use(helmet({
   },
   crossOriginEmbedderPolicy: false,
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  // Helmet's default is "no-referrer", which breaks third parties that
+  // require an origin Referer: OpenStreetMap tiles return a 403 "Access
+  // blocked" tile (admin company map), and YouTube embeds fail with Error 153.
+  // strict-origin-when-cross-origin sends only the origin cross-site (never
+  // paths or query strings), so no PII leaks.
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
 }));
 
 app.use(compression());

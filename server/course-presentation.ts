@@ -32,7 +32,9 @@ export function presentStep<T extends {title:string;type:string;config:any}>(slu
   const m = match(slug,step,locale);
   if (!m) return step;
   // Never replace exam/checkpoint config with seed data or expose answer keys.
-  const config = ['lesson','content','download'].includes(step.type) ? m.target.config : step.config;
+  // 'video' swaps too so the in-course EN/ES toggle switches to the matching
+  // language video (video config carries no answer keys).
+  const config = ['lesson','content','download','video'].includes(step.type) ? m.target.config : step.config;
   return {...step,title:m.target.title,config};
 }
 /** Graded-review explanation in the viewer's language (display only). */

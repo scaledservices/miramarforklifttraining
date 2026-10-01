@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
@@ -48,7 +47,7 @@ export default function OrderPhotoIdDialog({
   const { user } = useAuth();
 
   const saved = (user as any)?.savedShippingAddress;
-  const [shippingMethod, setShippingMethod] = useState<"standard" | "expedited">("standard");
+  const [shippingMethod] = useState<"standard" | "expedited">("standard");
   const [address, setAddress] = useState({
     name: saved?.name || (user as any)?.name || "",
     address: saved?.address || "",
@@ -129,17 +128,10 @@ export default function OrderPhotoIdDialog({
           </div>
 
           <div>
-            <p className="text-sm font-medium mb-2">{t("orderCertCard.shippingMethod", { defaultValue: "Shipping speed" })}</p>
-            <RadioGroup value={shippingMethod} onValueChange={(v: string) => setShippingMethod(v as "standard" | "expedited")} className="flex gap-4" data-testid="radio-photo-id-shipping">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <RadioGroupItem value="standard" id="pid-ship-std" />
-                <span className="text-sm">{t("orderCertCard.standardShipping", { defaultValue: "Standard" })} ${SHIPPING_RATES.standard.toFixed(2)}</span>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <RadioGroupItem value="expedited" id="pid-ship-exp" />
-                <span className="text-sm">{t("orderCertCard.expeditedShipping", { defaultValue: "Expedited" })} ${SHIPPING_RATES.expedited.toFixed(2)}</span>
-              </label>
-            </RadioGroup>
+            {/* 2026-09-28 (Alberto): expedited removed; standard USPS is free. */}
+            <p className="text-sm text-muted-foreground" data-testid="text-photo-id-free-shipping">
+              {t("orderCertCard.freeShippingLine", { defaultValue: "Free shipping (4-5 business days)" })}
+            </p>
           </div>
 
           {!addressValid && (

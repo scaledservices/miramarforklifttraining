@@ -4,8 +4,8 @@
 //   DATABASE_URL=postgres://... npx tsx scripts/seed-online-courses.ts
 //
 // Pass --refresh to also update EXISTING courses' steps in place (matched by
-// stepOrder): title/type/config/estimatedMinutes are overwritten and each
-// step's questions are replaced. Step rows are never deleted (step_progress
+// title+type, then position+type; see refreshSteps): order/title/config/
+// estimatedMinutes are rewritten and each step's questions are replaced. Step rows are never deleted (step_progress
 // and exam_attempts reference them), so enrollment progress is preserved.
 //   DATABASE_URL=postgres://... npx tsx scripts/seed-online-courses.ts --refresh
 import { db } from "../server/db";
@@ -22,10 +22,12 @@ import { CANONICAL_COURSE_ES as AERIAL_TTT_COURSE_ES, COURSE_STEPS_ES as AERIAL_
 
 const REFRESH = process.argv.includes("--refresh");
 
-async function insertQuestions(stepId: number, questions: NonNullable<(typeof COURSE_STEPS)[number]["questions"]>) {
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+async function insertQuestions(tx: Tx | typeof db, stepId: number, questions: NonNullable<(typeof COURSE_STEPS)[number]["questions"]>) {
   for (let j = 0; j < questions.length; j++) {
     const q = questions[j];
-    await db.insert(examQuestions).values({
+    await tx.insert(examQuestions).values({
       stepId,
       order: j + 1,
       question: q.question,
@@ -37,50 +39,91 @@ async function insertQuestions(stepId: number, questions: NonNullable<(typeof CO
   }
 }
 
+// Refresh existing steps to match the content file, preserving row identity.
+//
+// Rows are matched by (title, type) first, then by same position + same type
+// (handles title edits). Matching by position alone was unsafe: inserting a
+// step (2026-09-28 pre-exam video) would overwrite the exam row with video
+// config and orphan its exam_attempts / step_progress. A row is never
+// repurposed to a different step type.
+//
+// Reordering runs in one transaction in two phases because
+// (course_id, step_order) is unique: park matched rows at a high offset,
+// then write final positions.
 async function refreshSteps(courseId: number, slug: string, steps: typeof COURSE_STEPS) {
-  const existingSteps = await db
-    .select()
-    .from(courseSteps)
-    .where(eq(courseSteps.courseId, courseId))
-    .orderBy(asc(courseSteps.stepOrder));
+  await db.transaction(async (tx) => {
+    const existingSteps = await tx
+      .select()
+      .from(courseSteps)
+      .where(eq(courseSteps.courseId, courseId))
+      .orderBy(asc(courseSteps.stepOrder));
 
-  let updated = 0;
-  let created = 0;
-  for (let i = 0; i < steps.length; i++) {
-    const stepDef = steps[i];
-    const existing = existingSteps.find((s) => s.stepOrder === i + 1);
-    let stepId: number;
-    if (existing) {
-      await db.update(courseSteps).set({
-        title: stepDef.title,
-        type: stepDef.type,
-        config: stepDef.config,
-        estimatedMinutes: stepDef.estimatedMinutes,
-      }).where(eq(courseSteps.id, existing.id));
-      stepId = existing.id;
-      updated++;
-    } else {
-      const [step] = await db.insert(courseSteps).values({
-        courseId,
-        stepOrder: i + 1,
-        title: stepDef.title,
-        type: stepDef.type,
-        config: stepDef.config,
-        estimatedMinutes: stepDef.estimatedMinutes,
-      }).returning();
-      stepId = step.id;
-      created++;
+    const claimed = new Set<number>();
+    const assignment: (typeof existingSteps[number] | null)[] = steps.map(() => null);
+
+    // Pass 1: exact title + type.
+    steps.forEach((def, i) => {
+      const row = existingSteps.find((s) => !claimed.has(s.id) && s.title === def.title && s.type === def.type);
+      if (row) { assignment[i] = row; claimed.add(row.id); }
+    });
+    // Pass 2: same position + same type (title was edited).
+    steps.forEach((def, i) => {
+      if (assignment[i]) return;
+      const row = existingSteps.find((s) => !claimed.has(s.id) && s.stepOrder === i + 1 && s.type === def.type);
+      if (row) { assignment[i] = row; claimed.add(row.id); }
+    });
+
+    const PARK = 100000;
+    // Phase 1: park every existing row (claimed or not) out of the way.
+    for (const row of existingSteps) {
+      await tx.update(courseSteps).set({ stepOrder: PARK + row.stepOrder }).where(eq(courseSteps.id, row.id));
     }
-    if (stepDef.questions?.length) {
-      await db.delete(examQuestions).where(eq(examQuestions.stepId, stepId));
-      await insertQuestions(stepId, stepDef.questions);
+
+    let updated = 0;
+    let created = 0;
+    for (let i = 0; i < steps.length; i++) {
+      const def = steps[i];
+      const row = assignment[i];
+      let stepId: number;
+      if (row) {
+        await tx.update(courseSteps).set({
+          stepOrder: i + 1,
+          title: def.title,
+          type: def.type,
+          config: def.config,
+          estimatedMinutes: def.estimatedMinutes,
+          updatedAt: new Date(),
+        }).where(eq(courseSteps.id, row.id));
+        stepId = row.id;
+        updated++;
+      } else {
+        const [step] = await tx.insert(courseSteps).values({
+          courseId,
+          stepOrder: i + 1,
+          title: def.title,
+          type: def.type,
+          config: def.config,
+          estimatedMinutes: def.estimatedMinutes,
+        }).returning();
+        stepId = step.id;
+        created++;
+      }
+      if (def.questions?.length) {
+        await tx.delete(examQuestions).where(eq(examQuestions.stepId, stepId));
+        await insertQuestions(tx, stepId, def.questions);
+      }
     }
-  }
-  const extra = existingSteps.filter((s) => s.stepOrder > steps.length);
-  if (extra.length) {
-    console.warn(`[SEED] ${slug}: ${extra.length} existing step(s) beyond position ${steps.length} left untouched (ids ${extra.map((s) => s.id).join(", ")})`);
-  }
-  console.log(`[SEED] ${slug}: refreshed ${updated} step(s), created ${created}`);
+
+    // Unmatched legacy rows: keep (FKs), place after the canonical steps.
+    const orphans = existingSteps.filter((s) => !claimed.has(s.id));
+    for (let k = 0; k < orphans.length; k++) {
+      await tx.update(courseSteps).set({ stepOrder: steps.length + 1 + k }).where(eq(courseSteps.id, orphans[k].id));
+    }
+    if (orphans.length) {
+      console.warn(`[SEED] ${slug}: ${orphans.length} existing step(s) not in the content file were moved to the end (ids ${orphans.map((s) => s.id).join(", ")}). Review in the admin course editor.`);
+    }
+    console.log(`[SEED] ${slug}: refreshed ${updated} step(s), created ${created}`);
+  });
 }
 
 async function seedCourse(def: typeof CANONICAL_COURSE, steps: typeof COURSE_STEPS) {
@@ -124,7 +167,7 @@ async function seedCourse(def: typeof CANONICAL_COURSE, steps: typeof COURSE_STE
       estimatedMinutes: stepDef.estimatedMinutes,
     }).returning();
     if (stepDef.questions?.length) {
-      await insertQuestions(step.id, stepDef.questions);
+      await insertQuestions(db, step.id, stepDef.questions);
     }
   }
   console.log(`[SEED] ${def.slug}: ${steps.length} steps seeded`);

@@ -213,6 +213,12 @@ export default function OrderCertCard() {
   // exists for this cert, render an "already ordered" state instead of the
   // payment wizard (never let the user reach the 409 after entering card details).
   const existingCardOrder = data?.existingCardOrder ?? null;
+  // Set when THIS visit placed the order. After success we invalidate the
+  // certification query; the refetch now reports the order we just created,
+  // which used to flip the success screen into "Card already ordered"
+  // (2026-09-28 meeting bug). The guard below only applies to orders that
+  // existed before this visit.
+  const [justOrdered, setJustOrdered] = useState(false);
 
   // Claimable prepaid entitlements for this cert (Chunk 2 fulfillment).
   const { data: entitlementsData, isLoading: entitlementsLoading, error: entitlementsError } = useQuery<{ entitlements: PhotoIdEntitlement[] }>({
@@ -220,9 +226,14 @@ export default function OrderCertCard() {
     enabled: certId > 0,
   });
 
-  const prepaidEntitlement = (entitlementsData?.entitlements ?? []).find(e =>
+  // Frozen at success: after the photo consumes the entitlement its status
+  // flips to "fulfilled", and without this the refetch would drop the flow
+  // back into 3-step pay-now mode on the confirmation screen.
+  const [usedEntitlement, setUsedEntitlement] = useState<PhotoIdEntitlement | null>(null);
+  const liveEntitlement = (entitlementsData?.entitlements ?? []).find(e =>
     e.status === "awaiting_photo" && (!entitlementIdParam || e.id === entitlementIdParam)
   ) ?? null;
+  const prepaidEntitlement = usedEntitlement ?? liveEntitlement;
 
   const STEPS = prepaidEntitlement
     ? [t("orderCertCard.stepPhoto"), t("orderCertCard.stepDone")]
@@ -278,6 +289,7 @@ export default function OrderCertCard() {
       return res.json();
     },
     onSuccess: () => {
+      setJustOrdered(true);
       queryClient.invalidateQueries({ queryKey: ["/api/certifications"] });
       setStep(prepaidEntitlement ? 1 : 2);
       setIsProcessing(false);
@@ -298,6 +310,8 @@ export default function OrderCertCard() {
       return res.json();
     },
     onSuccess: () => {
+      setJustOrdered(true);
+      setUsedEntitlement(prepaidEntitlement);
       queryClient.invalidateQueries({ queryKey: ["/api/certifications"] });
       queryClient.invalidateQueries({ queryKey: ["/api/photo-id/entitlements"] });
       setStep(1);
@@ -333,7 +347,7 @@ export default function OrderCertCard() {
 
   // Already ordered: an active card order exists for this cert. Show the
   // existing order state and a way back, instead of the payment wizard.
-  if (existingCardOrder) {
+  if (existingCardOrder && !justOrdered) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 text-center space-y-4" data-testid="already-ordered-card">
         <Package className="h-12 w-12 text-accent mx-auto" />
@@ -715,8 +729,9 @@ export default function OrderCertCard() {
                 <span>${CARD_PRICE.toFixed(2)}</span>
               </div>
               <div className="flex justify-between gap-2 text-sm">
-                <span>{t("orderCertCard.shipping")} ({shippingMethod === "standard" ? t("orderCertCard.standardShipping").toLowerCase() : t("orderCertCard.expeditedShipping").toLowerCase()})</span>
-                <span>${shippingCost.toFixed(2)}</span>
+                {/* 2026-09-28 (Alberto): standard USPS is free; $25 covers the card. */}
+                <span>{t("orderCertCard.freeShippingLine", { defaultValue: "Free shipping (4-5 business days)" })}</span>
+                <span className="text-green-600 font-medium" data-testid="text-shipping-free">{t("orderCertCard.free", { defaultValue: "FREE" })}</span>
               </div>
               {paymentConfig?.configured && surcharge > 0 && (
                 <div className="flex justify-between gap-2 text-sm">

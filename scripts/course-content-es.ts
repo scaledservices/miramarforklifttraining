@@ -1,5 +1,6 @@
 import type { LessonBlock } from "@shared/lesson-blocks";
 import { StepDef } from "./course-content";
+import { FORKLIFT_SAFETY_VIDEO, REQUIRED_WATCH_PERCENTAGE } from "./course-videos";
 
 export const CANONICAL_COURSE_ES = {
   title: "Certificación en Línea para Operador de Montacargas",
@@ -1362,6 +1363,19 @@ export const COURSE_STEPS_ES: StepDef[] = [
   },
 
   // ═══ MÓDULO 8: Examen Final + Finalización ═══
+  // 2026-09-28 (Alberto): video obligatorio antes del examen final (mismo
+  // índice que el paso EN para que el selector de idioma funcione).
+  {
+    module: "Examen Final y Finalización",
+    title: "Video Obligatorio: Seguridad del Montacargas",
+    type: "video",
+    estimatedMinutes: 28,
+    config: {
+      video_url: FORKLIFT_SAFETY_VIDEO.es ?? FORKLIFT_SAFETY_VIDEO.en,
+      min_watch_percentage: REQUIRED_WATCH_PERCENTAGE,
+      description: "Mire este video de seguridad del montacargas antes de su examen final. Repasa los temas clave de este curso. El examen final se desbloquea cuando haya visto el video.",
+    },
+  },
   {
     module: "Examen Final y Finalización",
     title: "Examen Final: Certificación de Operador de Montacargas",
