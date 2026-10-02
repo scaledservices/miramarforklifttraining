@@ -12,6 +12,21 @@ declare module "express-session" {
   }
 }
 
+/**
+ * Log a user in on a FRESH session id (prevents session fixation: an
+ * attacker-planted pre-login session id never becomes authenticated).
+ * Use for every login path: password, registration, invite, OAuth.
+ */
+export function establishSession(req: Request, userId: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((err) => {
+      if (err) return reject(err);
+      req.session.userId = userId;
+      req.session.save((saveErr) => (saveErr ? reject(saveErr) : resolve()));
+    });
+  });
+}
+
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.session.userId) {
     return res.status(401).json({ error: "Authentication required" });

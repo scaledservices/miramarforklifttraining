@@ -7,7 +7,7 @@ import { sendWelcomeEmail, sendPasswordResetEmail } from "../email";
 import type { User } from "@shared/schema";
 import { getPostLoginRedirect } from "@shared/roles";
 import { resolveLocale } from "../locale-resolver";
-import { requireAuth, sanitizeReturnTo, sanitizeUser, loginLimiter, resetRequestLimiter, resetConfirmLimiter, acceptInviteLimiter } from "./middleware";
+import { requireAuth, establishSession, sanitizeReturnTo, sanitizeUser, loginLimiter, resetRequestLimiter, resetConfirmLimiter, acceptInviteLimiter } from "./middleware";
 import { pool } from "../db";
 
 export async function registerAuthRoutes(app: Express) {
@@ -37,7 +37,7 @@ app.post("/api/auth/register", async (req: Request, res: Response) => {
     const passwordHash = await hashPassword(password);
     const user = await storage.createUser({ email, passwordHash, name, phone, role: "individual", locale: regLocale, savedShippingAddress: companyName?.trim() ? { name, companyName: companyName.trim() } : null });
 
-    req.session.userId = user.id;
+    await establishSession(req, user.id);
 
     sendWelcomeEmail({ to: user.email, userName: user.name, actorUserId: user.id, locale: user.locale || "en" }).catch(err =>
       console.error("[EMAIL] Welcome email failed:", err)
@@ -75,7 +75,7 @@ app.post("/api/auth/login", loginLimiter, async (req: Request, res: Response) =>
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    req.session.userId = user.id;
+    await establishSession(req, user.id);
     return res.json({ user: sanitizeUser(user) });
   } catch (error) {
     console.error("[Auth] Login error:", error);
@@ -126,7 +126,8 @@ app.post("/api/auth/locale", requireAuth, async (req: Request, res: Response) =>
 // switcher for Alberto/Peter QA. Accounts are upserted by
 // scripts/seed-test-accounts.ts; login goes through the normal
 // /api/auth/login flow (real session, no auth bypass).
-if (process.env.NODE_ENV !== "production" || process.env.ENABLE_QA_ACCOUNT_SWITCHER === "true") {
+// Never registered while live payments are on (boot also refuses that combo).
+if (process.env.AUTHORIZE_ENVIRONMENT !== "production" && (process.env.NODE_ENV !== "production" || process.env.ENABLE_QA_ACCOUNT_SWITCHER === "true")) {
   app.get("/api/dev/demo-accounts", (_req: Request, res: Response) => {
     return res.json({
       accounts: [
@@ -186,10 +187,13 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       const user = req.user as User;
       const returnTo = sanitizeReturnTo(req.session.returnTo);
       delete req.session.returnTo;
-      req.session.userId = user.id;
-      req.session.save(() => {
-        res.redirect(returnTo || getPostLoginRedirect(user.role));
-      });
+      try {
+        await establishSession(req, user.id);
+      } catch (err) {
+        console.error("[Auth] Session establish failed:", err);
+        return res.redirect("/login?error=session");
+      }
+      res.redirect(returnTo || getPostLoginRedirect(user.role));
     }
   );
   console.log("[OAuth] Google strategy configured");
@@ -242,10 +246,13 @@ if (process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET) {
       const user = req.user as User;
       const returnTo = sanitizeReturnTo(req.session.returnTo);
       delete req.session.returnTo;
-      req.session.userId = user.id;
-      req.session.save(() => {
-        res.redirect(returnTo || getPostLoginRedirect(user.role));
-      });
+      try {
+        await establishSession(req, user.id);
+      } catch (err) {
+        console.error("[Auth] Session establish failed:", err);
+        return res.redirect("/login?error=session");
+      }
+      res.redirect(returnTo || getPostLoginRedirect(user.role));
     }
   );
   console.log("[OAuth] LinkedIn strategy configured");
@@ -297,10 +304,13 @@ if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
       const user = req.user as User;
       const returnTo = sanitizeReturnTo(req.session.returnTo);
       delete req.session.returnTo;
-      req.session.userId = user.id;
-      req.session.save(() => {
-        res.redirect(returnTo || getPostLoginRedirect(user.role));
-      });
+      try {
+        await establishSession(req, user.id);
+      } catch (err) {
+        console.error("[Auth] Session establish failed:", err);
+        return res.redirect("/login?error=session");
+      }
+      res.redirect(returnTo || getPostLoginRedirect(user.role));
     }
   );
   console.log("[OAuth] Facebook strategy configured");

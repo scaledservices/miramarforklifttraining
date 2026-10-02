@@ -34,6 +34,24 @@ if (isProduction && process.env.DEMO_MODE === "true") {
   process.exit(1);
 }
 
+// --- Live-payment safety (go-live hardening, 2026-10-01) ---
+// A typo such as AUTHORIZE_ENVIRONMENT=prod used to fall back to the SANDBOX
+// silently: customers would see "payment approved" and no money would move.
+const authorizeEnv = process.env.AUTHORIZE_ENVIRONMENT;
+if (isProduction && authorizeEnv !== undefined && authorizeEnv !== "sandbox" && authorizeEnv !== "production") {
+  console.error(`FATAL: AUTHORIZE_ENVIRONMENT must be "sandbox" or "production" (got "${authorizeEnv}"). Exiting.`);
+  process.exit(1);
+}
+// The QA account switcher publishes login credentials (including the
+// operator's admin account). Never allow it while real cards are charged.
+if (authorizeEnv === "production" && process.env.ENABLE_QA_ACCOUNT_SWITCHER === "true") {
+  console.error("FATAL: ENABLE_QA_ACCOUNT_SWITCHER=true is not allowed with AUTHORIZE_ENVIRONMENT=production. Exiting.");
+  process.exit(1);
+}
+if (isProduction) {
+  console.log(`[BOOT] Payments: Authorize.net ${authorizeEnv === "production" ? "LIVE (real charges)" : "SANDBOX (test charges only)"}`);
+}
+
 if (isProduction && !process.env.SESSION_SECRET) {
   console.error("FATAL: SESSION_SECRET must be set in production. Exiting.");
   process.exit(1);
