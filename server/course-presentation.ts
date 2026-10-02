@@ -35,7 +35,10 @@ export function presentStep<T extends {title:string;type:string;config:any}>(slu
   // 'video' swaps too so the in-course EN/ES toggle switches to the matching
   // language video (video config carries no answer keys).
   const config = ['lesson','content','download','video'].includes(step.type) ? m.target.config : step.config;
-  return {...step,title:m.target.title,config};
+  // module: authoritative, localized section name from the content file. The
+  // sidebar used to guess it from title regexes ("carga" matched every Spanish
+  // "Montacargas" title, scrambling ES sections).
+  return {...step,title:m.target.title,config,module:m.target.module};
 }
 /** Graded-review explanation in the viewer's language (display only). */
 export function presentExplanation(slug:string, step:{title:string;type:string}, q:{question:string;explanation:string|null}, locale:string): string|null {

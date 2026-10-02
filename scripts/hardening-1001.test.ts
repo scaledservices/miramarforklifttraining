@@ -3,6 +3,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { presentStep } from '../server/course-presentation';
+import { COURSE_STEPS } from './course-content';
+import { COURSE_STEPS_ES } from './course-content-es';
 
 test('every login path regenerates the session (no direct userId assignment)', () => {
   const auth = readFileSync('server/routes/auth.ts', 'utf8');
@@ -37,4 +40,14 @@ test('boot refuses the QA switcher together with live payments', () => {
   const r = boot({ AUTHORIZE_ENVIRONMENT: 'production', ENABLE_QA_ACCOUNT_SWITCHER: 'true' });
   assert.equal(r.status, 1, r.stdout + r.stderr);
   assert.match(r.stderr + r.stdout, /FATAL: ENABLE_QA_ACCOUNT_SWITCHER=true is not allowed with AUTHORIZE_ENVIRONMENT=production/);
+});
+
+test('course sidebar gets the real localized module from content, not a title guess', () => {
+  COURSE_STEPS.forEach((step, i) => {
+    const es = presentStep('online-forklift-operator-certification', { ...step }, 'es') as any;
+    assert.equal(es.module, COURSE_STEPS_ES[i].module, `ES module at step ${i + 1}`);
+    const en = presentStep('online-forklift-operator-certification', { ...step }, 'en') as any;
+    assert.equal(en.module, step.module, `EN module at step ${i + 1}`);
+  });
+  assert.match(readFileSync('client/src/pages/CoursePlayer.tsx', 'utf8'), /const serverModule = \(step as \{ module\?: string \}\)\.module;\n\s*if \(serverModule\) return serverModule;/);
 });

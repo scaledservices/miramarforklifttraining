@@ -250,6 +250,11 @@ export default function CoursePlayer() {
   const moduleRank = (key: ModuleKey): number => MODULE_KEY_ORDER.indexOf(key);
 
   const getStepModule = (step: StepWithProgress, index: number): string => {
+    // Server-provided module (from the course content file, already in the
+    // viewer's language) wins. Title matching below is only a fallback for
+    // admin-created steps that are not in a content file.
+    const serverModule = (step as { module?: string }).module;
+    if (serverModule) return serverModule;
     const title = step.title || "";
     for (const { key, pattern } of MODULE_MATCHERS) {
       if (pattern.test(title)) return t(`coursePlayer.${key}`);
