@@ -1,3 +1,4 @@
+import "./guard-not-production"; // must stay first: refuses production
 import bcrypt from "bcryptjs";
 import { db } from "../server/db";
 import { users } from "../shared/schema";

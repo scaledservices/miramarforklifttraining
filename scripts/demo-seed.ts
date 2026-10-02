@@ -1,3 +1,4 @@
+import "./guard-not-production"; // must stay first: refuses production
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { db, pool } from "../server/db";

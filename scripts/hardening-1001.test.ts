@@ -51,3 +51,17 @@ test('course sidebar gets the real localized module from content, not a title gu
   });
   assert.match(readFileSync('client/src/pages/CoursePlayer.tsx', 'utf8'), /const serverModule = \(step as \{ module\?: string \}\)\.module;\n\s*if \(serverModule\) return serverModule;/);
 });
+
+test('test-account and wipe seeders refuse to run against production', () => {
+  for (const script of ['scripts/demo-seed.ts', 'scripts/seed-test-accounts.ts']) {
+    assert.match(readFileSync(script, 'utf8').split('\n')[0], /^import "\.\/guard-not-production";/, `${script}: guard must be the first import`);
+    for (const env of [{ RAILWAY_ENVIRONMENT_NAME: 'production' }, { AUTHORIZE_ENVIRONMENT: 'production' }]) {
+      const r = spawnSync(process.execPath, ['--import', 'tsx', script], {
+        env: { PATH: process.env.PATH!, HOME: process.env.HOME!, DATABASE_URL: 'postgres://127.0.0.1:1/none', ...env },
+        encoding: 'utf8', timeout: 60_000,
+      });
+      assert.equal(r.status, 1, `${script} ${JSON.stringify(env)}: ${r.stderr}`);
+      assert.match(r.stderr, /FATAL: refusing to run/);
+    }
+  }
+});
