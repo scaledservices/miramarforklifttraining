@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uniqueIndex, index, uuid, numeric, check, date } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json, jsonb, uniqueIndex, index, uuid, numeric, check, date } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql, relations } from "drizzle-orm";
@@ -1222,3 +1222,19 @@ export const analyticsEvents = pgTable("analytics_events", {
 
 export type AnalyticsEvent = typeof analyticsEvents.$inferSelect;
 export type InsertAnalyticsEvent = typeof analyticsEvents.$inferInsert;
+
+// -----------------------------------------------------------------------------
+// express-session store (connect-pg-simple). Must exist before the app boots:
+// with the esbuild bundle the library's createTableIfMissing reads its bundled
+// table.sql relative to dist/ and crashes every session write with ENOENT
+// (prod outage 2026-10-05), so the table is managed here instead and
+// createTableIfMissing stays false. Column shape matches
+// node_modules/connect-pg-simple/table.sql exactly.
+// -----------------------------------------------------------------------------
+export const sessionStore = pgTable("session", {
+  sid: text("sid").primaryKey(),
+  sess: json("sess").notNull(),
+  expire: timestamp("expire", { precision: 6 }).notNull(),
+}, (table) => [
+  index("IDX_session_expire").on(table.expire),
+]);

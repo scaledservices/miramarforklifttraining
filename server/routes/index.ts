@@ -48,7 +48,11 @@ export async function registerRoutes(
   app.use(session({
     store: new PgStore({
       pool: pool as any,
-      createTableIfMissing: true,
+      // Must stay false: with the esbuild bundle the library resolves its
+      // table.sql relative to dist/ and crashes every session write with
+      // ENOENT (prod outage 2026-10-05). The "session" table lives in
+      // shared/schema.ts and is created by drizzle-kit push instead.
+      createTableIfMissing: false,
     }),
     secret: process.env.SESSION_SECRET || (process.env.NODE_ENV === "production" ? (() => { throw new Error("SESSION_SECRET required"); })() : "dev-session-key"),
     resave: false,
