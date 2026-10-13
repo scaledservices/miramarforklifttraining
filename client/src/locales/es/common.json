@@ -967,6 +967,8 @@
     "docPermitDesc": "Formulario de permiso de operación para documentar la autorización del operador de montacargas según las regulaciones de {{body}}."
   },
   "orderCertCard": {
+    "noPaymentNeeded": "Su código cubre el precio total. No se necesita tarjeta.",
+    "placeFreeOrder": "Realizar pedido",
     "pageTitle": "Ordenar una tarjeta con foto",
     "stepConfirm": "Confirmar",
     "stepShipping": "Envío",

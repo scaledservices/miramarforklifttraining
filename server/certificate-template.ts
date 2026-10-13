@@ -225,12 +225,17 @@ export async function renderCertificatePdf({ cert, user, course, trainingEnrollm
     // LOGO — centered, prominent
     // ════════════════════════════════════════
     const logoPath = getLogoPath();
-    const logoWidth = 180;
+    // 2026-10-05: new brand lockup is 1479x933 (~1.59:1, much taller than the
+    // old 2.25:1 wordmark). Size by HEIGHT, not width — a 180pt width made it
+    // 113pt tall and it overlapped the address/divider below. 66pt tall ends
+    // at y=110, clear of the address line at y=120.
+    const logoHeight = 66;
+    const logoWidth = Math.round(logoHeight * (1479 / 933) * 100) / 100; // ~104.6
     const logoX = (pageWidth - logoWidth) / 2;
-    const logoY = 42;
+    const logoY = 44;
 
     if (logoPath) {
-      doc.image(logoPath, logoX, logoY, { width: logoWidth });
+      doc.image(logoPath, logoX, logoY, { width: logoWidth, height: logoHeight });
     } else {
       doc.fontSize(16).fillColor(theme.pdf.fallbackBrandColor).text(brand.name.toUpperCase(), 0, 55, { align: "center" });
     }

@@ -18,6 +18,8 @@ import {
   calculateCardSurcharge,
 } from "../authorizeNetClient";
 import { logger } from "../monitoring";
+import { validateDiscountCode, computeDiscountAmount, recordDiscountRedemption } from "./discounts";
+import type { DiscountCode } from "@shared/schema";
 
 export const verifyCache = new Map<string, { data: any; expiresAt: number }>();
 
@@ -227,6 +229,9 @@ const certCardOrderSchema = z.object({
   // JPEG data URL, client-downscaled to <=480px. Hard cap keeps the JSON body
   // under Express's 100KB parser limit; anything bigger is rejected, not truncated.
   idPhoto: z.string().regex(/^data:image\/jpeg;base64,/, "Photo must be a JPEG").max(120_000).optional(),
+  // Optional discount code for the post-course wallet-card purchase
+  // (2026-10-13). Re-validated server-side; never trusted from the client.
+  discountCode: z.string().trim().max(32).optional(),
 });
 
 app.post("/api/cert-cards", requireAuth, payLimiter, async (req: Request, res: Response) => {
@@ -235,7 +240,7 @@ app.post("/api/cert-cards", requireAuth, payLimiter, async (req: Request, res: R
     if (!parsed.success) {
       return res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid card order" });
     }
-    const { certificationId, shippingAddress, shippingMethod, paymentNonce, idPhoto } = parsed.data;
+    const { certificationId, shippingAddress, shippingMethod, paymentNonce, idPhoto, discountCode } = parsed.data;
     const billingAddress = parsed.data.billingAddress ?? parsed.data.shippingAddress;
 
     const cert = await storage.getCertification(certificationId);
@@ -262,10 +267,27 @@ app.post("/api/cert-cards", requireAuth, payLimiter, async (req: Request, res: R
     // Matches PHOTO_ID_PRICE in authorizeNet.ts and CARD_PRICE in
     // OrderCertCard.tsx.
     const cardPrice = 25.0;
-    const subtotal = cardPrice + shippingCost;
+    const baseSubtotal = cardPrice + shippingCost;
+
+    // Discount (validated + computed server-side), applied BEFORE the card
+    // surcharge, same order of operations as course checkout.
+    let discount: DiscountCode | null = null;
+    if (discountCode) {
+      const validation = await validateDiscountCode(discountCode);
+      if (!validation.valid) {
+        return res.status(400).json({ error: `Discount code ${discountCode.toUpperCase()} is not valid: ${validation.reason}` });
+      }
+      discount = validation.code;
+    }
+    const discountAmount = discount ? computeDiscountAmount(discount, baseSubtotal) : 0;
+    const subtotal = Number(Math.max(0, baseSubtotal - discountAmount).toFixed(2));
+
     // Same card surcharge as course checkout (matches the client-side total).
-    const surcharge = calculateCardSurcharge(subtotal);
+    const surcharge = subtotal > 0 ? calculateCardSurcharge(subtotal) : 0;
     const totalAmount = Number((subtotal + surcharge).toFixed(2));
+    // A 100% code leaves nothing to charge: skip the gateway entirely
+    // (Authorize.net rejects $0 transactions).
+    const nothingToCharge = totalAmount <= 0;
 
     const isDemoMode = process.env.DEMO_MODE === "true" && !isAuthorizeNetConfigured();
 
@@ -275,6 +297,8 @@ app.post("/api/cert-cards", requireAuth, payLimiter, async (req: Request, res: R
     let transactionId: string;
     if (isDemoMode) {
       transactionId = `demo-${Date.now()}`;
+    } else if (nothingToCharge) {
+      transactionId = `discount-${discount?.code ?? "free"}-${Date.now()}`;
     } else {
       if (!isAuthorizeNetConfigured()) {
         return res.status(503).json({ error: "Payment is not configured. Please call us to order." });
@@ -330,20 +354,28 @@ app.post("/api/cert-cards", requireAuth, payLimiter, async (req: Request, res: R
       status: "paid",
       providerTransactionId: transactionId,
       chargeMetadata: {
-        provider: isDemoMode ? "demo_sandbox" : "authorize_net",
+        provider: isDemoMode ? "demo_sandbox" : nothingToCharge ? "discount_no_charge" : "authorize_net",
         surcharge,
+        ...(discount && discountAmount > 0 ? { discountCode: discount.code, discountAmount } : {}),
         platformEarnings: platformCut,
         partnerEarnings: partnerCut,
       },
       paidAt: new Date(),
     });
 
+    // Count the redemption against the code's usage limit. Card orders are not
+    // rows in `orders`, so orderId stays null; the code + amount also live on
+    // the card order's chargeMetadata for the audit trail.
+    if (discount && discountAmount > 0) {
+      await recordDiscountRedemption({ codeId: discount.id, amountDiscounted: discountAmount });
+    }
+
     await storage.createAuditLog({
       actorUserId: req.session.userId!,
       action: "card_upsell_purchased",
       entity: "cert_card_orders",
       entityId: String(cardOrder.id),
-      metadata: { certificationId, totalAmount, transactionId, demoMode: isDemoMode, hasIdPhoto: !!idPhoto },
+      metadata: { certificationId, totalAmount, transactionId, demoMode: isDemoMode, hasIdPhoto: !!idPhoto, discountCode: discount?.code ?? null, discountAmount },
     });
 
     try {

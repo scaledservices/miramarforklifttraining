@@ -967,6 +967,8 @@
     "docPermitDesc": "Permit to operate form for documenting forklift operator authorization per {{body}} regulations."
   },
   "orderCertCard": {
+    "noPaymentNeeded": "Your code covers the full price. No card needed.",
+    "placeFreeOrder": "Place order",
     "pageTitle": "Order a Photo ID",
     "stepConfirm": "Confirm",
     "stepShipping": "Shipping",
