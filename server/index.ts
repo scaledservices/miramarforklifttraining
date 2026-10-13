@@ -96,7 +96,10 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
       imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
-      connectSrc: ["'self'", "https://api.authorize.net", "https://apitest.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net", "wss:", "ws:"],
+      // api2.authorize.net: production Accept.js (AcceptCore) posts its
+      // tokenization request there, NOT api.authorize.net — omitting it left
+      // the Pay button stuck on "Processing" with a blocked connect-src.
+      connectSrc: ["'self'", "https://api.authorize.net", "https://api2.authorize.net", "https://apitest.authorize.net", "https://api2test.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net", "wss:", "ws:"],
       frameSrc: ["'self'", "https://accept.authorize.net", "https://test.authorize.net", "https://js.authorize.net", "https://jstest.authorize.net", "https://www.youtube-nocookie.com", "https://www.youtube.com"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
