@@ -114,6 +114,11 @@ export default function Checkout() {
   const [photoIdShippingMethod, setPhotoIdShippingMethod] = useState<"standard" | "expedited">("standard");
   const [photoIdShipping, setPhotoIdShipping] = useState({ name: "", companyName: "", address: "", city: "", state: "", zip: "" });
 
+  // Auth state (moved up): the photo-ID checkbox only renders for signed-in
+  // users, so the add-on must not appear in totals/payload while the user
+  // cannot see or uncheck it (bug 2026-10-13: signed-out summary showed $25).
+  const needsAuth = !authLoading && !isAuthenticated;
+
   const PHOTO_ID_PRICE = 25.0;
   // 2026-09-07 (Alberto): flat $25 per card, standard USPS shipping INCLUDED.
   // No shipping-method choice remains in the UI; retained only so the server
@@ -241,7 +246,7 @@ export default function Checkout() {
 
   // Photo ID add-on math (mirrors server; server is source of truth). Added
   // AFTER discount (discounts never apply to the add-on), BEFORE surcharge.
-  const photoIdAddOnTotal = photoIdChecked && photoIdCount > 0
+  const photoIdAddOnTotal = !needsAuth && photoIdChecked && photoIdCount > 0
     ? Number((photoIdCount * (PHOTO_ID_PRICE + PHOTO_ID_SHIPPING[photoIdShippingMethod])).toFixed(2))
     : 0;
   const preSurchargeTotal = Number((discountedSubtotal + photoIdAddOnTotal).toFixed(2));
@@ -388,8 +393,6 @@ export default function Checkout() {
       </div>
     );
   }
-
-  const needsAuth = !authLoading && !isAuthenticated;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
