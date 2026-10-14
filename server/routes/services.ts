@@ -283,6 +283,12 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         rawResponse: { surcharge: depositSurcharge, principal: pricing.deposit },
       });
 
+      // Full payment is collected at booking (BOOKING_DEPOSIT_RATE = 1), so the
+      // order is paid. Left "pending", the admin Refund button never appeared
+      // for hands-on bookings (meeting 2026-10-13).
+      if (pricing.balance <= 0.01) {
+        await storage.updateOrderStatus(order.id, "paid");
+      }
       orderId = order.id;
       depositCharged = chargeAmount;
     }

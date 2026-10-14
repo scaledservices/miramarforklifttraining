@@ -81,6 +81,24 @@ export async function refundTransaction(
     return { success: true, transactionId: anetResult.transactionId, rawResponse: anetResult.rawResponse };
   }
 
+  // Manual payments (check/cash/card reader recorded by the office, meeting
+  // 2026-10-13): the money goes back offline, so record the refund and close
+  // the order. There is no gateway transaction to reverse.
+  if (payment.provider?.startsWith("manual_")) {
+    const manualRefundId = `MANUAL-REFUND-${Date.now()}`;
+    await db.insert(payments).values({
+      orderId,
+      provider: payment.provider,
+      providerTransactionId: manualRefundId,
+      status: "refunded",
+      amount: String(amount),
+      rawResponse: { manual: true, refund: true },
+    });
+    await db.update(orders).set({ status: "refunded", updatedAt: new Date() }).where(eq(orders.id, orderId));
+    await revokeOrderCertifications(manualRefundId);
+    return { success: true, transactionId: manualRefundId };
+  }
+
   if (isDemo) {
     const mockRefundId = `REFUND-${Date.now()}`;
     await db.insert(payments).values({

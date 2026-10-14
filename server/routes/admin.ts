@@ -6,6 +6,7 @@ import { eq, and, ne, isNotNull } from "drizzle-orm";
 import { platformSettings, enrollments as enrollmentsTable, emailOutbox } from "@shared/schema";
 import { isAdminRole } from "@shared/roles";
 import { refundTransaction } from "../payments";
+import { refundableAmount } from "@shared/order-payment-summary";
 import { regenerateCertificatePdf } from "../certificate-pdf";
 import { pdfStore } from "../pdf-store";
 import { sendRefundNotification, sendCertificateRevokedNotification, sendShippingNotification } from "../email";
@@ -301,11 +302,17 @@ app.post("/api/admin/orders/:id/refund", requireRole("admin", "super_admin"), as
 
     const orderPayments = await storage.getPaymentsByOrder(order.id);
     const approvedPayment = orderPayments.find((p: any) => p.status === "approved");
+    // 2026-10-13: refund what the card was actually charged (fee included),
+    // not order.total (which excludes the card fee). One gateway transaction
+    // can't be refunded beyond its own amount.
+    const refundAmount = approvedPayment
+      ? Math.min(refundableAmount(orderPayments), Number(approvedPayment.amount))
+      : Number(order.total);
 
-    if (approvedPayment && approvedPayment.providerTransactionId) {
+    if (approvedPayment && (approvedPayment.providerTransactionId || approvedPayment.provider?.startsWith("manual_"))) {
       const refundResult = await refundTransaction(
-        approvedPayment.providerTransactionId,
-        Number(order.total),
+        approvedPayment.providerTransactionId || "",
+        refundAmount,
         "XXXX",
         order.id
       );
@@ -337,7 +344,7 @@ app.post("/api/admin/orders/:id/refund", requireRole("admin", "super_admin"), as
         await sendRefundNotification({
           to: orderUser.email,
           orderNumber: order.orderNumber,
-          refundAmount: Number(order.total),
+          refundAmount,
           actorUserId: req.session.userId!,
           locale: refundLocale,
         });

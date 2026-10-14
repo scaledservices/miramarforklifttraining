@@ -20,6 +20,7 @@ import { resolveLocale } from "../locale-resolver";
 import { resolveCourseSlug } from "@shared/course-slug-map";
 import { logger, logPaymentError } from "../monitoring";
 import { requireAuth, payLimiter } from "./middleware";
+import { refundableAmount } from "@shared/order-payment-summary";
 import { SHIPPING_RATES } from "../constants";
 
 // Photo ID wallet card pricing (Alberto 2026-09-07: flat $25 per card,
@@ -343,9 +344,12 @@ export function registerAuthorizeNetRoutes(app: Express) {
       if (!payment.providerTransactionId) {
         return res.status(400).json({ error: "No transaction ID found for refund" });
       }
+      // 2026-10-13: refund the fee-inclusive amount actually charged.
+      const allPayments = await db.select().from(paymentsTable).where(eq(paymentsTable.orderId, order.id));
+      const refundAmount = Math.min(refundableAmount(allPayments), Number(payment.amount));
       const refundResult = await refundTransaction(
         payment.providerTransactionId!,
-        Number(order.total),
+        refundAmount,
         order.id
       );
 
@@ -357,7 +361,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
         orderId: order.id,
         provider: "authorize_net",
         providerTransactionId: refundResult.transactionId,
-        amount: String(order.total),
+        amount: String(refundAmount),
         status: "refunded",
       });
 
@@ -370,7 +374,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
         entityId: String(orderId),
         metadata: {
           orderNumber: order.orderNumber,
-          amount: order.total,
+          amount: refundAmount,
           transactionId: refundResult.transactionId,
         },
       });
