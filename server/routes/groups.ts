@@ -11,6 +11,7 @@ import { requireAuth, payLimiter } from "./middleware";
 import { SHIPPING_RATES } from "../constants";
 import { isAuthorizeNetConfigured, createTransactionFromNonce, calculateCardSurcharge } from "../authorizeNetClient";
 import { logger } from "../monitoring";
+import { isAdminRole } from "@shared/roles";
 
 // Photo ID wallet card pricing (matches certs.ts / authorizeNet.ts).
 const PHOTO_ID_PRICE = 25.0;
@@ -293,67 +294,64 @@ app.post("/api/groups/:id/members/:memberId/reissue", requireAuth, async (req: R
 // in TeamPhotoIdStatus — must send the photo-specific email, not the generic
 // training reminder)
 app.post("/api/groups/:id/members/:memberId/remind-photo-id", requireAuth, async (req: Request, res: Response) => {
+  // Rewritten 2026-10-13: the previous handler referenced tables and storage
+  // helpers that do not exist in this codebase and failed on every click. Same ownership rule as the other crew routes;
+  // re-sends the SAME upload link the member got when the photo ID was paid.
   try {
-    const group = await storage.getCourseGroup(parseInt(req.params.id));
-    if (!group) {
-      return res.status(404).json({ error: "Group not found" });
+    const group = await storage.getGroup(parseInt(String(req.params.id)));
+    if (!group) return res.status(404).json({ error: "Group not found" });
+    if (group.adminUserId !== req.session.userId) {
+      const currentUser = await storage.getUser(req.session.userId!);
+      if (!currentUser || !isAdminRole(currentUser.role)) return res.status(403).json({ error: "Access denied" });
     }
 
-    const isAdmin = req.session.userRole === "admin" || req.session.userRole === "super_admin";
-    if (group.managerId !== req.session.userId && !isAdmin) {
-      return res.status(403).json({ error: "Access denied" });
+    // :memberId is the member's USER id (TeamPhotoIdStatus sends member.userId).
+    const memberUserId = parseInt(String(req.params.memberId));
+    const members = await storage.listGroupMembers(group.id);
+    if (!members.some((m) => m.userId === memberUserId)) {
+      return res.status(404).json({ error: "Member not found in this crew" });
+    }
+    const memberUser = await storage.getUser(memberUserId);
+    if (!memberUser?.email) return res.status(400).json({ error: "Member has no email address" });
+
+    // Find this member's certification with a photo ID still awaiting a photo
+    // (same matching rule as GET /api/groups/:id/photo-id-status).
+    const awaiting = await db.select().from(photoIdEntitlements).where(eq(photoIdEntitlements.status, "awaiting_photo"));
+    const certs = await storage.getCertificationsByUser(memberUserId);
+    let target: { certificationId: number; entitlementId: number } | null = null;
+    for (const cert of certs) {
+      const ent = awaiting.find((e) => e.enrollmentId === cert.enrollmentId)
+        || awaiting.find((e) => e.enrollmentId === null && e.purchasedByUserId === group.adminUserId);
+      if (ent) { target = { certificationId: cert.id, entitlementId: ent.id }; break; }
+    }
+    if (!target) {
+      return res.status(400).json({ error: "This member has no photo ID waiting for a photo." });
     }
 
-    const member = await storage.getCourseGroupMember(parseInt(req.params.memberId));
-    if (!member || member.groupId !== group.id) {
-      return res.status(404).json({ error: "Member not found" });
-    }
-
-    const memberEmail = member.memberEmail || (await getUserEmail(member.userId));
-    if (!memberEmail) {
-      return res.status(400).json({ error: "Member has no email address" });
-    }
-
-    // Check if member already has photo upload access (token already issued)
-    let entitlements: any[] = [];
-    if (member.userId) {
-      try {
-        entitlements = await getPhotoIdEntitlementsForUser(member.userId);
-      } catch { /* user may not exist */ }
-    }
-    const hasAccess = entitlements.some((e: any) =>
-      e.status === "paid" || e.status === "issued" || e.status === "photo_uploaded"
-    );
-    if (!hasAccess) {
-      return res.status(400).json({ error: "Member has no photo ID entitlement — issue one first" });
-    }
-
-    const token = crypto.randomUUID();
-    await db.insert(photoIdUploadTokens).values({
-      token,
-      email: memberEmail,
-      groupId: group.id,
-      groupMemberId: member.id,
-      expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000),
+    const baseUrl = process.env.SITE_URL || `https://${brand.domain}`;
+    const uploadUrl = `${baseUrl}/order-cert-card/${target.certificationId}?entitlement=${target.entitlementId}`;
+    const admin = await storage.getUser(group.adminUserId);
+    const sent = await sendPhotoIdUploadRequest({
+      to: memberUser.email,
+      memberName: memberUser.name || "crew member",
+      purchaserName: admin?.name || "Your crew admin",
+      uploadUrl,
+      actorUserId: req.session.userId!,
+      locale: await resolveLocale({ userId: memberUserId }),
     });
 
-    const [cert] = await db
-      .select()
-      .from(certifications)
-      .where(eq(certifications.id, group.certificationId));
-
-    await sendPhotoIdUploadRequest({
-      to: memberEmail,
-      groupMemberId: member.id,
-      memberName: `${member.firstName || ""} ${member.lastName || ""}`.trim() || "Team Member",
-      certificationName: cert?.courseName || "Forklift Certification",
-      uploadToken: token,
+    await storage.createAuditLog({
+      actorUserId: req.session.userId!,
+      action: "photo_id_reminder_sent",
+      entity: "photo_id_entitlements",
+      entityId: String(target.entitlementId),
+      metadata: { groupId: group.id, memberUserId, certificationId: target.certificationId, emailed: !!sent },
     });
 
-    res.json({ success: true, message: "Photo upload request sent" });
+    return res.json({ success: true, message: "Photo upload request sent" });
   } catch (error) {
-    console.error("Send photo ID reminder error:", error);
-    res.status(500).json({ error: "Failed to send photo upload request" });
+    logger.error("[Groups] Photo ID reminder failed", { source: "server", metadata: { error: String(error) } });
+    return res.status(500).json({ error: "Failed to send photo upload request" });
   }
 });
 

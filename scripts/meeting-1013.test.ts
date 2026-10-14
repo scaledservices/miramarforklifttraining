@@ -87,3 +87,12 @@ test('slot generator closes the Saturday when Fresno is booked; booking API refu
   const seed = readFileSync('scripts/seed-service-areas.ts', 'utf8');
   assert.match(seed, /priorityAreaSlug: "central-california"/);
 });
+
+test('crew photo-ID reminder route uses real tables and helpers', () => {
+  const src = readFileSync('server/routes/groups.ts', 'utf8');
+  const route = src.slice(src.indexOf('/remind-photo-id"'), src.indexOf('/members/:memberId/remind", requireAuth'));
+  for (const gone of ['getCourseGroup', 'photoIdUploadTokens', 'getUserEmail', 'getPhotoIdEntitlementsForUser', 'userRole']) {
+    assert.ok(!route.includes(gone), `still references ${gone}`);
+  }
+  assert.match(route, /sendPhotoIdUploadRequest\(\{/);
+});
