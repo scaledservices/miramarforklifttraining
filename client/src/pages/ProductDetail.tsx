@@ -83,7 +83,10 @@ export default function ProductDetail() {
   const hasBulkPricing = product.bulkPricing && product.bulkPricing.length > 0;
   const currentPricePerSeat = hasBulkPricing ? getBulkPrice(product, seats) : (typeof product.price === "number" ? product.price : 0);
   const totalPrice = hasBulkPricing ? getBulkTotal(product, seats) : currentPricePerSeat * seats;
-  const isCrewPurchase = seats > 1;
+  // ?crew=1 comes from a crew admin's "Buy more seats" button: even 1 seat is
+  // a crew seat (unassigned, lands on the Seats page), not a personal course.
+  const forceCrew = new URLSearchParams(searchString).get("crew") === "1";
+  const isCrewPurchase = seats > 1 || forceCrew;
 
   const seatLabel = seats === 1 ? t("productDetail.seat") : t("productDetail.seats");
 
@@ -94,6 +97,7 @@ export default function ProductDetail() {
       title: product.title,
       price: currentPricePerSeat,
       isTeamProduct: isCrewPurchase,
+      crewOnly: forceCrew || undefined,
       quantity: seats,
     });
     navigate("/checkout");
@@ -106,6 +110,7 @@ export default function ProductDetail() {
       title: product.title,
       price: currentPricePerSeat,
       isTeamProduct: isCrewPurchase,
+      crewOnly: forceCrew || undefined,
       quantity: seats,
     });
     toast({

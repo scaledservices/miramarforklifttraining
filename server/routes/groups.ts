@@ -620,6 +620,7 @@ app.get("/api/groups/:id/enrollments", requireAuth, async (req: Request, res: Re
         allEnrollments.push({
           ...enrollment,
           courseName: course?.title || "Unknown",
+          courseSlug: course?.slug || null,
           userName,
           pendingInvite: pendingByEnrollment.get(enrollment.id) || null,
           reassignBlockReason,

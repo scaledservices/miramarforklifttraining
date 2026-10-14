@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, BookOpen, TrendingUp, Award, ChevronRight, ShoppingCart, GraduationCap, AlertTriangle, Lightbulb } from "lucide-react";
 import GroupLayout from "./GroupLayout";
+import { buyMoreSeatsHref } from "@/lib/crewSeats";
 import TeamPhotoIdStatus from "@/components/dashboard/TeamPhotoIdStatus";
 
 // Course recommendation logic based on completed certifications
@@ -137,7 +138,16 @@ export default function GroupDashboard() {
             <h1 className="text-2xl font-bold" data-testid="text-group-name">{group.name}</h1>
             <p className="text-muted-foreground">{t("group.crewAdminDashboard")}</p>
           </div>
-          <Badge variant="secondary" data-testid="badge-group-id">{t("group.crewNumber", { id: group.id })}</Badge>
+          <div className="flex items-center gap-2">
+            {/* Always available, not only when every seat is used (meeting 2026-10-13). */}
+            <Link href={buyMoreSeatsHref(enrollmentsData?.enrollments)}>
+              <Button variant="outline" size="sm" data-testid="button-header-buy-seats">
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                {t("group.buyMoreSeats")}
+              </Button>
+            </Link>
+            <Badge variant="secondary" data-testid="badge-group-id">{t("group.crewNumber", { id: group.id })}</Badge>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -217,7 +227,7 @@ export default function GroupDashboard() {
                 <h3 className="font-semibold">{t("group.needMoreSeats")}</h3>
                 <p className="text-sm text-muted-foreground">{t("group.needMoreSeatsDesc")}</p>
               </div>
-              <Link href="/p/online-forklift-operator-training?seats=5">
+              <Link href={buyMoreSeatsHref(enrollmentsData?.enrollments)}>
                 <Button data-testid="button-buy-more-seats">
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   {t("group.buyMoreSeats")}

@@ -8,6 +8,8 @@ export interface CartItem {
   price: number;
   quantity: number;
   isTeamProduct?: boolean;
+  /** Set when added from a crew admin's "Buy more seats" link. */
+  crewOnly?: boolean;
   bookingId?: number;
   isBooking?: boolean;
 }
@@ -89,7 +91,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const slug = i.productSlug || i.courseSlug;
         const product = getProductBySlug(slug);
         const newPrice = product ? getBulkPrice(product, quantity) : i.price;
-        return { ...i, quantity, price: newPrice, isTeamProduct: quantity > 1 };
+        // A crew seat stays a crew seat at quantity 1 (crew admin buying one
+        // more seat, meeting 2026-10-13); otherwise >1 seat means crew.
+        return { ...i, quantity, price: newPrice, isTeamProduct: i.crewOnly || quantity > 1 };
       })
     );
   }, []);

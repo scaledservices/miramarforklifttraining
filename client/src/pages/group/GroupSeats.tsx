@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import GroupLayout from "./GroupLayout";
+import { buyMoreSeatsHref } from "@/lib/crewSeats";
 import { useTranslation } from "react-i18next";
 
 export default function GroupSeats() {
@@ -206,9 +207,18 @@ export default function GroupSeats() {
   return (
     <GroupLayout>
       <div className="space-y-6 p-6">
-        <div>
-          <h1 className="text-2xl font-bold" data-testid="text-page-title">{t("groupSeats.pageTitle")}</h1>
-          <p className="text-muted-foreground">{t("groupSeats.pageDesc")}</p>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-bold" data-testid="text-page-title">{t("groupSeats.pageTitle")}</h1>
+            <p className="text-muted-foreground">{t("groupSeats.pageDesc")}</p>
+          </div>
+          {/* Always available, not only when every seat is used (meeting 2026-10-13). */}
+          <Link href={buyMoreSeatsHref(allSeats)}>
+            <Button variant="outline" size="sm" data-testid="button-header-buy-seats">
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              {t("group.buyMoreSeats")}
+            </Button>
+          </Link>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
@@ -463,7 +473,7 @@ export default function GroupSeats() {
                 {unassignedSeats.length === 0 && (
                   <div className="p-6 text-center border-t" data-testid="cta-buy-more-seats">
                     <p className="text-muted-foreground mb-3">{t("groupSeats.allAssigned")}</p>
-                    <Link href="/p/online-forklift-operator-training?seats=5">
+                    <Link href={buyMoreSeatsHref(allSeats)}>
                       <Button data-testid="button-buy-more-seats">
                         <ShoppingCart className="h-4 w-4 mr-2" />
                         {t("groupSeats.purchaseAdditional")}

@@ -602,6 +602,14 @@ async function postPaymentProcessing(
       });
       await storage.updateGroupCompanyId(group.id, company.id);
     }
+    // Attach the new seats to the existing crew. Without this the order had no
+    // groupId, so seats bought later never appeared on the crew's Seats page
+    // (/api/groups/:id/enrollments reads getOrdersByGroup). Meeting 2026-10-13.
+    if (group) {
+      await storage.updateOrderGroupId(orderId, group.id);
+      const refreshed = group.companyId ? group : await storage.getGroup(group.id);
+      if (refreshed?.companyId) await storage.updateOrderCompany(orderId, refreshed.companyId);
+    }
   }
 
   // Emails

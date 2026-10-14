@@ -41,3 +41,19 @@ test('manual payments refund offline instead of failing', () => {
   const src = readFileSync('server/payments.ts', 'utf8');
   assert.match(src, /payment\.provider\?\.startsWith\("manual_"\)/);
 });
+
+test('existing crew admin seat purchases attach to their crew', () => {
+  const src = readFileSync('server/routes/authorizeNet.ts', 'utf8');
+  assert.match(src, /if \(group\) \{\s*await storage\.updateOrderGroupId\(orderId, group\.id\)/);
+});
+
+test('buy-more-seats link targets the crew course as a crew seat', async () => {
+  const src = readFileSync('client/src/lib/crewSeats.ts', 'utf8');
+  assert.match(src, /seats=1&crew=1/);
+  const dash = readFileSync('client/src/pages/group/GroupDashboard.tsx', 'utf8');
+  const seats = readFileSync('client/src/pages/group/GroupSeats.tsx', 'utf8');
+  assert.match(dash, /button-header-buy-seats/);
+  assert.match(seats, /button-header-buy-seats/);
+  const pd = readFileSync('client/src/pages/ProductDetail.tsx', 'utf8');
+  assert.match(pd, /seats > 1 \|\| forceCrew/);
+});
