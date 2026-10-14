@@ -26,3 +26,18 @@ test('fully paid hands-on booking marks its order paid', () => {
   const src = readFileSync('server/routes/services.ts', 'utf8');
   assert.match(src, /pricing\.balance <= 0\.01\) \{\s*await storage\.updateOrderStatus\(order\.id, "paid"\)/);
 });
+
+test('manual bookings get an order and can record a check at creation', () => {
+  const src = readFileSync('server/routes/services.ts', 'utf8');
+  assert.match(src, /async function ensureBookingOrder/);
+  // record-balance no longer dead-ends on orderless bookings
+  assert.doesNotMatch(src, /Booking has no linked order/);
+  assert.match(src, /const pay = req\.body\.payment/);
+  const dlg = readFileSync('client/src/components/admin/NewBookingDialog.tsx', 'utf8');
+  assert.match(dlg, /data-testid="input-nb-payment-reference"/);
+});
+
+test('manual payments refund offline instead of failing', () => {
+  const src = readFileSync('server/payments.ts', 'utf8');
+  assert.match(src, /payment\.provider\?\.startsWith\("manual_"\)/);
+});

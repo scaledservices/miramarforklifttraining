@@ -80,7 +80,7 @@ export default function AdminBookings() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(() => new Date());
   const [recordOpen, setRecordOpen] = useState(false);
-  const [recordForm, setRecordForm] = useState({ method: "cash", amount: "", note: "" });
+  const [recordForm, setRecordForm] = useState({ method: "cash", amount: "", note: "", reference: "" });
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [rescheduleForm, setRescheduleForm] = useState({ sessionDate: "", startTime: "", endTime: "" });
   const [completePromptOpen, setCompletePromptOpen] = useState(false);
@@ -161,6 +161,7 @@ export default function AdminBookings() {
         method: recordForm.method,
         amount: Number(recordForm.amount),
         note: recordForm.note || undefined,
+        reference: recordForm.reference || undefined,
       });
       return res.json();
     },
@@ -171,7 +172,7 @@ export default function AdminBookings() {
         description: data.balanceDue > 0 ? `Remaining balance: $${data.balanceDue.toFixed(2)}` : "Balance fully paid",
       });
       setRecordOpen(false);
-      setRecordForm({ method: "cash", amount: "", note: "" });
+      setRecordForm({ method: "cash", amount: "", note: "", reference: "" });
     },
     onError: (err: Error) => toast({ title: err.message || "Failed to record payment", variant: "destructive" }),
   });
@@ -858,9 +859,17 @@ export default function AdminBookings() {
                 />
               </div>
               <div className="space-y-2">
+                <Label>{recordForm.method === "check" ? "Check # (optional)" : "Reference (optional)"}</Label>
+                <Input
+                  value={recordForm.reference}
+                  onChange={(e) => setRecordForm((f) => ({ ...f, reference: e.target.value }))}
+                  data-testid="input-record-reference"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label>Note (optional)</Label>
                 <Input
-                  placeholder="Check #, who paid, etc."
+                  placeholder="Who paid, etc."
                   value={recordForm.note}
                   onChange={(e) => setRecordForm((f) => ({ ...f, note: e.target.value }))}
                   data-testid="input-record-note"

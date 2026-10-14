@@ -454,6 +454,21 @@ app.post("/api/admin/bookings", requireRole("admin", "super_admin"), async (req:
     const totalPrice = (Number(rawTotal) || 0).toFixed(2);
     const status = rawStatus === "confirmed" ? "confirmed" : "pending";
 
+    // Optional office-collected payment at creation (meeting 2026-10-13):
+    // { method: "check", amount, reference: "check #1234" }.
+    const pay = req.body.payment as { method?: string; amount?: number | string; reference?: string } | undefined;
+    let payAmount = 0;
+    if (pay && pay.method) {
+      if (!(MANUAL_PAYMENT_METHODS as readonly string[]).includes(pay.method)) {
+        return res.status(400).json({ error: "Invalid payment method" });
+      }
+      payAmount = Number(pay.amount);
+      if (!Number.isFinite(payAmount) || payAmount <= 0) return res.status(400).json({ error: "Invalid payment amount" });
+      if (payAmount > Number(totalPrice) + 0.01) {
+        return res.status(400).json({ error: `Payment ($${payAmount.toFixed(2)}) is more than the booking total ($${totalPrice})` });
+      }
+    }
+
     const booking = await storage.createBooking({
       userId: ownerUserId,
       serviceAreaId: Number(serviceAreaId),
@@ -475,15 +490,29 @@ app.post("/api/admin/bookings", requireRole("admin", "super_admin"), async (req:
       orderId: null,
     });
 
+    // Every admin booking gets an order so its money can be tracked, refunded,
+    // and reported like an online booking (meeting 2026-10-13).
+    let orderId: number | null = null;
+    if (Number(totalPrice) > 0 || payAmount > 0) {
+      orderId = await ensureBookingOrder(booking as any);
+      if (payAmount > 0) {
+        await recordManualPayment({ orderId, method: pay!.method!, amount: payAmount, reference: pay!.reference, recordedBy: req.session.userId! });
+        if (payAmount >= Number(totalPrice) - 0.01) await storage.updateOrderStatus(orderId, "paid");
+      }
+    }
+
     await storage.createAuditLog({
       actorUserId: req.session.userId!,
       action: "admin_booking_created",
       entity: "booking",
       entityId: String(booking.id),
-      metadata: { bookingNumber: booking.bookingNumber, serviceAreaId, sessionDate, startTime, participantCount, manual: true },
+      metadata: {
+        bookingNumber: booking.bookingNumber, serviceAreaId, sessionDate, startTime, participantCount, manual: true,
+        ...(payAmount > 0 ? { paymentMethod: pay!.method, paymentAmount: payAmount, reference: pay!.reference || null } : {}),
+      },
     });
 
-    return res.status(201).json(booking);
+    return res.status(201).json({ ...booking, orderId: orderId ?? booking.orderId });
   } catch (error) {
     console.error("[Admin Bookings] Manual create error:", error);
     return res.status(500).json({ error: "Failed to create booking" });
@@ -635,6 +664,39 @@ app.patch("/api/bookings/:id/confirm", requireRole("admin", "super_admin"), asyn
 
 // ---------- Phase A: booking finance, balance collection, reschedule, no-show ----------
 
+/**
+ * Manual (admin) bookings were created with no order, so the office could not
+ * record a check/cash payment against them (the old "no linked order" 400).
+ * Create the order on demand (owned by the booking's user, total = booking
+ * price) and link it. Meeting 2026-10-13.
+ */
+async function ensureBookingOrder(booking: { id: number; userId: number; orderId: number | null; totalPrice: string | number }): Promise<number> {
+  if (booking.orderId) return booking.orderId;
+  const order = await storage.createOrder({
+    userId: booking.userId,
+    total: Number(booking.totalPrice || 0).toFixed(2),
+    status: "pending",
+    refundPolicyAccepted: true,
+  });
+  const { bookings: bookingsTable } = await import("@shared/schema");
+  await db.update(bookingsTable).set({ orderId: order.id }).where(eq(bookingsTable.id, booking.id));
+  return order.id;
+}
+
+const MANUAL_PAYMENT_METHODS = ["cash", "check", "card_reader", "other"] as const;
+
+/** Record an office-collected payment (check/cash/...) and close the order when fully paid. */
+async function recordManualPayment(p: { orderId: number; method: string; amount: number; reference?: string | null; note?: string | null; recordedBy: number }) {
+  await storage.createPayment({
+    orderId: p.orderId,
+    provider: `manual_${p.method}`,
+    providerTransactionId: null,
+    status: "approved",
+    amount: p.amount.toFixed(2),
+    rawResponse: { recordedBy: p.recordedBy, reference: p.reference || null, note: p.note || null },
+  });
+}
+
 async function getBookingFinance(bookingId: number) {
   const booking = await storage.getBookingById(bookingId);
   if (!booking) return null;
@@ -681,31 +743,24 @@ app.get("/api/admin/bookings/:id/finance", requireRole("admin", "super_admin"), 
 
 app.post("/api/admin/bookings/:id/record-balance", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
   try {
-    const { method, amount, note } = req.body;
-    const ALLOWED_METHODS = ["cash", "check", "card_reader", "other"];
-    if (!ALLOWED_METHODS.includes(method)) return res.status(400).json({ error: "Invalid payment method" });
+    const { method, amount, note, reference } = req.body;
+    if (!(MANUAL_PAYMENT_METHODS as readonly string[]).includes(method)) return res.status(400).json({ error: "Invalid payment method" });
     const amt = Number(amount);
     if (!Number.isFinite(amt) || amt <= 0) return res.status(400).json({ error: "Invalid amount" });
 
     const fin = await getBookingFinance(Number(req.params.id));
     if (!fin) return res.status(404).json({ error: "Booking not found" });
-    if (!fin.booking.orderId) return res.status(400).json({ error: "Booking has no linked order" });
     if (amt > fin.balanceDue + 0.01) {
       return res.status(400).json({ error: `Amount exceeds balance due ($${fin.balanceDue.toFixed(2)})` });
     }
+    // Older manual bookings have no order yet: create + link one now.
+    const orderId = await ensureBookingOrder(fin.booking as any);
 
-    await storage.createPayment({
-      orderId: fin.booking.orderId,
-      provider: `manual_${method}`,
-      providerTransactionId: null,
-      status: "approved",
-      amount: String(amt.toFixed(2)),
-      rawResponse: { recordedBy: req.session.userId, note: note || null },
-    });
+    await recordManualPayment({ orderId, method, amount: amt, reference, note, recordedBy: req.session.userId! });
 
     const after = await getBookingFinance(fin.booking.id);
     if (after && after.balanceDue <= 0.01) {
-      await storage.updateOrderStatus(fin.booking.orderId, "paid");
+      await storage.updateOrderStatus(orderId, "paid");
     }
 
     await storage.createAuditLog({
@@ -713,7 +768,7 @@ app.post("/api/admin/bookings/:id/record-balance", requireRole("admin", "super_a
       action: "balance_payment_recorded",
       entity: "booking",
       entityId: String(fin.booking.id),
-      metadata: { bookingNumber: fin.booking.bookingNumber, method, amount: amt, note: note || null },
+      metadata: { bookingNumber: fin.booking.bookingNumber, method, amount: amt, reference: reference || null, note: note || null },
     });
 
     return res.json({ success: true, balanceDue: after?.balanceDue ?? 0 });
@@ -777,12 +832,13 @@ app.post("/api/bookings/:id/pay-balance", requireAuth, async (req: Request, res:
   try {
     const fin = await getBookingFinance(Number(req.params.id));
     if (!fin || fin.booking.userId !== req.session.userId) return res.status(404).json({ error: "Booking not found" });
-    if (!fin.booking.orderId) return res.status(400).json({ error: "Booking has no linked order" });
     if (fin.balanceDue <= 0.01) return res.status(400).json({ error: "No balance due" });
     if (!isAuthorizeNetConfigured()) return res.status(400).json({ error: "Online payment is not available. Please call us." });
 
     const { paymentNonce } = req.body;
     if (!paymentNonce) return res.status(400).json({ error: "Payment details required" });
+    // Orderless (manual) bookings get their order on first payment.
+    fin.booking.orderId = await ensureBookingOrder(fin.booking as any);
 
     const surcharge = calculateCardSurcharge(fin.balanceDue);
     const chargeAmount = Number((fin.balanceDue + surcharge).toFixed(2));

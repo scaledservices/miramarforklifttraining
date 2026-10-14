@@ -42,6 +42,12 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
     specialRequests: "",
     totalPrice: "",
     status: "confirmed",
+    // Office-collected payment (meeting 2026-10-13): phone/walk-in customers
+    // often pay by check. "unpaid" = record it later from the booking.
+    paymentStatus: "unpaid" as "unpaid" | "paid",
+    paymentMethod: "check",
+    paymentAmount: "",
+    paymentReference: "",
   });
 
   const { data: serviceAreas } = useQuery<ServiceArea[]>({ queryKey: ["/api/service-areas"] });
@@ -73,13 +79,24 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
         specialRequests: form.specialRequests || undefined,
         totalPrice: form.totalPrice || "0",
         status: form.status,
+        payment: form.paymentStatus === "paid"
+          ? {
+              method: form.paymentMethod,
+              amount: Number(form.paymentAmount || form.totalPrice || 0),
+              reference: form.paymentReference || undefined,
+            }
+          : undefined,
       });
       return res.json();
     },
     onSuccess: (b) => {
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/today"] });
-      toast({ title: `Booking ${b.bookingNumber} created` });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] });
+      toast({
+        title: `Booking ${b.bookingNumber} created`,
+        description: form.paymentStatus === "paid" ? "Payment recorded." : undefined,
+      });
       onOpenChange(false);
     },
     onError: (err: Error) => {
@@ -87,8 +104,10 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
     },
   });
 
+  const paymentAmount = Number(form.paymentAmount || form.totalPrice || 0);
+  const paymentOk = form.paymentStatus === "unpaid" || (paymentAmount > 0 && paymentAmount <= Number(form.totalPrice || 0) + 0.01);
   const canSubmit =
-    form.serviceAreaId && form.sessionDate && form.contactName && form.contactPhone && form.contactEmail && Number(form.participantCount) > 0;
+    form.serviceAreaId && form.sessionDate && form.contactName && form.contactPhone && form.contactEmail && Number(form.participantCount) > 0 && paymentOk;
 
   function set(patch: Partial<typeof form>) {
     setForm((f) => ({ ...f, ...patch }));
@@ -101,7 +120,7 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
           <DialogTitle>New booking (manual)</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground -mt-1">
-          For phone / in-person bookings. Updates the calendar and trainer availability automatically. No online payment is taken here.
+          For phone / in-person bookings. Updates the calendar and trainer availability automatically. No card is charged here: if the customer paid by check or cash, record it below.
         </p>
 
         <div className="space-y-4 pt-2">
@@ -199,6 +218,49 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
               <Input placeholder="State" value={form.customerState} onChange={(e) => set({ customerState: e.target.value })} data-testid="input-nb-state" />
               <Input placeholder="ZIP" value={form.customerZip} onChange={(e) => set({ customerZip: e.target.value })} data-testid="input-nb-zip" />
             </div>
+          </div>
+
+          {/* Payment collected by the office (check / cash / card reader). */}
+          <div className="space-y-3 rounded-md border p-3" data-testid="section-nb-payment">
+            <Label>Payment</Label>
+            <Select value={form.paymentStatus} onValueChange={(v) => set({ paymentStatus: v as "unpaid" | "paid" })}>
+              <SelectTrigger data-testid="select-nb-payment-status"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="unpaid">Not paid yet (record it later)</SelectItem>
+                <SelectItem value="paid">Paid now</SelectItem>
+              </SelectContent>
+            </Select>
+            {form.paymentStatus === "paid" && (
+              <div className="grid grid-cols-3 gap-2">
+                <Select value={form.paymentMethod} onValueChange={(v) => set({ paymentMethod: v })}>
+                  <SelectTrigger data-testid="select-nb-payment-method"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="check">Check</SelectItem>
+                    <SelectItem value="cash">Cash</SelectItem>
+                    <SelectItem value="card_reader">Card reader</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  type="number" min={0} step="0.01"
+                  placeholder={form.totalPrice ? `$${Number(form.totalPrice).toFixed(2)}` : "Amount"}
+                  value={form.paymentAmount}
+                  onChange={(e) => set({ paymentAmount: e.target.value })}
+                  data-testid="input-nb-payment-amount"
+                />
+                <Input
+                  placeholder={form.paymentMethod === "check" ? "Check #" : "Reference"}
+                  value={form.paymentReference}
+                  onChange={(e) => set({ paymentReference: e.target.value })}
+                  data-testid="input-nb-payment-reference"
+                />
+              </div>
+            )}
+            {form.paymentStatus === "paid" && !paymentOk && (
+              <p className="text-xs text-destructive" data-testid="text-nb-payment-error">
+                {Number(form.totalPrice || 0) > 0 ? "Payment can't be more than the total price." : "Enter the total price first."}
+              </p>
+            )}
           </div>
 
           <div className="space-y-1.5">
