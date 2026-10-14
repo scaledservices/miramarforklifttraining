@@ -36,11 +36,17 @@ export default function CopyHoursDialog({ sourceArea, allAreas, open, onOpenChan
     mutationFn: async () => {
       if (!sourceRules) throw new Error("No hours to copy");
       await Promise.all(
-        selectedIds.map((id) =>
-          apiRequest("PATCH", `/api/service-areas/${id}/availability`, {
-            availabilityRules: sourceRules,
-          }),
-        ),
+        selectedIds.map((id) => {
+          // Copy weekly hours only. Each target keeps its own conditional-day
+          // rule (e.g. San Diego Saturdays that yield to Fresno), so copying
+          // San Diego to Fresno can't make Fresno conditional on itself.
+          const { conditionalDays: _srcCond, ...hours } = sourceRules as AvailabilityRules & { conditionalDays?: unknown };
+          const target = allAreas.find((a) => a.id === id);
+          const targetCond = (target?.availabilityRules as { conditionalDays?: unknown } | undefined)?.conditionalDays;
+          return apiRequest("PATCH", `/api/service-areas/${id}/availability`, {
+            availabilityRules: targetCond ? { ...hours, conditionalDays: targetCond } : hours,
+          });
+        }),
       );
       return selectedIds.length;
     },

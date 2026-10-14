@@ -57,3 +57,33 @@ test('buy-more-seats link targets the crew course as a crew seat', async () => {
   const pd = readFileSync('client/src/pages/ProductDetail.tsx', 'utf8');
   assert.match(pd, /seats > 1 \|\| forceCrew/);
 });
+
+// ---- San Diego Saturdays yield to Fresno (Peter: "prioritize Fresno") ----
+import { conditionalDaysOf, isConditionalDate, yieldsTo } from '../shared/conditional-days';
+const SD = { id: 1, slug: 'southern-california', availabilityRules: { daysOfWeek: [1, 3, 5], conditionalDays: { daysOfWeek: [6], priorityAreaSlug: 'central-california', timeSlots: [{ startTime: '09:00', endTime: '13:00' }] } } };
+const FRESNO = { id: 2, slug: 'central-california', availabilityRules: { daysOfWeek: [6] } };
+const SAT = '2026-11-07', WED = '2026-11-04';
+
+test('San Diego offers Saturday as a conditional day, 9-1 only', () => {
+  assert.equal(isConditionalDate(SD, SAT), true);
+  assert.equal(isConditionalDate(SD, WED), false);
+  assert.deepEqual(conditionalDaysOf(SD)!.timeSlots, [{ startTime: '09:00', endTime: '13:00' }]);
+  assert.equal(conditionalDaysOf(FRESNO), null);
+});
+
+test('a San Diego Saturday booking never blocks Fresno (Fresno has priority)', () => {
+  assert.equal(yieldsTo(SD, 'central-california', SAT), true);
+  // ...but a San Diego weekday booking still counts as normal for other cities
+  assert.equal(yieldsTo(SD, 'central-california', WED), false);
+  // ...and Fresno bookings are never ignored for San Diego
+  assert.equal(yieldsTo(FRESNO, 'southern-california', SAT), false);
+});
+
+test('slot generator closes the Saturday when Fresno is booked; booking API refuses it', () => {
+  const st = readFileSync('server/storage.ts', 'utf8');
+  assert.match(st, /isConditional && !priorityBooked\.has\(dateStr\)/);
+  const sv = readFileSync('server/routes/services.ts', 'utf8');
+  assert.equal((sv.match(/isConditionalDateClosed\(/g) || []).length, 3); // customer, admin, reschedule
+  const seed = readFileSync('scripts/seed-service-areas.ts', 'utf8');
+  assert.match(seed, /priorityAreaSlug: "central-california"/);
+});

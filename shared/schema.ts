@@ -537,6 +537,8 @@ export interface AvailabilityRules {
    * re-homed by the trainer if a group claims the day.
    */
   groupThreshold?: number;
+  /** Extra days offered only when a priority area is free (shared/conditional-days.ts). */
+  conditionalDays?: import("./conditional-days").ConditionalDays;
 }
 
 export interface AvailableSlot {
@@ -551,6 +553,11 @@ export interface AvailableSlot {
    * The slot is still bookable; the trainer resolves the conflict later.
    */
   tentative?: boolean;
+  /**
+   * True on a conditional day (e.g. San Diego Saturday): offered only while
+   * the priority city (Fresno) is free, so the trainer confirms the date.
+   */
+  conditional?: boolean;
 }
 
 export const platformSettings = pgTable("platform_settings", {

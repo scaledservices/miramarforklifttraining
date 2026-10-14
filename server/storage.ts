@@ -45,6 +45,7 @@ import {
 } from "@shared/schema";
 import type { QuoteStatus } from "@shared/config/quote-states";
 import { db, pool } from "./db";
+import { conditionalDaysOf, isConditionalDate, yieldsTo } from "@shared/conditional-days";
 import { eq, and, desc, asc, lt, lte, sql, isNull, ne, or, inArray, gt, gte, isNotNull } from "drizzle-orm";
 
 export interface IStorage {
@@ -199,6 +200,7 @@ export interface IStorage {
   getTrainerBlockedDates(from: string, to: string, excludeServiceAreaId?: number, groupThreshold?: number): Promise<Set<string>>;
   getTrainerSoftHoldDates(from: string, to: string, excludeServiceAreaId?: number, groupThreshold?: number): Promise<Set<string>>;
   isTrainerBookedOnDate(sessionDate: string, excludeServiceAreaId?: number, groupThreshold?: number): Promise<boolean>;
+  isConditionalDateClosed(areaId: number, sessionDate: string): Promise<boolean>;
 
   createBooking(data: InsertBooking): Promise<Booking>;
   getBookingById(id: number): Promise<Booking | undefined>;
@@ -1346,15 +1348,28 @@ export class DatabaseStorage implements IStorage {
     const slots: AvailableSlot[] = [];
     const current = new Date(effectiveFrom);
 
+    // Conditional days (San Diego Saturday): offered only while the priority
+    // area (Fresno) has no booking that date. Fresno always wins.
+    const cond = conditionalDaysOf({ id: serviceAreaId, slug: "", availabilityRules: rules });
+    let priorityBooked = new Set<string>();
+    if (cond) {
+      const priority = await this.getServiceAreaBySlug(cond.priorityAreaSlug);
+      if (priority) priorityBooked = await this.areaBookedDates(priority.id, from, to);
+    }
+
     while (current <= effectiveTo) {
       const dayOfWeek = current.getDay();
       // LOCAL date label (matches getDay()); toISOString() is UTC and off by one.
       const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}-${String(current.getDate()).padStart(2, "0")}`;
 
-      if (daysOfWeek.includes(dayOfWeek) && !blackoutSet.has(dateStr)) {
+      const isRegular = daysOfWeek.includes(dayOfWeek);
+      const isConditional = !isRegular && !!cond && cond.daysOfWeek.includes(dayOfWeek);
+      // A conditional date the priority area has claimed is simply not offered.
+      if ((isRegular || (isConditional && !priorityBooked.has(dateStr))) && !blackoutSet.has(dateStr)) {
         const trainerBusy = trainerBlockedDates.has(dateStr);
         const tentative = !trainerBusy && softHoldDates.has(dateStr);
-        for (const slot of timeSlots) {
+        const daySlots = isConditional ? cond!.timeSlots : timeSlots;
+        for (const slot of daySlots) {
           const booked = bookedMap.get(`${dateStr}_${slot.startTime}`) || 0;
           slots.push({
             date: dateStr,
@@ -1364,6 +1379,7 @@ export class DatabaseStorage implements IStorage {
             bookedParticipants: trainerBusy ? maxParticipants : booked,
             available: !trainerBusy && booked < maxParticipants,
             tentative,
+            ...(isConditional ? { conditional: true } : {}),
           });
         }
       }
@@ -1387,6 +1403,57 @@ export class DatabaseStorage implements IStorage {
     return Number(result?.total || 0);
   }
 
+  /**
+   * Per-date participant totals at OTHER areas, skipping bookings on a
+   * conditional day that yields to the viewing area (e.g. a San Diego Saturday
+   * never blocks Fresno). Meeting 2026-10-13.
+   */
+  private async otherAreaTotalsByDate(conditions: any[], viewingAreaId?: number): Promise<{ sessionDate: string; totalParticipants: number }[]> {
+    const rows = await db.select({
+      sessionDate: bookings.sessionDate,
+      serviceAreaId: bookings.serviceAreaId,
+      totalParticipants: sql<number>`COALESCE(SUM(${bookings.participantCount}), 0)`,
+    })
+    .from(bookings)
+    .where(and(...conditions))
+    .groupBy(bookings.sessionDate, bookings.serviceAreaId);
+    const areas = await db.select().from(serviceAreas);
+    const byId = new Map(areas.map((a) => [a.id, a]));
+    const viewingSlug = viewingAreaId !== undefined ? byId.get(viewingAreaId)?.slug : undefined;
+    const totals = new Map<string, number>();
+    for (const r of rows) {
+      if (yieldsTo(byId.get(r.serviceAreaId) as any, viewingSlug, r.sessionDate)) continue;
+      totals.set(r.sessionDate, (totals.get(r.sessionDate) || 0) + Number(r.totalParticipants));
+    }
+    return Array.from(totals, ([sessionDate, totalParticipants]) => ({ sessionDate, totalParticipants }));
+  }
+
+  /** Dates in [from,to] where `areaId` has any active booking. */
+  private async areaBookedDates(areaId: number, from: string, to: string): Promise<Set<string>> {
+    const rows = await db.selectDistinct({ sessionDate: bookings.sessionDate })
+      .from(bookings)
+      .where(and(
+        eq(bookings.serviceAreaId, areaId),
+        sql`${bookings.sessionDate} >= ${from}`,
+        sql`${bookings.sessionDate} <= ${to}`,
+        ne(bookings.status, 'cancelled'),
+      ));
+    return new Set(rows.map((r) => r.sessionDate));
+  }
+
+  /**
+   * Is a conditional date closed because its priority area is booked?
+   * Fresno wins: any active Fresno booking that day closes San Diego Saturday.
+   */
+  async isConditionalDateClosed(areaId: number, sessionDate: string): Promise<boolean> {
+    const area = await this.getServiceAreaById(areaId);
+    if (!area || !isConditionalDate(area as any, sessionDate)) return false;
+    const c = conditionalDaysOf(area as any)!;
+    const priority = await this.getServiceAreaBySlug(c.priorityAreaSlug);
+    if (!priority) return false;
+    return (await this.areaBookedDates(priority.id, sessionDate, sessionDate)).size > 0;
+  }
+
   // Group priority: only GROUP bookings (participants >= groupThreshold) at
   // another city hard-block the day for this area. Small bookings never block.
   async getTrainerBlockedDates(from: string, to: string, excludeServiceAreaId?: number, groupThreshold: number = 4): Promise<Set<string>> {
@@ -1398,13 +1465,7 @@ export class DatabaseStorage implements IStorage {
     if (excludeServiceAreaId !== undefined) {
       conditions.push(ne(bookings.serviceAreaId, excludeServiceAreaId));
     }
-    const results = await db.select({
-      sessionDate: bookings.sessionDate,
-      totalParticipants: sql<number>`COALESCE(SUM(${bookings.participantCount}), 0)`,
-    })
-    .from(bookings)
-    .where(and(...conditions))
-    .groupBy(bookings.sessionDate);
+    const results = await this.otherAreaTotalsByDate(conditions, excludeServiceAreaId);
 
     // A date is hard-blocked only if the combined group size at other cities
     // meets the threshold (a committed group, not a stray individual).
@@ -1427,13 +1488,7 @@ export class DatabaseStorage implements IStorage {
     if (excludeServiceAreaId !== undefined) {
       conditions.push(ne(bookings.serviceAreaId, excludeServiceAreaId));
     }
-    const results = await db.select({
-      sessionDate: bookings.sessionDate,
-      totalParticipants: sql<number>`COALESCE(SUM(${bookings.participantCount}), 0)`,
-    })
-    .from(bookings)
-    .where(and(...conditions))
-    .groupBy(bookings.sessionDate);
+    const results = await this.otherAreaTotalsByDate(conditions, excludeServiceAreaId);
 
     return new Set(
       results
@@ -1452,13 +1507,8 @@ export class DatabaseStorage implements IStorage {
     if (excludeServiceAreaId !== undefined) {
       conditions.push(ne(bookings.serviceAreaId, excludeServiceAreaId));
     }
-    const [result] = await db.select({
-      totalParticipants: sql<number>`COALESCE(SUM(${bookings.participantCount}), 0)`,
-    })
-    .from(bookings)
-    .where(and(...conditions));
-
-    return Number(result?.totalParticipants || 0) >= groupThreshold;
+    const totals = await this.otherAreaTotalsByDate(conditions, excludeServiceAreaId);
+    return Number(totals[0]?.totalParticipants || 0) >= groupThreshold;
   }
 
   async createBooking(data: InsertBooking): Promise<Booking> {

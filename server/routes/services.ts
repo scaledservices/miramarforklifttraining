@@ -13,6 +13,7 @@ import { validateDiscountCode, computeDiscountAmount, recordDiscountRedemption }
 import { createTransactionFromNonce, isAuthorizeNetConfigured, calculateCardSurcharge } from "../authorizeNetClient";
 import { isAdminRole } from "@shared/roles";
 import { eq } from "drizzle-orm";
+import { conditionalDaysOf } from "@shared/conditional-days";
 
 export function registerServiceRoutes(app: Express) {
 app.get("/api/documents", (_req: Request, res: Response) => {
@@ -152,11 +153,19 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
 
     const requestedDate = new Date(sessionDate + "T12:00:00Z");
     const dayOfWeek = requestedDate.getUTCDay();
-    if (!rules.daysOfWeek.includes(dayOfWeek)) {
+    // Conditional day (San Diego Saturday): allowed only while the priority
+    // area (Fresno) has no booking that date. Meeting 2026-10-13.
+    const cond = conditionalDaysOf(area as any);
+    const isConditionalDay = !rules.daysOfWeek.includes(dayOfWeek) && !!cond && cond.daysOfWeek.includes(dayOfWeek);
+    if (!rules.daysOfWeek.includes(dayOfWeek) && !isConditionalDay) {
       return res.status(400).json({ error: "Training is not available on this day of the week" });
     }
+    if (isConditionalDay && await storage.isConditionalDateClosed(area.id, sessionDate)) {
+      return res.status(409).json({ error: "The trainer is booked at another location on this date. Please select a different date." });
+    }
 
-    const validSlot = rules.timeSlots.some((s: any) => s.startTime === startTime && s.endTime === endTime);
+    const daySlots = isConditionalDay ? cond!.timeSlots : rules.timeSlots;
+    const validSlot = daySlots.some((s: any) => s.startTime === startTime && s.endTime === endTime);
     if (!validSlot) {
       return res.status(400).json({ error: "Invalid time slot" });
     }
@@ -438,6 +447,9 @@ app.post("/api/admin/bookings", requireRole("admin", "super_admin"), async (req:
     const trainerBusy = await storage.isTrainerBookedOnDate(sessionDate, Number(serviceAreaId), groupThreshold);
     if (trainerBusy) {
       return res.status(409).json({ error: "The trainer is already committed to a group at another location on this date." });
+    }
+    if (await storage.isConditionalDateClosed(Number(serviceAreaId), sessionDate)) {
+      return res.status(409).json({ error: "Fresno already has a booking that Saturday, and Fresno has priority. Pick another date." });
     }
     const maxParticipants = rules?.maxParticipants || 10;
     const bookedAlready = await storage.getBookedParticipants(Number(serviceAreaId), sessionDate, startTime);
@@ -894,6 +906,9 @@ app.patch("/api/admin/bookings/:id/reschedule", requireRole("admin", "super_admi
     const trainerBusy = await storage.isTrainerBookedOnDate(sessionDate, booking.serviceAreaId);
     if (trainerBusy) {
       return res.status(409).json({ error: "The trainer is already booked at another location on this date" });
+    }
+    if (await storage.isConditionalDateClosed(booking.serviceAreaId, sessionDate)) {
+      return res.status(409).json({ error: "Fresno already has a booking that Saturday, and Fresno has priority. Pick another date." });
     }
 
     const { bookings: bookingsTable } = await import("@shared/schema");

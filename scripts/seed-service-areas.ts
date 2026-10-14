@@ -40,6 +40,13 @@ const SERVICE_AREAS = [
       groupThreshold: 4,
       windowDays: 90,
       blackoutDates: [],
+      // Saturdays 9-1 only while Fresno has no booking that date; Fresno wins
+      // (Alberto meeting 2026-10-13, Peter: prioritize Fresno).
+      conditionalDays: {
+        daysOfWeek: [6],
+        priorityAreaSlug: "central-california",
+        timeSlots: [{ startTime: "09:00", endTime: "13:00" }],
+      },
     },
   },
   {

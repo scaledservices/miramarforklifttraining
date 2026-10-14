@@ -1871,6 +1871,7 @@
     "selectTimeSlot": "Select Time Slot",
     "spotsRemaining": "{{count}} spots remaining",
     "nextAvailable": "Next available: {{date}}",
+    "conditionalDayNotice": "To be confirmed by the trainer. Saturday sessions in San Diego depend on the trainer's schedule, so we will reach out to confirm your date after booking.",
     "trainerConfirmation": "To be confirmed by the trainer. Las Vegas sessions require a minimum group size, so we will reach out to confirm your date after booking.",
     "tentativeNotice": "This date is tentatively held at another location. You can still book it - our team will confirm your session within one business day.",
     "noSlotsForDate": "No available time slots for this date. Please try another date.",

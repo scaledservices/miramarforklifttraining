@@ -1868,6 +1868,7 @@
     "selectTimeSlot": "Seleccionar Horario",
     "spotsRemaining": "{{count}} lugares disponibles",
     "nextAvailable": "Próxima disponibilidad: {{date}}",
+    "conditionalDayNotice": "Para ser confirmado por el instructor. Las sesiones de los sábados en San Diego dependen del horario del instructor, así que nos comunicaremos con usted para confirmar su fecha después de la reserva.",
     "trainerConfirmation": "Para ser confirmado por el instructor. Las sesiones de Las Vegas requieren un grupo mínimo, así que nos comunicaremos con usted para confirmar su fecha después de la reserva.",
     "tentativeNotice": "Esta fecha está reservada provisionalmente en otra ubicación. Aún puede reservarla - nuestro equipo confirmará su sesión dentro de un día hábil.",
     "noSlotsForDate": "No hay horarios disponibles para esta fecha. Intente otra fecha.",

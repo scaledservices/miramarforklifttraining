@@ -69,6 +69,7 @@ interface RawSlot {
   bookedParticipants: number;
   available: boolean;
   tentative?: boolean;
+  conditional?: boolean;
 }
 
 const EQUIPMENT_OPTIONS = [
@@ -295,6 +296,9 @@ export default function BookTraining() {
   }, [rawSlots]);
 
   const selectedDateTentative = selectedDate ? tentativeDateSet.has(selectedDate) : false;
+  // San Diego Saturday (meeting 2026-10-13): offered only while Fresno is free,
+  // so the trainer confirms the date after booking.
+  const selectedDateConditional = !!selectedDate && !!rawSlots?.some?.((s) => s.date === selectedDate && s.conditional);
 
   const slotsForDate = useMemo(() => {
     if (!selectedDate || !rawSlots || !Array.isArray(rawSlots)) return [];
@@ -903,6 +907,12 @@ export default function BookTraining() {
                       <p className="mb-3 flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2" data-testid="text-trainer-confirmation">
                         <AlertCircle className="w-4 h-4 shrink-0" />
                         {t("bookTraining.trainerConfirmation")}
+                      </p>
+                    )}
+                    {selectedDateConditional && (
+                      <p className="mb-3 flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2" data-testid="text-conditional-notice">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        {t("bookTraining.conditionalDayNotice")}
                       </p>
                     )}
                     {selectedDateTentative && (
