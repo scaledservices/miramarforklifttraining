@@ -23,8 +23,11 @@ export type DiscountValidationResult =
  * Validate a discount code string against active/window/max-redemption rules.
  * Returns the full code row on success so callers can compute the discount.
  */
+import { normalizeDiscountCode } from "@shared/discount-code";
+export { normalizeDiscountCode };
+
 export async function validateDiscountCode(rawCode: string): Promise<DiscountValidationResult> {
-  const normalized = String(rawCode || "").trim().toUpperCase();
+  const normalized = normalizeDiscountCode(rawCode);
   if (!normalized) return { valid: false, reason: "No code provided" };
 
   const rows = await db.select().from(discountCodes).where(eq(discountCodes.code, normalized));

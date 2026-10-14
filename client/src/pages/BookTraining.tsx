@@ -195,7 +195,7 @@ export default function BookTraining() {
         setAppliedDiscount({ code: data.code, discountType: data.discountType, amount: Number(data.amount) });
       } else {
         setAppliedDiscount(null);
-        setDiscountError(data.reason || null);
+        setDiscountError(data.reason || "invalid");
       }
     } catch {
       setAppliedDiscount(null);
@@ -1260,7 +1260,10 @@ export default function BookTraining() {
                         </Button>
                       </div>
                       {discountError && (
-                        <p className="text-xs text-destructive" data-testid="text-promo-error">{t("bookTraining.promoInvalid")}</p>
+                        <p className="text-xs text-destructive" data-testid="text-promo-error">
+                          {/* 2026-10-13: show the server's real reason (limit reached, expired...) instead of a generic message */}
+                          {discountError === "invalid" ? t("bookTraining.promoInvalid") : discountError}
+                        </p>
                       )}
                     </div>
                     <CardPaymentSection
