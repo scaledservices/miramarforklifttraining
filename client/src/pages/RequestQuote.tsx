@@ -14,7 +14,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, Building2, Users, MapPin, Phone, Mail, Calendar, ClipboardList, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -39,6 +38,11 @@ const TRAINING_TYPES = [
 
 const activeLocations = getActiveLocations();
 
+// 2026-10-13 (Alberto): one question instead of two. "At your location" lives
+// in the Training Area dropdown next to the cities, so a customer outside our
+// three markets (e.g. Arizona) can ask for a quote without picking a city.
+const AT_YOUR_LOCATION = "__onsite__";
+
 const formSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
   lastName: z.string().min(2, "Last name is required"),
@@ -46,7 +50,6 @@ const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().optional(),
   requestedLocationSlug: z.string().min(1, "Please select a location"),
-  trainingLocation: z.enum(["facility", "onsite"]),
   trainingAddress: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
@@ -57,7 +60,8 @@ const formSchema = z.object({
   preferredDate1: z.string().optional(),
   notes: z.string().optional(),
 }).refine((data) => {
-  if (data.trainingLocation === "onsite") {
+  const loc = getLocation(data.requestedLocationSlug);
+  if (data.requestedLocationSlug === AT_YOUR_LOCATION || (loc && !loc.supportsInPerson)) {
     return data.trainingAddress && data.trainingAddress.length >= 5 &&
            data.city && data.city.length >= 2 &&
            data.state && data.state.length >= 2 &&
@@ -89,7 +93,10 @@ export default function RequestQuote() {
     trackEvent("quote_started", {});
   }, []);
 
-  const defaultLocationSlug = activeLocations.length > 0 ? activeLocations[0].slug : "san-diego";
+  // ?location=onsite deep-links straight to "At your location".
+  const defaultLocationSlug = new URLSearchParams(window.location.search).get("location") === "onsite"
+    ? AT_YOUR_LOCATION
+    : activeLocations.length > 0 ? activeLocations[0].slug : "san-diego";
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -100,7 +107,6 @@ export default function RequestQuote() {
       email: "",
       phone: "",
       requestedLocationSlug: defaultLocationSlug,
-      trainingLocation: "facility",
       trainingAddress: "",
       city: "",
       state: "",
@@ -113,15 +119,17 @@ export default function RequestQuote() {
     },
   });
 
-  const trainingLocation = form.watch("trainingLocation");
   const selectedLocationSlug = form.watch("requestedLocationSlug");
-  const selectedLocation = getSelectedLocation(selectedLocationSlug);
-  const showFacilityOption = selectedLocation?.supportsInPerson ?? false;
+  const isOnsite = selectedLocationSlug === AT_YOUR_LOCATION;
+  const selectedLocation = isOnsite ? undefined : getSelectedLocation(selectedLocationSlug);
+  // Address fields show for "At your location" (or a market with no facility).
+  const showAddressFields = isOnsite || (!!selectedLocation && !selectedLocation.supportsInPerson);
 
   const mutation = useMutation({
     mutationFn: (data: FormValues) => {
-      const loc = getSelectedLocation(data.requestedLocationSlug);
-      const isFacility = data.trainingLocation === "facility" && loc?.supportsInPerson;
+      const onsite = data.requestedLocationSlug === AT_YOUR_LOCATION;
+      const loc = onsite ? undefined : getSelectedLocation(data.requestedLocationSlug);
+      const isFacility = !onsite && !!loc?.supportsInPerson;
       const payload: Record<string, string | number | string[] | undefined> = {
         contactName: `${data.firstName} ${data.lastName}`,
         companyName: data.companyName || undefined,
@@ -137,18 +145,20 @@ export default function RequestQuote() {
         preferredDate1: data.preferredDate1 || undefined,
         notes: data.notes || undefined,
         leadSource: getLeadSourceFromUrl(),
-        requestedLocationSlug: data.requestedLocationSlug,
+        requestedLocationSlug: onsite ? undefined : data.requestedLocationSlug,
         requestedLocationType: isFacility ? "facility" : "customer_onsite",
       };
       return apiRequest("POST", "/api/onsite-requests", payload);
     },
     onSuccess: () => {
-      trackLeadSubmit(getLeadSourceFromUrl(), form.getValues("requestedLocationSlug"));
+      const submittedSlug = form.getValues("requestedLocationSlug");
+      const submittedMarket = submittedSlug === AT_YOUR_LOCATION ? "customer_onsite" : submittedSlug;
+      trackLeadSubmit(getLeadSourceFromUrl(), submittedMarket);
       trackEvent("quote_submitted", {
         lead_source: getLeadSourceFromUrl(),
         trainee_count: form.getValues("traineeCount"),
-        training_location: form.getValues("trainingLocation"),
-        requested_location: form.getValues("requestedLocationSlug"),
+        training_location: submittedSlug === AT_YOUR_LOCATION ? "onsite" : "facility",
+        requested_location: submittedMarket,
       });
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -269,16 +279,7 @@ export default function RequestQuote() {
                 <FormField control={form.control} name="requestedLocationSlug" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("requestQuote.trainingMarket")}</FormLabel>
-                    <Select
-                      onValueChange={(val) => {
-                        field.onChange(val);
-                        const loc = getSelectedLocation(val);
-                        if (loc && !loc.supportsInPerson) {
-                          form.setValue("trainingLocation", "onsite");
-                        }
-                      }}
-                      value={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-training-market">
                           <SelectValue placeholder={t("requestQuote.selectLocation")} />
@@ -288,37 +289,17 @@ export default function RequestQuote() {
                         {activeLocations.map((loc) => (
                           <SelectItem key={loc.slug} value={loc.slug}>{loc.displayName}</SelectItem>
                         ))}
+                        <SelectItem value={AT_YOUR_LOCATION} data-testid="option-at-your-location">
+                          {t("requestQuote.atYourLocation")}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )} />
 
-                <FormField control={form.control} name="trainingLocation" render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>{t("requestQuote.trainingLocationLabel")}</FormLabel>
-                    <FormControl>
-                      <RadioGroup onValueChange={field.onChange} value={field.value} className="flex flex-col sm:flex-row gap-4">
-                        {showFacilityOption && (
-                          <div className="flex items-center space-x-2">
-                            <RadioGroupItem value="facility" id="loc-facility" data-testid="radio-facility" />
-                            <label htmlFor="loc-facility" className="text-sm cursor-pointer">
-                              {t("requestQuote.atFacility", { location: selectedLocation?.displayName || "" })}
-                            </label>
-                          </div>
-                        )}
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="onsite" id="loc-onsite" data-testid="radio-onsite" />
-                          <label htmlFor="loc-onsite" className="text-sm cursor-pointer">{t("requestQuote.atYourFacility")}</label>
-                        </div>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
                 {/* Clearly show the address of the facility the customer selected. */}
-                {trainingLocation === "facility" && showFacilityOption && selectedLocation && (
+                {!showAddressFields && selectedLocation && (
                   <div className="border rounded-lg p-4 bg-accent/10 flex items-start gap-3" data-testid="facility-address-display">
                     <MapPin className="h-5 w-5 text-brand-orange shrink-0 mt-0.5" />
                     <div className="text-sm">
@@ -329,7 +310,7 @@ export default function RequestQuote() {
                   </div>
                 )}
 
-                {trainingLocation === "onsite" && (
+                {showAddressFields && (
                   <div className="space-y-3 border rounded-lg p-4 bg-muted/30">
                     <p className="text-sm font-medium">{t("requestQuote.yourTrainingAddress")}</p>
                     <FormField control={form.control} name="trainingAddress" render={({ field }) => (

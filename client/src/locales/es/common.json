@@ -2401,6 +2401,7 @@
     "dashboardCtaLink": "Ir a Referidos"
   },
   "requestQuote": {
+    "atYourLocation": "En su ubicación (vamos a usted)",
     "seoTitle": "Solicita una Cotización de Capacitación de Montacargas | {{brand}}",
     "seoDesc": "Obtén una cotización rápida de {{brand}} para capacitación de montacargas en tu instalación o certificación en grupo. Cuéntanos sobre tu equipo de trabajo y respondemos en un día hábil.",
     "successTitle": "¡Recibimos tu solicitud de cotización!",
