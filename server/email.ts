@@ -805,6 +805,20 @@ function parseNotificationPreferences(prefs: unknown): Record<NotificationType, 
   return defaults;
 }
 
+/**
+ * The office inbox (online@miramarforklift.com via ADMIN_EMAIL) ALWAYS gets
+ * booking/order/payment alerts: Alberto forwards them to Christine for
+ * invoicing (meeting 2026-10-14). Admins who opted in are added on top.
+ */
+export function officeInbox(): string {
+  return process.env.ADMIN_EMAIL || brand.support.email || `admin@${brand.domain}`;
+}
+
+export function withOfficeInbox(recipients: string[]): string[] {
+  const all = [officeInbox(), ...recipients];
+  return Array.from(new Set(all.map((e) => e.trim().toLowerCase()).filter(Boolean)));
+}
+
 async function getAdminEmails(notificationType: NotificationType): Promise<string[]> {
   try {
     const admins = await db.select({ email: users.email, prefs: users.notificationPreferences })
@@ -818,15 +832,10 @@ async function getAdminEmails(notificationType: NotificationType): Promise<strin
       })
       .map(a => a.email);
 
-    if (recipients.length === 0) {
-      const fallback = process.env.ADMIN_EMAIL || `admin@${brand.domain}`;
-      return [fallback];
-    }
-    return recipients;
+    return withOfficeInbox(recipients);
   } catch (err) {
     console.error("[EMAIL] Failed to fetch admin recipients:", err);
-    const fallback = process.env.ADMIN_EMAIL || `admin@${brand.domain}`;
-    return [fallback];
+    return [officeInbox()];
   }
 }
 
@@ -1512,11 +1521,11 @@ async function getAdminEmailsFallback(): Promise<string[]> {
     const admins = await db.select({ email: users.email })
       .from(users)
       .where(eq(users.role, 'super_admin'));
-    if (admins.length > 0) return admins.map(a => a.email);
+    return withOfficeInbox(admins.map(a => a.email));
   } catch (err) {
     console.error("[EMAIL] Failed to fetch admin recipients:", err);
   }
-  return [process.env.ADMIN_EMAIL || `admin@${brand.domain}`];
+  return [officeInbox()];
 }
 
 export async function sendAbandonedCheckoutReminder(params: {

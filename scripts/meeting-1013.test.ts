@@ -125,3 +125,11 @@ test('wallet cards take no discount codes', () => {
   const route = readFileSync('server/routes/certs.ts', 'utf8');
   assert.match(route, /Discount codes apply to training only/);
 });
+
+test('booking/order/payment alerts always include the office inbox (online@)', async () => {
+  process.env.ADMIN_EMAIL = 'online@miramarforklift.com';
+  const { withOfficeInbox } = await import('../server/email');
+  assert.deepEqual(withOfficeInbox([]), ['online@miramarforklift.com']);
+  assert.deepEqual(withOfficeInbox(['Training@MiramarForklift.com', 'online@miramarforklift.com']),
+    ['online@miramarforklift.com', 'training@miramarforklift.com']);
+});
