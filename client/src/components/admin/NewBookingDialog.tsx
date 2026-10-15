@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { catalog } from "@/data/catalog";
 import type { ServiceArea } from "@shared/schema";
+import { programsForArea, autoPrice, AREA_FACILITY } from "@shared/manual-booking";
 
 interface NewBookingDialogProps {
   open: boolean;
@@ -27,7 +28,12 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
   const { toast } = useToast();
   const [form, setForm] = useState({
     serviceAreaId: "",
-    productSlug: "standard-forklift-certification",
+    productSlug: "",
+    // "facility" = at our training site; "onsite" = trainer goes to the
+    // customer's address (meeting 2026-10-14: match the onsite location list).
+    where: "facility" as "facility" | "onsite",
+    // true once Alberto types a price himself (discounts); stops auto-fill.
+    priceEdited: false,
     sessionDate: "",
     startTime: "09:00",
     endTime: "13:00",
@@ -58,7 +64,31 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
   );
   const timeSlots = (selectedArea?.availabilityRules as any)?.timeSlots ?? [];
 
-  const handsOnProducts = useMemo(() => catalog.filter((p) => p.category === "hands-on"), []);
+  // Only the programs offered at the chosen location (no duplicates across
+  // cities), price filled in from the program x participants.
+  const programs = useMemo(
+    () => programsForArea(catalog as any, selectedArea?.slug),
+    [selectedArea?.slug],
+  );
+
+  function pickArea(id: string) {
+    const area = serviceAreas?.find((a) => String(a.id) === id);
+    const list = programsForArea(catalog as any, area?.slug);
+    const keep = list.find((p) => p.slug === form.productSlug) ?? list[0];
+    set({
+      serviceAreaId: id,
+      productSlug: keep?.slug ?? "",
+      ...(form.priceEdited ? {} : { totalPrice: autoPrice(keep?.price, form.participantCount) }),
+    });
+  }
+  function pickProgram(slug: string) {
+    const p = programs.find((x) => x.slug === slug);
+    set({ productSlug: slug, ...(form.priceEdited ? {} : { totalPrice: autoPrice(p?.price, form.participantCount) }) });
+  }
+  function pickCount(count: string) {
+    const p = programs.find((x) => x.slug === form.productSlug);
+    set({ participantCount: count, ...(form.priceEdited ? {} : { totalPrice: autoPrice(p?.price, count) }) });
+  }
 
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -76,7 +106,10 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
         customerCity: form.customerCity,
         customerState: form.customerState,
         customerZip: form.customerZip,
-        specialRequests: form.specialRequests || undefined,
+        specialRequests: [
+          form.where === "onsite" ? "ONSITE: training at the customer's location (address above)." : "",
+          form.specialRequests,
+        ].filter(Boolean).join("\n") || undefined,
         totalPrice: form.totalPrice || "0",
         status: form.status,
         payment: form.paymentStatus === "paid"
@@ -106,8 +139,9 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
 
   const paymentAmount = Number(form.paymentAmount || form.totalPrice || 0);
   const paymentOk = form.paymentStatus === "unpaid" || (paymentAmount > 0 && paymentAmount <= Number(form.totalPrice || 0) + 0.01);
+  const onsiteAddressOk = form.where === "facility" || (form.customerAddress && form.customerCity && form.customerState && form.customerZip);
   const canSubmit =
-    form.serviceAreaId && form.sessionDate && form.contactName && form.contactPhone && form.contactEmail && Number(form.participantCount) > 0 && paymentOk;
+    form.serviceAreaId && form.productSlug && onsiteAddressOk && form.sessionDate && form.contactName && form.contactPhone && form.contactEmail && Number(form.participantCount) > 0 && paymentOk;
 
   function set(patch: Partial<typeof form>) {
     setForm((f) => ({ ...f, ...patch }));
@@ -127,26 +161,39 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label>Location *</Label>
-              <Select value={form.serviceAreaId} onValueChange={(v) => set({ serviceAreaId: v })}>
+              <Select value={form.serviceAreaId} onValueChange={pickArea}>
                 <SelectTrigger data-testid="select-nb-area"><SelectValue placeholder="Choose location" /></SelectTrigger>
                 <SelectContent>
-                  {(serviceAreas ?? []).map((a) => (
+                  {(serviceAreas ?? []).filter((a) => AREA_FACILITY[a.slug]).map((a) => (
                     <SelectItem key={a.id} value={String(a.id)}>{a.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Program *</Label>
-              <Select value={form.productSlug} onValueChange={(v) => set({ productSlug: v })}>
-                <SelectTrigger data-testid="select-nb-product"><SelectValue /></SelectTrigger>
+              <Label>Where *</Label>
+              <Select value={form.where} onValueChange={(v) => set({ where: v as "facility" | "onsite" })}>
+                <SelectTrigger data-testid="select-nb-where"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {handsOnProducts.map((p) => (
-                    <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>
-                  ))}
+                  <SelectItem value="facility">At our {selectedArea?.name ?? ""} facility</SelectItem>
+                  <SelectItem value="onsite">At the customer's location</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Program *</Label>
+            <Select value={form.productSlug} onValueChange={pickProgram} disabled={!selectedArea}>
+              <SelectTrigger data-testid="select-nb-product">
+                <SelectValue placeholder={selectedArea ? "Choose program" : "Choose a location first"} />
+              </SelectTrigger>
+              <SelectContent>
+                {programs.map((p) => (
+                  <SelectItem key={p.slug} value={p.slug}>{p.title} · ${p.price}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
@@ -177,11 +224,12 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
               <Label>Participants *</Label>
-              <Input type="number" min={1} value={form.participantCount} onChange={(e) => set({ participantCount: e.target.value })} data-testid="input-nb-count" />
+              <Input type="number" min={1} value={form.participantCount} onChange={(e) => pickCount(e.target.value)} data-testid="input-nb-count" />
             </div>
             <div className="space-y-1.5">
               <Label>Total price ($)</Label>
-              <Input type="number" min={0} step="0.01" placeholder="0.00" value={form.totalPrice} onChange={(e) => set({ totalPrice: e.target.value })} data-testid="input-nb-price" />
+              <Input type="number" min={0} step="0.01" placeholder="0.00" value={form.totalPrice} onChange={(e) => set({ totalPrice: e.target.value, priceEdited: true })} data-testid="input-nb-price" />
+              <p className="text-xs text-muted-foreground">{form.priceEdited ? "Custom price" : "From program price; edit for a discount"}</p>
             </div>
             <div className="space-y-1.5">
               <Label>Status</Label>
@@ -211,7 +259,10 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
           </div>
 
           <div className="space-y-1.5">
-            <Label>Training address <span className="text-muted-foreground font-normal">(if onsite)</span></Label>
+            <Label>
+              {form.where === "onsite" ? "Training address *" : "Customer address"}{" "}
+              <span className="text-muted-foreground font-normal">{form.where === "onsite" ? "(where the trainer goes)" : "(optional)"}</span>
+            </Label>
             <Input placeholder="Street" value={form.customerAddress} onChange={(e) => set({ customerAddress: e.target.value })} data-testid="input-nb-address" />
             <div className="grid grid-cols-3 gap-2 mt-2">
               <Input placeholder="City" value={form.customerCity} onChange={(e) => set({ customerCity: e.target.value })} data-testid="input-nb-city" />

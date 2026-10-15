@@ -133,3 +133,23 @@ test('booking/order/payment alerts always include the office inbox (online@)', a
   assert.deepEqual(withOfficeInbox(['Training@MiramarForklift.com', 'online@miramarforklift.com']),
     ['online@miramarforklift.com', 'training@miramarforklift.com']);
 });
+
+import { programsForArea, autoPrice } from '../shared/manual-booking';
+import { catalog } from '../client/src/data/catalog';
+
+test('manual booking shows only the chosen location\'s programs, no duplicates', () => {
+  const fresno = programsForArea(catalog as any, 'central-california');
+  assert.deepEqual(fresno.map((p) => p.slug), ['standard-forklift-certification-fresno']);
+  const sd = programsForArea(catalog as any, 'southern-california');
+  assert.equal(sd.length, 8);
+  assert.equal(new Set(sd.map((p) => p.title)).size, sd.length);
+  assert.ok(sd.every((p) => p.slug.endsWith('-san-diego')));
+  assert.equal(programsForArea(catalog as any, 'southern-nevada').length, 5);
+  assert.deepEqual(programsForArea(catalog as any, undefined), []);
+});
+
+test('manual booking price fills from program x participants', () => {
+  assert.equal(autoPrice(280, '3'), '840.00');
+  assert.equal(autoPrice(280, '0'), '');
+  assert.equal(autoPrice(undefined, '2'), '');
+});
