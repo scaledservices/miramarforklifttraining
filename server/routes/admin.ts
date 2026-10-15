@@ -286,7 +286,11 @@ app.get("/api/admin/orders", requireRole("admin", "super_admin"), async (_req: R
           if (companyName) companyCache.set(order.companyId, companyName);
         }
       }
-      return { ...order, userName: user?.name || "Unknown", userEmail: user?.email || "", companyName, companyId: order.companyId || null };
+      // Amount refundable = what was actually charged (card fee included).
+      const pays = await storage.getPaymentsByOrder(order.id);
+      const paidAmount = refundableAmount(pays as any);
+      const method = (pays as any[]).find((p) => p.status === "approved")?.provider || null;
+      return { ...order, userName: user?.name || "Unknown", userEmail: user?.email || "", companyName, companyId: order.companyId || null, paidAmount, paymentProvider: method };
     }));
     return res.json({ orders: enriched });
   } catch (error) {
@@ -319,6 +323,7 @@ app.post("/api/admin/orders/:id/refund", requireRole("admin", "super_admin"), as
       if (!refundResult.success) {
         return res.status(400).json({ error: refundResult.errorMessage || "Refund failed" });
       }
+      (res.locals as any).refundMethod = (refundResult as any).method;
     } else {
       await storage.updateOrderStatus(order.id, "refunded");
     }
@@ -353,7 +358,7 @@ app.post("/api/admin/orders/:id/refund", requireRole("admin", "super_admin"), as
       console.error("[Refund] Email error (non-fatal):", emailErr);
     }
 
-    return res.json({ success: true, revokedCertifications: certs.length });
+    return res.json({ success: true, revokedCertifications: certs.length, refundAmount, method: (res.locals as any).refundMethod || null });
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });
   }

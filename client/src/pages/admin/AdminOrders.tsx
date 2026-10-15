@@ -26,10 +26,14 @@ interface AdminOrder {
   createdAt: string;
   companyId: number | null;
   companyName: string | null;
+  paidAmount?: number;
+  paymentProvider?: string | null;
 }
 
 export default function AdminOrders() {
   const [viewOrder, setViewOrder] = useState<AdminOrder | null>(null);
+  // Refund confirmation (Alberto 2026-10-14): one click used to refund instantly.
+  const [refundOrder, setRefundOrder] = useState<AdminOrder | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [userFilter, setUserFilter] = useState<number | null>(null);
@@ -51,11 +55,18 @@ export default function AdminOrders() {
 
   const refundMutation = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest("POST", `/api/admin/orders/${id}/refund`);
+      const res = await apiRequest("POST", `/api/admin/orders/${id}/refund`);
+      return res.json() as Promise<{ refundAmount?: number; method?: "void" | "refund" | null }>;
     },
-    onSuccess: () => {
+    onSuccess: (r) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] });
-      toast({ title: "Refund issued" });
+      setRefundOrder(null);
+      toast({
+        title: r?.method === "void" ? "Charge voided" : "Refund issued",
+        description: r?.method === "void"
+          ? `The $${(r.refundAmount ?? 0).toFixed(2)} charge was cancelled before it settled. The customer is never charged.`
+          : r?.refundAmount != null ? `$${r.refundAmount.toFixed(2)} returned to the customer.` : undefined,
+      });
     },
     onError: (err: Error) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -218,8 +229,9 @@ export default function AdminOrders() {
                           <Button
                             size="icon"
                             variant="ghost"
-                            onClick={() => refundMutation.mutate(order.id)}
+                            onClick={() => setRefundOrder(order)}
                             disabled={refundMutation.isPending}
+                            title="Refund"
                             data-testid={`button-refund-order-${order.id}`}
                           >
                             <RefreshCw />
@@ -267,6 +279,44 @@ export default function AdminOrders() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setViewOrder(null)} data-testid="button-close-order-detail">
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Are-you-sure step before any money moves (Alberto 2026-10-14). */}
+      <Dialog open={!!refundOrder} onOpenChange={(o) => { if (!o && !refundMutation.isPending) setRefundOrder(null); }}>
+        <DialogContent className="max-w-md" data-testid="dialog-confirm-refund">
+          <DialogHeader>
+            <DialogTitle>Refund this order?</DialogTitle>
+          </DialogHeader>
+          {refundOrder && (
+            <div className="space-y-3 text-sm">
+              <p>
+                <span className="font-semibold">{refundOrder.orderNumber}</span> · {refundOrder.userName}
+                {refundOrder.userEmail ? <span className="text-muted-foreground"> ({refundOrder.userEmail})</span> : null}
+              </p>
+              <p className="text-lg font-bold" data-testid="text-refund-amount">
+                ${Number(refundOrder.paidAmount ?? refundOrder.total).toFixed(2)}
+              </p>
+              <p className="text-muted-foreground">
+                {refundOrder.paymentProvider?.startsWith("manual_")
+                  ? "This was paid by check or cash. Return the money to the customer yourself; this only records the refund."
+                  : "The full amount goes back to the customer's card. Any certificates from this order will be revoked."}
+              </p>
+              <p className="font-medium text-destructive">This cannot be undone.</p>
+            </div>
+          )}
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setRefundOrder(null)} disabled={refundMutation.isPending} data-testid="button-cancel-refund">
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => refundOrder && refundMutation.mutate(refundOrder.id)}
+              disabled={refundMutation.isPending}
+              data-testid="button-confirm-refund"
+            >
+              {refundMutation.isPending ? "Refunding..." : "Yes, refund"}
             </Button>
           </DialogFooter>
         </DialogContent>
