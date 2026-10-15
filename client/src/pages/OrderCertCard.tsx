@@ -22,8 +22,6 @@ import {
   Loader2,
   Lock,
   Image as ImageIcon,
-  Tag,
-  X,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { formatCardNumber, digitsOnly } from "@/lib/inputFormat";
@@ -168,33 +166,8 @@ export default function OrderCertCard() {
   // without it. Downscaled data URL, same processing as before.
   const [idPhoto, setIdPhoto] = useState<string | null>(null);
 
-  // Discount code (2026-10-13). Server re-validates and re-computes; this only
-  // previews the reduced total.
-  const [discountInput, setDiscountInput] = useState("");
-  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; discountType: "percent" | "fixed"; amount: number } | null>(null);
-  const [discountError, setDiscountError] = useState<string | null>(null);
-  const validateDiscount = useMutation({
-    mutationFn: async (code: string) => {
-      const res = await apiRequest("POST", "/api/discount-codes/validate", { code });
-      return res.json() as Promise<{ valid: boolean; code?: string; discountType?: "percent" | "fixed"; amount?: number; reason?: string }>;
-    },
-    onSuccess: (d, submitted) => {
-      if (d.valid && d.discountType && typeof d.amount === "number") {
-        setAppliedDiscount({ code: d.code || submitted.trim().toUpperCase(), discountType: d.discountType, amount: d.amount });
-        setDiscountError(null);
-      } else {
-        setAppliedDiscount(null);
-        setDiscountError(d.reason || t("checkout.discountInvalid", { defaultValue: "This code is not valid." }));
-      }
-    },
-    onError: () => setDiscountError(t("checkout.discountCheckFailed", { defaultValue: "Could not check the code. Please try again." })),
-  });
-  const applyDiscount = () => {
-    const v = discountInput.trim();
-    if (!v) return;
-    setDiscountError(null);
-    validateDiscount.mutate(v);
-  };
+  // Discount codes do NOT apply to wallet cards (Alberto 2026-10-14: codes are
+  // for training only, never add-on revenue).
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -296,21 +269,9 @@ export default function OrderCertCard() {
   }, [prepaidEntitlement]);
 
   const shippingCost = 0; // 2026-09-07 (Alberto): shipping included in flat $25
-  const baseSubtotal = CARD_PRICE + shippingCost;
-  // Mirrors server/routes/discounts.ts computeDiscountAmount.
-  const discountAmount = appliedDiscount
-    ? Number(Math.min(
-        appliedDiscount.discountType === "percent"
-          ? baseSubtotal * (Math.min(Math.max(appliedDiscount.amount, 0), 100) / 100)
-          : Math.max(appliedDiscount.amount, 0),
-        baseSubtotal,
-      ).toFixed(2))
-    : 0;
-  const subtotal = Number(Math.max(0, baseSubtotal - discountAmount).toFixed(2));
-  const surcharge = paymentConfig?.configured && subtotal > 0 ? Number((subtotal * CARD_SURCHARGE_RATE).toFixed(2)) : 0;
+  const subtotal = CARD_PRICE + shippingCost;
+  const surcharge = paymentConfig?.configured ? Number((subtotal * CARD_SURCHARGE_RATE).toFixed(2)) : 0;
   const total = Number((subtotal + surcharge).toFixed(2));
-  // 100% code: nothing to charge, so no card form and no gateway call.
-  const isFree = !!appliedDiscount && total <= 0;
 
   // Pay-now path (no prepaid entitlement) — POST /api/cert-cards, unchanged.
   const orderMutation = useMutation({
@@ -326,9 +287,6 @@ export default function OrderCertCard() {
       }
       if (data.paymentNonce) {
         payload.paymentNonce = data.paymentNonce;
-      }
-      if (appliedDiscount) {
-        payload.discountCode = appliedDiscount.code;
       }
       const res = await apiRequest("POST", "/api/cert-cards", payload);
       return res.json();
@@ -449,10 +407,7 @@ export default function OrderCertCard() {
     }
     if (!prepaidEntitlement && step === reviewStepIndex) {
       // Payment step — use Accept.js dispatchData if configured, demo mode otherwise
-      if (isFree) {
-        setIsProcessing(true);
-        orderMutation.mutate({});
-      } else if (paymentConfig?.configured && paymentConfig.clientKey && paymentConfig.apiLoginID && acceptLoaded && window.Accept) {
+      if (paymentConfig?.configured && paymentConfig.clientKey && paymentConfig.apiLoginID && acceptLoaded && window.Accept) {
         // Basic validation
         const cardNumber = cardForm.cardNumber.replace(/\s/g, "");
         if (!cardNumber || cardNumber.length < 13) {
@@ -639,13 +594,7 @@ export default function OrderCertCard() {
             </div>
 
             {/* Payment */}
-            {isFree ? (
-              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4 text-sm" data-testid="banner-no-payment">
-                <p className="font-medium text-green-800 dark:text-green-400">
-                  {t("orderCertCard.noPaymentNeeded", { defaultValue: "Your code covers the full price. No card needed." })}
-                </p>
-              </div>
-            ) : paymentConfig?.configured ? (
+            {paymentConfig?.configured ? (
               <>
                 <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm">
                   <p className="font-medium text-blue-800 dark:text-blue-400 mb-1">
@@ -777,54 +726,6 @@ export default function OrderCertCard() {
                 </p>
               </div>
             )}
-            {/* Discount code */}
-            <div className="space-y-2" data-testid="section-discount">
-              {appliedDiscount ? (
-                <div className="flex items-center justify-between gap-2 bg-brand-green/10 border border-brand-green/30 rounded-md px-3 py-2">
-                  <div className="flex items-center gap-2 text-sm min-w-0">
-                    <Tag className="w-4 h-4 shrink-0 text-brand-green" />
-                    <span className="font-mono font-medium truncate" data-testid="text-applied-discount">{appliedDiscount.code}</span>
-                    <span className="text-muted-foreground shrink-0">
-                      {appliedDiscount.discountType === "percent" ? `-${appliedDiscount.amount}%` : `-$${appliedDiscount.amount.toFixed(2)}`}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => { setAppliedDiscount(null); setDiscountInput(""); setDiscountError(null); }}
-                    className="text-muted-foreground hover:text-foreground shrink-0"
-                    aria-label={t("checkout.removeDiscount", { defaultValue: "Remove discount code" })}
-                    disabled={isProcessing}
-                    data-testid="button-remove-discount"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={t("checkout.discountPlaceholder", { defaultValue: "Discount code" })}
-                    value={discountInput}
-                    onChange={(e) => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(null); }}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyDiscount(); } }}
-                    className="font-mono uppercase"
-                    disabled={isProcessing || validateDiscount.isPending}
-                    data-testid="input-discount-code"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="shrink-0"
-                    onClick={applyDiscount}
-                    disabled={!discountInput.trim() || isProcessing || validateDiscount.isPending}
-                    data-testid="button-apply-discount"
-                  >
-                    {validateDiscount.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : t("checkout.applyDiscount", { defaultValue: "Apply" })}
-                  </Button>
-                </div>
-              )}
-              {discountError && <p className="text-xs text-destructive" data-testid="text-discount-error">{discountError}</p>}
-            </div>
-
             <div className="border-t pt-4 space-y-2">
               <div className="flex justify-between gap-2 text-sm">
                 <span>{t("orderCertCard.walletCard")}</span>
@@ -835,12 +736,6 @@ export default function OrderCertCard() {
                 <span>{t("orderCertCard.freeShippingLine", { defaultValue: "Free shipping (4-5 business days)" })}</span>
                 <span className="text-green-600 font-medium" data-testid="text-shipping-free">{t("orderCertCard.free", { defaultValue: "FREE" })}</span>
               </div>
-              {discountAmount > 0 && (
-                <div className="flex justify-between gap-2 text-sm" data-testid="row-discount">
-                  <span className="text-muted-foreground">{t("checkout.discount", { defaultValue: "Discount" })} ({appliedDiscount?.code})</span>
-                  <span className="text-green-600">-${discountAmount.toFixed(2)}</span>
-                </div>
-              )}
               {paymentConfig?.configured && surcharge > 0 && (
                 <div className="flex justify-between gap-2 text-sm">
                   <span className="text-muted-foreground">{t("orderCertCard.cardFee", { pct: (CARD_SURCHARGE_RATE * 100).toFixed(1), defaultValue: `Card processing fee (${(CARD_SURCHARGE_RATE * 100).toFixed(1)}%)` })}</span>
@@ -896,7 +791,7 @@ export default function OrderCertCard() {
           </Button>
           <Button
             onClick={handleNext}
-            disabled={!canProceed() || isProcessing || (step === reviewStepIndex && !prepaidEntitlement && !isFree && !paymentConfig?.configured && !paymentConfig?.demoMode)}
+            disabled={!canProceed() || isProcessing || (step === reviewStepIndex && !prepaidEntitlement && !paymentConfig?.configured && !paymentConfig?.demoMode)}
             data-testid="button-next-step"
           >
             {isProcessing ? (
@@ -912,9 +807,7 @@ export default function OrderCertCard() {
             ) : step === reviewStepIndex ? (
               <>
                 <Lock className="h-4 w-4 mr-2" />
-                {isFree
-                  ? t("orderCertCard.placeFreeOrder", { defaultValue: "Place order" })
-                  : t("orderCertCard.placeOrder", { defaultValue: `Pay $${total.toFixed(2)}` })}
+                {t("orderCertCard.placeOrder", { defaultValue: `Pay $${total.toFixed(2)}` })}
               </>
             ) : (
               <>
