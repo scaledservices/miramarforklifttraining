@@ -96,3 +96,32 @@ test('crew photo-ID reminder route uses real tables and helpers', () => {
   }
   assert.match(route, /sendPhotoIdUploadRequest\(\{/);
 });
+
+// ---- 2026-10-14 production review ----
+import { reversalMethodFor, anetErrorText } from '../server/authorizeNetClient';
+
+test('same-day charges are voided, settled ones refunded, reversed ones refused', () => {
+  assert.equal(reversalMethodFor('capturedPendingSettlement'), 'void');
+  assert.equal(reversalMethodFor('settledSuccessfully'), 'refund');
+  assert.equal(reversalMethodFor('voided'), 'none');
+  assert.equal(reversalMethodFor(undefined), 'none');
+});
+
+test('Authorize.net error text is read from messages.message[0].text', () => {
+  assert.equal(anetErrorText({ messages: { message: [{ text: 'The record cannot be found.' }] } }), 'The record cannot be found.');
+  const src = readFileSync('server/authorizeNetClient.ts', 'utf8');
+  assert.doesNotMatch(src, /creditCardCardNumber/);
+});
+
+test('refund asks for confirmation first', () => {
+  const src = readFileSync('client/src/pages/admin/AdminOrders.tsx', 'utf8');
+  assert.match(src, /onClick=\{\(\) => setRefundOrder\(order\)\}/);
+  assert.match(src, /button-confirm-refund/);
+});
+
+test('wallet cards take no discount codes', () => {
+  const page = readFileSync('client/src/pages/OrderCertCard.tsx', 'utf8');
+  assert.doesNotMatch(page, /input-discount-code/);
+  const route = readFileSync('server/routes/certs.ts', 'utf8');
+  assert.match(route, /Discount codes apply to training only/);
+});

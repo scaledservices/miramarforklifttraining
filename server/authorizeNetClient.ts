@@ -160,7 +160,7 @@ export async function createTransactionFromNonce(
     // Handle decline or error
     const message = txResponse?.errors?.[0]?.errorText
       || data?.messages?.message?.[0]?.text
-      || `Transaction failed with response code ${responseCode}`;
+      || "The card was declined.";
 
     return {
       success: false,
@@ -175,78 +175,100 @@ export async function createTransactionFromNonce(
   }
 }
 
+/** Authorize.net error text lives at messages.message[0].text (not messages[0]). */
+export function anetErrorText(data: any): string | undefined {
+  return data?.transactionResponse?.errors?.[0]?.errorText
+    || data?.messages?.message?.[0]?.text;
+}
+
+async function anetPost(body: unknown): Promise<any> {
+  const response = await fetch(getApiUrl(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  // Authorize.net prefixes JSON responses with a UTF-8 BOM.
+  return JSON.parse((await response.text()).replace(/^\uFEFF/, ""));
+}
+
+/** Not-yet-settled statuses: the charge must be VOIDED, not refunded. */
+export const VOIDABLE_STATUSES = ["capturedPendingSettlement", "authorizedPendingCapture", "FDSPendingReview", "FDSAuthorizedPendingReview"];
+
 /**
- * Refund a transaction. Must reference the original transaction ID.
- * If the transaction hasn't settled yet, this acts as a void; if settled,
- * it issues a refund.
+ * Decide how to reverse a charge from its Authorize.net status.
+ * Same-day charges (pending settlement) are voided in full; settled charges
+ * are refunded (needs the card's last 4 from the transaction details).
+ */
+export function reversalMethodFor(status: string | undefined): "void" | "refund" | "none" {
+  if (!status) return "none";
+  if (VOIDABLE_STATUSES.includes(status)) return "void";
+  if (status === "settledSuccessfully") return "refund";
+  return "none";
+}
+
+/**
+ * Refund (or void) a transaction. Meeting 2026-10-14 fix: the old request
+ * sent an invalid payment field (Authorize.net rejected it), never voided
+ * same-day charges, and read the error from the wrong path ("response code
+ * undefined").
  */
 export async function refundTransaction(
   originalTransactionId: string,
   amount: number,
   orderId: number
-): Promise<TransactionResult> {
+): Promise<TransactionResult & { method?: "void" | "refund" }> {
   if (!isAuthorizeNetConfigured()) {
-    return {
-      success: false,
-      errorMessage: "Authorize.net is not configured.",
-    };
+    return { success: false, errorMessage: "Authorize.net is not configured." };
   }
-
-  const merchantAuthentication = {
-    name: API_LOGIN_ID,
-    transactionKey: TRANSACTION_KEY,
-  };
-
-  const requestBody = {
-    createTransactionRequest: {
-      merchantAuthentication,
-      transactionRequest: {
-        transactionType: "refundTransaction",
-        amount: amount.toFixed(2),
-        payment: {
-          creditCardCardNumber: "XXXXXXXXXXXX", // masked — Authorize.net only needs last 4 for refunds via API
-        },
-        refTransId: originalTransactionId,
-        order: {
-          invoiceNumber: String(orderId).slice(0, 20),
-        },
-      },
-    },
-  };
+  const merchantAuthentication = { name: API_LOGIN_ID, transactionKey: TRANSACTION_KEY };
 
   try {
-    const response = await fetch(getApiUrl(), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
-    });
-
-    const data = await response.json();
-    const txResponse = data?.transactionResponse;
-    const responseCode = txResponse?.responseCode;
-
-    if (responseCode === "1") {
+    const details = await anetPost({ getTransactionDetailsRequest: { merchantAuthentication, transId: originalTransactionId } });
+    const tx = details?.transaction;
+    if (!tx) {
+      return { success: false, errorMessage: anetErrorText(details) || "Could not find the original card transaction.", rawResponse: details };
+    }
+    const status: string = tx.transactionStatus;
+    const method = reversalMethodFor(status);
+    if (method === "none") {
+      const already = /void|refund/i.test(status);
       return {
-        success: true,
-        transactionId: txResponse?.transId,
-        rawResponse: data,
+        success: false,
+        errorMessage: already
+          ? "This charge was already voided or refunded in Authorize.net."
+          : `This charge can't be refunded right now (Authorize.net status: ${status}).`,
+        rawResponse: details,
       };
     }
 
-    const message = txResponse?.errors?.[0]?.errorText
-      || data?.messages?.[0]?.description
-      || `Refund failed with response code ${responseCode}`;
+    const transactionRequest: Record<string, unknown> = method === "void"
+      ? { transactionType: "voidTransaction", refTransId: originalTransactionId }
+      : {
+          transactionType: "refundTransaction",
+          amount: amount.toFixed(2),
+          payment: {
+            creditCard: {
+              // Refunds need the last 4 digits (as returned, e.g. "XXXX0027") and a masked expiry.
+              cardNumber: String(tx.payment?.creditCard?.cardNumber || "").slice(-4),
+              expirationDate: "XXXX",
+            },
+          },
+          refTransId: originalTransactionId,
+          order: { invoiceNumber: String(orderId).slice(0, 20) },
+        };
 
+    const data = await anetPost({ createTransactionRequest: { merchantAuthentication, transactionRequest } });
+    if (data?.transactionResponse?.responseCode === "1") {
+      return { success: true, transactionId: data.transactionResponse.transId || originalTransactionId, rawResponse: data, method };
+    }
     return {
       success: false,
-      errorMessage: message,
+      errorMessage: anetErrorText(data) || `${method === "void" ? "Void" : "Refund"} was not approved by Authorize.net.`,
       rawResponse: data,
+      method,
     };
   } catch (error: any) {
-    return {
-      success: false,
-      errorMessage: error.message || "Network error during refund",
-    };
+    return { success: false, errorMessage: error.message || "Network error during refund" };
   }
 }
 
