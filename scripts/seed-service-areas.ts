@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 
 const SERVICE_AREAS = [
   {
-    name: "Southern California",
+    name: "San Diego",
     slug: "southern-california",
     state: "CA",
     description:
@@ -50,7 +50,7 @@ const SERVICE_AREAS = [
     },
   },
   {
-    name: "Central California",
+    name: "Fresno",
     slug: "central-california",
     state: "CA",
     description:
@@ -76,7 +76,7 @@ const SERVICE_AREAS = [
     },
   },
   {
-    name: "Southern Nevada",
+    name: "Las Vegas",
     slug: "southern-nevada",
     state: "NV",
     description:
