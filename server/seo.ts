@@ -3,6 +3,7 @@ import { storage } from "./storage";
 import { isAdminRole } from "@shared/roles";
 import { brand } from "@shared/config/brand";
 import { GENERATED_CITY_SLUGS } from "../client/src/data/serviceAreaCityFacts";
+import { legacyRedirectMiddleware } from "./legacy-redirects";
 
 const SITE_URL = process.env.SITE_URL || `https://${brand.domain}`;
 
@@ -179,6 +180,9 @@ const SPANISH_ONLY_PAGES = [
 ];
 
 export function registerSeoRoutes(app: Express) {
+  // Old WordPress URLs (training.miramarforklift.com) -> 301 / 410.
+  app.use(legacyRedirectMiddleware);
+
   for (const [slug, target] of Object.entries(REDIRECT_MAP)) {
     app.get(`/${slug}`, (_req: Request, res: Response) => {
       res.redirect(301, target);
