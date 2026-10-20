@@ -139,13 +139,33 @@ import { catalog } from '../client/src/data/catalog';
 
 test('manual booking shows only the chosen location\'s programs, no duplicates', () => {
   const fresno = programsForArea(catalog as any, 'central-california');
-  assert.deepEqual(fresno.map((p) => p.slug), ['standard-forklift-certification-fresno']);
+  assert.deepEqual(fresno.map((p) => p.slug), [
+    'standard-forklift-certification-fresno',
+    'scissor-aerial-boom-lift-certification-fresno',
+    'forklift-train-the-trainer-fresno',
+    'scissor-aerial-train-the-trainer-fresno',
+  ]);
   const sd = programsForArea(catalog as any, 'southern-california');
-  assert.equal(sd.length, 8);
+  assert.equal(sd.length, 10);
   assert.equal(new Set(sd.map((p) => p.title)).size, sd.length);
   assert.ok(sd.every((p) => p.slug.endsWith('-san-diego')));
-  assert.equal(programsForArea(catalog as any, 'southern-nevada').length, 5);
+  const lv = programsForArea(catalog as any, 'southern-nevada');
+  assert.equal(lv.length, 8);
+  assert.ok(lv.every((p) => p.slug.endsWith('-las-vegas')));
   assert.deepEqual(programsForArea(catalog as any, undefined), []);
+});
+
+test('every city offers standard scissor lift and both Train the Trainer programs (meeting 2026-10-16)', () => {
+  for (const [area, city] of [['southern-california', 'san-diego'], ['southern-nevada', 'las-vegas'], ['central-california', 'fresno']]) {
+    const list = programsForArea(catalog as any, area);
+    for (const base of ['standard-forklift-certification', 'scissor-aerial-boom-lift-certification', 'forklift-train-the-trainer', 'scissor-aerial-train-the-trainer']) {
+      const p = list.find((x) => x.slug === `${base}-${city}`);
+      assert.ok(p, `${base}-${city} missing`);
+      assert.ok(p!.price > 0);
+    }
+    assert.equal(list.find((x) => x.slug.startsWith('scissor-aerial-boom'))!.price, 200);
+    assert.ok(!list.some((x) => x.location === 'online'), 'online kits must not appear');
+  }
 });
 
 test('manual booking price fills from program x participants', () => {

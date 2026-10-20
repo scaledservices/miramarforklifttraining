@@ -18,17 +18,42 @@ export interface ProgramLike {
   location?: string;
 }
 
-/** Hands-on programs offered at the area's facility, one entry per program. */
+/** Every city can be booked for these, at the facility or the customer's site
+ *  (Alberto 2026-10-16). Prefix of the catalog slug, location suffix dropped. */
+const EVERY_CITY_PROGRAMS = [
+  "standard-forklift-certification",
+  "scissor-aerial-boom-lift-certification",
+  "forklift-train-the-trainer",
+  "scissor-aerial-train-the-trainer",
+];
+
+/** Programs offered at the area's facility (hands-on + Train the Trainer), one
+ *  entry per program. The standard scissor lift program is only in the public
+ *  catalog for San Diego; for the other cities it is offered here (manual
+ *  booking only) from the San Diego entry, under a city-specific slug. */
 export function programsForArea<T extends ProgramLike>(catalog: T[], areaSlug: string | undefined): T[] {
   const facility = areaSlug ? AREA_FACILITY[areaSlug] : undefined;
   if (!facility) return [];
   const seen = new Set<string>();
-  return catalog.filter((p) => {
-    if (p.category !== "hands-on" || p.location !== facility) return false;
-    if (seen.has(p.title)) return false;
+  const out: T[] = [];
+  const add = (p: T) => {
+    if (seen.has(p.title)) return;
     seen.add(p.title);
-    return true;
-  });
+    out.push(p);
+  };
+  for (const p of catalog) {
+    if (p.category === "hands-on" && p.location === facility) add(p);
+  }
+  for (const base of EVERY_CITY_PROGRAMS) {
+    const here = catalog.find((p) => p.slug === `${base}-${facility}`);
+    if (here) { add(here); continue; }
+    const template = catalog.find((p) => p.slug.startsWith(`${base}-`) && p.location && p.location !== "online");
+    if (template) add({ ...template, slug: `${base}-${facility}`, location: facility });
+  }
+  for (const p of catalog) {
+    if (p.category === "trainer" && p.location === facility) add(p);
+  }
+  return out;
 }
 
 /** Program price x participants, as a 2-decimal string ("" if unknown). */
