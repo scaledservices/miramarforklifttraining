@@ -35,8 +35,8 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-20 text-center space-y-6">
         <SEOHead
-          title={`${loc.seo.title} | ${brand.name}`}
-          description={loc.seo.description}
+          title={`${(i18n.language.startsWith("es") && loc.es ? loc.es.seo : loc.seo).title} | ${brand.name}`}
+          description={(i18n.language.startsWith("es") && loc.es ? loc.es.seo : loc.seo).description}
         />
         <Construction className="h-16 w-16 text-muted-foreground mx-auto" />
         <h1 className="text-3xl font-bold" data-testid="text-coming-soon-title">{t("location.comingSoonTitle", { city: loc.city })}</h1>
@@ -59,12 +59,25 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
     "fresno": "location.fr",
   };
   const i18nPrefix = slugToI18n[slug] || `location.${slug.replace(/-/g, "")}`;
+  const isEs = i18n.language.startsWith("es");
+  const L = (en: string, es: string) => (isEs ? es : en);
+  const seo = isEs && loc.es ? loc.es.seo : loc.seo;
+  const equipmentTypes = isEs && loc.es ? loc.es.equipmentTypes : loc.equipmentTypes;
+  const hours = isEs && loc.es ? loc.es.hours : loc.hours;
+  const pricingNameEs: Record<string, string> = {
+    standard: "Montacargas Estándar",
+    scissorAerial: "Elevador de Tijera + Aéreo",
+    reachForklift: "Reach Truck + Montacargas",
+    orderPickerForklift: "Order Picker + Montacargas",
+    forkliftScissorEpj: "Montacargas + Elevador de Tijera + EPJ",
+    fullMultiEquipment: "Multiequipo Completo",
+  };
 
   return (
     <>
       <SEOHead
-        title={t(`${i18nPrefix}.seoTitle`, { brand: brand.name, defaultValue: `${loc.seo.title} | ${brand.name}` })}
-        description={t(`${i18nPrefix}.seoDesc`, { brand: brand.name, body: industry.regulatory.body, defaultValue: loc.seo.description })}
+        title={t(`${i18nPrefix}.seoTitle`, { brand: brand.name, defaultValue: `${seo.title} | ${brand.name}` })}
+        description={t(`${i18nPrefix}.seoDesc`, { brand: brand.name, body: industry.regulatory.body, defaultValue: seo.description })}
         canonical={`/locations/${slug}`}
         jsonLd={[localBusinessSchema({
           name: brand.name,
@@ -79,8 +92,8 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
 
       <Hero
         image={loc.heroImage}
-        title={t(`${i18nPrefix}.heroTitle`, { brand: brand.name, defaultValue: loc.seo.title })}
-        subtitle={t(`${i18nPrefix}.heroSubtitle`, { body: industry.regulatory.body, defaultValue: loc.seo.description })}
+        title={t(`${i18nPrefix}.heroTitle`, { brand: brand.name, defaultValue: seo.title })}
+        subtitle={t(`${i18nPrefix}.heroSubtitle`, { body: industry.regulatory.body, defaultValue: seo.description })}
         primaryCta={{ label: t(`${i18nPrefix}.bookTraining`, { defaultValue: t("location.bookTrainingDefault") }), href: "/in-person-training" }}
         secondaryCta={{ label: t(`${i18nPrefix}.requestQuote`, { defaultValue: t("location.requestQuoteDefault") }), href: "/request-quote" }}
       />
@@ -91,10 +104,10 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
             <div className="lg:col-span-2 space-y-10">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight mb-4" data-testid="text-about-title">
-                  {t(`${i18nPrefix}.aboutTitle`, { defaultValue: `About Our ${loc.city} Training Center` })}
+                  {t(`${i18nPrefix}.aboutTitle`, { defaultValue: t("location.aboutTitleGeneric", { city: loc.city, defaultValue: L(`About Our ${loc.city} Training Center`, `Acerca de Nuestro Centro de Capacitación en ${loc.city}`) }) })}
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  {t(`${i18nPrefix}.aboutDesc`, { brand: brand.name, body: industry.regulatory.body, address: loc.address.full, defaultValue: `${brand.name} offers forklift training in ${loc.city}.` })}
+                  {t(`${i18nPrefix}.aboutDesc`, { brand: brand.name, body: industry.regulatory.body, address: loc.address.full, defaultValue: t("location.aboutDescGeneric", { brand: brand.name, city: loc.city, defaultValue: L(`${brand.name} offers forklift training in ${loc.city}.`, `${brand.name} ofrece capacitación de montacargas en ${loc.city}.`) }) })}
                 </p>
               </div>
 
@@ -103,7 +116,7 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                   {t(`${i18nPrefix}.equipmentTitle`, { defaultValue: t("location.equipmentTitleDefault") })}
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
-                  {loc.equipmentTypes.map((eq) => (
+                  {equipmentTypes.map((eq) => (
                     <div key={eq} className="flex items-center gap-2 text-sm">
                       <CheckCircle className="h-4 w-4 text-brand-green shrink-0" />
                       <span>{eq}</span>
@@ -118,9 +131,9 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                     {t(`${i18nPrefix}.pricingTitle`, { defaultValue: t("location.pricingTitleDefault", { defaultValue: "Pricing" }) })}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {Object.values(brand.pricing.inPerson).map((course) => (
+                    {Object.entries(brand.pricing.inPerson).map(([courseKey, course]) => (
                       <div key={course.name} className="flex items-center justify-between bg-card border rounded-lg px-4 py-3">
-                        <span className="text-sm font-medium">{course.name}</span>
+                        <span className="text-sm font-medium">{t(`location.pricingNames.${courseKey}`, { defaultValue: L(course.name, pricingNameEs[courseKey] ?? course.name) })}</span>
                         <span className="text-sm font-bold text-brand-orange">${course.price}</span>
                       </div>
                     ))}
@@ -137,10 +150,10 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
-                    { icon: Shield, title: t(`${i18nPrefix}.why1Title`, { defaultValue: "OSHA-Aligned Curriculum" }), desc: t(`${i18nPrefix}.why1Desc`, { body: industry.regulatory.body, defaultValue: `All courses meet ${industry.regulatory.body} requirements` }) },
-                    { icon: Award, title: t(`${i18nPrefix}.why2Title`, { defaultValue: "Experienced Instructors" }), desc: t(`${i18nPrefix}.why2Desc`, { defaultValue: "10+ years of training experience" }) },
-                    { icon: Users, title: t(`${i18nPrefix}.why3Title`, { defaultValue: "Bilingual Training" }), desc: t(`${i18nPrefix}.why3Desc`, { defaultValue: "English and Spanish instruction available" }) },
-                    { icon: Clock, title: t(`${i18nPrefix}.why4Title`, { defaultValue: "Same-Day Certification" }), desc: t(`${i18nPrefix}.why4Desc`, { defaultValue: "Walk out with your certification card the same day" }) },
+                    { icon: Shield, title: t(`${i18nPrefix}.why1Title`, { defaultValue: L("OSHA-Aligned Curriculum", t("location.oshaAligned", { body: industry.regulatory.body })) }), desc: t(`${i18nPrefix}.why1Desc`, { body: industry.regulatory.body, defaultValue: t("location.why1DescGeneric", { body: industry.regulatory.body, defaultValue: L(`All courses meet ${industry.regulatory.body} requirements`, `Todos los cursos cumplen con los requisitos de ${industry.regulatory.body}`) }) }) },
+                    { icon: Award, title: t(`${i18nPrefix}.why2Title`, { defaultValue: t("location.why2TitleGeneric", { defaultValue: L("Experienced Instructors", "Instructores con Experiencia") }) }), desc: t(`${i18nPrefix}.why2Desc`, { defaultValue: L("10+ years of training experience", t("location.tenYearsExp")) }) },
+                    { icon: Users, title: t(`${i18nPrefix}.why3Title`, { defaultValue: t("location.why3TitleGeneric", { defaultValue: L("Bilingual Training", "Capacitación Bilingüe") }) }), desc: t(`${i18nPrefix}.why3Desc`, { defaultValue: t("location.why3DescGeneric", { defaultValue: L("English and Spanish instruction available", "Instrucción disponible en inglés y español") }) }) },
+                    { icon: Clock, title: t(`${i18nPrefix}.why4Title`, { defaultValue: L("Same-Day Certification", t("location.sameDayCert")) }), desc: t(`${i18nPrefix}.why4Desc`, { defaultValue: t("location.why4DescGeneric", { defaultValue: L("Walk out with your certification card the same day", "Sal con tu tarjeta de certificación el mismo día") }) }) },
                   ].map((item) => (
                     <div key={item.title} className="flex items-start gap-3">
                       <item.icon className="h-5 w-5 text-brand-dark shrink-0 mt-0.5" />
@@ -185,7 +198,7 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                     <Clock className="w-5 h-5 text-brand-dark shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium">{t("location.hoursLabel")}</p>
-                      <p className="text-sm text-muted-foreground">{loc.hours}</p>
+                      <p className="text-sm text-muted-foreground">{hours}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -229,8 +242,8 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
       </section>
 
       <CTABand
-        title={t(`${i18nPrefix}.ctaTitle`, { defaultValue: `Ready to Train in ${loc.city}?` })}
-        subtitle={t(`${i18nPrefix}.ctaSubtitle`, { defaultValue: `Contact us today to schedule your training in ${loc.city}.` })}
+        title={t(`${i18nPrefix}.ctaTitle`, { defaultValue: t("location.ctaTitleGeneric", { city: loc.city, defaultValue: L(`Ready to Train in ${loc.city}?`, `¿Listo para capacitarte en ${loc.city}?`) }) })}
+        subtitle={t(`${i18nPrefix}.ctaSubtitle`, { defaultValue: t("location.ctaSubtitleGeneric", { city: loc.city, defaultValue: L(`Contact us today to schedule your training in ${loc.city}.`, `Contáctanos hoy para programar tu capacitación en ${loc.city}.`) }) })}
         primaryCta={{ label: t(`${i18nPrefix}.bookTraining`, { defaultValue: t("location.bookTrainingDefault") }), href: "/in-person-training" }}
         secondaryCta={{ label: t(`${i18nPrefix}.requestQuote`, { defaultValue: t("location.requestQuoteDefault") }), href: "/request-quote" }}
       />

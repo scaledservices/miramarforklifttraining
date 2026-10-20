@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { brand } from "@shared/config/brand";
 import { useCurrentLocale } from "@/hooks/useLocaleLocation";
@@ -28,6 +29,20 @@ export default function SEOHead({
   jsonLd,
 }: SEOHeadProps) {
   const locale = useCurrentLocale();
+
+  // index.html ships an English default description for first paint. Helmet
+  // adds the page's own tags (marked data-rh) but leaves the static ones, so
+  // Spanish pages ended up with the English description first. Drop the
+  // static defaults once the page provides its own.
+  useEffect(() => {
+    if (!description) return;
+    document
+      .querySelectorAll(
+        'meta[name="description"]:not([data-rh]), meta[property="og:description"]:not([data-rh]), meta[name="twitter:description"]:not([data-rh])',
+      )
+      .forEach((el) => el.remove());
+  }, [description]);
+
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
   const ogImageUrl = ogImage
     ? ogImage.startsWith("http") ? ogImage : `${BASE_URL}${ogImage}`

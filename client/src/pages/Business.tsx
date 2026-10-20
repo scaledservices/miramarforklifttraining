@@ -6,6 +6,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { catalog, getBulkPrice, type Product } from "@/data/catalog";
+import { useTranslatedProducts } from "@/hooks/useTranslatedProduct";
 import { useState, useMemo, useCallback } from "react";
 import {
   ArrowRight,
@@ -53,15 +54,17 @@ export default function Business() {
   const perSeat = getBulkPrice(onlineProduct, seats);
   const total = perSeat * seats;
 
+  const translatedCatalog = useTranslatedProducts(catalog);
+
   const handsOnByLocation = useMemo(() => {
-    const products = catalog.filter((p) => p.category === "hands-on");
+    const products = translatedCatalog.filter((p) => p.category === "hands-on");
     const grouped: Record<string, Product[]> = {};
     for (const p of products) {
       if (!grouped[p.location]) grouped[p.location] = [];
       grouped[p.location].push(p);
     }
     return grouped;
-  }, []);
+  }, [translatedCatalog]);
 
   return (
     <>

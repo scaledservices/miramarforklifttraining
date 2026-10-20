@@ -3,33 +3,21 @@ import { useState } from "react";
 import SEOHead from "@/components/seo/SEOHead";
 import { brand } from "@shared/config/brand";
 import { industry } from "@shared/config/industry";
-import { faqItems, type FAQItem } from "@/data/faq";
+import { faqItems, localizeFaq, type FAQItem } from "@/data/faq";
 import { faqSchema } from "@/components/seo/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import { ChevronDown, Search, Phone } from "lucide-react";
 
-const CATEGORIES: { value: FAQItem["category"] | "all"; label: string }[] = [
-  { value: "all", label: "All Questions" },
-  { value: "general", label: "General" },
-  { value: "certification", label: "Certification" },
-  { value: "online", label: "Online Training" },
-  { value: "hands-on", label: "Hands-On Training" },
-  { value: "business", label: "For Businesses" },
+const CATEGORIES: { value: FAQItem["category"] | "all"; labelKey: string; label: string; labelEs: string }[] = [
+  { value: "all", labelKey: "faqPage.categoryAll", label: "All Questions", labelEs: "Todas las preguntas" },
+  { value: "general", labelKey: "faqPage.categoryGeneral", label: "General", labelEs: "General" },
+  { value: "certification", labelKey: "faqPage.categoryCertification", label: "Certification", labelEs: "Certificación" },
+  { value: "online", labelKey: "faqPage.categoryOnline", label: "Online Training", labelEs: "Capacitación en línea" },
+  { value: "hands-on", labelKey: "faqPage.categoryHandsOn", label: "Hands-On Training", labelEs: "Capacitación presencial" },
+  { value: "business", labelKey: "faqPage.categoryBusiness", label: "For Businesses", labelEs: "Para empresas" },
 ];
-
-// Conversational FAQ items specifically for the AEO schema block
-const conversationalFAQs = faqItems.filter((f) =>
-  [
-    "How much does forklift certification cost?",
-    "How long does it take to get forklift certified?",
-    "Is online forklift certification valid?",
-    "Do I need to renew my forklift certification?",
-    "Can you train forklift operators at my workplace?",
-    "What is train the trainer for forklift certification?",
-  ].includes(f.question)
-);
 
 export default function FAQPage() {
   const { t, i18n } = useTranslation();
@@ -37,7 +25,12 @@ export default function FAQPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const filteredFAQs = faqItems.filter((faq) => {
+  const isEs = i18n.language.startsWith("es");
+  const localizedFAQs = localizeFaq(faqItems, i18n.language);
+  // Conversational FAQ items specifically for the AEO schema block
+  const conversationalFAQs = localizedFAQs.filter((f) => f.conversational);
+
+  const filteredFAQs = localizedFAQs.filter((faq) => {
     const matchesCategory = activeCategory === "all" || faq.category === activeCategory;
     const matchesSearch =
       searchTerm === "" ||
@@ -47,7 +40,7 @@ export default function FAQPage() {
   });
 
   // Classic long-tail FAQ schema (all items)
-  const classicSchema = faqSchema(faqItems, i18n.language);
+  const classicSchema = faqSchema(localizedFAQs, i18n.language);
 
   // Conversational/AEO schema (natural-language questions for AI overviews)
   const conversationalSchema = faqSchema(conversationalFAQs, i18n.language);
@@ -97,7 +90,7 @@ export default function FAQPage() {
                 }`}
                 data-testid={`button-faq-category-${cat.value}`}
               >
-                {cat.label}
+                {t(cat.labelKey, { defaultValue: isEs ? cat.labelEs : cat.label })}
               </button>
             ))}
           </div>

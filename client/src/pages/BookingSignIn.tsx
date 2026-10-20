@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle2, MapPin, CalendarDays, Clock, GraduationCap, AlertCircle, Loader2 } from "lucide-react";
 import { brand } from "@shared/config/brand";
+import i18n from "@/i18n";
 
 interface SigninBootstrap {
   bookingNumber: string;
@@ -25,8 +26,8 @@ interface SigninBootstrap {
  * Public on-site sign-in (Alberto meeting 2026-07-28). A trainee scans the
  * class QR code (or the proctor opens the link on an iPad) and records their
  * own name - replacing the paper sign-in sheet and feeding the marketing
- * database. No account required. English-first for the pilot (most trainees
- * are bilingual; ES can be layered on after Alberto validates the flow).
+ * database. No account required. The QR link has no /es prefix, so the page
+ * picks English or Spanish from the phone's language and offers a toggle.
  */
 export default function BookingSignIn() {
   const params = useParams<{ bookingNumber: string }>();
@@ -38,6 +39,10 @@ export default function BookingSignIn() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [done, setDone] = useState(false);
+  const [lang, setLang] = useState<"en" | "es">(() =>
+    typeof navigator !== "undefined" && /^es\b/i.test(navigator.language || "") ? "es" : "en",
+  );
+  const t = i18n.getFixedT(lang);
 
   const { data, isLoading, error } = useQuery<SigninBootstrap>({
     queryKey: ["/api/booking-signin", bookingNumber],
@@ -61,14 +66,14 @@ export default function BookingSignIn() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
     onError: (err: Error) => {
-      toast({ title: "Could not sign you in", description: err.message, variant: "destructive" });
+      toast({ title: t("bookingSignIn.couldNotSignIn"), description: err.message, variant: "destructive" });
     },
   });
 
   function formatDate(d?: string) {
     if (!d) return "";
     const dt = new Date(`${d}T12:00:00`);
-    return dt.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+    return dt.toLocaleDateString(lang === "es" ? "es-US" : "en-US", { weekday: "long", month: "long", day: "numeric" });
   }
 
   if (isLoading) {
@@ -86,9 +91,9 @@ export default function BookingSignIn() {
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <Card className="w-full max-w-md border-destructive/40"><CardContent className="p-6 text-center space-y-3">
           <AlertCircle className="w-10 h-10 text-destructive mx-auto" />
-          <h1 className="text-lg font-semibold">Sign-in link not found</h1>
+          <h1 className="text-lg font-semibold">{t("bookingSignIn.notFoundTitle")}</h1>
           <p className="text-sm text-muted-foreground">
-            Check the link with your trainer, or call {brand.support.phone}.
+            {t("bookingSignIn.notFoundBody", { phone: brand.support.phone })}
           </p>
         </CardContent></Card>
       </div>
@@ -100,9 +105,9 @@ export default function BookingSignIn() {
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <Card className="w-full max-w-md border-green-500/40"><CardContent className="p-8 text-center space-y-3">
           <CheckCircle2 className="w-14 h-14 text-green-600 mx-auto" />
-          <h1 className="text-2xl font-bold">You're signed in</h1>
+          <h1 className="text-2xl font-bold">{t("bookingSignIn.doneTitle")}</h1>
           <p className="text-muted-foreground">
-            Thanks, {firstName}. Your attendance for {formatDate(data.sessionDate)} is recorded.
+            {t("bookingSignIn.doneBody", { name: firstName, date: formatDate(data.sessionDate) })}
           </p>
         </CardContent></Card>
       </div>
@@ -115,7 +120,21 @@ export default function BookingSignIn() {
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-1">
             <GraduationCap className="w-5 h-5 text-accent" />
-            <h1 className="text-xl font-bold">Training Sign-In</h1>
+            <h1 className="text-xl font-bold">{t("bookingSignIn.title")}</h1>
+            <div className="ml-auto flex rounded-md border text-xs overflow-hidden" role="group" aria-label="Language / Idioma">
+              {(["en", "es"] as const).map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  onClick={() => setLang(l)}
+                  aria-pressed={lang === l}
+                  className={`px-2 py-1 ${lang === l ? "bg-accent text-accent-foreground font-semibold" : "text-muted-foreground"}`}
+                  data-testid={`button-signin-lang-${l}`}
+                >
+                  {l === "en" ? "English" : "Español"}
+                </button>
+              ))}
+            </div>
           </div>
           <p className="text-sm text-muted-foreground mb-5">{brand.support.phone} · {data.trainingType}</p>
 
@@ -130,20 +149,20 @@ export default function BookingSignIn() {
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="firstName">First name *</Label>
+                <Label htmlFor="firstName">{t("bookingSignIn.firstName")} *</Label>
                 <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" data-testid="input-signin-first" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="lastName">Last name *</Label>
+                <Label htmlFor="lastName">{t("bookingSignIn.lastName")} *</Label>
                 <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} autoComplete="family-name" data-testid="input-signin-last" />
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email <span className="text-muted-foreground font-normal">(optional, for your certificate)</span></Label>
+              <Label htmlFor="email">{t("bookingSignIn.email")} <span className="text-muted-foreground font-normal">{t("bookingSignIn.emailHint")}</span></Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" data-testid="input-signin-email" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <Label htmlFor="phone">{t("bookingSignIn.phone")} <span className="text-muted-foreground font-normal">{t("bookingSignIn.optional")}</span></Label>
               <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" data-testid="input-signin-phone" />
             </div>
             <Button
@@ -153,7 +172,7 @@ export default function BookingSignIn() {
               onClick={() => signinMutation.mutate()}
               data-testid="button-signin-submit"
             >
-              {signinMutation.isPending ? (<><Loader2 className="w-4 h-4 animate-spin mr-2" />Signing in...</>) : "Sign In"}
+              {signinMutation.isPending ? (<><Loader2 className="w-4 h-4 animate-spin mr-2" />{t("bookingSignIn.signingIn")}</>) : t("bookingSignIn.signIn")}
             </Button>
           </div>
         </CardContent>

@@ -22,6 +22,15 @@ export interface TrainingLocation {
     title: string;
     description: string;
   };
+  /** Spanish overrides for user-facing text (used on /es pages). */
+  es?: {
+    hours: string;
+    equipmentTypes: string[];
+    seo: {
+      title: string;
+      description: string;
+    };
+  };
 }
 
 export const LOCATION_SLUGS = ["san-diego", "las-vegas", "fresno"] as const;
@@ -62,6 +71,21 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
       title: "Forklift Training in San Diego",
       description: "OSHA-aligned forklift certification in San Diego. In-person at our Miramar facility or on-site at your location.",
     },
+    es: {
+      hours: "Lun-Vie: 7:00 AM - 5:00 PM",
+      equipmentTypes: [
+        "Montacargas de Contrapeso de Asiento (LPG)",
+        "Reach Truck",
+        "Order Picker",
+        "Transpaleta Eléctrica (EPJ)",
+        "Elevador de Tijera",
+        "Elevador Aéreo/de Pluma",
+      ],
+      seo: {
+        title: "Capacitación de Montacargas en San Diego",
+        description: "Certificación de montacargas alineada con OSHA en San Diego. Presencial en nuestra instalación de Miramar o en el sitio de su empresa.",
+      },
+    },
   },
   "las-vegas": {
     slug: "las-vegas",
@@ -91,6 +115,19 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
     seo: {
       title: "Forklift Training in Las Vegas",
       description: "OSHA-aligned forklift certification in Las Vegas. In-person at our facility or on-site at your location.",
+    },
+    es: {
+      hours: "Lun-Vie: 7:00 AM - 5:00 PM",
+      equipmentTypes: [
+        "Montacargas de Contrapeso de Asiento (LPG)",
+        "Reach Truck",
+        "Order Picker",
+        "Transpaleta Eléctrica (EPJ)",
+      ],
+      seo: {
+        title: "Capacitación de Montacargas en Las Vegas",
+        description: "Certificación de montacargas alineada con OSHA en Las Vegas. Presencial en nuestra instalación o en el sitio de su empresa.",
+      },
     },
   },
   fresno: {
@@ -123,6 +160,21 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
     seo: {
       title: "Forklift Training in Fresno",
       description: "OSHA-aligned forklift certification in Fresno. In-person at our facility or on-site at your location.",
+    },
+    es: {
+      hours: "Con cita previa: llame para programar",
+      equipmentTypes: [
+        "Montacargas de Contrapeso de Asiento (LPG)",
+        "Reach Truck",
+        "Order Picker",
+        "Transpaleta Eléctrica (EPJ)",
+        "Elevador de Tijera",
+        "Elevador Aéreo/de Pluma",
+      ],
+      seo: {
+        title: "Capacitación de Montacargas en Fresno",
+        description: "Certificación de montacargas alineada con OSHA en Fresno. Presencial en nuestra instalación o en el sitio de su empresa.",
+      },
     },
   },
 };

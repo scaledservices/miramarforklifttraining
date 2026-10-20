@@ -1,3 +1,4 @@
+import { brand } from "@shared/config/brand";
 import { industry } from "@shared/config/industry";
 
 interface ProductTranslation {
@@ -9,6 +10,10 @@ interface ProductTranslation {
   priceLabel?: string;
   languages?: string[];
   equipmentCovered?: string[];
+  ctaLabel?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  imageAlt?: string;
 }
 
 export const catalogEs: Record<string, ProductTranslation> = {
@@ -31,8 +36,11 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     priceLabel: "por asiento",
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación de Operador de Montacargas en Línea | Conforme a ${industry.regulatory.body} | ${brand.name}`,
+    metaDescription: `Complete su certificación de operador de montacargas en línea por $45.00 por asiento. Capacitación conforme a ${industry.regulatory.body} con certificado inmediato. A su propio ritmo, 1-2 horas.`,
   },
   "aerial-online": {
+    imageAlt: "Capacitación para certificación de operadores de elevadores aéreos",
     title: "Certificación de Operador de Elevadores Aéreos y de Tijera",
     shortDescription: `Certifíquese en elevadores aéreos y de tijera en línea. Capacitación conforme a ${industry.regulatory.body}/ANSI que cubre protección contra caídas, estabilidad, inspección y procedimientos de emergencia.`,
     longDescription: `Nuestra certificación integral en línea de Operador de Elevadores Aéreos y de Tijera cubre los estándares OSHA 29 CFR 1926.453 y ANSI/SAIA A92. Este curso a su propio ritmo enseña la operación segura de elevadores aéreos, de tijera y de pluma a través de lecciones interactivas que cubren clasificaciones de MEWP, inspección pre-operación, protección contra caídas, principios de estabilidad, peligros del lugar de trabajo, seguridad eléctrica y procedimientos de rescate de emergencia.`,
@@ -53,8 +61,11 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     priceLabel: "por asiento",
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación de Elevadores Aéreos y de Tijera en Línea | Conforme a ${industry.regulatory.body} | ${brand.name}`,
+    metaDescription: `Complete su certificación de elevadores aéreos y de tijera en línea por $59.00 por asiento. Capacitación conforme a OSHA y ANSI A92 con certificado inmediato. A su propio ritmo, 1-2 horas.`,
   },
   "forklift-ttt-online": {
+    imageAlt: "Certificación de instructores de montacargas (Train the Trainer)",
     title: "Certificación Capacitar al Capacitador de Montacargas",
     shortDescription: `Conviértase en un instructor certificado de montacargas. Aprenda a capacitar y evaluar operadores en sus instalaciones bajo OSHA 29 CFR 1910.178(l)(2)(iii).`,
     longDescription: `Nuestra Certificación Capacitar al Capacitador lo prepara para convertirse en un instructor calificado de operadores de montacargas bajo OSHA 29 CFR 1910.178(l)(2)(iii). Este curso integral en línea cubre el marco regulatorio de OSHA, principios de aprendizaje de adultos, diseño de programas de capacitación, los 22 temas requeridos, metodología de capacitación práctica, evaluación de operadores, administración de programas y cultura de seguridad.`,
@@ -74,8 +85,12 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     priceLabel: "por asiento",
     languages: ["Inglés", "Español"],
+    ctaLabel: "Certifíquese como Instructor",
+    metaTitle: `Certificación Capacitar al Capacitador de Montacargas en Línea | ${brand.name}`,
+    metaDescription: `Conviértase en instructor certificado de montacargas en línea por $150. Certificación Capacitar al Capacitador conforme a OSHA. A su propio ritmo, 2-3 horas. Califíquese para capacitar y evaluar operadores.`,
   },
   "forklift-ttt-combo-online": {
+    imageAlt: "Combo de certificación de instructores de montacargas con kit",
     title: "Certificación Capacitar al Capacitador de Montacargas (Combo con Kit)",
     shortDescription: `Certificación completa Capacitar al Capacitador MÁS un kit físico de capacitación enviado a sus instalaciones. Todo lo que necesita para capacitar operadores internamente.`,
     longDescription: `Nuestro Combo Capacitar al Capacitador incluye el curso completo de certificación en línea MÁS un kit físico de capacitación enviado a sus instalaciones. El kit incluye manual impreso del instructor, presentaciones PowerPoint, formularios de evaluación práctica, listas de inspección, permisos de operador, tarjetas de certificación, hojas de asistencia, póster de seguridad y USB con materiales digitales.`,
@@ -95,8 +110,12 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     priceLabel: "por asiento",
     languages: ["Inglés", "Español"],
+    ctaLabel: "Obtenga el Combo con Kit",
+    metaTitle: `Capacitar al Capacitador de Montacargas (Combo con Kit) | ${brand.name}`,
+    metaDescription: `Certificación Capacitar al Capacitador de montacargas con kit físico de capacitación por $480. Curso en línea más manuales impresos, formularios, certificados y materiales enviados a usted.`,
   },
   "aerial-ttt-online": {
+    imageAlt: "Certificación de instructores de elevadores aéreos (Train the Trainer)",
     title: "Certificación Capacitar al Capacitador de Elevadores Aéreos y de Tijera",
     shortDescription: `Conviértase en un instructor certificado de elevadores aéreos y de tijera. Aprenda a capacitar y evaluar operadores de MEWP bajo OSHA y ANSI A92.`,
     longDescription: `Nuestra Certificación Capacitar al Capacitador de Elevadores Aéreos combina principios de aprendizaje de adultos con contenido específico de elevadores aéreos. Cubre OSHA 29 CFR 1926.453, 1910.178(l)(2)(iii) y ANSI/SAIA A92.24. Aprenderá a diseñar programas de capacitación, realizar evaluaciones prácticas, enseñar protección contra caídas y desarrollar planes de rescate.`,
@@ -117,6 +136,9 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     priceLabel: "por asiento",
     languages: ["Inglés", "Español"],
+    ctaLabel: "Certifíquese como Instructor",
+    metaTitle: `Certificación Capacitar al Capacitador de Elevadores Aéreos en Línea | ${brand.name}`,
+    metaDescription: `Conviértase en instructor certificado de elevadores aéreos en línea por $150. Conforme a OSHA y ANSI A92. A su propio ritmo, 2-3 horas. Califíquese para capacitar y evaluar operadores de MEWP.`,
   },
   "aerial-ttt-combo-online": {
     title: "Certificación Capacitar al Capacitador de Elevadores Aéreos (Combo con Kit)",
@@ -139,6 +161,9 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     priceLabel: "por asiento",
     languages: ["Inglés", "Español"],
+    ctaLabel: "Obtenga el Combo con Kit",
+    metaTitle: `Capacitar al Capacitador de Elevadores Aéreos (Combo con Kit) | ${brand.name}`,
+    metaDescription: `Certificación Capacitar al Capacitador de elevadores aéreos con kit físico de capacitación por $480. Curso en línea más manuales impresos, formularios, certificados y materiales enviados a usted.`,
   },
   "std-forklift-sd": {
     title: "Certificación Estándar de Montacargas (LPG de Asiento o EPJ)",
@@ -155,6 +180,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Acceso a red de colocación laboral"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación Estándar de Montacargas en San Diego | LPG de Asiento y EPJ | ${brand.name}`,
+    metaDescription: `Certificación práctica de montacargas en San Diego por $280. Capacitación en LPG de asiento y EPJ con certificación ${industry.regulatory.body} el mismo día.`,
   },
   "scissor-aerial-sd": {
     title: "Certificación Estándar de Elevador de Tijera y Pluma/Aéreo",
@@ -172,6 +199,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Certificado de finalización"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación de Elevador de Tijera y Pluma/Aéreo en San Diego | ${brand.name}`,
+    metaDescription: `Certificación de elevador de tijera y pluma/aéreo en San Diego por $200. Certificación ${industry.regulatory.body} el mismo día con capacitación práctica.`,
   },
   "reach-sd": {
     title: "Capacitación y Certificación de Reach",
@@ -188,6 +217,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Certificado de finalización"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Capacitación y Certificación de Reach Truck en San Diego | ${brand.name}`,
+    metaDescription: `Certificación de operador de reach truck en San Diego por $300. Capacitación práctica conforme a ${industry.regulatory.body} con certificación el mismo día.`,
   },
   "order-picker-sd": {
     title: "Capacitación y Certificación de Order Picker",
@@ -205,6 +236,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Acceso a red de colocación laboral"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Capacitación y Certificación de Order Picker en San Diego | ${brand.name}`,
+    metaDescription: `Certificación de operador de order picker en San Diego por $300. Capacitación práctica conforme a ${industry.regulatory.body} con certificación el mismo día.`,
   },
   "reach-forklift-sd": {
     title: "Capacitación Práctica de Reach y Montacargas (LPG de Asiento + Reach)",
@@ -221,6 +254,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Certificados para ambos tipos de equipo"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Combo de Capacitación de Reach y Montacargas en San Diego | ${brand.name}`,
+    metaDescription: `Doble certificación de reach truck y montacargas en San Diego por $490. Dos certificaciones en una sesión con capacitación práctica.`,
   },
   "orderpicker-forklift-sd": {
     title: "Capacitación Práctica de Order Picker y Montacargas (LPG de Asiento + Order Picker)",
@@ -238,6 +273,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Acceso a red de colocación laboral"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Combo de Capacitación de Order Picker y Montacargas en San Diego | ${brand.name}`,
+    metaDescription: `Doble certificación de order picker y montacargas en San Diego por $490. Dos certificaciones en una sesión con capacitación práctica.`,
   },
   "forklift-scissor-epj-sd": {
     title: "Certificación de Montacargas, Elevador de Tijera y EPJ",
@@ -255,6 +292,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     equipmentCovered: ["Montacargas LPG de Asiento", "Elevador de Tijera", "Transpaleta Eléctrica (EPJ)"],
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación de Montacargas, Elevador de Tijera y EPJ en San Diego | ${brand.name}`,
+    metaDescription: `Triple certificación en San Diego por $550: montacargas, elevador de tijera y EPJ. Certificación ${industry.regulatory.body} el mismo día con capacitación práctica.`,
   },
   "all-in-one-sd": {
     title: "Certificación de Montacargas, Elevador de Tijera, Order Picker/Reach y EPJ",
@@ -273,6 +312,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     equipmentCovered: ["Montacargas LPG de Asiento", "Elevador de Tijera (JLG 1930)", "Order Picker / Reach Truck", "Transpaleta Eléctrica (EPJ)"],
     languages: ["Inglés", "Español"],
+    metaTitle: `Paquete Completo de Certificación de Equipos en San Diego | ${brand.name}`,
+    metaDescription: `Certificación todo en uno en San Diego por $650: montacargas, elevador de tijera, order picker/reach y EPJ. Paquete de máximo valor.`,
   },
   "std-forklift-lv": {
     title: "Certificación Estándar de Montacargas (LPG de Asiento o EPJ)",
@@ -289,6 +330,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Acceso a red de colocación laboral"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación Estándar de Montacargas en Las Vegas | LPG de Asiento y EPJ | ${brand.name}`,
+    metaDescription: `Certificación práctica de montacargas en Las Vegas por $280. Capacitación en LPG de asiento y EPJ con certificación ${industry.regulatory.body} el mismo día.`,
   },
   "scissor-aerial-lv": {
     title: "Certificación Estándar de Elevador de Tijera y Pluma/Aéreo",
@@ -322,6 +365,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Certificado de finalización"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Capacitación y Certificación de Reach Truck en Las Vegas | ${brand.name}`,
+    metaDescription: `Certificación de operador de reach truck en Las Vegas por $300. Capacitación práctica conforme a ${industry.regulatory.body} con certificación el mismo día.`,
   },
   "order-picker-lv": {
     title: "Capacitación y Certificación de Order Picker",
@@ -339,6 +384,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Acceso a red de colocación laboral"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Capacitación y Certificación de Order Picker en Las Vegas | ${brand.name}`,
+    metaDescription: `Certificación de operador de order picker en Las Vegas por $300. Capacitación práctica conforme a ${industry.regulatory.body} con certificación el mismo día.`,
   },
   "reach-forklift-lv": {
     title: "Capacitación Práctica de Reach y Montacargas (LPG de Asiento + Reach)",
@@ -355,6 +402,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Certificados para ambos tipos de equipo"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Combo de Capacitación de Reach y Montacargas en Las Vegas | ${brand.name}`,
+    metaDescription: `Doble certificación de reach truck y montacargas en Las Vegas por $490. Dos certificaciones en una sesión.`,
   },
   "orderpicker-forklift-lv": {
     title: "Capacitación Práctica de Order Picker y Montacargas (LPG de Asiento + Order Picker)",
@@ -372,6 +421,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Acceso a red de colocación laboral"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Combo de Capacitación de Order Picker y Montacargas en Las Vegas | ${brand.name}`,
+    metaDescription: `Doble certificación de order picker y montacargas en Las Vegas por $490. Dos certificaciones en una sesión.`,
   },
   "forklift-scissor-epj-lv": {
     title: "Certificación de Montacargas, Elevador de Tijera y EPJ",
@@ -423,6 +474,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Acceso a red de colocación laboral"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación Estándar de Montacargas en Fresno | LPG de Asiento y EPJ | ${brand.name}`,
+    metaDescription: `Certificación práctica de montacargas en Fresno, CA por $280. Capacitación en LPG de asiento y EPJ con certificación ${industry.regulatory.body} el mismo día.`,
   },
   "ttt-forklift-sd": {
     title: "Certificación Capacitar al Capacitador de Montacargas",
@@ -439,6 +492,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Instrucción en aula y ejercicios prácticos"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación Capacitar al Capacitador de Montacargas en San Diego | ${brand.name}`,
+    metaDescription: `Conviértase en instructor certificado de montacargas en San Diego por $750. Programa integral con todos los materiales incluidos.`,
   },
   "ttt-forklift-lv": {
     title: "Certificación Capacitar al Capacitador de Montacargas",
@@ -455,6 +510,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Instrucción en aula y ejercicios prácticos"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Certificación Capacitar al Capacitador de Montacargas en Las Vegas | ${brand.name}`,
+    metaDescription: `Conviértase en instructor certificado de montacargas en Las Vegas por $750. Programa integral con todos los materiales incluidos.`,
   },
   "ttt-scissor-sd": {
     title: "Certificación Capacitar al Capacitador de Elevador de Tijera y Pluma",
@@ -471,6 +528,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Instrucción en aula y ejercicios prácticos"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Capacitar al Capacitador de Elevador de Tijera y Aéreo en San Diego | ${brand.name}`,
+    metaDescription: `Conviértase en instructor certificado de elevador de tijera y aéreo en San Diego por $750. Programa conforme a ${industry.regulatory.body} con todos los materiales.`,
   },
   "ttt-scissor-lv": {
     title: "Certificación Capacitar al Capacitador de Elevador de Tijera y Pluma",
@@ -487,6 +546,44 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Instrucción en aula y ejercicios prácticos"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Capacitar al Capacitador de Elevador de Tijera y Aéreo en Las Vegas | ${brand.name}`,
+    metaDescription: `Conviértase en instructor certificado de elevador de tijera y aéreo en Las Vegas por $750. Programa conforme a ${industry.regulatory.body} con todos los materiales.`,
+  },
+  "ttt-forklift-fresno": {
+    title: "Certificación Capacitar al Capacitador de Montacargas",
+    shortDescription: "Conviértase en un instructor certificado de montacargas en Fresno. Califíquese para capacitar y certificar operadores de montacargas en sus propias instalaciones.",
+    longDescription: `Nuestro programa de Certificación Capacitar al Capacitador en Fresno lo prepara para convertirse en un instructor calificado de capacitación de montacargas. Este curso integral presencial cubre los requisitos de capacitación de ${industry.regulatory.body}, técnicas de evaluación adecuadas y métodos de instrucción práctica. Al completar, estará autorizado para capacitar y certificar operadores de montacargas en su lugar de trabajo. Incluye un folder con todos los materiales.`,
+    duration: "2-4 horas",
+    includes: [
+      "Capacitación completa dirigida por instructor",
+      `Currículo de cumplimiento de ${industry.regulatory.body}`,
+      "Certificación de instructor al completar",
+      "Folder con todos los materiales de capacitación",
+      "Capacitación en metodología de evaluación",
+      "Práctica de enseñanza práctica",
+      "Instrucción en aula y ejercicios prácticos"
+    ],
+    languages: ["Inglés", "Español"],
+    metaTitle: `Certificación Capacitar al Capacitador de Montacargas en Fresno | ${brand.name}`,
+    metaDescription: `Conviértase en instructor certificado de montacargas en Fresno por $750. Programa integral con todos los materiales incluidos.`,
+  },
+  "ttt-scissor-fresno": {
+    title: "Certificación Capacitar al Capacitador de Elevador de Tijera y Pluma",
+    shortDescription: "Conviértase en un instructor certificado de elevador de tijera y pluma en Fresno. Capacite y certifique operadores de elevadores de tijera y aéreos en sus instalaciones.",
+    longDescription: `Este programa prepara a individuos para capacitar y certificar operadores de elevadores de tijera y aéreos en cumplimiento con las regulaciones de ${industry.regulatory.body}. Enfocado en protocolos de seguridad, técnicas de instrucción y evaluación de riesgos para mejorar la seguridad y eficiencia en el lugar de trabajo. Al completar, estará autorizado para capacitar y certificar operadores de elevadores de tijera y pluma en su lugar de trabajo. Incluye un folder con todos los materiales.`,
+    duration: "2-4 horas",
+    includes: [
+      "Capacitación completa dirigida por instructor",
+      `Currículo de cumplimiento de ${industry.regulatory.body} para elevadores aéreos`,
+      "Certificación de instructor al completar",
+      "Folder con todos los materiales de capacitación",
+      "Protocolos de seguridad y evaluación de riesgos",
+      "Capacitación en técnicas de instrucción",
+      "Instrucción en aula y ejercicios prácticos"
+    ],
+    languages: ["Inglés", "Español"],
+    metaTitle: `Capacitar al Capacitador de Elevador de Tijera y Aéreo en Fresno | ${brand.name}`,
+    metaDescription: `Conviértase en instructor certificado de elevador de tijera y aéreo en Fresno por $750. Programa conforme a ${industry.regulatory.body} con todos los materiales.`,
   },
   "ttt-forklift-kit": {
     title: "Kit Capacitar al Capacitador de Montacargas",
@@ -505,6 +602,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     equipmentCovered: ["Montacargas de Contrapeso", "Reach Trucks", "Transpaletas", "Otros Vehículos Industriales Motorizados"],
     languages: ["Inglés", "Español"],
+    metaTitle: `Kit Capacitar al Capacitador de Montacargas | Materiales Conformes a ${industry.regulatory.body} | ${brand.name}`,
+    metaDescription: `Kit completo de instructor de montacargas por $350. Incluye presentaciones, video, manuales, exámenes, 20 certificados y 20 tarjetas tipo billetera.`,
   },
   "ttt-scissor-kit": {
     title: "Kit Capacitar al Capacitador de Elevador de Tijera",
@@ -523,6 +622,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     equipmentCovered: ["Elevadores de Tijera", "Plataformas de Trabajo Aéreo"],
     languages: ["Inglés", "Español"],
+    metaTitle: `Kit Capacitar al Capacitador de Elevador de Tijera | Materiales Conformes a ${industry.regulatory.body} | ${brand.name}`,
+    metaDescription: `Kit completo de instructor de elevador de tijera por $350. Incluye presentaciones, video, manuales, exámenes, 20 certificados y 20 tarjetas tipo billetera.`,
   },
   "cert-cards": {
     title: "Tarjetas de Certificación",
@@ -538,6 +639,8 @@ export const catalogEs: Record<string, ProductTranslation> = {
       "Disponible en inglés y español"
     ],
     languages: ["Inglés", "Español"],
+    metaTitle: `Tarjetas de Certificación de Montacargas | Conformes a ${industry.regulatory.body} | ${brand.name}`,
+    metaDescription: `Tarjetas de certificación de montacargas conformes a ${industry.regulatory.body} por $12 el set de 20. Tarjetas brillantes tamaño billetera para documentar la capacitación de operadores.`,
   },
   "cert-kit": {
     title: "Kit de Certificación de Capacitación",
@@ -557,5 +660,7 @@ export const catalogEs: Record<string, ProductTranslation> = {
     ],
     equipmentCovered: ["Montacargas de Contrapeso", "Reach Trucks", "Transpaletas", "Otros Vehículos Industriales Motorizados"],
     languages: ["Inglés", "Español"],
+    metaTitle: `Kit de Certificación de Capacitación de Montacargas | Capacitación Interna | ${brand.name}`,
+    metaDescription: `Kit completo de capacitación de montacargas aprobado por ${industry.regulatory.body} por $350. Incluye video, presentaciones, manuales, exámenes, 20 certificados y tarjetas tipo billetera.`,
   },
 };

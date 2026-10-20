@@ -6,6 +6,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { catalog, type Product } from "@/data/catalog";
+import { catalogEs } from "@/data/catalog-es";
 import { brand } from "@shared/config/brand";
 import { getLocation } from "@shared/config/locations";
 import { industry } from "@shared/config/industry";
@@ -133,6 +134,8 @@ export default function BookTraining() {
   const { productSlug } = useParams<{ productSlug?: string }>();
   const [, navigate] = useLocation();
   const { t, i18n } = useTranslation();
+  // Display-only: booking data and the slug sent to the server stay English.
+  const trTitle = (p: Product) => (i18n.language.startsWith("es") && catalogEs[p.id]?.title) || p.title;
   const { user, isAuthenticated, register: registerAccount } = useAuth();
   const { toast } = useToast();
 
@@ -771,7 +774,7 @@ export default function BookTraining() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <p className="font-semibold text-foreground">{p.title}</p>
+                                <p className="font-semibold text-foreground">{trTitle(p)}</p>
                                 {p.featured && <Badge variant="secondary" className="text-xs">{t("common.mostPopular")}</Badge>}
                               </div>
                               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{p.shortDescription}</p>
@@ -1153,7 +1156,7 @@ export default function BookTraining() {
                       <span className="text-muted-foreground">{t("bookTraining.trainingLabel")}</span>
                       <span className="font-medium text-foreground">
                         {selectedProducts.length > 0
-                          ? selectedProducts.map((p) => p.title).join(", ")
+                          ? selectedProducts.map((p) => trTitle(p)).join(", ")
                           : selectedEquipment.join(", ")}
                         {selectedProducts.length > 0 && selectedEquipment.length > 0 && (
                           <span className="block text-xs text-muted-foreground mt-0.5">
@@ -1362,7 +1365,7 @@ export default function BookTraining() {
                     <p className="text-muted-foreground">{t("bookTraining.trainingLabel")}</p>
                     {selectedProducts.map((p) => (
                       <div key={p.id} className="flex justify-between items-baseline mt-1">
-                        <p className="font-medium text-foreground">{p.title}</p>
+                        <p className="font-medium text-foreground">{trTitle(p)}</p>
                         {typeof p.price === "number" && (
                           <span className="text-xs text-muted-foreground">${p.price}</span>
                         )}

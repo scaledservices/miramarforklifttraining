@@ -65,6 +65,7 @@ import IndustriesHub from "@/pages/IndustriesHub";
 import { CartProvider } from "@/contexts/CartContext";
 import DemoBanner from "@/components/DemoBanner";
 import SEOHead from "@/components/seo/SEOHead";
+import i18n from "@/i18n";
 import { lazy, Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
@@ -290,8 +291,8 @@ function AppContent() {
   return (
     <div className="min-h-screen flex flex-col bg-background pb-14 lg:pb-0">
       <SEOHead
-        title={`${brand.name} | ${industry.regulatory.body}-Aligned Forklift Training & Certification`}
-        description={`Get your forklift certification in San Diego — in-person at our facility or on-site at your location. ${industry.regulatory.body}-aligned programs with same-day certification.`}
+        title={i18n.t("seo.home.title", { brand: brand.name, body: industry.regulatory.body })}
+        description={i18n.t("seo.home.description", { body: industry.regulatory.body })}
       />
       <DemoBanner />
       <LanguageBanner />

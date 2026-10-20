@@ -1421,7 +1421,24 @@
       "whyChooseTitle": "Por que capacitarse en nuestra instalacion de Fresno?"
     },
     "pricingNote": "Los precios varían según el tipo de equipo y el tamaño del grupo. Los precios por volumen para grupos grandes se confirman en su cotización. Llame para una cotización personalizada.",
-    "pricingTitleDefault": "Precios"
+    "pricingTitleDefault": "Precios",
+    "aboutTitleGeneric": "Acerca de Nuestro Centro de Capacitación en {{city}}",
+    "aboutDescGeneric": "{{brand}} ofrece capacitación de montacargas en {{city}}.",
+    "why1DescGeneric": "Todos los cursos cumplen con los requisitos de {{body}}",
+    "why2TitleGeneric": "Instructores con Experiencia",
+    "why3TitleGeneric": "Capacitación Bilingüe",
+    "why3DescGeneric": "Instrucción disponible en inglés y español",
+    "why4DescGeneric": "Sal con tu tarjeta de certificación el mismo día",
+    "ctaTitleGeneric": "¿Listo para capacitarte en {{city}}?",
+    "ctaSubtitleGeneric": "Contáctanos hoy para programar tu capacitación en {{city}}.",
+    "pricingNames": {
+      "standard": "Montacargas Estándar",
+      "scissorAerial": "Elevador de Tijera + Aéreo",
+      "reachForklift": "Reach Truck + Montacargas",
+      "orderPickerForklift": "Order Picker + Montacargas",
+      "forkliftScissorEpj": "Montacargas + Elevador de Tijera + EPJ",
+      "fullMultiEquipment": "Multiequipo Completo"
+    }
   },
   "seoPage": {
     "startCertification": "Iniciar Certificación — $45.00",
@@ -2791,7 +2808,13 @@
     "stillHaveQuestionsDesc": "Estamos para ayudarle. Llámenos y responderemos cualquier pregunta sobre capacitación, certificación o precios.",
     "title": "Preguntas Frecuentes",
     "seoTitle": "Preguntas Frecuentes | {{brand}}",
-    "subtitle": "Todo lo que necesita saber sobre la certificación de montacargas, las opciones de capacitación, los precios y los requisitos de OSHA."
+    "subtitle": "Todo lo que necesita saber sobre la certificación de montacargas, las opciones de capacitación, los precios y los requisitos de OSHA.",
+    "categoryAll": "Todas las preguntas",
+    "categoryGeneral": "General",
+    "categoryCertification": "Certificación",
+    "categoryOnline": "Capacitación en línea",
+    "categoryHandsOn": "Capacitación presencial",
+    "categoryBusiness": "Para empresas"
   },
   "payBalance": {
     "balanceDue": "Saldo pendiente",
@@ -3043,5 +3066,60 @@
     "fulfillStepComplete_other": "Marcar completo: crea {{count}} certificados y envía correo al cliente",
     "fulfillViewCerts": "Ver certificados",
     "navUsers": "Usuarios"
+  },
+  "bookingSignIn": {
+    "couldNotSignIn": "No pudimos registrar tu asistencia",
+    "notFoundTitle": "No encontramos este enlace de registro",
+    "notFoundBody": "Verifica el enlace con tu instructor o llama al {{phone}}.",
+    "doneTitle": "Tu asistencia quedó registrada",
+    "doneBody": "Gracias, {{name}}. Registramos tu asistencia para el {{date}}.",
+    "title": "Registro de asistencia",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "email": "Correo electrónico",
+    "emailHint": "(opcional, para tu certificado)",
+    "phone": "Teléfono",
+    "optional": "(opcional)",
+    "signingIn": "Registrando...",
+    "signIn": "Registrar asistencia"
+  },
+  "businessFaqPage": {
+    "heroSubtitle": "Encuentre respuestas a preguntas comunes sobre nuestros programas de capacitación, certificaciones y soluciones para empresas.",
+    "generalTitle": "Preguntas generales",
+    "generalSubtitle": "Todo lo que necesita saber sobre la certificación de montacargas.",
+    "ctaSubtitle": "Nuestro equipo está listo para ayudarle. Comuníquese con nosotros y le responderemos dentro de un día hábil."
+  },
+  "availabilityChecker": {
+    "title": "Consulte la disponibilidad de capacitación en sus instalaciones",
+    "intro": "Ingrese su código postal para ver si ofrecemos capacitación en sus instalaciones en su zona.",
+    "zipPlaceholder": "Código postal",
+    "check": "Consultar",
+    "available": "¡Ofrecemos capacitación en sus instalaciones en su zona!",
+    "serviceArea": "Zona de servicio:",
+    "requestOnsite": "Solicitar capacitación en sus instalaciones",
+    "unavailable": "Este código postal está fuera de nuestras zonas habituales de capacitación en sus instalaciones",
+    "unavailableBody": "Aun así, es posible que podamos ir a usted.",
+    "contactUs": "Contáctenos",
+    "unavailableTail": " para un arreglo especial."
+  },
+  "supportChat": {
+    "ticketCreated": "Solicitud de soporte creada",
+    "ticketBody": "Enviamos tu mensaje a nuestro equipo. Te responderemos en un plazo de 1 día hábil.",
+    "confirmationTo": "Enviaremos la confirmación a {{email}}",
+    "duration": "Duración:",
+    "format": "Formato:",
+    "locations": "Ubicaciones:",
+    "greeting": "¡Hola! Soy el asistente de {{brand}}. Puedo ayudarte con precios, preguntas sobre certificación, requisitos de {{body}} y más. ¿En qué te puedo ayudar hoy?",
+    "qa": {
+      "pricing": "Precios",
+      "certificate": "Verificar certificado",
+      "checkout": "Ayuda con el pago",
+      "contact": "Hablar con una persona"
+    },
+    "qaMsg": {
+      "pricing": "¿Cuáles son sus precios para la certificación de montacargas?",
+      "certificate": "Necesito verificar una certificación de montacargas",
+      "checkout": "Necesito ayuda para completar mi compra"
+    }
   }
 }

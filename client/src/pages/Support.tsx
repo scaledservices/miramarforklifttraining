@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import SEOHead from "@/components/seo/SEOHead";
 import { brand } from "@shared/config/brand";
 import { industry } from "@shared/config/industry";
@@ -103,13 +104,13 @@ function TicketSuccessCard({ action }: { action: AssistantAction }) {
         <div className="flex items-start gap-3">
           <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium">Support Ticket Created</p>
+            <p className="text-sm font-medium">{i18n.t("supportChat.ticketCreated")}</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Your message has been sent to our team. We'll respond within 1 business day.
+              {i18n.t("supportChat.ticketBody")}
             </p>
             {action.data?.email && (
               <p className="text-xs text-muted-foreground mt-1">
-                Confirmation will be sent to {action.data.email}
+                {i18n.t("supportChat.confirmationTo", { email: action.data.email })}
               </p>
             )}
           </div>
@@ -202,12 +203,12 @@ function CourseInfoCard({ action }: { action: AssistantAction }) {
             )}
             {data.duration && (
               <p className="text-xs text-muted-foreground mt-1">
-                <span className="font-medium">Duration:</span> {data.duration}
+                <span className="font-medium">{i18n.t("supportChat.duration")}</span> {data.duration}
               </p>
             )}
             {data.format && (
               <p className="text-xs text-muted-foreground mt-1">
-                <span className="font-medium">Format:</span> {data.format}
+                <span className="font-medium">{i18n.t("supportChat.format")}</span> {data.format}
               </p>
             )}
             {data.combo && (
@@ -217,7 +218,7 @@ function CourseInfoCard({ action }: { action: AssistantAction }) {
             )}
             {data.locations && (
               <p className="text-xs text-muted-foreground mt-1">
-                <span className="font-medium">Locations:</span> {data.locations.join(", ")}
+                <span className="font-medium">{i18n.t("supportChat.locations")}</span> {data.locations.join(", ")}
               </p>
             )}
           </div>
@@ -274,7 +275,7 @@ function ChatPanel({
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: `Hi there! I'm the ${brand.name} assistant. I can help you with pricing, certification questions, ${industry.regulatory.body} requirements, and more. How can I help you today?`,
+      content: t("supportChat.greeting", { brand: brand.name, body: industry.regulatory.body }),
       timestamp: new Date(),
     },
   ]);
@@ -541,14 +542,14 @@ function ChatPanel({
                 if (action.message === null) {
                   onContactHuman();
                 } else {
-                  handleSend(action.message);
+                  handleSend(t(`supportChat.qaMsg.${action.id}`, { defaultValue: action.message }));
                 }
               }}
               disabled={isTyping || isLimitReached}
               data-testid={`button-quick-${action.label.toLowerCase().replace(/\s+/g, "-")}`}
             >
               <QuickActionIcon icon={action.icon} />
-              <span className="ml-1.5">{action.label}</span>
+              <span className="ml-1.5">{t(`supportChat.qa.${action.id}`, { defaultValue: action.label })}</span>
             </Button>
           ))}
         </div>

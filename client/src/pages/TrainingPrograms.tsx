@@ -6,6 +6,7 @@ import CTABand from "@/components/sections/CTABand";
 import ProductCard from "@/components/sections/ProductCard";
 import SEOHead from "@/components/seo/SEOHead";
 import { catalog, type ProductCategory, type ProductLocation } from "@/data/catalog";
+import { useTranslatedProducts } from "@/hooks/useTranslatedProduct";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
@@ -103,8 +104,10 @@ export default function TrainingPrograms() {
   const hasActiveFilters =
     filters.categories.length > 0 || filters.locations.length > 0;
 
+  const translatedCatalog = useTranslatedProducts(catalog);
+
   const filteredProducts = useMemo(() => {
-    return catalog.filter((product) => {
+    return translatedCatalog.filter((product) => {
       if (
         filters.categories.length > 0 &&
         !filters.categories.includes(product.category)
@@ -119,7 +122,7 @@ export default function TrainingPrograms() {
       }
       return true;
     });
-  }, [filters]);
+  }, [filters, translatedCatalog]);
 
   const categoryFilters: {
     key: ProductCategory;

@@ -1,6 +1,32 @@
 import { useTranslation } from "react-i18next";
 import type { BlogArticle } from "@/data/blog";
 import { blogEs } from "@/data/blog-es";
+import { blogEsContent } from "@/data/blog-es-content";
+
+function toSpanish(article: BlogArticle): BlogArticle {
+  const es = blogEs[article.slug];
+  const esBody = blogEsContent[article.slug];
+  if (!es && !esBody) return article;
+
+  return {
+    ...article,
+    ...(es
+      ? {
+          title: es.title,
+          excerpt: es.excerpt,
+          category: es.category,
+          readTime: es.readTime,
+        }
+      : {}),
+    ...(esBody
+      ? {
+          content: esBody.content,
+          metaTitle: esBody.metaTitle,
+          metaDescription: esBody.metaDescription,
+        }
+      : {}),
+  };
+}
 
 export function useTranslatedBlog(article: BlogArticle | null | undefined): BlogArticle | undefined {
   const { i18n } = useTranslation();
@@ -8,16 +34,7 @@ export function useTranslatedBlog(article: BlogArticle | null | undefined): Blog
   if (!article) return article as undefined;
   if (!i18n.language.startsWith("es")) return article;
 
-  const es = blogEs[article.slug];
-  if (!es) return article;
-
-  return {
-    ...article,
-    title: es.title,
-    excerpt: es.excerpt,
-    category: es.category,
-    readTime: es.readTime,
-  };
+  return toSpanish(article);
 }
 
 export function useTranslatedBlogs(articles: BlogArticle[]): BlogArticle[] {
@@ -25,15 +42,5 @@ export function useTranslatedBlogs(articles: BlogArticle[]): BlogArticle[] {
 
   if (!i18n.language.startsWith("es")) return articles;
 
-  return articles.map((article) => {
-    const es = blogEs[article.slug];
-    if (!es) return article;
-    return {
-      ...article,
-      title: es.title,
-      excerpt: es.excerpt,
-      category: es.category,
-      readTime: es.readTime,
-    };
-  });
+  return articles.map(toSpanish);
 }

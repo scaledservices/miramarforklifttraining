@@ -78,7 +78,7 @@ export default function ProductDetail() {
 
   const categoryImage = getProductImage(rawProduct!);
   const altKey = getProductImageAltKey(rawProduct!);
-  const categoryImageAlt = altKey ? t(altKey) : (rawProduct!.imageAlt || product.title);
+  const categoryImageAlt = altKey ? t(altKey) : (product.imageAlt || product.title);
 
   const hasBulkPricing = product.bulkPricing && product.bulkPricing.length > 0;
   const currentPricePerSeat = hasBulkPricing ? getBulkPrice(product, seats) : (typeof product.price === "number" ? product.price : 0);

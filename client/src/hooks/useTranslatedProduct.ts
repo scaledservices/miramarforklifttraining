@@ -11,6 +11,7 @@ function translateProduct(product: Product, lang: string): Product {
   return {
     ...product,
     title: es.title,
+    ...(es.imageAlt !== undefined ? { imageAlt: es.imageAlt } : {}),
     shortDescription: es.shortDescription,
     longDescription: es.longDescription,
     duration: es.duration,
@@ -18,6 +19,9 @@ function translateProduct(product: Product, lang: string): Product {
     ...(es.priceLabel !== undefined ? { priceLabel: es.priceLabel } : {}),
     ...(es.languages !== undefined ? { languages: es.languages } : {}),
     ...(es.equipmentCovered !== undefined ? { equipmentCovered: es.equipmentCovered } : {}),
+    ...(es.ctaLabel !== undefined ? { ctaLabel: es.ctaLabel } : {}),
+    ...(es.metaTitle !== undefined ? { metaTitle: es.metaTitle } : {}),
+    ...(es.metaDescription !== undefined ? { metaDescription: es.metaDescription } : {}),
   };
 }
 

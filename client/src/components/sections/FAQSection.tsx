@@ -1,17 +1,21 @@
 import { useTranslation } from "react-i18next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import type { FAQItem } from "@/data/faq";
+import { localizeFaq, type FAQItem, type LocalizedFAQItem } from "@/data/faq";
 
 interface FAQSectionProps {
-  items: FAQItem[];
+  /** Bilingual items are localized automatically; pre-localized items are shown as-is. */
+  items: FAQItem[] | LocalizedFAQItem[];
   title?: string;
   subtitle?: string;
   maxItems?: number;
 }
 
 export default function FAQSection({ items, title, subtitle, maxItems }: FAQSectionProps) {
-  const { t } = useTranslation();
-  const displayItems = maxItems ? items.slice(0, maxItems) : items;
+  const { t, i18n } = useTranslation();
+  const sliced = maxItems ? items.slice(0, maxItems) : items;
+  const displayItems: LocalizedFAQItem[] = (sliced as (FAQItem | LocalizedFAQItem)[]).map((item) =>
+    "questionEs" in item ? localizeFaq([item as FAQItem], i18n.language)[0] : item,
+  );
   const displayTitle = title || t("faqSection.defaultTitle");
 
   return (

@@ -4,7 +4,7 @@ import { industry } from "@shared/config/industry";
 import SEOHead from "@/components/seo/SEOHead";
 import { organizationSchema, faqSchema } from "@/components/seo/StructuredData";
 import { useCurrentLocale } from "@/hooks/useLocaleLocation";
-import { faqItems } from "@/data/faq";
+import { faqItems, localizeFaq } from "@/data/faq";
 import FAQSection from "@/components/sections/FAQSection";
 import TrustBadgeBar from "@/components/sections/TrustBadgeBar";
 import { Link } from "wouter";
@@ -138,11 +138,8 @@ export default function Home() {
         canonical="/"
         jsonLd={[
           organizationSchema(locale),
-          // faqItems are English-only content — emitting them with
-          // inLanguage:"es" on the Spanish page is invalid, so EN only.
-          ...(locale === "en"
-            ? [faqSchema(faqItems.slice(0, 6).map(({ question, answer }) => ({ question, answer })), locale)]
-            : []),
+          // FAQ schema in the page language (faqItems carry EN + ES text).
+          faqSchema(localizeFaq(faqItems.slice(0, 6), locale).map(({ question, answer }) => ({ question, answer })), locale),
         ]}
       />
 

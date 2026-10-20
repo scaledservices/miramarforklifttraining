@@ -41,7 +41,7 @@ export default function ProductCard({ product: rawProduct, variant = "compact", 
 
   const productImage = getProductImage(rawProduct);
   const altKey = getProductImageAltKey(rawProduct);
-  const productImageAlt = altKey ? t(altKey) : (rawProduct.imageAlt || product.title);
+  const productImageAlt = altKey ? t(altKey) : (product.imageAlt || product.title);
 
   if (variant === "full") {
     return (
