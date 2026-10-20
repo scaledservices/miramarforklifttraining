@@ -770,7 +770,7 @@
     },
     "support": {
       "title": "Soporte y Contacto | {{brand}}",
-      "description": "Obtén ayuda instantánea de nuestro asistente de IA o contacta al equipo de {{brand}}. Estamos aquí para ayudarte con precios, preguntas de certificación, requisitos de {{body}} y más."
+      "description": "Comuníquese con el equipo de {{brand}} por teléfono, correo electrónico o mensaje para recibir ayuda con precios, preguntas sobre certificación, requisitos de {{body}} y más."
     },
     "business": {
       "title": "Soluciones de Capacitación de Montacargas para Empresas | Certificación de Equipo",
@@ -1766,15 +1766,7 @@
   },
   "supportPage": {
     "title": "¿Cómo Podemos Ayudarle?",
-    "subtitle": "Converse con nuestro asistente de IA para respuestas instantáneas, o comuníquese directamente con nuestro equipo.",
-    "aiAssistant": "Asistente de IA",
-    "demoMode": "Asistente de demostración (sin conexión)",
-    "messageLimit": "Ha alcanzado el límite de mensajes para esta sesión. Para más asistencia, utilice el formulario de contacto a continuación.",
-    "connectionError": "Problema de conexión. Intente de nuevo o use el formulario de contacto.",
-    "retry": "Reintentar",
-    "disclaimer": "Este asistente proporciona orientación general. Para preguntas oficiales de cumplimiento de {{body}}, consulte a un profesional de seguridad certificado.",
-    "messageLimitPlaceholder": "Límite de mensajes alcanzado",
-    "chatPlaceholder": "Escriba su pregunta...",
+    "subtitle": "Llámenos, escríbanos o envíenos un mensaje. Nuestro equipo le responde en un plazo de un día hábil.",
     "sendMessage": "Envíenos un Mensaje",
     "fullName": "Nombre Completo *",
     "placeholderName": "Su nombre",
@@ -1806,7 +1798,8 @@
     "trainingLocations": "Ubicaciones de Capacitación",
     "sanDiego": "San Diego, CA",
     "lasVegas": "Las Vegas, NV",
-    "handsOnFacility": "Instalación de capacitación práctica"
+    "handsOnFacility": "Instalación de capacitación práctica",
+    "fresno": "Fresno, CA"
   },
   "onsiteTraining": {
     "pageTitle": "Solicitar Capacitación en Su Instalación",
@@ -3115,27 +3108,6 @@
     "unavailableBody": "Aun así, es posible que podamos ir a usted.",
     "contactUs": "Contáctenos",
     "unavailableTail": " para un arreglo especial."
-  },
-  "supportChat": {
-    "ticketCreated": "Solicitud de soporte creada",
-    "ticketBody": "Enviamos tu mensaje a nuestro equipo. Te responderemos en un plazo de 1 día hábil.",
-    "confirmationTo": "Enviaremos la confirmación a {{email}}",
-    "duration": "Duración:",
-    "format": "Formato:",
-    "locations": "Ubicaciones:",
-    "greeting": "¡Hola! Soy el asistente de {{brand}}. Puedo ayudarte con precios, preguntas sobre certificación, requisitos de {{body}} y más. ¿En qué te puedo ayudar hoy?",
-    "qa": {
-      "pricing": "Precios",
-      "certificate": "Verificar certificado",
-      "checkout": "Ayuda con el pago",
-      "contact": "Hablar con una persona"
-    },
-    "qaMsg": {
-      "pricing": "¿Cuáles son sus precios para la certificación de montacargas?",
-      "certificate": "Necesito verificar una certificación de montacargas",
-      "checkout": "Necesito ayuda para completar mi compra"
-    },
-    "course": "Curso:"
   },
   "formErrors": {
     "firstNameRequired": "El nombre es obligatorio",

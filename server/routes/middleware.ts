@@ -140,9 +140,3 @@ export const examSubmitLimiter = rateLimit({
   max: 10,
   keyGenerator: (req: Request) => req.params.enrollmentId || req.ip || "unknown",
 });
-export const assistantLimiter = rateLimit({
-  name: "assistant",
-  windowMs: 60_000,
-  max: 20,
-  keyGenerator: (req: Request) => req.session?.userId ? String(req.session.userId) : (req.ip || "unknown"),
-});

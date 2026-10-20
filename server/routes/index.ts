@@ -15,7 +15,6 @@ import { registerCertRoutes } from "./certs";
 import { registerGroupRoutes } from "./groups";
 import { registerAdminRoutes } from "./admin";
 import { registerServiceRoutes } from "./services";
-import { registerAssistantRoutes } from "./assistant";
 import { registerTrainingEventRoutes } from "./training-events";
 import { registerQuoteRoutes } from "./quotes";
 import { registerAuthorizeNetRoutes } from "./authorizeNet";
@@ -82,7 +81,6 @@ export async function registerRoutes(
   registerGroupRoutes(app);
   registerAdminRoutes(app);
   registerServiceRoutes(app);
-  registerAssistantRoutes(app);
   registerTrainingEventRoutes(app);
   registerQuoteRoutes(app);
   registerAuthorizeNetRoutes(app);

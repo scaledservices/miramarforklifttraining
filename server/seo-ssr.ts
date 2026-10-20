@@ -643,7 +643,7 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; h1:
     title: `Support & Contact | ${brand.name}`,
     description: `Get help from ${brand.name}. Contact our support team for questions about forklift certification, training, or technical issues. Call ${brand.support.phone}.`,
     h1: "Support & Contact",
-    bodyHtml: `<p>Get instant help from our AI assistant or contact the ${brand.name} team. We're here to help with pricing, certification questions, ${industry.regulatory.body} requirements, and more.</p>`,
+    bodyHtml: `<p>Call, email, or send a message to the ${brand.name} team. We're here to help with pricing, certification questions, ${industry.regulatory.body} requirements, and more.</p>`,
   },
   "/locations": {
     title: `On-Site Training Locations | ${brand.name}`,

@@ -770,7 +770,7 @@
     },
     "support": {
       "title": "Support & Contact | {{brand}}",
-      "description": "Get instant help from our AI assistant or contact the {{brand}} team. We are here to help with pricing, certification questions, {{body}} requirements, and more."
+      "description": "Contact the {{brand}} team by phone, email, or message for help with pricing, certification questions, {{body}} requirements, and more."
     },
     "business": {
       "title": "Business Forklift Training Solutions | Team Certification",
@@ -1769,15 +1769,7 @@
   },
   "supportPage": {
     "title": "How Can We Help?",
-    "subtitle": "Chat with our AI assistant for instant answers, or reach out to our team directly.",
-    "aiAssistant": "AI Assistant",
-    "demoMode": "Demo Assistant (not connected)",
-    "messageLimit": "You've reached the message limit for this session. For further assistance, please use the contact form below.",
-    "connectionError": "Connection issue. Please try again or use the contact form.",
-    "retry": "Retry",
-    "disclaimer": "This assistant provides general guidance. For official {{body}} compliance questions, consult a certified safety professional.",
-    "messageLimitPlaceholder": "Message limit reached",
-    "chatPlaceholder": "Type your question...",
+    "subtitle": "Call us, email us, or send a message. Our team gets back to you within one business day.",
     "sendMessage": "Send Us a Message",
     "fullName": "Full Name *",
     "placeholderName": "Your name",
@@ -1809,7 +1801,8 @@
     "trainingLocations": "Training Locations",
     "sanDiego": "San Diego, CA",
     "lasVegas": "Las Vegas, NV",
-    "handsOnFacility": "Hands-on training facility"
+    "handsOnFacility": "Hands-on training facility",
+    "fresno": "Fresno, CA"
   },
   "onsiteTraining": {
     "pageTitle": "Request On-Site Training",
@@ -3115,27 +3108,6 @@
     "unavailableBody": "We may still be able to come to you.",
     "contactUs": "Contact us",
     "unavailableTail": " for custom arrangements."
-  },
-  "supportChat": {
-    "ticketCreated": "Support Ticket Created",
-    "ticketBody": "Your message has been sent to our team. We'll respond within 1 business day.",
-    "confirmationTo": "Confirmation will be sent to {{email}}",
-    "duration": "Duration:",
-    "format": "Format:",
-    "locations": "Locations:",
-    "greeting": "Hi there! I'm the {{brand}} assistant. I can help you with pricing, certification questions, {{body}} requirements, and more. How can I help you today?",
-    "qa": {
-      "pricing": "Pricing Info",
-      "certificate": "Check Certificate",
-      "checkout": "Help with Checkout",
-      "contact": "Contact Human"
-    },
-    "qaMsg": {
-      "pricing": "What are your pricing options for forklift certification?",
-      "certificate": "I need to verify a forklift certification",
-      "checkout": "I need help completing my purchase"
-    },
-    "course": "Course:"
   },
   "formErrors": {
     "firstNameRequired": "First name is required",
