@@ -29,6 +29,7 @@ import {
   Ship,
   Trees,
 } from "lucide-react";
+import { equipmentName } from "@/lib/equipmentName";
 
 interface IndustryLandingProps {
   slug: string;
@@ -66,6 +67,7 @@ export default function IndustryLanding({ slug }: IndustryLandingProps) {
   const description = isEs ? data.descriptionEs : data.description;
   const heroSubtitle = isEs ? data.heroSubtitleEs : data.heroSubtitle;
   const whyMiramar = isEs ? data.whyMiramarEs : data.whyMiramar;
+  const oshaConcerns = isEs && data.oshaConcernsEs ? data.oshaConcernsEs : data.oshaConcerns;
   const faqs = isEs ? data.faqsEs : data.faqs;
 
   const BASE_URL = SITE_URL;
@@ -173,7 +175,7 @@ export default function IndustryLanding({ slug }: IndustryLandingProps) {
                 {t("industries.oshaIntro", { name, body: industry.regulatory.body, standard: industry.regulatory.standard })}
               </p>
               <ul className="space-y-3">
-                {data.oshaConcerns.map((concern, i) => (
+                {oshaConcerns.map((concern, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <Shield className="w-5 h-5 text-brand-dark shrink-0 mt-0.5" />
                     <span className="text-sm text-muted-foreground leading-relaxed">{concern}</span>
@@ -193,7 +195,7 @@ export default function IndustryLanding({ slug }: IndustryLandingProps) {
                 {data.equipment.map((eq, i) => (
                   <div key={i} className="flex items-center gap-3 bg-muted/50 rounded-lg px-4 py-3">
                     <Wrench className="w-5 h-5 text-brand-dark shrink-0" />
-                    <span className="text-sm font-medium">{eq}</span>
+                    <span className="text-sm font-medium">{equipmentName(eq)}</span>
                   </div>
                 ))}
               </div>

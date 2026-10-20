@@ -11,6 +11,7 @@ import SEOHead from "@/components/seo/SEOHead";
 import { breadcrumbSchema } from "@/components/seo/StructuredData";
 import { SITE_URL } from "@/components/seo/siteUrl";
 import { ArrowRight, Truck, Phone, Users } from "lucide-react";
+import { equipmentName } from "@/lib/equipmentName";
 
 const INDUSTRY_ICONS: Record<string, string> = {
   warehousing: "📦",
@@ -85,7 +86,7 @@ export default function IndustriesHub() {
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {ind.equipment.slice(0, 3).map((eq) => (
                         <span key={eq} className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded">
-                          {eq.split("(")[0].trim()}
+                          {equipmentName(eq).split("(")[0].trim()}
                         </span>
                       ))}
                     </div>

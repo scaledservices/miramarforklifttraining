@@ -21,6 +21,8 @@ export interface IndustryData {
   equipment: string[];
   /** OSHA compliance concerns specific to this industry */
   oshaConcerns: string[];
+  /** Spanish oshaConcerns (same order) */
+  oshaConcernsEs?: string[];
   /** Why Miramar for this industry (EN) */
   whyMiramar: string[];
   /** Why Miramar for this industry (ES) */
@@ -57,6 +59,13 @@ export const INDUSTRIES: IndustryData[] = [
       "Rack stacking safety at height with reach trucks and order pickers",
       "Battery charging station hazards and LPG refueling procedures",
       "Pre-shift inspection requirements for high-utilization fleets",
+    ],
+    oshaConcernsEs: [
+      "Operación en pasillos angostos y tránsito de peatones en espacios reducidos",
+      "Estabilidad de la carga y capacidades nominales para distintas configuraciones de tarimas",
+      "Seguridad al apilar en estantería en altura con montacargas de alcance y recogepedidos",
+      "Riesgos en estaciones de carga de baterías y procedimientos de recarga de gas LP",
+      "Requisitos de inspección antes de cada turno para flotas de uso intensivo",
     ],
     whyMiramar: [
       "On-site training at your warehouse on your actual equipment",
@@ -139,6 +148,13 @@ export const INDUSTRIES: IndustryData[] = [
       "Cross-dock pedestrian traffic and blind corners",
       "Mixed LPG and electric equipment in the same facility",
       "High-throughput shift handoffs and operator fatigue",
+    ],
+    oshaConcernsEs: [
+      "Carga y descarga de remolques: capacidad de la placa de muelle y requisitos de calzas para ruedas",
+      "Posicionamiento de remolques y coordinación con tractores de patio",
+      "Tránsito de peatones en el cross-dock y esquinas sin visibilidad",
+      "Equipos de gas LP y eléctricos en la misma instalación",
+      "Cambios de turno de alto volumen y fatiga del operador",
     ],
     whyMiramar: [
       "On-site training at your distribution center or cross-dock",
@@ -223,6 +239,13 @@ export const INDUSTRIES: IndustryData[] = [
       "Job site traffic management and ground worker safety",
       "Daily site condition changes requiring ongoing hazard assessment",
     ],
+    oshaConcernsEs: [
+      "Riesgos al operar en terreno irregular y superficies desniveladas",
+      "Protección contra caídas y requisitos de arnés en elevadores aéreos",
+      "Distancia de seguridad de líneas eléctricas aéreas y riesgo de electrocución",
+      "Control del tránsito en la obra y seguridad del personal a pie",
+      "Cambios diarios en las condiciones de la obra que requieren evaluar los riesgos de forma continua",
+    ],
     whyMiramar: [
       "On-site training at your job site on your actual equipment",
       "Instructors who understand construction safety and OSHA 1926 standards",
@@ -306,6 +329,13 @@ export const INDUSTRIES: IndustryData[] = [
       "Narrow aisle navigation between production equipment",
       "Hazardous material handling and spill containment awareness",
     ],
+    oshaConcernsEs: [
+      "Tránsito de peatones en la planta de producción y zonas de interacción con maquinaria",
+      "Manejo de cargas cerca de líneas de producción activas y celdas robóticas",
+      "Carga de baterías muy cerca de las operaciones de manufactura",
+      "Circulación por pasillos angostos entre equipos de producción",
+      "Manejo de materiales peligrosos y conocimiento de contención de derrames",
+    ],
     whyMiramar: [
       "On-site training on your production floor with your equipment",
       "Instructors experienced with manufacturing environments",
@@ -387,6 +417,13 @@ export const INDUSTRIES: IndustryData[] = [
       "Load stability when moving mixed retail inventory",
       "Noise and safety protocols in customer-facing environments",
       "Seasonal staffing and temporary operator certification needs",
+    ],
+    oshaConcernsEs: [
+      "Tránsito de clientes y empleados en zonas cercanas al área de ventas",
+      "Operación de transpaleta eléctrica en el piso de ventas y pasillos de bodega",
+      "Estabilidad de la carga al mover inventario mixto",
+      "Protocolos de ruido y seguridad en entornos de atención al cliente",
+      "Personal de temporada y necesidades de certificación de operadores temporales",
     ],
     whyMiramar: [
       "On-site training at your distribution center or retail backroom",
@@ -470,6 +507,13 @@ export const INDUSTRIES: IndustryData[] = [
       "Battery management in cold environments and charging station safety",
       "Allergen and contamination awareness during material handling",
     ],
+    oshaConcernsEs: [
+      "Riesgos en cámaras frigoríficas: menor tracción, condensación y visibilidad limitada",
+      "Requisitos de equipo eléctrico en áreas de grado alimenticio y de almacenamiento en frío",
+      "Tránsito de peatones en los muelles de carga durante la distribución de alto volumen",
+      "Manejo de baterías en ambientes fríos y seguridad en las estaciones de carga",
+      "Conciencia sobre alérgenos y contaminación durante el manejo de materiales",
+    ],
     whyMiramar: [
       "On-site training at your cold storage or distribution facility",
       "Instructors experienced with food and beverage operations",
@@ -551,6 +595,13 @@ export const INDUSTRIES: IndustryData[] = [
       "Customer traffic in retail yard environments",
       "Telehandler load charts and reach limitations for elevated loads",
       "Securing and transporting building materials safely",
+    ],
+    oshaConcernsEs: [
+      "Manejo de cargas largas e inestables: paquetes de madera, láminas de tablaroca, tubería",
+      "Riesgos en patios exteriores: grava, lodo, pendientes y condiciones del clima",
+      "Tránsito de clientes en patios de venta",
+      "Tablas de carga del manipulador telescópico y límites de alcance para cargas elevadas",
+      "Asegurar y transportar materiales de construcción de forma segura",
     ],
     whyMiramar: [
       "On-site training at your lumber yard or building supply facility",
@@ -634,6 +685,13 @@ export const INDUSTRIES: IndustryData[] = [
       "Reach stacker load charts and stability at extended reach",
       "Working near water and dock edge fall hazards",
       "High-noise environment communication and signal protocols",
+    ],
+    oshaConcernsEs: [
+      "Manejo de contenedores: apilar, desapilar y asegurar cargas pesadas",
+      "Control del tránsito de peatones y vehículos en muelles y zonas de atraque",
+      "Tablas de carga del apilador de alcance y estabilidad con el brazo extendido",
+      "Trabajo cerca del agua y riesgo de caídas en el borde del muelle",
+      "Comunicación y protocolos de señales en entornos de mucho ruido",
     ],
     whyMiramar: [
       "On-site training at your port facility or shipping terminal",
