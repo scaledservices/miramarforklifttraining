@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { UserPlus, RotateCcw, RefreshCw, Trash2, Loader2, BookOpen, Users, CheckCircle2, XCircle } from "lucide-react";
 import { useState, useCallback } from "react";
 import GroupLayout from "./GroupLayout";
+import { courseTitle } from "@/lib/courseTitle";
 
 type BulkInviteResult = {
   name: string;
@@ -372,7 +373,7 @@ export default function GroupMembers() {
                       <SelectItem value="none">{t("groupMembers.noPreAssignment")}</SelectItem>
                       {uniqueUnassignedCourses.map((seat: any) => (
                         <SelectItem key={seat.courseId} value={String(seat.id)} data-testid={`option-seat-${seat.id}`}>
-                          {seat.courseName || t("groupMembers.seatNumber", { id: seat.id })}
+                          {courseTitle(seat.courseName) || t("groupMembers.seatNumber", { id: seat.id })}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -423,7 +424,7 @@ export default function GroupMembers() {
                       <TableCell data-testid={`text-member-training-${member.id}`}>
                         {member.courseName ? (
                           <div className="space-y-1">
-                            <span className="text-sm">{member.courseName}</span>
+                            <span className="text-sm">{courseTitle(member.courseName)}</span>
                             {member.trainingStatus === "in_progress" && (
                               <Progress value={member.progressPct || 0} className="h-1.5 w-24" />
                             )}
@@ -472,7 +473,7 @@ export default function GroupMembers() {
                                           ) : (
                                             <BookOpen className="h-3 w-3 mr-2" />
                                           )}
-                                          {courseSeat.courseName || t("dashboard.courseNumber", { id: courseSeat.courseId })}
+                                          {courseTitle(courseSeat.courseName) || t("dashboard.courseNumber", { id: courseSeat.courseId })}
                                         </Button>
                                       );
                                     })}

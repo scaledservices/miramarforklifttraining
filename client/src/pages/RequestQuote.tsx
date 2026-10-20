@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, Building2, Users, MapPin, Phone, Mail, Calendar, ClipboardList, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import SEOHead from "@/components/seo/SEOHead";
 import { formatUsPhone, normalizeEmail, capitalizeWords, digitsOnly } from "@/lib/inputFormat";
 
@@ -43,19 +44,21 @@ const activeLocations = getActiveLocations();
 // three markets (e.g. Arizona) can ask for a quote without picking a city.
 const AT_YOUR_LOCATION = "__onsite__";
 
-const formSchema = z.object({
-  firstName: z.string().min(2, "First name is required"),
-  lastName: z.string().min(2, "Last name is required"),
+// Built per-render language (see useMemo in the component) so validation
+// messages follow the active locale instead of being frozen at module load.
+const makeFormSchema = (t: TFunction) => z.object({
+  firstName: z.string().min(2, t("formErrors.firstNameRequired")),
+  lastName: z.string().min(2, t("formErrors.lastNameRequired")),
   companyName: z.string().optional(),
-  email: z.string().email("Please enter a valid email address"),
+  email: z.string().email(t("formErrors.emailInvalid")),
   phone: z.string().optional(),
-  requestedLocationSlug: z.string().min(1, "Please select a location"),
+  requestedLocationSlug: z.string().min(1, t("formErrors.locationRequired")),
   trainingAddress: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   zip: z.string().optional(),
-  traineeCount: z.coerce.number().int().min(1, "At least 1 participant").max(1000),
-  equipmentTypes: z.array(z.string()).min(1, "Please select at least one equipment type"),
+  traineeCount: z.coerce.number().int().min(1, t("formErrors.minOneParticipant")).max(1000),
+  equipmentTypes: z.array(z.string()).min(1, t("formErrors.equipmentRequired")),
   trainingType: z.string().optional(),
   preferredDate1: z.string().optional(),
   notes: z.string().optional(),
@@ -69,11 +72,11 @@ const formSchema = z.object({
   }
   return true;
 }, {
-  message: "Please provide the full training address for on-site training",
+  message: t("formErrors.onsiteAddressRequired"),
   path: ["trainingAddress"],
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<ReturnType<typeof makeFormSchema>>;
 
 function getLeadSourceFromUrl(): string {
   const params = new URLSearchParams(window.location.search);
@@ -85,7 +88,8 @@ function getSelectedLocation(slug: string): TrainingLocation | undefined {
 }
 
 export default function RequestQuote() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const formSchema = useMemo(() => makeFormSchema(t), [t, i18n.language]);
   const [submitted, setSubmitted] = useState(false);
 
   // Track funnel entry: user landed on the quote form.
@@ -238,14 +242,14 @@ export default function RequestQuote() {
                   <FormField control={form.control} name="firstName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("requestQuote.firstName")}</FormLabel>
-                      <FormControl><Input placeholder="Jane" {...field} type="text" autoComplete="given-name" onBlur={() => field.onChange(capitalizeWords(field.value.trim()))} data-testid="input-first-name" /></FormControl>
+                      <FormControl><Input placeholder={t("requestQuote.firstNamePlaceholder")} {...field} type="text" autoComplete="given-name" onBlur={() => field.onChange(capitalizeWords(field.value.trim()))} data-testid="input-first-name" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="lastName" render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("requestQuote.lastName")}</FormLabel>
-                      <FormControl><Input placeholder="Smith" {...field} type="text" autoComplete="family-name" onBlur={() => field.onChange(capitalizeWords(field.value.trim()))} data-testid="input-last-name" /></FormControl>
+                      <FormControl><Input placeholder={t("requestQuote.lastNamePlaceholder")} {...field} type="text" autoComplete="family-name" onBlur={() => field.onChange(capitalizeWords(field.value.trim()))} data-testid="input-last-name" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -254,7 +258,7 @@ export default function RequestQuote() {
                 <FormField control={form.control} name="companyName" render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("requestQuote.companyNameOptional")}</FormLabel>
-                    <FormControl><Input placeholder="Acme Logistics" {...field} type="text" autoComplete="organization" data-testid="input-company-name" /></FormControl>
+                    <FormControl><Input placeholder={t("requestQuote.companyPlaceholder")} {...field} type="text" autoComplete="organization" data-testid="input-company-name" /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )} />

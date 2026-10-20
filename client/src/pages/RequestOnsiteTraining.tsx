@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, Building2, Users, MapPin, Phone, Mail, Calendar, ClipboardList } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import SEOHead from "@/components/seo/SEOHead";
 
 const EQUIPMENT_ENTRIES = [
@@ -36,28 +37,31 @@ const US_STATES = [
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY",
 ];
 
-const formSchema = z.object({
+// Built per-render language (see useMemo in the component) so validation
+// messages follow the active locale instead of being frozen at module load.
+const makeFormSchema = (t: TFunction) => z.object({
   companyName: z.string().optional(),
-  contactName: z.string().min(2, "Contact name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  phone: z.string().min(7, "Please enter a valid phone number"),
-  trainingAddress: z.string().min(5, "Please enter a street address"),
-  city: z.string().min(2, "Please enter a city"),
-  state: z.string().min(2, "Please select a state"),
-  zip: z.string().min(5, "Please enter a valid ZIP code"),
-  traineeCount: z.coerce.number().int().min(1, "Must have at least 1 trainee").max(1000, "Please contact us for groups over 1000"),
+  contactName: z.string().min(2, t("formErrors.contactNameMin")),
+  email: z.string().email(t("formErrors.emailInvalid")),
+  phone: z.string().min(7, t("formErrors.phoneInvalid")),
+  trainingAddress: z.string().min(5, t("formErrors.streetRequired")),
+  city: z.string().min(2, t("formErrors.cityRequired")),
+  state: z.string().min(2, t("formErrors.stateRequired")),
+  zip: z.string().min(5, t("formErrors.zipInvalid")),
+  traineeCount: z.coerce.number().int().min(1, t("formErrors.minOneTrainee")).max(1000, t("formErrors.maxTrainees")),
   preferredDate1: z.string().optional(),
   preferredDate2: z.string().optional(),
   preferredDate3: z.string().optional(),
-  equipmentTypes: z.array(z.string()).min(1, "Please select at least one equipment type"),
-  trainingType: z.string().min(1, "Please select a training type"),
+  equipmentTypes: z.array(z.string()).min(1, t("formErrors.equipmentRequired")),
+  trainingType: z.string().min(1, t("formErrors.trainingTypeRequired")),
   notes: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<ReturnType<typeof makeFormSchema>>;
 
 export default function RequestOnsiteTraining() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const formSchema = useMemo(() => makeFormSchema(t), [t, i18n.language]);
   const [submitted, setSubmitted] = useState(false);
 
   const form = useForm<FormValues>({
@@ -161,7 +165,7 @@ export default function RequestOnsiteTraining() {
                       <FormItem>
                         <FormLabel>{t("onsiteTraining.contactName")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Jane Smith" {...field} data-testid="input-contact-name" />
+                          <Input placeholder={t("onsiteTraining.contactNamePlaceholder")} {...field} data-testid="input-contact-name" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -174,7 +178,7 @@ export default function RequestOnsiteTraining() {
                       <FormItem>
                         <FormLabel>{t("onsiteTraining.companyName")}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Acme Logistics Co." {...field} data-testid="input-company-name" />
+                          <Input placeholder={t("onsiteTraining.companyPlaceholder")} {...field} data-testid="input-company-name" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -284,7 +288,7 @@ export default function RequestOnsiteTraining() {
                       <FormItem>
                         <FormLabel>{t("onsiteTraining.numberOfTrainees")}</FormLabel>
                         <FormControl>
-                          <Input type="number" min={1} placeholder="e.g. 10" {...field} data-testid="input-trainee-count" />
+                          <Input type="number" min={1} placeholder={t("onsiteTraining.traineePlaceholder")} {...field} data-testid="input-trainee-count" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

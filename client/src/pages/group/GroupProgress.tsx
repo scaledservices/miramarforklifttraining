@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Bell, Loader2 } from "lucide-react";
 import GroupLayout from "./GroupLayout";
 import { useTranslation } from "react-i18next";
+import { courseTitle } from "@/lib/courseTitle";
 
 export default function GroupProgress() {
   const { t } = useTranslation();
@@ -131,7 +132,7 @@ export default function GroupProgress() {
                         {enrollment.userName || t("groupProgress.unassigned")}
                       </TableCell>
                       <TableCell data-testid={`text-progress-course-${enrollment.id}`}>
-                        {enrollment.courseName}
+                        {courseTitle(enrollment.courseName)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3 min-w-[150px]">

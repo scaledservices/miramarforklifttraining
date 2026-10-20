@@ -762,7 +762,7 @@
   "seo": {
     "home": {
       "title": "OSHA-Aligned Forklift Training & Certification",
-      "description": "Get your forklift certification online or at our training facilities. OSHA-aligned programs with same-day certification available. Starting at $45.00."
+      "description": "Forklift training at your job site or at our San Diego, Las Vegas and Fresno facilities, plus online certification. OSHA-aligned programs with same-day certification available."
     },
     "onlineCertification": {
       "title": "Online Forklift Certification — OSHA-Compliant Training | $45.00",
@@ -1039,7 +1039,14 @@
     "demoMode": "Demo Mode - No real charges",
     "paymentNotConfigured": "Payment is not configured. Please call us to order.",
     "securePayment": "Secure Card Payment",
-    "securePaymentDesc": "Your card is processed securely through Authorize.net. We never see or store your card details."
+    "securePaymentDesc": "Your card is processed securely through Authorize.net. We never see or store your card details.",
+    "alreadyOrderedTitle": "Card already ordered",
+    "alreadyOrderedDesc": "You already have an active card order for this certification. Its current status is shown below.",
+    "orderNumber": "Order",
+    "invalidCardNumber": "Please enter a valid card number.",
+    "cardExpirationRequired": "Please enter the card expiration date.",
+    "cardCvvRequired": "Please enter the card CVV code.",
+    "paymentAuthFailed": "Payment authorization failed."
   },
   "teamPhotoId": {
     "title": "Team photo IDs",
@@ -1855,7 +1862,10 @@
     "typeInitialCert": "Initial Certification",
     "typeRecert": "Recertification",
     "typeRefresher": "Refresher",
-    "typeEvalOnly": "Evaluation Only"
+    "typeEvalOnly": "Evaluation Only",
+    "contactNamePlaceholder": "Jane Smith",
+    "companyPlaceholder": "Acme Logistics Co.",
+    "traineePlaceholder": "e.g. 10"
   },
   "bookTraining": {
     "seoTitle": "Book On-Site Forklift Training | {{brand}}",
@@ -1955,7 +1965,8 @@
     "accountSetupRetryNote": "We couldn't set up your account automatically. Create one below to finish your purchase — your details are already filled in.",
     "onsiteSessionBase": "On-site training session",
     "travelFee": "Travel fee (~{{miles}} mi)",
-    "travelWaived": "Travel fee waived (3+ participants)"
+    "travelWaived": "Travel fee waived (3+ participants)",
+    "participantCountHint": "Tap + or -, or type a number and tab away."
   },
   "businessPage": {
     "heroTitle": "Forklift Training for Your Business",
@@ -2478,7 +2489,10 @@
     },
     "customQuoteTitle": "Custom Quote for Your Team",
     "customQuoteDesc": "Every quote is customized to your company size, location, and equipment. Send us the details below and we will respond within one business day.",
-    "facilityAddressTitle": "Your training will take place at:"
+    "facilityAddressTitle": "Your training will take place at:",
+    "firstNamePlaceholder": "Jane",
+    "lastNamePlaceholder": "Smith",
+    "companyPlaceholder": "Acme Logistics"
   },
   "serviceAreas": {
     "notFoundTitle": "Service Area Not Found",
@@ -3120,6 +3134,109 @@
       "pricing": "What are your pricing options for forklift certification?",
       "certificate": "I need to verify a forklift certification",
       "checkout": "I need help completing my purchase"
-    }
+    },
+    "course": "Course:"
+  },
+  "formErrors": {
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "emailInvalid": "Please enter a valid email address",
+    "locationRequired": "Please select a location",
+    "minOneParticipant": "At least 1 participant",
+    "equipmentRequired": "Please select at least one equipment type",
+    "onsiteAddressRequired": "Please provide the full training address for on-site training",
+    "contactNameMin": "Contact name must be at least 2 characters",
+    "phoneInvalid": "Please enter a valid phone number",
+    "streetRequired": "Please enter a street address",
+    "cityRequired": "Please enter a city",
+    "stateRequired": "Please select a state",
+    "zipInvalid": "Please enter a valid ZIP code",
+    "minOneTrainee": "Must have at least 1 trainee",
+    "maxTrainees": "Please contact us for groups over 1000",
+    "trainingTypeRequired": "Please select a training type"
+  },
+  "attendeeNames": {
+    "savedCount_one": "Saved {{count}} attendee",
+    "savedCount_other": "Saved {{count}} attendees",
+    "saved": "Saved",
+    "saveFailed": "Could not save attendees",
+    "updated": "Attendee updated",
+    "updateFailed": "Could not update attendee",
+    "removed": "Attendee removed",
+    "removeFailed": "Could not remove attendee",
+    "nameRequiredTitle": "First and last name required",
+    "nameRequiredDesc": "Enter each attendee's full name exactly as it should appear on their certification.",
+    "confirmRemove": "Remove this attendee? This cannot be undone.",
+    "heading": "Who's attending?",
+    "intro": "Enter each attendee's full first and last name - this is exactly what will be printed on their certification. You can add names now or later; trainees can also sign themselves in on the day with the class QR code.",
+    "loading": "Loading...",
+    "firstNamePlaceholder": "First name *",
+    "lastNamePlaceholder": "Last name *",
+    "emailPlaceholder": "Email (optional)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "unnamed": "Unnamed",
+    "signedIn": "signed in",
+    "edit": "Edit",
+    "remove": "Remove",
+    "addAttendee_one": "Add attendee ({{count}} seat left)",
+    "addAttendee_other": "Add attendee ({{count}} seats left)",
+    "saveNames": "Save names"
+  },
+  "orderPhotoId": {
+    "fullName": "Full name",
+    "zip": "ZIP"
+  },
+  "groupDashboard": {
+    "recs": {
+      "aerialScissorTitle": "Aerial & Scissor Lift Certification",
+      "aerialScissorReason": "Expand your team's qualifications with aerial lift certification",
+      "forkliftTttTitle": "Forklift Train the Trainer",
+      "forkliftTttReason": "Build internal training capacity — train your own operators",
+      "forkliftOperatorTitle": "Forklift Operator Certification",
+      "forkliftOperatorReason": "Complete your team's forklift certification",
+      "aerialTttTitle": "Aerial Lift Train the Trainer",
+      "aerialTttReasonCapacity": "Build internal training capacity for aerial lifts",
+      "aerialTttReasonExpand": "Expand your trainer qualifications to aerial lifts"
+    },
+    "recommendedTitle": "Recommended Next Steps for Your Team",
+    "learnMore": "Learn More",
+    "expirationsTitle": "Upcoming Certification Expirations",
+    "teamMember": "Team member",
+    "certification": "Certification",
+    "expiresIn": "{{course}} expires in {{days}} days ({{date}})",
+    "recertifyNow": "Recertify Now"
+  },
+  "dashboardBookings": {
+    "training": "Training",
+    "title": "Your upcoming training",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month",
+    "weekdays": [
+      "S",
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S"
+    ],
+    "seats_one": "{{count}} seat",
+    "seats_other": "{{count}} seats",
+    "whatToExpectLabel": "What to expect:",
+    "whatToExpectText": "approximately 3-4 hours — a 1-hour presentation and kit review, followed by the hands-on practical. Bring a photo ID; at a company site, follow your company's PPE requirements."
+  },
+  "discountShare": {
+    "linkCopied": "Link copied",
+    "copyFailed": "Could not copy link",
+    "linkLabel": "Booking link with code",
+    "linkHelp": "Customers who open this link get the code applied automatically. The same code also works typed in at checkout.",
+    "qrLabel": "QR code (print on flyers or show on your phone)",
+    "qrAlt": "QR code for discount {{code}}",
+    "downloadQr": "Download QR image",
+    "generating": "Generating QR code..."
+  },
+  "certificationPage": {
+    "downloadNotAvailable": "Download not available"
   }
 }

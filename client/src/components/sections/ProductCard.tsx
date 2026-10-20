@@ -29,7 +29,7 @@ interface ProductCardProps {
 export default function ProductCard({ product: rawProduct, variant = "compact", ctaLabelOverride, ctaHrefOverride }: ProductCardProps) {
   const { t } = useTranslation();
   const product = useTranslatedProduct(rawProduct);
-  const translatedCta = ctaKeyMap[rawProduct.ctaLabel] ? t(ctaKeyMap[rawProduct.ctaLabel]) : rawProduct.ctaLabel;
+  const translatedCta = ctaKeyMap[rawProduct.ctaLabel] ? t(ctaKeyMap[rawProduct.ctaLabel]) : product.ctaLabel;
 
   const locationLabel = product.location === "san-diego" ? t("productCard.sanDiego")
     : t("productCard.onlineLocation");

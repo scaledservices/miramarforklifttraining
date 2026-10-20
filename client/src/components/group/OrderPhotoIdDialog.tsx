@@ -103,7 +103,7 @@ export default function OrderPhotoIdDialog({
             <p className="text-sm font-medium mb-2">{t("checkout.shipping.whyTitle", { defaultValue: "Where should we mail the wallet card?" })}</p>
             <div className="space-y-2">
               <div>
-                <Label htmlFor="pid-ship-name">{t("orderCertCard.name", { defaultValue: "Full name" })}</Label>
+                <Label htmlFor="pid-ship-name">{t("orderPhotoId.fullName")}</Label>
                 <Input id="pid-ship-name" value={address.name} onChange={(e) => setAddress({ ...address, name: e.target.value })} data-testid="input-photo-id-ship-name" />
               </div>
               <div>
@@ -120,7 +120,7 @@ export default function OrderPhotoIdDialog({
                   <Input id="pid-ship-state" value={address.state} onChange={(e) => setAddress({ ...address, state: e.target.value })} data-testid="input-photo-id-ship-state" />
                 </div>
                 <div>
-                  <Label htmlFor="pid-ship-zip">{t("orderCertCard.zip", { defaultValue: "ZIP" })}</Label>
+                  <Label htmlFor="pid-ship-zip">{t("orderPhotoId.zip")}</Label>
                   <Input id="pid-ship-zip" value={address.zip} onChange={(e) => setAddress({ ...address, zip: e.target.value })} data-testid="input-photo-id-ship-zip" />
                 </div>
               </div>

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Download, ArrowLeft, FileText, AlertTriangle, CheckCircle, Clock, XCircle } from "lucide-react";
+import { courseTitle } from "@/lib/courseTitle";
 
 interface Company {
   id: number;
@@ -314,7 +315,7 @@ export default function AuditBinder() {
                       <TableRow key={cert.id}>
                         <TableCell className="font-medium">{cert.employeeName}</TableCell>
                         <TableCell className="font-mono text-sm">{cert.certificateNumber}</TableCell>
-                        <TableCell>{cert.courseName}</TableCell>
+                        <TableCell>{courseTitle(cert.courseName)}</TableCell>
                         <TableCell className="text-sm">{formatDate(cert.issuedAt)}</TableCell>
                         <TableCell className="text-sm">{formatDate(cert.expiresAt)}</TableCell>
                         <TableCell>{statusBadge(cert.complianceStatus)}</TableCell>

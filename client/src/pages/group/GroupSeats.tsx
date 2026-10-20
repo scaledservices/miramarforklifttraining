@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import GroupLayout from "./GroupLayout";
 import { buyMoreSeatsHref } from "@/lib/crewSeats";
 import { useTranslation } from "react-i18next";
+import { courseTitle } from "@/lib/courseTitle";
 
 export default function GroupSeats() {
   const { t } = useTranslation();
@@ -270,7 +271,7 @@ export default function GroupSeats() {
                         {unassignedSeats.map((seat: any) => (
                           <TableRow key={seat.id} data-testid={`row-seat-${seat.id}`}>
                             <TableCell className="font-medium" data-testid={`text-seat-course-${seat.id}`}>
-                              {seat.courseName}
+                              {courseTitle(seat.courseName)}
                             </TableCell>
                             <TableCell>
                               {seat.pendingInvite ? (
@@ -407,7 +408,7 @@ export default function GroupSeats() {
                       <TableBody>
                         {assignedSeats.map((seat: any) => (
                           <TableRow key={seat.id} data-testid={`row-assigned-seat-${seat.id}`}>
-                            <TableCell className="font-medium">{seat.courseName}</TableCell>
+                            <TableCell className="font-medium">{courseTitle(seat.courseName)}</TableCell>
                             <TableCell>{seat.userName || t("groupSeats.unknown")}</TableCell>
                             <TableCell>
                               <Badge variant="default">{String(t(`status.${seat.status}`, seat.status))}</Badge>

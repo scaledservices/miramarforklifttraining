@@ -11,6 +11,7 @@ import { BookOpen, Clock, PlayCircle, Award, GraduationCap, Gift, CalendarDays }
 import { Redirect } from "wouter";
 import DashboardBookings from "@/components/dashboard/DashboardBookings";
 import type { Booking } from "@shared/schema";
+import { courseTitle } from "@/lib/courseTitle";
 
 // Peter 2026-09-07: empty state that respects hands-on bookings.
 // If the customer has upcoming onsite/hands-on training, we show a
@@ -161,7 +162,7 @@ export default function Dashboard() {
                 <Card key={enrollment.id} data-testid={`card-enrollment-${enrollment.id}`}>
                   <CardHeader className="flex flex-row items-start justify-between gap-2 pb-3">
                     <CardTitle className="text-base leading-tight">
-                      {enrollment.course?.title || t("dashboard.courseNumber", { id: enrollment.courseId })}
+                      {courseTitle(enrollment.course?.title) || t("dashboard.courseNumber", { id: enrollment.courseId })}
                     </CardTitle>
                     {isComplete ? (
                       <Badge variant="default" className="bg-green-600 shrink-0" data-testid={`badge-status-${enrollment.id}`}>

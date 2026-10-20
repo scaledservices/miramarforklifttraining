@@ -9,6 +9,7 @@ import { IdCard, Truck, Upload, ShoppingCart, Bell } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
+import { courseTitle } from "@/lib/courseTitle";
 
 /**
  * Group-admin per-member photo-ID status (wallet-card spec 2.3). Lists each
@@ -107,7 +108,7 @@ export default function TeamPhotoIdStatus({ groupId }: { groupId: number }) {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {statusBadge(cert.status)}
-                  <span className="text-sm truncate">{cert.courseTitle}</span>
+                  <span className="text-sm truncate">{courseTitle(cert.courseTitle)}</span>
                   {cert.status === "shipped" && cert.trackingNumber && (
                     <span className="text-xs text-muted-foreground flex items-center gap-1">
                       <Truck className="h-3 w-3" />

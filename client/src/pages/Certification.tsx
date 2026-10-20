@@ -90,7 +90,7 @@ export default function Certification() {
     setDownloading(true);
     try {
       const res = await fetch(`/api/certifications/${certId}/download`, { credentials: "include" });
-      if (!res.ok) throw new Error("Download not available");
+      if (!res.ok) throw new Error(t("certificationPage.downloadNotAvailable"));
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

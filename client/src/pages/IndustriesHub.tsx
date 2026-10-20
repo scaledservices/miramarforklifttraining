@@ -40,10 +40,10 @@ export default function IndustriesHub() {
     <div>
       <SEOHead
         title={isEs
-          ? `Certificacion de Montacargas por Industria | ${brand.name}`
+          ? `Certificación de Montacargas por Industria | ${brand.name}`
           : `Forklift Certification by Industry | ${brand.name}`}
         description={isEs
-          ? "Certificacion de montacargas alineada con OSHA para almacenes, logistica, construccion, manufactura, retail, alimentos y bebidas, madera y puertos en San Diego, Las Vegas y Fresno."
+          ? "Certificación de montacargas alineada con OSHA para almacenes, logística, construcción, manufactura, retail, alimentos y bebidas, madera y puertos en San Diego, Las Vegas y Fresno."
           : "OSHA-aligned forklift certification for warehousing, logistics, construction, manufacturing, retail, food & beverage, lumber, and shipping in San Diego, Las Vegas & Fresno."}
         canonical="/industries"
         jsonLd={[breadcrumbs]}
@@ -127,11 +127,11 @@ export default function IndustriesHub() {
             <Users className="w-3 h-3 mr-1" /> {isEs ? "Programa Especial" : "Special Program"}
           </Badge>
           <h3 className="text-xl md:text-2xl font-bold mb-2">
-            {isEs ? "Es Agencia de Personal Temporal?" : "Staffing Agency?"}
+            {isEs ? "¿Es Agencia de Personal Temporal?" : "Staffing Agency?"}
           </h3>
           <p className="text-white/80 mb-5 max-w-2xl mx-auto">
             {isEs
-              ? "Certifique a sus trabajadores temporales en 24 horas con reservacion prioritaria, descuentos por volumen y facturacion net-30."
+              ? "Certifique a sus trabajadores temporales en 24 horas con reservación prioritaria, descuentos por volumen y facturación net-30."
               : "Get your temps certified in 24 hours with priority booking, volume pricing, and net-30 invoicing."}
           </p>
           <Link href="/staffing-agency-program">

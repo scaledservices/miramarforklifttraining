@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { getQueryFn, apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
+import { courseTitle } from "@/lib/courseTitle";
 
 interface VerifyResponse {
   valid: boolean;
@@ -299,7 +300,7 @@ export default function CertificateVerify() {
               <BookOpen className="h-4 w-4 text-muted-foreground" />
               <div>
                 <p className="text-xs text-muted-foreground">{t("certVerify.courseLabel")}</p>
-                <p className="font-medium text-sm" data-testid="text-course-name">{data.courseName}</p>
+                <p className="font-medium text-sm" data-testid="text-course-name">{courseTitle(data.courseName)}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">

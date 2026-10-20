@@ -1,11 +1,14 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarDays, MapPin, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import AttendeeNamesForm from "@/components/booking/AttendeeNamesForm";
+import { catalog } from "@/data/catalog";
+import { catalogEs } from "@/data/catalog-es";
 import type { Booking, ServiceArea } from "@shared/schema";
 
 /**
@@ -15,6 +18,9 @@ import type { Booking, ServiceArea } from "@shared/schema";
  * Sits above the online-course enrollment cards on Dashboard.
  */
 export default function DashboardBookings() {
+  const { t, i18n } = useTranslation();
+  const isEs = i18n.language.startsWith("es");
+  const locale = isEs ? "es-US" : "en-US";
   const [calMonth, setCalMonth] = useState(() => new Date());
 
   const { data: bookings, isLoading } = useQuery<Booking[]>({
@@ -34,7 +40,15 @@ export default function DashboardBookings() {
   const bookedDates = useMemo(() => new Set(upcoming.map((b) => b.sessionDate)), [upcoming]);
 
   function areaName(id: number) {
-    return areas?.find((a) => a.id === id)?.name ?? "Training";
+    return areas?.find((a) => a.id === id)?.name ?? t("dashboardBookings.training");
+  }
+
+  // English keeps showing the raw slug (unchanged); Spanish shows the
+  // translated product title when the slug maps to a catalog product.
+  function productLabel(slug: string) {
+    if (!isEs) return slug;
+    const p = catalog.find((x) => x.slug === slug);
+    return (p && catalogEs[p.id]?.title) || slug;
   }
 
   // --- mini calendar grid ---
@@ -42,7 +56,7 @@ export default function DashboardBookings() {
   const month = calMonth.getMonth();
   const firstDow = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const monthLabel = calMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const monthLabel = calMonth.toLocaleDateString(locale, { month: "long", year: "numeric" });
 
   const cells: (string | null)[] = [];
   for (let i = 0; i < firstDow; i++) cells.push(null);
@@ -51,7 +65,7 @@ export default function DashboardBookings() {
   }
 
   function fmtDate(d: string) {
-    return new Date(`${d}T12:00:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    return new Date(`${d}T12:00:00`).toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" });
   }
 
   if (isLoading) {
@@ -66,7 +80,7 @@ export default function DashboardBookings() {
     <section className="mb-10" data-testid="dashboard-bookings">
       <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
         <CalendarDays className="w-5 h-5 text-accent" />
-        Your upcoming training
+        {t("dashboardBookings.title")}
       </h2>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -75,13 +89,13 @@ export default function DashboardBookings() {
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-semibold">{monthLabel}</CardTitle>
             <div className="flex gap-1">
-              <button onClick={() => setCalMonth(new Date(year, month - 1, 1))} className="p-1 rounded hover:bg-muted" aria-label="Previous month" data-testid="button-cal-prev"><ChevronLeft className="w-4 h-4" /></button>
-              <button onClick={() => setCalMonth(new Date(year, month + 1, 1))} className="p-1 rounded hover:bg-muted" aria-label="Next month" data-testid="button-cal-next"><ChevronRight className="w-4 h-4" /></button>
+              <button onClick={() => setCalMonth(new Date(year, month - 1, 1))} className="p-1 rounded hover:bg-muted" aria-label={t("dashboardBookings.prevMonth")} data-testid="button-cal-prev"><ChevronLeft className="w-4 h-4" /></button>
+              <button onClick={() => setCalMonth(new Date(year, month + 1, 1))} className="p-1 rounded hover:bg-muted" aria-label={t("dashboardBookings.nextMonth")} data-testid="button-cal-next"><ChevronRight className="w-4 h-4" /></button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-1">
-              {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => <span key={i}>{d}</span>)}
+              {(t("dashboardBookings.weekdays", { returnObjects: true }) as string[]).map((d, i) => <span key={i}>{d}</span>)}
             </div>
             <div className="grid grid-cols-7 gap-1">
               {cells.map((iso, i) => {
@@ -113,7 +127,7 @@ export default function DashboardBookings() {
                   <div>
                     <p className="font-semibold text-foreground">{fmtDate(b.sessionDate)} · {b.startTime}-{b.endTime}</p>
                     <p className="text-sm text-muted-foreground flex items-center gap-1 mt-0.5">
-                      <MapPin className="w-3.5 h-3.5" />{areaName(b.serviceAreaId)} · {b.productSlug}
+                      <MapPin className="w-3.5 h-3.5" />{areaName(b.serviceAreaId)} · {productLabel(b.productSlug)}
                     </p>
                     {/* 2026-09-07 (Alberto): show the actual training address so
                         the customer knows where to go / where the trainer arrives. */}
@@ -122,13 +136,13 @@ export default function DashboardBookings() {
                     </p>
                   </div>
                   <Badge variant="secondary" className="shrink-0 flex items-center gap-1">
-                    <Users className="w-3 h-3" />{b.participantCount} seat{b.participantCount === 1 ? "" : "s"}
+                    <Users className="w-3 h-3" />{t("dashboardBookings.seats", { count: b.participantCount })}
                   </Badge>
                 </div>
                 {/* 2026-09-07 (Alberto): "what to expect" summary so attendees know
                     how to prepare and what the session looks like. */}
                 <div className="rounded-md bg-muted/40 border px-3 py-2 text-xs text-muted-foreground">
-                  <span className="font-medium text-foreground">What to expect:</span> approximately 3-4 hours — a 1-hour presentation and kit review, followed by the hands-on practical. Bring a photo ID; at a company site, follow your company's PPE requirements.
+                  <span className="font-medium text-foreground">{t("dashboardBookings.whatToExpectLabel")}</span> {t("dashboardBookings.whatToExpectText")}
                 </div>
                 <AttendeeNamesForm bookingId={b.id} participantCount={b.participantCount} />
               </CardContent>

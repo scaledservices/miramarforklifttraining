@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { formatUsPhone, normalizeEmail, capitalizeWords } from "@/lib/inputFormat";
+import { courseTitle } from "@/lib/courseTitle";
 
 interface AssistantAction {
   type: "navigate" | "create_ticket" | "verify_cert" | "course_info";
@@ -153,7 +154,7 @@ function CertVerificationCard({ action }: { action: AssistantAction }) {
               )}
               {data.courseName && (
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-medium">Course:</span> {data.courseName}
+                  <span className="font-medium">{i18n.t("supportChat.course")}</span> {courseTitle(data.courseName)}
                 </p>
               )}
               {data.issuedAt && (

@@ -9,19 +9,21 @@ import { Users, BookOpen, TrendingUp, Award, ChevronRight, ShoppingCart, Graduat
 import GroupLayout from "./GroupLayout";
 import { buyMoreSeatsHref } from "@/lib/crewSeats";
 import TeamPhotoIdStatus from "@/components/dashboard/TeamPhotoIdStatus";
+import { courseTitle } from "@/lib/courseTitle";
 
-// Course recommendation logic based on completed certifications
+// Course recommendation logic based on completed certifications.
+// title/reason are i18n keys (groupDashboard.recs.*), translated at render time.
 const COURSE_RECOMMENDATIONS: Record<string, { slug: string; title: string; reason: string }[]> = {
   "online-forklift-operator-certification": [
-    { slug: "online-aerial-scissor-lift-training", title: "Aerial & Scissor Lift Certification", reason: "Expand your team's qualifications with aerial lift certification" },
-    { slug: "online-forklift-train-the-trainer", title: "Forklift Train the Trainer", reason: "Build internal training capacity — train your own operators" },
+    { slug: "online-aerial-scissor-lift-training", title: "groupDashboard.recs.aerialScissorTitle", reason: "groupDashboard.recs.aerialScissorReason" },
+    { slug: "online-forklift-train-the-trainer", title: "groupDashboard.recs.forkliftTttTitle", reason: "groupDashboard.recs.forkliftTttReason" },
   ],
   "online-aerial-scissor-lift-certification": [
-    { slug: "online-forklift-operator-training", title: "Forklift Operator Certification", reason: "Complete your team's forklift certification" },
-    { slug: "online-aerial-train-the-trainer", title: "Aerial Lift Train the Trainer", reason: "Build internal training capacity for aerial lifts" },
+    { slug: "online-forklift-operator-training", title: "groupDashboard.recs.forkliftOperatorTitle", reason: "groupDashboard.recs.forkliftOperatorReason" },
+    { slug: "online-aerial-train-the-trainer", title: "groupDashboard.recs.aerialTttTitle", reason: "groupDashboard.recs.aerialTttReasonCapacity" },
   ],
   "online-forklift-train-the-trainer": [
-    { slug: "online-aerial-train-the-trainer", title: "Aerial Lift Train the Trainer", reason: "Expand your trainer qualifications to aerial lifts" },
+    { slug: "online-aerial-train-the-trainer", title: "groupDashboard.recs.aerialTttTitle", reason: "groupDashboard.recs.aerialTttReasonExpand" },
   ],
 };
 
@@ -276,7 +278,7 @@ export default function GroupDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Lightbulb className="h-5 w-5 text-yellow-500" />
-                      Recommended Next Steps for Your Team
+                      {t("groupDashboard.recommendedTitle")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -285,13 +287,13 @@ export default function GroupDashboard() {
                         <div className="flex items-center gap-3">
                           <GraduationCap className="h-8 w-8 text-primary" />
                           <div>
-                            <p className="font-medium">{rec.title}</p>
-                            <p className="text-sm text-muted-foreground">{rec.reason}</p>
+                            <p className="font-medium">{t(rec.title)}</p>
+                            <p className="text-sm text-muted-foreground">{t(rec.reason)}</p>
                           </div>
                         </div>
                         <Link href={`/p/${rec.slug}`}>
                           <Button size="sm" variant="outline">
-                            Learn More
+                            {t("groupDashboard.learnMore")}
                           </Button>
                         </Link>
                       </div>
@@ -305,7 +307,7 @@ export default function GroupDashboard() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <AlertTriangle className="h-5 w-5 text-orange-500" />
-                      Upcoming Certification Expirations
+                      {t("groupDashboard.expirationsTitle")}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
@@ -315,14 +317,14 @@ export default function GroupDashboard() {
                       return (
                         <div key={cert.id} className="flex items-center justify-between gap-4 p-3 rounded-lg border border-orange-200 bg-orange-50">
                           <div>
-                            <p className="font-medium">{cert.userName || cert.courseName || "Team member"}</p>
+                            <p className="font-medium">{cert.userName || courseTitle(cert.courseName) || t("groupDashboard.teamMember")}</p>
                             <p className="text-sm text-muted-foreground">
-                              {cert.courseName || "Certification"} expires in {daysUntilExpiry} days ({expiry.toLocaleDateString()})
+                              {t("groupDashboard.expiresIn", { course: courseTitle(cert.courseName) || t("groupDashboard.certification"), days: daysUntilExpiry, date: expiry.toLocaleDateString() })}
                             </p>
                           </div>
                           <Link href={`/p/online-forklift-operator-training`}>
                             <Button size="sm" variant="outline">
-                              Recertify Now
+                              {t("groupDashboard.recertifyNow")}
                             </Button>
                           </Link>
                         </div>

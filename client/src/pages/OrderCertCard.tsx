@@ -132,7 +132,7 @@ type Address = { name: string; address: string; city: string; state: string; zip
 const EMPTY_ADDRESS: Address = { name: "", address: "", city: "", state: "", zip: "", country: "US" };
 
 export default function OrderCertCard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const params = useParams<{ certificationId: string }>();
   const certId = parseInt(params.certificationId || "0");
   const searchString = useSearch();
@@ -355,19 +355,17 @@ export default function OrderCertCard() {
       <div className="max-w-2xl mx-auto px-4 py-12 text-center space-y-4" data-testid="already-ordered-card">
         <Package className="h-12 w-12 text-accent mx-auto" />
         <h1 className="text-2xl font-bold" data-testid="text-already-ordered-title">
-          {t("orderCertCard.alreadyOrderedTitle", { defaultValue: "Card already ordered" })}
+          {t("orderCertCard.alreadyOrderedTitle")}
         </h1>
         <p className="text-muted-foreground" data-testid="text-already-ordered-desc">
-          {t("orderCertCard.alreadyOrderedDesc", {
-            defaultValue: "You already have an active card order for this certification. Its current status is shown below.",
-          })}
+          {t("orderCertCard.alreadyOrderedDesc")}
         </p>
         <div className="inline-flex items-center gap-2">
           <Badge variant="secondary" className="capitalize" data-testid="badge-existing-order-status">
             {existingCardOrder.status.replace(/_/g, " ")}
           </Badge>
           <span className="text-sm text-muted-foreground">
-            {t("orderCertCard.orderNumber", { defaultValue: "Order" })} #{existingCardOrder.id}
+            {t("orderCertCard.orderNumber")} #{existingCardOrder.id}
           </span>
         </div>
         <div className="pt-2">
@@ -411,15 +409,15 @@ export default function OrderCertCard() {
         // Basic validation
         const cardNumber = cardForm.cardNumber.replace(/\s/g, "");
         if (!cardNumber || cardNumber.length < 13) {
-          toast({ title: "Please enter a valid card number.", variant: "destructive" });
+          toast({ title: t("orderCertCard.invalidCardNumber"), variant: "destructive" });
           return;
         }
         if (!cardForm.month || !cardForm.year) {
-          toast({ title: "Please enter the card expiration date.", variant: "destructive" });
+          toast({ title: t("orderCertCard.cardExpirationRequired"), variant: "destructive" });
           return;
         }
         if (!cardForm.cardCode || cardForm.cardCode.length < 3) {
-          toast({ title: "Please enter the card CVV code.", variant: "destructive" });
+          toast({ title: t("orderCertCard.cardCvvRequired"), variant: "destructive" });
           return;
         }
 
@@ -437,8 +435,14 @@ export default function OrderCertCard() {
             const nonce = response.opaqueData.dataValue;
             orderMutation.mutate({ paymentNonce: nonce });
           } else {
-            const errMsg = response.messages.message?.[0]?.text || "Payment authorization failed.";
-            toast({ title: errMsg, variant: "destructive" });
+            const gatewayMsg = response.messages.message?.[0]?.text;
+            // English: unchanged (gateway text as title). Other locales: translated
+            // title, with the gateway's English detail kept as the description.
+            if (i18n.language.startsWith("en")) {
+              toast({ title: gatewayMsg || t("orderCertCard.paymentAuthFailed"), variant: "destructive" });
+            } else {
+              toast({ title: t("orderCertCard.paymentAuthFailed"), description: gatewayMsg, variant: "destructive" });
+            }
             setIsProcessing(false);
           }
         });

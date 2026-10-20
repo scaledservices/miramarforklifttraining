@@ -83,7 +83,7 @@ export default function SpanishServiceArea({ city: slug }: SpanishServiceAreaPro
       <div className="max-w-7xl mx-auto px-4 py-20 text-center">
         <h1 className="text-2xl font-bold mb-4">Ciudad no encontrada</h1>
         <Link href="/es/certificacion-montacargas">
-          <Button>Volver a la pagina de certificacion</Button>
+          <Button>Volver a la página de certificación</Button>
         </Link>
       </div>
     );
@@ -116,7 +116,7 @@ export default function SpanishServiceArea({ city: slug }: SpanishServiceAreaPro
   const breadcrumbs = breadcrumbSchema(
     [
       { name: "Inicio", url: "/" },
-      { name: "Certificacion de Montacargas", url: "/certificacion-montacargas" },
+      { name: "Certificación de Montacargas", url: "/certificacion-montacargas" },
       { name: data.city, url: canonicalPath },
     ],
     "es"

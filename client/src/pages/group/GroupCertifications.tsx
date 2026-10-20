@@ -11,6 +11,7 @@ import { Link } from "wouter";
 import GroupLayout from "./GroupLayout";
 import OrderPhotoIdDialog from "@/components/group/OrderPhotoIdDialog";
 import { useTranslation } from "react-i18next";
+import { courseTitle } from "@/lib/courseTitle";
 
 type PhotoIdStatus = "not_ordered" | "photo_needed" | "ordered" | "shipped";
 interface PhotoIdCertStatus {
@@ -143,7 +144,7 @@ export default function GroupCertifications() {
                         {cert.userName}
                       </TableCell>
                       <TableCell data-testid={`text-cert-course-${cert.id}`}>
-                        {cert.courseName}
+                        {courseTitle(cert.courseName)}
                       </TableCell>
                       <TableCell className="font-mono text-sm" data-testid={`text-cert-number-${cert.id}`}>
                         {cert.certificateNumber}
