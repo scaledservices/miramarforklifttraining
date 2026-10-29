@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle, ArrowRight, BookOpen, Users } from "lucide-react";
 import { fireConfetti, fireTripleConfetti } from "@/lib/confetti";
 import { orderPaymentSummary } from "@shared/order-payment-summary";
+import { trackEvent } from "@/lib/analytics";
 
 export default function OrderConfirmation() {
   const { t } = useTranslation();
@@ -31,6 +32,18 @@ export default function OrderConfirmation() {
   useEffect(() => {
     if (data && !confettiFired.current) {
       confettiFired.current = true;
+      // Record the purchase once per order for the Traffic page funnel.
+      try {
+        const key = `mft-purchase-tracked-${orderId}`;
+        if (data.order?.status === "paid" && !sessionStorage.getItem(key)) {
+          sessionStorage.setItem(key, "1");
+          trackEvent("purchase", {
+            order_id: String(orderId),
+            revenue: Number(data.payment?.amountPaid ?? data.order?.total) || 0,
+            crew: !!data.order?.groupId,
+          });
+        }
+      } catch {}
       if (data.order?.groupId) {
         fireTripleConfetti();
       } else {

@@ -1198,9 +1198,16 @@ export const pageViews = pgTable("page_views", {
   country: text("country"),
   region: text("region"), // state
   city: text("city"),
+  visitorId: text("visitor_id"), // persistent anonymous visitor id (localStorage, 2 years)
+  isNewVisitor: boolean("is_new_visitor").notNull().default(false), // true on views in the visitor's first session
+  utmSource: text("utm_source"),
+  utmMedium: text("utm_medium"),
+  utmCampaign: text("utm_campaign"),
+  device: text("device"), // mobile | tablet | desktop
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => [
   index("page_views_created_idx").on(table.createdAt),
+  index("page_views_visitor_idx").on(table.visitorId),
   index("page_views_path_created_idx").on(table.path, table.createdAt),
   index("page_views_session_idx").on(table.sessionId),
 ]);
@@ -1217,6 +1224,7 @@ export const analyticsEvents = pgTable("analytics_events", {
   ctaDestination: text("cta_destination"), // where the CTA links to
   leadSource: text("lead_source"), // organic | referral | direct | paid | rep_sourced
   sessionId: text("session_id"),
+  visitorId: text("visitor_id"),
   userId: integer("user_id"),
   metadata: jsonb("metadata"), // additional event-specific data
   revenue: numeric("revenue", { precision: 10, scale: 2 }), // if event has revenue impact

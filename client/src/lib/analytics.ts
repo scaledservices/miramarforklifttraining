@@ -16,7 +16,9 @@
  *   onsiteTrainingRequests.leadSource column.
  */
 
-type EventName = "page_view" | "cta_click" | "checkout_start" | "lead_submit" | "checkout_contact" | "booking_started" | "booking_step_reached" | "booking_completed" | "quote_started" | "quote_submitted";
+import { trackEvent as recordEvent } from "@/lib/tracker";
+
+type EventName = "page_view" | "cta_click" | "checkout_start" | "lead_submit" | "checkout_contact" | "booking_started" | "booking_step_reached" | "booking_completed" | "quote_started" | "quote_submitted" | "purchase";
 
 type EventProperties = Record<string, string | number | boolean | undefined>;
 
@@ -59,7 +61,19 @@ export function trackEvent(name: EventName, properties?: EventProperties): void 
     console.debug(`[analytics] ${name}`, properties);
   }
 
-  // Production: send to GA4 if configured
+  // Always record in our own analytics (admin Traffic page).
+  if (typeof window !== "undefined" && name !== "page_view") {
+    const revenue = Number(properties?.revenue ?? properties?.total_price);
+    recordEvent(name, window.location.pathname, {
+      metadata: properties || {},
+      revenue: Number.isFinite(revenue) && revenue > 0 ? revenue : undefined,
+      leadSource: typeof properties?.lead_source === "string" ? properties.lead_source : undefined,
+      ctaLabel: typeof properties?.cta_label === "string" ? properties.cta_label : undefined,
+      ctaDestination: typeof properties?.cta_destination === "string" ? properties.cta_destination : undefined,
+    });
+  }
+
+  // Also send to GA4 if configured
   if (MEASUREMENT_ID && typeof window !== "undefined") {
     if (!initialized) initGA();
     if (window.gtag) {

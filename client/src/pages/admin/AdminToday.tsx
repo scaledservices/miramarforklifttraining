@@ -21,6 +21,7 @@ import {
   Loader2,
 } from "lucide-react";
 import TodaySessionCard from "@/components/admin/today/TodaySessionCard";
+import TrafficGlanceCard from "@/components/admin/today/TrafficGlanceCard";
 import FulfillTrainingSheet from "@/components/admin/today/FulfillTrainingSheet";
 import {
   type TodayData,
@@ -174,6 +175,9 @@ export default function AdminToday() {
           </h1>
           <p className="text-muted-foreground">{formatDay(data.date, { weekday: "long", month: "long", day: "numeric" })}</p>
         </div>
+
+        {/* Website visitors today — Alberto's first daily check */}
+        <TrafficGlanceCard />
 
         {/* Money story — collected, outstanding, and your cut, in one line */}
         <Card data-testid="card-money-story">

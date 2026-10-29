@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { markStaffBrowser } from "@/lib/tracker";
 
 export type UserRole = "individual" | "certified_student" | "instructor_applicant" | "instructor" | "group_admin" | "admin" | "super_admin";
 
@@ -20,6 +21,7 @@ export function useAuth() {
     queryKey: ["/api/auth/me"],
     staleTime: 5 * 60 * 1000,
   });
+  if (data?.user) markStaffBrowser(data.user.role);
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {

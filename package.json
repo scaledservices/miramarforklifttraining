@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@ip-location-db/dbip-city-mmdb": "^2.3.2026060513",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@octokit/rest": "^21.1.1",
     "@radix-ui/react-accordion": "^1.2.4",
@@ -72,6 +73,7 @@
     "input-otp": "^1.4.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.453.0",
+    "maxmind": "^5.0.7",
     "memorystore": "^1.6.7",
     "minimatch": "^9.0.7",
     "multer": "^2.2.0",
