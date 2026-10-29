@@ -1,9 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import AdminLayout from "./AdminLayout";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +15,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { getAllLocations } from "@shared/config/locations";
+import { leadToQuoteDefaults, type LeadForPrefill } from "@shared/lead-prefill";
 import { insertQuoteSchema } from "@shared/schema";
 import {
   Form,
@@ -142,6 +145,27 @@ export default function AdminQuoteCreate() {
     },
   });
 
+  // Coming from an on-site request: fill the quote with what the customer asked for.
+  const { data: leadResponse } = useQuery<{ request: LeadForPrefill }>({
+    queryKey: ["/api/admin/onsite-requests", prefillLeadId],
+    enabled: !!prefillLeadId,
+  });
+  const prefilled = useRef(false);
+  useEffect(() => {
+    const lead = leadResponse?.request;
+    if (!lead || prefilled.current || form.formState.isDirty) return;
+    prefilled.current = true;
+    const d = leadToQuoteDefaults({ ...lead, id: lead.id ?? prefillLeadId });
+    const knownSlugs = new Set(allLocations.map((l) => l.slug));
+    form.reset({
+      ...form.getValues(),
+      ...d,
+      locationSlug: d.locationSlug && knownSlugs.has(d.locationSlug) ? d.locationSlug : "",
+      companyId: prefillCompanyId ?? d.companyId,
+      contactId: prefillContactId ?? d.contactId,
+    });
+  }, [leadResponse, form, allLocations, prefillLeadId, prefillCompanyId, prefillContactId]);
+
   const locationType = form.watch("locationType");
   const equipmentTypes = form.watch("equipmentTypes") ?? [];
 
@@ -196,11 +220,11 @@ export default function AdminQuoteCreate() {
     <AdminLayout>
       <div className="space-y-6 max-w-3xl" data-testid="admin-quote-create">
         <div className="flex items-center gap-4">
-          <Link href="/admin/quotes">
+          <BackLink href="/admin/quotes">
             <Button variant="ghost" size="icon" data-testid="button-back-quotes">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-          </Link>
+          </BackLink>
           <h1 className="text-2xl font-bold">New Quote</h1>
         </div>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import AdminLayout from "./AdminLayout";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +13,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ArrowLeft, Loader2, Link2 } from "lucide-react";
 import { Link, useLocation, useSearch } from "wouter";
 import { getAllLocations } from "@shared/config/locations";
+import { dateOnlyToLocalInput } from "@shared/lead-prefill";
 
 interface LeadData {
   id: number;
@@ -82,15 +84,9 @@ export default function AdminTrainingEventCreate() {
       if (leadData.equipmentTypes?.length) setEquipmentTypes(leadData.equipmentTypes);
       if (leadData.notes) setAdminNotes(`Lead notes: ${leadData.notes}`);
 
-      if (leadData.preferredDate1) {
-        try {
-          const d = new Date(leadData.preferredDate1);
-          if (!isNaN(d.getTime())) {
-            const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
-            setScheduledStart(local.toISOString().slice(0, 16));
-          }
-        } catch {}
-      }
+      // Lead dates are date-only text; keep the customer's calendar day.
+      const start = dateOnlyToLocalInput(leadData.preferredDate1);
+      if (start) setScheduledStart(start);
     }
   }, [leadData, initialized]);
 
@@ -156,11 +152,11 @@ export default function AdminTrainingEventCreate() {
     <AdminLayout>
       <div className="max-w-2xl space-y-6" data-testid="admin-training-event-create">
         <div className="flex items-center gap-4">
-          <Link href={fromLeadId ? `/admin/onsite-requests/${fromLeadId}` : "/admin/training-events"}>
+          <BackLink href={fromLeadId ? `/admin/onsite-requests/${fromLeadId}` : "/admin/training-events"}>
             <Button variant="ghost" size="icon" data-testid="button-back-events">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-          </Link>
+          </BackLink>
           <div>
             <h1 className="text-2xl font-bold">Create Training Event</h1>
             {leadData && (
