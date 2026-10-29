@@ -236,19 +236,19 @@ export default function AdminToday() {
         {/* Quick stats: the week at a glance */}
         <div className="grid grid-cols-3 gap-3" data-testid="row-quick-stats">
           <QuickStat
-            label={t("adminUx.statSessions", { defaultValue: "Sessions this week" })}
+            label={t("adminUx.statSessions", { defaultValue: "Sessions, next 7 days" })}
             hint={t("adminUx.statSessionsHint", { defaultValue: "Training sessions booked in the next 7 days" })}
             value={data.week.reduce((n, d) => n + d.groups.reduce((m, g) => m + g.bookingCount, 0), 0)}
             testId="stat-sessions-week"
           />
           <QuickStat
-            label={t("adminUx.statLeads", { defaultValue: "New leads" })}
-            hint={t("adminUx.statLeadsHint", { defaultValue: "People who asked about training in the last 7 days" })}
+            label={t("adminUx.statLeads", { defaultValue: "Quote requests, last 7 days" })}
+            hint={t("adminUx.statLeadsHint", { defaultValue: "People who asked for a training quote in the last 7 days" })}
             value={data.newLeads.length}
             testId="stat-leads-week"
           />
           <QuickStat
-            label={t("adminUx.statCerts", { defaultValue: "Certificates issued" })}
+            label={t("adminUx.statCerts", { defaultValue: "Certificates issued, last 7 days" })}
             hint={t("adminUx.statCertsHint", { defaultValue: "Certificates issued in the last 7 days" })}
             value={certsThisWeek}
             testId="stat-certs-week"
