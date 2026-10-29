@@ -270,14 +270,14 @@ export default function AdminAnalytics() {
           <Kpi icon={FileText} label={L("kQuotes", "Quote requests")} value={c?.quotes} prev={p?.quotes} compare={compare} loading={isLoading} testId="kpi-quotes"
             hint={c ? pct(c.quotes, c.sessions) + " " + L("ofVisits", "of visits") : undefined} />
           <Kpi icon={CalendarCheck} label={L("kBookings", "Bookings")} value={c?.bookings} prev={p?.bookings} compare={compare} loading={isLoading} testId="kpi-bookings"
-            hint={c && c.bookings_started ? L("started", "{{n}} started", { n: c.bookings_started }) : undefined} />
+            hint={c && c.bookings_started ? L("started", "Started: {{n}}", { n: c.bookings_started }) : undefined} />
           <Kpi icon={ShoppingCart} label={L("kPurchases", "Online purchases")} value={c?.purchases} prev={p?.purchases} compare={compare} loading={isLoading} testId="kpi-purchases"
             hint={c && c.revenue ? money(c.revenue) : undefined} />
         </div>
 
         {c && c.visitors > 0 && (
           <InsightLine testId="traffic-insight">
-            {L("insight", "{{v}} people visited. {{n}} were new. {{s}} of visits left after one page. Average visit (more than one page): {{t}}.", {
+            {L("insight", "Visitors: {{v}} ({{n}} new). Left after one page: {{s}} of visits. Average visit (2+ pages): {{t}}.", {
               v: fmt(c.visitors), n: fmt(c.new_visitors), s: pct(c.single_page_sessions, c.sessions),
               t: c.avg_seconds >= 60 ? `${Math.round(c.avg_seconds / 60)} min` : `${Math.round(c.avg_seconds)} sec`,
             })}
@@ -326,7 +326,7 @@ export default function AdminAnalytics() {
         {/* Sources / Locations / Devices */}
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <ListCard title={L("sources", "Where visitors came from")} icon={Globe} loading={isLoading} testId="card-sources"
-            rows={(data?.sources || []).map((r) => ({ key: r.source, label: source(r.source), value: r.visitors, sub: r.conversions ? L("conv", "{{n}} converted", { n: r.conversions }) : undefined, onClick: () => drill("source", r.source) }))}
+            rows={(data?.sources || []).map((r) => ({ key: r.source, label: source(r.source), value: r.visitors, sub: r.conversions ? L("conv", "Converted: {{n}}", { n: r.conversions }) : undefined, onClick: () => drill("source", r.source) }))}
             empty={L("none", "No visits in this range yet.")} />
           <ListCard title={L("locations", "Visitor locations (state)")} icon={MapPin} loading={isLoading} testId="card-regions"
             rows={(data?.regions || []).map((r) => ({ key: r.region + r.country, label: r.region === "Unknown" ? L("unknownLoc", "Unknown (before tracking)") : place(null, r.region, r.country), value: r.visitors, onClick: () => drill("region", r.region) }))}
@@ -338,7 +338,7 @@ export default function AdminAnalytics() {
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <ListCard title={L("topPages", "Most viewed pages")} icon={Eye} loading={isLoading} testId="card-pages" mono
-            rows={(data?.topPages || []).slice(0, 15).map((r) => ({ key: r.path, label: r.path, value: r.views, sub: L("byN", "{{n}} visitors", { n: r.visitors }), onClick: () => drill("page", r.path) }))}
+            rows={(data?.topPages || []).slice(0, 15).map((r) => ({ key: r.path, label: r.path, value: r.views, sub: L("byN", "Visitors: {{n}}", { n: r.visitors }), onClick: () => drill("page", r.path) }))}
             empty={L("none", "No visits in this range yet.")} />
           <ListCard title={L("landing", "First page of a visit")} icon={LogIn} loading={isLoading} testId="card-landing" mono
             rows={(data?.landingPages || []).slice(0, 15).map((r) => ({ key: r.path, label: r.path, value: r.sessions, sub: L("leftN", "{{p}} left right away", { p: pct(r.left_after_one, r.sessions) }), onClick: () => drill("landing", r.path) }))}
@@ -567,7 +567,7 @@ function JourneyView({ sid, onOpen, labels }: {
             {data.otherVisits.map((o) => (
               <button key={o.session_id} onClick={() => onOpen(o.session_id)} className="w-full text-left rounded px-2 py-1.5 hover:bg-muted/60">
                 <span>{ptTime(o.started)}</span>
-                <span className="text-muted-foreground"> · {L("pagesN", "{{n}} pages", { n: o.views })} · </span>
+                <span className="text-muted-foreground"> · {L("pagesN", "Pages: {{n}}", { n: o.views })} · </span>
                 <span className="font-mono text-xs">{o.landing}</span>
               </button>
             ))}

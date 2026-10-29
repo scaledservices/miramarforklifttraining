@@ -30,7 +30,7 @@ export default function TrafficGlanceCard() {
         <div className="flex items-end justify-between gap-3">
           <div className="flex items-baseline gap-2 min-w-0">
             <p className="text-2xl font-bold tabular-nums" data-testid="text-visitors-today">{data ? fmt(data.today.visitors) : "-"}</p>
-            <span className="text-sm text-muted-foreground">{data ? L("glanceViews", "{{n}} page views", { n: fmt(data.today.views) }) : ""}</span>
+            <span className="text-sm text-muted-foreground">{data ? L("glanceViews", "Page views: {{n}}", { n: fmt(data.today.views) }) : ""}</span>
             {data && (
               <TrendChip current={data.today.visitors} previous={data.yesterday.visitors}
                 compareLabel={L("vsYesterday", "vs yesterday ({{n}})", { n: data.yesterday.visitors })} testId="chip-visitors-trend" />
