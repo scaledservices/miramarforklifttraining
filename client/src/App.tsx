@@ -69,6 +69,7 @@ import i18n from "@/i18n";
 import { lazy, Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
+import { recordLocation } from "@/lib/nav-history";
 import LanguageBanner from "@/components/LanguageBanner";
 import { useLocaleLocation } from "@/hooks/useLocaleLocation";
 import { DEFAULT_LOCALE, getStoredLocale } from "@/lib/locale";
@@ -133,6 +134,7 @@ function ScrollToTop() {
   const [location] = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
+    recordLocation(location);
   }, [location]);
   return null;
 }

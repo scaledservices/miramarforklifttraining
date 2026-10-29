@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import AdminLayout from "./AdminLayout";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,7 +16,7 @@ import {
   ArrowLeft, User, Building2, Phone, Mail, MapPin, Users, Calendar,
   ClipboardList, MessageSquare, StickyNote, Wrench, UserPlus, UserCheck,
   Star, CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp,
-  Clock, PhoneCall, FileText, AlertCircle, Link2, Plus,
+  Clock, PhoneCall, FileText, AlertCircle, Plus,
 } from "lucide-react";
 import { Link } from "wouter";
 import { VALID_TRANSITIONS, STATUS_LABELS, type OnsiteStatus } from "@shared/config/onsite-states";
@@ -427,94 +428,6 @@ function NextActionPanel({ leadId, currentType, currentDate }: { leadId: string;
   );
 }
 
-function CompanyLinkPanel({ leadId, request }: { leadId: string; request: OnsiteRequest }) {
-  const { toast } = useToast();
-
-  const createCompanyMutation = useMutation({
-    mutationFn: () => apiRequest("POST", `/api/admin/leads/${leadId}/create-company`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/onsite-requests", leadId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/leads", leadId, "activities"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/leads"] });
-      toast({ title: "Company created and linked" });
-    },
-    onError: (err: Error) => {
-      toast({ title: "Failed to create company", description: err.message, variant: "destructive" });
-    },
-  });
-
-  const createContactMutation = useMutation({
-    mutationFn: () => apiRequest("POST", `/api/admin/leads/${leadId}/create-contact`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/onsite-requests", leadId] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/leads", leadId, "activities"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/leads"] });
-      toast({ title: "Contact created and linked" });
-    },
-    onError: (err: Error) => {
-      toast({ title: "Failed to create contact", description: err.message, variant: "destructive" });
-    },
-  });
-
-  return (
-    <div className="space-y-3" data-testid="company-link-panel">
-      <div className="flex items-center gap-3 flex-wrap">
-        {request.companyId ? (
-          <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-            <Link href={`/admin/companies/${request.companyId}`} className="text-sm text-primary hover:underline font-medium" data-testid="link-company">
-              View Company Record
-            </Link>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">No company linked</span>
-            {request.companyName && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 text-xs"
-                onClick={() => createCompanyMutation.mutate()}
-                disabled={createCompanyMutation.isPending}
-                data-testid="button-create-company"
-              >
-                {createCompanyMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Plus className="h-3 w-3 mr-1" />}
-                Create "{request.companyName}"
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
-      <div className="flex items-center gap-3 flex-wrap">
-        {request.contactId ? (
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">{request.contactName}</span>
-            <Badge variant="secondary" className="text-[10px]">Linked</Badge>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">No contact linked</span>
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 text-xs"
-              onClick={() => createContactMutation.mutate()}
-              disabled={createContactMutation.isPending}
-              data-testid="button-create-contact"
-            >
-              {createContactMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Plus className="h-3 w-3 mr-1" />}
-              Create Contact for "{request.contactName}"
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
 export default function AdminOnsiteRequestDetail() {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
@@ -639,10 +552,10 @@ export default function AdminOnsiteRequestDetail() {
         <div className="max-w-5xl">
           <p className="text-destructive" data-testid="text-not-found">Request not found.</p>
           <Button variant="ghost" asChild className="mt-4">
-            <Link href="/admin/onsite-requests">
+            <BackLink href="/admin/onsite-requests">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Requests
-            </Link>
+            </BackLink>
           </Button>
         </div>
       </AdminLayout>
@@ -656,10 +569,10 @@ export default function AdminOnsiteRequestDetail() {
       <div className="max-w-5xl space-y-6">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild data-testid="button-back">
-            <Link href="/admin/onsite-requests">
+            <BackLink href="/admin/onsite-requests">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back
-            </Link>
+            </BackLink>
           </Button>
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
@@ -1012,14 +925,6 @@ export default function AdminOnsiteRequestDetail() {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-card border rounded-xl p-5 space-y-4">
-              <h2 className="font-semibold text-foreground flex items-center gap-2 text-sm">
-                <Link2 className="h-4 w-4 text-muted-foreground" />
-                CRM Links
-              </h2>
-              <CompanyLinkPanel leadId={id!} request={request} />
-            </div>
-
             <div className="bg-card border rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-foreground flex items-center gap-2 text-sm">

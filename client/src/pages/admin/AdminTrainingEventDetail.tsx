@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import AdminLayout from "./AdminLayout";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -153,11 +154,11 @@ export default function AdminTrainingEventDetail() {
     <AdminLayout>
       <div className="space-y-6" data-testid="admin-training-event-detail">
         <div className="flex items-center gap-4">
-          <Link href="/admin/training-events">
+          <BackLink href="/admin/training-events">
             <Button variant="ghost" size="icon" data-testid="button-back-events">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-          </Link>
+          </BackLink>
           <div className="flex-1">
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold" data-testid="text-event-title">{event.title}</h1>

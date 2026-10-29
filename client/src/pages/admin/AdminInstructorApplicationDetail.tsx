@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import AdminLayout from "./AdminLayout";
+import BackLink from "@/components/BackLink";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -219,10 +220,10 @@ export default function AdminInstructorApplicationDetail() {
         <div className="max-w-4xl">
           <p className="text-destructive" data-testid="text-not-found">Application not found.</p>
           <Button variant="ghost" asChild className="mt-4">
-            <Link href="/admin/instructor-applications">
+            <BackLink href="/admin/instructor-applications">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Applications
-            </Link>
+            </BackLink>
           </Button>
         </div>
       </AdminLayout>
@@ -234,10 +235,10 @@ export default function AdminInstructorApplicationDetail() {
       <div className="max-w-4xl space-y-6">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild data-testid="button-back">
-            <Link href="/admin/instructor-applications">
+            <BackLink href="/admin/instructor-applications">
               <ArrowLeft className="h-4 w-4 mr-1" />
               Back
-            </Link>
+            </BackLink>
           </Button>
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
