@@ -50,6 +50,9 @@ function getSession(): Session {
       const s = JSON.parse(raw) as Session;
       if (s?.id && Date.now() - s.ts < SESSION_TTL) {
         s.ts = Date.now();
+        // A tagged link clicked mid-visit takes over the visit's campaign.
+        const utm = readUtm();
+        if (utm) s.utm = utm;
         localStorage.setItem(SESSION_KEY, JSON.stringify(s));
         return s;
       }
