@@ -138,9 +138,12 @@ export function initAnalytics() {
 
   function recordPageview() {
     const path = window.location.pathname;
-    if (path === lastPath) return;
+    // The language redirect (/locations/x -> /en/locations/x) is the same page,
+    // so compare without the locale prefix or every landing counts twice.
+    const key = path.replace(/^\/(en|es)(?=\/|$)/, "") || "/";
+    if (key === lastPath) return;
     const first = lastPath === "";
-    lastPath = path;
+    lastPath = key;
 
     track(path, {
       // Only the first page of a page load has a meaningful external referrer.
