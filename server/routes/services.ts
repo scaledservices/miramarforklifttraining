@@ -524,7 +524,42 @@ app.post("/api/admin/bookings", requireRole("admin", "super_admin"), async (req:
       },
     });
 
-    return res.status(201).json({ ...booking, orderId: orderId ?? booking.orderId });
+    // Booked from an on-site request (meeting 2026-10-26): the request no
+    // longer needs follow-up, so move it to scheduled/confirmed and log it.
+    const leadId = Number(req.body.originatingLeadId);
+    let lead: { id: number; status: string } | null = null;
+    if (Number.isInteger(leadId) && leadId > 0) {
+      try {
+        const existing = await storage.getOnsiteTrainingRequest(leadId);
+        if (existing) {
+          const nextStatus = status === "confirmed" ? "confirmed" : "scheduled";
+          const keep = ["confirmed", "completed", "invoiced"].includes(existing.status) && nextStatus === "scheduled";
+          const updated = await storage.updateOnsiteTrainingRequest(leadId, {
+            ...(keep ? {} : { status: nextStatus as any }),
+            lastActivityAt: new Date(),
+            nextActionType: null,
+            nextActionDate: null,
+          } as any);
+          await storage.createLeadActivity({
+            leadId,
+            companyId: existing.companyId ?? null,
+            contactId: existing.contactId ?? null,
+            actorUserId: req.session.userId!,
+            activityType: "booking_created",
+            metadata: {
+              bookingId: booking.id, bookingNumber: booking.bookingNumber, sessionDate, startTime,
+              participantCount: Number(participantCount), totalPrice,
+              previousStatus: existing.status, newStatus: updated?.status ?? existing.status,
+            },
+          });
+          lead = { id: leadId, status: updated?.status ?? existing.status };
+        }
+      } catch (leadErr) {
+        console.error("[Bookings] Lead update after admin booking failed (non-fatal):", leadErr);
+      }
+    }
+
+    return res.status(201).json({ ...booking, orderId: orderId ?? booking.orderId, lead });
   } catch (error) {
     console.error("[Admin Bookings] Manual create error:", error);
     return res.status(500).json({ error: "Failed to create booking" });

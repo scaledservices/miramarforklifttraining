@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams } from "wouter";
 import AdminLayout from "./AdminLayout";
+import NewBookingDialog from "@/components/admin/NewBookingDialog";
 import BackLink from "@/components/BackLink";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +17,7 @@ import {
   ArrowLeft, User, Building2, Phone, Mail, MapPin, Users, Calendar,
   ClipboardList, MessageSquare, StickyNote, Wrench, UserPlus, UserCheck,
   Star, CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp,
-  Clock, PhoneCall, FileText, AlertCircle, Plus,
+  Clock, PhoneCall, FileText, AlertCircle, Plus, CalendarCheck,
 } from "lucide-react";
 import { Link } from "wouter";
 import { VALID_TRANSITIONS, STATUS_LABELS, type OnsiteStatus } from "@shared/config/onsite-states";
@@ -142,6 +143,7 @@ const ACTIVITY_ICONS: Record<string, typeof Clock> = {
   company_linked: Building2,
   contact_linked: User,
   training_event_created: Calendar,
+  booking_created: CalendarCheck,
   training_event_status_changed: Calendar,
   training_event_updated: Calendar,
   quote_created: FileText,
@@ -162,6 +164,7 @@ const ACTIVITY_LABELS: Record<string, string> = {
   company_linked: "Company Linked",
   contact_linked: "Contact Linked",
   training_event_created: "Training Event Created",
+  booking_created: "Booking Created",
   training_event_status_changed: "Event Status Changed",
   training_event_updated: "Training Event Updated",
   quote_created: "Quote Created",
@@ -260,6 +263,12 @@ function ActivityTimeline({ leadId }: { leadId: string }) {
               )}
               {a.activityType === "contact_linked" && meta?.contactName && (
                 <p className="text-xs text-muted-foreground mt-0.5">Linked to {meta.contactName}</p>
+              )}
+              {a.activityType === "booking_created" && meta && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  <Link href="/admin/bookings" className="underline">{meta.bookingNumber as string}</Link>
+                  {" "}for {meta.sessionDate as string} at {meta.startTime as string}, {String(meta.participantCount)} trainee(s)
+                </p>
               )}
               {a.activityType === "training_event_created" && meta && (
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -430,6 +439,7 @@ function NextActionPanel({ leadId, currentType, currentDate }: { leadId: string;
 
 export default function AdminOnsiteRequestDetail() {
   const { id } = useParams<{ id: string }>();
+  const [bookingOpen, setBookingOpen] = useState(false);
   const { toast } = useToast();
   const [newStatus, setNewStatus] = useState<string>("");
   const [statusInitialized, setStatusInitialized] = useState(false);
@@ -925,6 +935,39 @@ export default function AdminOnsiteRequestDetail() {
           </div>
 
           <div className="space-y-6">
+            {/* Book it (meeting 2026-10-26): once the details are agreed with the
+                customer, create the booking from this request in one step. */}
+            <div className="bg-card border rounded-xl p-5 space-y-3" data-testid="card-book-request">
+              <h2 className="font-semibold text-foreground flex items-center gap-2 text-sm">
+                <CalendarCheck className="h-4 w-4 text-muted-foreground" />
+                Booking
+              </h2>
+              {["scheduled", "confirmed", "completed", "invoiced"].includes(request.status) ? (
+                <p className="text-sm text-muted-foreground" data-testid="text-request-booked">
+                  This request is {STATUS_LABELS[request.status as OnsiteStatus].toLowerCase()}. The booking is on the calendar and in the activity timeline.
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  When the date and price are agreed, create the booking. The details below are filled in for you, and this request moves out of your follow-up list.
+                </p>
+              )}
+              <Button
+                className="w-full"
+                variant={["scheduled", "confirmed", "completed", "invoiced"].includes(request.status) ? "outline" : "default"}
+                onClick={() => setBookingOpen(true)}
+                data-testid="button-create-booking-from-request"
+              >
+                <CalendarCheck className="h-4 w-4 mr-2" />
+                {["scheduled", "confirmed", "completed", "invoiced"].includes(request.status) ? "Create another booking" : "Create Booking"}
+              </Button>
+              <NewBookingDialog
+                open={bookingOpen}
+                onOpenChange={setBookingOpen}
+                fromLead={request}
+                onCreated={(b) => toast({ title: `Booked: ${b.bookingNumber}`, description: "The request is now marked as scheduled." })}
+              />
+            </div>
+
             <div className="bg-card border rounded-xl p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-foreground flex items-center gap-2 text-sm">

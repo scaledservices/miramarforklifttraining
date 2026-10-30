@@ -100,3 +100,70 @@ export function nextNavStack(stack: string[], location: string, max = 50): strin
   const next = [...stack, location];
   return next.length > max ? next.slice(next.length - max) : next;
 }
+
+// ─── On-site request -> manual booking ─────────────────────────────
+
+/** Facility (lead's requestedLocationSlug) -> booking service-area slug. */
+const FACILITY_AREA: Record<string, string> = {
+  "san-diego": "southern-california",
+  "fresno": "central-california",
+  "las-vegas": "southern-nevada",
+};
+const CENTRAL_CA_CITIES = ["fresno", "clovis", "visalia", "madera", "hanford", "selma", "tulare", "merced", "reedley", "sanger", "porterville", "lemoore", "kingsburg", "dinuba"];
+
+/** Booking service area for a request: its chosen facility, else by the
+ * customer's state/city (NV -> Las Vegas, Central Valley -> Fresno, other CA
+ * -> San Diego). Alberto can change it in the dialog. */
+export function areaSlugForLead(lead: LeadForPrefill): string | null {
+  if (lead.requestedLocationSlug && FACILITY_AREA[lead.requestedLocationSlug]) return FACILITY_AREA[lead.requestedLocationSlug];
+  const state = (lead.state || "").trim().toUpperCase();
+  const city = (lead.city || "").trim().toLowerCase();
+  if (state === "NV" || state === "NEVADA") return "southern-nevada";
+  if (CENTRAL_CA_CITIES.some((c) => city.includes(c))) return "central-california";
+  if (state === "CA" || state === "CALIFORNIA" || city) return "southern-california";
+  return null;
+}
+
+/** Pick the program that matches what the customer asked for, from the
+ * programs offered at the chosen area. */
+export function programForLead<T extends { slug: string }>(programs: T[], lead: LeadForPrefill): T | undefined {
+  const eq = mapLeadEquipment(lead.equipmentTypes);
+  const trainer = /trainer/i.test(lead.trainingType || "") || /train.the.trainer/i.test(lead.notes || "");
+  const lifts = eq.some((e) => e === "scissor_lift" || e === "boom_lift");
+  const forklift = eq.some((e) => !["scissor_lift", "boom_lift"].includes(e));
+  const want = trainer
+    ? (lifts && !forklift ? "scissor-aerial-train-the-trainer" : "forklift-train-the-trainer")
+    : (lifts && !forklift ? "scissor-aerial-boom-lift-certification" : "standard-forklift-certification");
+  return programs.find((p) => p.slug.startsWith(want)) ?? programs[0];
+}
+
+export interface LeadForBooking extends LeadForPrefill {
+  email?: string | null;
+  phone?: string | null;
+}
+
+/** Booking dialog values from an on-site request. */
+export function leadToBookingDefaults(lead: LeadForBooking) {
+  const onsite = lead.requestedLocationType === "customer_onsite" || (!lead.requestedLocationSlug && !!lead.trainingAddress);
+  const eqLabels = (lead.equipmentTypes || []).filter(Boolean);
+  const notes = [
+    lead.id != null ? `From quote request #${lead.id}${lead.companyName ? ` (${lead.companyName})` : ""}.` : "",
+    lead.trainingType ? `Training type: ${lead.trainingType}.` : "",
+    eqLabels.length ? `Equipment: ${eqLabels.join(", ")}.` : "",
+    lead.notes ? `Customer notes: ${lead.notes}` : "",
+  ].filter(Boolean).join("\n");
+  return {
+    areaSlug: areaSlugForLead(lead),
+    where: (onsite ? "onsite" : "facility") as "onsite" | "facility",
+    sessionDate: dateOnlyToLocalDate(lead.preferredDate1),
+    participantCount: lead.traineeCount && lead.traineeCount > 0 ? String(lead.traineeCount) : "1",
+    contactName: lead.contactName || "",
+    contactPhone: lead.phone || "",
+    contactEmail: lead.email || "",
+    customerAddress: lead.trainingAddress || "",
+    customerCity: lead.city || "",
+    customerState: lead.state || "",
+    customerZip: lead.zip || "",
+    specialRequests: notes,
+  };
+}

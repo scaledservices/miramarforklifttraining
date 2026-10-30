@@ -746,7 +746,8 @@ export const LEAD_ACTIVITY_TYPES = [
   "rep_assigned", "follow_up_scheduled", "quote_requested",
   "company_linked", "contact_linked",
   "training_event_created", "training_event_status_changed", "training_event_updated",
-  "quote_created", "quote_sent", "quote_approved", "quote_declined", "quote_converted"
+  "quote_created", "quote_sent", "quote_approved", "quote_declined", "quote_converted",
+  "booking_created"
 ] as const;
 export type LeadActivityType = typeof LEAD_ACTIVITY_TYPES[number];
 

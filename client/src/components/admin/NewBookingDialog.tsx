@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,10 +12,15 @@ import { Loader2 } from "lucide-react";
 import { catalog } from "@/data/catalog";
 import type { ServiceArea } from "@shared/schema";
 import { programsForArea, autoPrice, AREA_FACILITY } from "@shared/manual-booking";
+import { leadToBookingDefaults, programForLead, type LeadForBooking } from "@shared/lead-prefill";
 
 interface NewBookingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** On-site request to book (meeting 2026-10-26): prefills the form, and the
+   * server marks the request scheduled once the booking is created. */
+  fromLead?: (LeadForBooking & { id: number }) | null;
+  onCreated?: (booking: { id: number; bookingNumber: string }) => void;
 }
 
 /**
@@ -24,7 +29,7 @@ interface NewBookingDialogProps {
  * payment is captured - the office collects by its normal channel and
  * reconciles via the booking finance tools.
  */
-export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialogProps) {
+export default function NewBookingDialog({ open, onOpenChange, fromLead, onCreated }: NewBookingDialogProps) {
   const { toast } = useToast();
   const [form, setForm] = useState({
     serviceAreaId: "",
@@ -57,6 +62,36 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
   });
 
   const { data: serviceAreas } = useQuery<ServiceArea[]>({ queryKey: ["/api/service-areas"] });
+
+  // Prefill once per opening from the on-site request.
+  const prefilledFor = useRef<number | null>(null);
+  useEffect(() => {
+    if (!open) { prefilledFor.current = null; return; }
+    if (!fromLead || !serviceAreas || prefilledFor.current === fromLead.id) return;
+    prefilledFor.current = fromLead.id;
+    const d = leadToBookingDefaults(fromLead);
+    const area = serviceAreas.find((a) => a.slug === d.areaSlug);
+    const list = programsForArea(catalog as any, area?.slug);
+    const program = programForLead(list, fromLead);
+    setForm((f) => ({
+      ...f,
+      serviceAreaId: area ? String(area.id) : "",
+      productSlug: program?.slug ?? "",
+      where: d.where,
+      priceEdited: false,
+      sessionDate: d.sessionDate,
+      participantCount: d.participantCount,
+      contactName: d.contactName,
+      contactPhone: d.contactPhone,
+      contactEmail: d.contactEmail,
+      customerAddress: d.customerAddress,
+      customerCity: d.customerCity,
+      customerState: d.customerState,
+      customerZip: d.customerZip,
+      specialRequests: d.specialRequests,
+      totalPrice: autoPrice((program as any)?.price, d.participantCount),
+    }));
+  }, [open, fromLead, serviceAreas]);
 
   const selectedArea = useMemo(
     () => serviceAreas?.find((a) => String(a.id) === form.serviceAreaId),
@@ -112,6 +147,7 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
         ].filter(Boolean).join("\n") || undefined,
         totalPrice: form.totalPrice || "0",
         status: form.status,
+        originatingLeadId: fromLead?.id,
         payment: form.paymentStatus === "paid"
           ? {
               method: form.paymentMethod,
@@ -126,6 +162,11 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
       queryClient.invalidateQueries({ queryKey: ["/api/bookings"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/today"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] });
+      if (fromLead) {
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/onsite-requests"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/leads", String(fromLead.id), "activities"] });
+      }
+      onCreated?.(b);
       toast({
         title: `Booking ${b.bookingNumber} created`,
         description: form.paymentStatus === "paid" ? "Payment recorded." : undefined,
@@ -151,7 +192,7 @@ export default function NewBookingDialog({ open, onOpenChange }: NewBookingDialo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>New booking (manual)</DialogTitle>
+          <DialogTitle>{fromLead ? "New booking from quote request" : "New booking (manual)"}</DialogTitle>
         </DialogHeader>
         <p className="text-sm text-muted-foreground -mt-1">
           For phone / in-person bookings. Updates the calendar and trainer availability automatically. No card is charged here: if the customer paid by check or cash, record it below.
