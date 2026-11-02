@@ -1,4 +1,4 @@
-import { formatBookingNumber } from "@shared/booking-labels";
+import { formatBookingNumber, bookingNumberPrefix } from "@shared/booking-labels";
 import {
   users, groups, groupMembers, courses, courseSteps, examQuestions,
   orders, orderItems, payments, webhookEvents, enrollments, stepProgress,
@@ -1513,17 +1513,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBooking(data: InsertBooking): Promise<Booking> {
-    // Short, readable numbers (Alberto 2026-10-27): BK-2026-0016. Next number
-    // = highest this year + 1; the unique constraint catches a simultaneous
-    // booking and we retry. Older BK-<timestamp>-XXXX numbers are untouched.
-    const year = new Date().getFullYear();
+    // Readable numbers (Alberto 2026-10-27; format chosen 2026-11-02):
+    // <location>-<class MMDD>-<nn>, e.g. SD-1113-02 = 2nd booking for the San
+    // Diego class on Nov 13. nn = highest existing for that prefix + 1 (across
+    // years, so a repeat date next year continues the count and stays unique);
+    // the unique constraint catches a simultaneous booking and we retry. The
+    // number is an ID: it does not change if the class is rescheduled.
+    const area = data.serviceAreaId ? await this.getServiceAreaById(Number(data.serviceAreaId)) : undefined;
+    const prefix = bookingNumberPrefix((area as any)?.slug, String(data.sessionDate));
     for (let attempt = 0; attempt < 5; attempt++) {
       const r = await pool.query(
         `SELECT COALESCE(MAX(CAST(SPLIT_PART(booking_number, '-', 3) AS INTEGER)), 0) AS max_num
            FROM bookings WHERE booking_number ~ $1`,
-        [`^BK-${year}-[0-9]+$`]
+        [`^${prefix}-[0-9]+$`]
       );
-      const bookingNumber = formatBookingNumber(year, Number(r.rows[0].max_num) + 1 + attempt);
+      const bookingNumber = formatBookingNumber(prefix, Number(r.rows[0].max_num) + 1 + attempt);
       try {
         const [booking] = await db.insert(bookings).values({ ...data, bookingNumber }).returning();
         return booking;

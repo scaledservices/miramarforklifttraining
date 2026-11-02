@@ -56,7 +56,25 @@ export function bookingLocation(addr: { address?: string | null; city?: string |
   return { label: "On-site Address (customer)", text: [street, cityLine].filter(Boolean).join(", "), atFacility: false };
 }
 
-/** "BK-2026-0016": year + zero-padded sequence (replaces BK-<timestamp>-<random>). */
-export function formatBookingNumber(year: number, seq: number): string {
-  return `BK-${year}-${String(seq).padStart(4, "0")}`;
+/** Service area slug -> location code used in booking numbers. */
+export const BOOKING_LOCATION_CODES: Record<string, string> = {
+  "southern-california": "SD",
+  "southern-nevada": "LV",
+  "central-california": "FR",
+};
+
+/**
+ * Booking number prefix (Peter/Alberto 2026-11-02, option 1):
+ * <location>-<class month+day>, e.g. "SD-1113" for a San Diego class on Nov 13.
+ * Unknown areas fall back to "BK".
+ */
+export function bookingNumberPrefix(areaSlug: string | null | undefined, sessionDate: string): string {
+  const code = (areaSlug && BOOKING_LOCATION_CODES[areaSlug]) || "BK";
+  const m = /^\d{4}-(\d{2})-(\d{2})/.exec(String(sessionDate || ""));
+  return `${code}-${m ? m[1] + m[2] : "0000"}`;
+}
+
+/** "SD-1113-02": prefix + that day's booking count at that location, 2 digits. */
+export function formatBookingNumber(prefix: string, seq: number): string {
+  return `${prefix}-${String(seq).padStart(2, "0")}`;
 }

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { trainingLabel, bookingLocation, formatBookingNumber, humanizeSlug } from "../shared/booking-labels";
+import { trainingLabel, bookingLocation, formatBookingNumber, bookingNumberPrefix, humanizeSlug } from "../shared/booking-labels";
 
 test("booking labels: training name from slug, with city", () => {
   assert.equal(trainingLabel("standard-forklift-certification-las-vegas"), "Standard Forklift Certification (Las Vegas)");
@@ -23,6 +23,10 @@ test("booking labels: facility vs customer on-site address", () => {
 });
 
 test("booking labels: short booking numbers", () => {
-  assert.equal(formatBookingNumber(2026, 16), "BK-2026-0016");
-  assert.equal(formatBookingNumber(2026, 12345), "BK-2026-12345");
+  assert.equal(bookingNumberPrefix("southern-california", "2026-11-13"), "SD-1113");
+  assert.equal(bookingNumberPrefix("southern-nevada", "2026-11-02"), "LV-1102");
+  assert.equal(bookingNumberPrefix("central-california", "2026-12-05"), "FR-1205");
+  assert.equal(bookingNumberPrefix("somewhere-else", "2026-01-09"), "BK-0109");
+  assert.equal(formatBookingNumber("SD-1113", 2), "SD-1113-02");
+  assert.equal(formatBookingNumber("SD-1113", 104), "SD-1113-104");
 });
