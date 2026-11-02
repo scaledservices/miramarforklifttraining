@@ -7,16 +7,7 @@
 import { storage } from "./storage";
 import type { ReceiptDetails, ReceiptLineItem } from "./authorizeNetClient";
 
-const UPPER = new Set(["epj", "osha", "lpg", "sd", "lv", "id", "ttt"]);
-
-/** "forklift-scissor-lift-epj-certification-san-diego" -> "Forklift Scissor Lift EPJ Certification San Diego" */
-export function humanizeSlug(slug: string): string {
-  return String(slug || "")
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((w) => (UPPER.has(w.toLowerCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
-    .join(" ");
-}
+export { humanizeSlug, trainingLabel } from "@shared/booking-labels";
 
 /** "2026-11-02" + "09:00" -> "Nov 2, 2026 9:00 AM" (no timezone math: both are local wall-clock values). */
 export function formatSession(date?: string | null, time?: string | null): string {

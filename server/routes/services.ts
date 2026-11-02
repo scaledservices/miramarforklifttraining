@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from "express";
-import { receiptCustomer, surchargeLine, humanizeSlug, formatSession, billingZipFrom } from "../payment-receipt";
+import { receiptCustomer, surchargeLine, trainingLabel, formatSession, billingZipFrom } from "../payment-receipt";
 import { storage } from "../storage";
 import { z } from "zod";
 import { brand } from "@shared/config/brand";
@@ -269,7 +269,7 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         refundPolicyAccepted: true,
       });
 
-      const productLabel = (productSlugs.length ? productSlugs : [productSlug]).map(humanizeSlug).join(" + ");
+      const productLabel = trainingLabel((productSlugs.length ? productSlugs : [productSlug]).join(", "));
       const result = await createTransactionFromNonce(paymentNonce, chargeAmount, order.id, order.orderNumber, true, billingZipFrom(req.body) ? { zip: billingZipFrom(req.body) } : undefined, {
         customer: await receiptCustomer(user.id, { contact: { name: contactName, email: contactEmail, phone: contactPhone } }),
         description: [
@@ -875,7 +875,7 @@ app.post("/api/bookings/:id/pay-balance", requireAuth, async (req: Request, res:
     const b: any = fin.booking;
     const result = await createTransactionFromNonce(paymentNonce, chargeAmount, fin.booking.orderId, order?.orderNumber || `BAL-${fin.booking.bookingNumber}`, true, billingZipFrom(req.body) ? { zip: billingZipFrom(req.body) } : undefined, {
       customer: await receiptCustomer(b.userId, { companyId: (order as any)?.companyId, contact: { name: b.contactName, email: b.contactEmail, phone: b.contactPhone } }),
-      description: [`Balance for ${b.bookingNumber}`, humanizeSlug(b.productSlug), formatSession(b.sessionDate, b.startTime), `${b.participantCount} trainee${b.participantCount === 1 ? "" : "s"}`].filter(Boolean).join(", "),
+      description: [`Balance for ${b.bookingNumber}`, trainingLabel(b.productSlug), formatSession(b.sessionDate, b.startTime), `${b.participantCount} trainee${b.participantCount === 1 ? "" : "s"}`].filter(Boolean).join(", "),
       lineItems: [{ itemId: "balance", name: "Training balance", description: `Balance for ${b.bookingNumber}`, quantity: 1, unitPrice: fin.balanceDue }, ...surchargeLine(surcharge)],
     });
     if (!result.success) {

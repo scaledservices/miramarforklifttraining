@@ -7,6 +7,7 @@ import { industry } from "@shared/config/industry";
 import { t as emailT } from "./email-i18n";
 import { logEmailError } from "./monitoring";
 import QRCode from "qrcode";
+import { trainingLabel, bookingLocation } from "@shared/booking-labels";
 
 function getSiteUrl(): string {
   if (process.env.SITE_URL) return process.env.SITE_URL;
@@ -654,7 +655,7 @@ export async function sendBookingConfirmation(params: {
       <p>${_("body")}</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("bookingNumber")}</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("date")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("time")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("location")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.onsiteAddress}</td></tr>
@@ -726,10 +727,10 @@ export async function sendBookingAdminNotification(params: {
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer Name</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactName}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactPhone}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.contactEmail}" style="color: ${theme.email.linkColor};">${params.contactEmail}</a></td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Time</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Address</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.customerAddress}<br>${params.customerCity}, ${params.customerState} ${params.customerZip}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${bookingLocation({ address: params.customerAddress, city: params.customerCity, state: params.customerState, zip: params.customerZip }).label}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${bookingLocation({ address: params.customerAddress, city: params.customerCity, state: params.customerState, zip: params.customerZip }).text}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Participants</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.participantCount}</td></tr>
         ${specialRequestsRow}
       </table>
@@ -771,7 +772,7 @@ export async function sendBookingCancellation(params: {
       <p>${_("body")}</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${emailT(loc, "bookingConfirmation", "bookingNumber")}</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${emailT(loc, "bookingConfirmation", "trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${emailT(loc, "bookingConfirmation", "trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${emailT(loc, "bookingConfirmation", "date")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
         <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${emailT(loc, "bookingConfirmation", "time")}</td><td style="padding: 8px;">${params.startTime} - ${params.endTime}</td></tr>
       </table>
@@ -866,7 +867,7 @@ export async function sendBookingConfirmedEmail(params: {
       <p>${_("body")}</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_bc("bookingNumber")}</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_bc("trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_bc("trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_bc("date")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_bc("time")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
         <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">${_bc("location")}</td><td style="padding: 8px;">${params.onsiteAddress}</td></tr>
@@ -909,7 +910,7 @@ export async function sendBookingCompletedEmail(params: {
     html: wrap(loc, `
       <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">${_("heading")}</h2>
       <p>${_("greeting").replace("{{contactName}}", params.contactName)}</p>
-      <p>${_("body").replace("{{brandName}}", brand.name).replace("{{sessionDate}}", params.sessionDate).replace("{{trainingType}}", params.trainingType).replace("{{participantCount}}", String(params.participantCount))}</p>
+      <p>${_("body").replace("{{brandName}}", brand.name).replace("{{sessionDate}}", params.sessionDate).replace("{{trainingType}}", trainingLabel(params.trainingType)).replace("{{participantCount}}", String(params.participantCount))}</p>
       <div style="background: ${theme.email.successBg}; border-left: 4px solid ${theme.email.successBorder}; padding: 16px; margin: 20px 0; border-radius: 4px;">
         <p style="margin: 0; font-weight: bold; color: ${theme.email.successText};">${_("nextSteps")}</p>
         <ul style="margin: 8px 0 0; color: ${theme.colors.text.dark}; font-size: 13px;">
@@ -1069,7 +1070,7 @@ export async function sendContactFormAdminAlert(params: {
   for (const to of recipients) {
     await sendEmail({
       to,
-      subject: `Contact Form: ${params.name} — ${params.trainingType}`,
+      subject: `Contact Form: ${params.name} — ${trainingLabel(params.trainingType)}`,
       template: "contact_form_admin",
       payload: params,
       html: wrap(loc, `
@@ -1078,7 +1079,7 @@ export async function sendContactFormAdminAlert(params: {
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Name</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.name}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.email}" style="color: ${theme.email.linkColor};">${params.email}</a></td></tr>
           ${params.phone ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.phone}</td></tr>` : ""}
-          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
           <tr><td style="padding: 8px; color: ${theme.colors.text.muted}; vertical-align: top;">Message</td><td style="padding: 8px;">${params.message}</td></tr>
         </table>
         <div style="text-align: center; margin: 30px 0;">
@@ -1174,10 +1175,10 @@ export async function sendBookingAdminNotificationToAll(params: {
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer Name</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactName}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactPhone}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.contactEmail}" style="color: ${theme.email.linkColor};">${params.contactEmail}</a></td></tr>
-          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Time</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
-          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Address</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.customerAddress}<br>${params.customerCity}, ${params.customerState} ${params.customerZip}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${bookingLocation({ address: params.customerAddress, city: params.customerCity, state: params.customerState, zip: params.customerZip }).label}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${bookingLocation({ address: params.customerAddress, city: params.customerCity, state: params.customerState, zip: params.customerZip }).text}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Participants</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.participantCount}</td></tr>
           ${amountPaidRow}
           ${specialRequestsRow}
@@ -1218,7 +1219,7 @@ export async function sendBookingCancellationAdminAlert(params: {
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Booking Number</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactName}</td></tr>
-          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate} (${params.startTime} - ${params.endTime})</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Participants</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.participantCount}</td></tr>
           <tr><td style="padding: 8px; color: ${theme.colors.text.muted};">Cancelled By</td><td style="padding: 8px;">${params.cancelledBy}</td></tr>
@@ -1273,7 +1274,7 @@ export async function sendOnsiteRequestCustomerConfirmation(params: {
       <h3 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 24px;">${_("summary")}</h3>
       <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
         ${params.companyName ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("company")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.companyName}</td></tr>` : ""}
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainingType")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainees")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.traineeCount}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${_("trainingLocation")}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.city}, ${params.state}</td></tr>
         ${dateRows}
@@ -1347,7 +1348,7 @@ export async function sendOnsiteRequestAdminAlert(params: {
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Email</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="mailto:${params.email}" style="color: ${theme.email.linkColor};">${params.email}</a></td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><a href="tel:${params.phone}" style="color: ${theme.email.linkColor};">${params.phone}</a></td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Address</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingAddress}, ${params.city}, ${params.state} ${params.zip}</td></tr>
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.trainingType}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${trainingLabel(params.trainingType)}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Trainees</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.traineeCount}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Equipment Types</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.equipmentTypes.join(", ") || "Not specified"}</td></tr>
         ${dateRows}
@@ -1461,7 +1462,7 @@ export async function sendInstructorAssignmentNotification(params: {
       <p>Hi ${params.instructorName},</p>
       <p>You've been proposed for an on-site training assignment. Here are the details:</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted}; width: 140px;">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">${params.trainingType}</td></tr>
+        <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted}; width: 140px;">Training Type</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">${trainingLabel(params.trainingType)}</td></tr>
         ${params.companyName ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Company</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">${params.companyName}</td></tr>` : ""}
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Location</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: 600;">${params.city}, ${params.state}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Preferred Dates</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><ul style="margin: 0; padding-left: 16px;">${datesList}</ul></td></tr>

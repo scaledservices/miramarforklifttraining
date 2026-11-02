@@ -1,3 +1,4 @@
+import { formatBookingNumber } from "@shared/booking-labels";
 import {
   users, groups, groupMembers, courses, courseSteps, examQuestions,
   orders, orderItems, payments, webhookEvents, enrollments, stepProgress,
@@ -1512,9 +1513,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBooking(data: InsertBooking): Promise<Booking> {
-    const bookingNumber = `BK-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-    const [booking] = await db.insert(bookings).values({ ...data, bookingNumber }).returning();
-    return booking;
+    // Short, readable numbers (Alberto 2026-10-27): BK-2026-0016. Next number
+    // = highest this year + 1; the unique constraint catches a simultaneous
+    // booking and we retry. Older BK-<timestamp>-XXXX numbers are untouched.
+    const year = new Date().getFullYear();
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const r = await pool.query(
+        `SELECT COALESCE(MAX(CAST(SPLIT_PART(booking_number, '-', 3) AS INTEGER)), 0) AS max_num
+           FROM bookings WHERE booking_number ~ $1`,
+        [`^BK-${year}-[0-9]+$`]
+      );
+      const bookingNumber = formatBookingNumber(year, Number(r.rows[0].max_num) + 1 + attempt);
+      try {
+        const [booking] = await db.insert(bookings).values({ ...data, bookingNumber }).returning();
+        return booking;
+      } catch (err: any) {
+        if (err?.code === "23505" && String(err?.constraint || "").includes("booking_number") && attempt < 4) continue;
+        throw err;
+      }
+    }
+    throw new Error("Could not allocate a booking number");
   }
 
   async getBookingById(id: number): Promise<Booking | undefined> {
