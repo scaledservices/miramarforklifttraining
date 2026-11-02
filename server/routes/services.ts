@@ -274,7 +274,8 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         customer: await receiptCustomer(user.id, { contact: { name: contactName, email: contactEmail, phone: contactPhone } }),
         description: [
           productLabel,
-          (area as any)?.name,
+          // Product names often already end in the city ("... San Diego").
+          (area as any)?.name && !productLabel.toLowerCase().includes(String((area as any).name).toLowerCase()) ? (area as any).name : "",
           formatSession(sessionDate, startTime),
           `${participantCount} trainee${Number(participantCount) === 1 ? "" : "s"}`,
           appliedDiscount ? `discount -$${appliedDiscount.amount.toFixed(2)}` : "",
