@@ -260,7 +260,7 @@ export default function Checkout() {
   }, [items.length]);
 
   const chargeMutation = useMutation({
-    mutationFn: async (data: { paymentNonce?: string; isCardPayment: boolean }) => {
+    mutationFn: async (data: { paymentNonce?: string; isCardPayment: boolean; billingZip?: string }) => {
       const payload: Record<string, unknown> = {
         items: items.map((i) => ({ courseSlug: i.courseSlug, quantity: i.quantity })),
         refundPolicyAccepted: refundAccepted,
@@ -280,6 +280,7 @@ export default function Checkout() {
       }
       if (data.paymentNonce) {
         payload.paymentNonce = data.paymentNonce;
+        if (data.billingZip) payload.billingZip = data.billingZip;
       }
       const res = await apiRequest("POST", "/api/authorize-net/charge", payload);
       return res.json();
@@ -355,6 +356,7 @@ export default function Checkout() {
           chargeMutation.mutate({
             paymentNonce: nonce,
             isCardPayment: true,
+            billingZip: cardForm.zip || undefined,
           });
         } else {
           const errMsg = response.messages.message?.[0]?.text || t("checkout.paymentFailed");

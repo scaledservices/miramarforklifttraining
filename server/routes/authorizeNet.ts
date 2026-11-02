@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import { receiptCustomer, surchargeLine, billingZipFrom } from "../payment-receipt";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
@@ -243,12 +244,28 @@ export function registerAuthorizeNetRoutes(app: Express) {
       }
 
       // Charge the card via Authorize.net
+      const discountOff = Number((orderRes.total - discountResult.discountedTotal).toFixed(2));
+      const courseNames = orderRes.lines.map((l) => `${l.name}${l.quantity > 1 ? ` x${l.quantity}` : ""}`).join(", ");
       const result = await createTransactionFromNonce(
         paymentNonce,
         total,
         order.id,
         order.orderNumber,
-        isCardPayment !== false
+        isCardPayment !== false,
+        billingZipFrom(req.body) ? { zip: billingZipFrom(req.body) } : undefined,
+        {
+          customer: await receiptCustomer(req.session.userId, { companyId: (order as any).companyId }),
+          description: `${isTeamPurchase ? "Online training (team seats)" : "Online training"}: ${[
+            courseNames,
+            discountOff > 0 ? `discount -$${discountOff.toFixed(2)}` : "",
+            addOn ? `${addOn.count} photo ID card(s)` : "",
+          ].filter(Boolean).join(", ")}`,
+          lineItems: [
+            ...orderRes.lines,
+            ...(addOn ? [{ itemId: "photo-id", name: "Photo ID card + shipping", quantity: addOn.count, unitPrice: Number((addOnTotal / addOn.count).toFixed(2)) }] : []),
+            ...surchargeLine(surcharge),
+          ],
+        }
       );
 
       if (!result.success) {
@@ -479,8 +496,9 @@ async function buildOrder(
   userId: number,
   isTeamPurchase: boolean,
   locale?: string
-): Promise<{ order: any; total: number }> {
+): Promise<{ order: any; total: number; lines: Array<{ itemId: string; name: string; quantity: number; unitPrice: number }> }> {
   const orderItems = [];
+  const lines: Array<{ itemId: string; name: string; quantity: number; unitPrice: number }> = [];
   let total = 0;
 
   // Language follows the account (2026-09-13): if the request didn't carry an
@@ -504,6 +522,7 @@ async function buildOrder(
     const unitPrice = Number(course.price);
     const qty = item.quantity || 1;
     orderItems.push({ courseId: course.id, quantity: qty, unitPrice });
+    lines.push({ itemId: String(course.slug || course.id), name: String(course.title || course.slug), quantity: qty, unitPrice });
     total += unitPrice * qty;
   }
 
@@ -532,7 +551,7 @@ async function buildOrder(
     }
   }
 
-  return { order, total };
+  return { order, total, lines };
 }
 
 /**

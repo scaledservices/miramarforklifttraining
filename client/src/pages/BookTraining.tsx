@@ -453,6 +453,7 @@ export default function BookTraining() {
     productPrice: number;
     productSlugs: string[];
     paymentNonce?: string;
+    billingZip?: string;
     discountCode?: string;
   }
 
@@ -496,11 +497,12 @@ export default function BookTraining() {
     return parts.join(" | ") || "custom-training";
   }
 
-  function handleSubmit(paymentNonce?: string | null) {
+  function handleSubmit(paymentNonce?: string | null, billingZip?: string) {
     if (!isAuthenticated || !serviceArea || !selectedDate || !selectedSlot) return;
     const productPrice = productsSubtotal;
     bookingMutation.mutate({
       paymentNonce: paymentNonce || undefined,
+      billingZip,
       discountCode: appliedDiscount?.code,
       productSlugs: selectedProducts.map((p) => p.slug),
       serviceAreaId: serviceArea.id,
@@ -1282,7 +1284,7 @@ export default function BookTraining() {
                     <CardPaymentSection
                       chargeAmount={depositWithSurcharge}
                       pending={bookingMutation.isPending}
-                      onPay={(nonce) => handleSubmit(nonce)}
+                      onPay={(nonce, meta) => handleSubmit(nonce, meta?.billingZip)}
                       ctaLabel={t("booking.payNowCta", { amount: depositWithSurcharge.toFixed(2) })}
                       fallbackCtaLabel={t("bookTraining.confirmBooking")}
                     />

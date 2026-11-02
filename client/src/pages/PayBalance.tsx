@@ -35,9 +35,10 @@ export default function PayBalance() {
   });
 
   const payMutation = useMutation({
-    mutationFn: async (nonce: string | null) => {
+    mutationFn: async ({ nonce, billingZip }: { nonce: string | null; billingZip?: string }) => {
       const res = await apiRequest("POST", `/api/bookings/${bookingId}/pay-balance`, {
         paymentNonce: nonce,
+        billingZip,
       });
       return res.json();
     },
@@ -122,7 +123,7 @@ export default function PayBalance() {
           <CardPaymentSection
             chargeAmount={Number((balance.balanceDue * 1.03).toFixed(2))}
             pending={payMutation.isPending}
-            onPay={(nonce) => payMutation.mutate(nonce)}
+            onPay={(nonce, meta) => payMutation.mutate({ nonce, billingZip: meta?.billingZip })}
             ctaLabel={t("payBalance.payCta", { amount: (balance.balanceDue * 1.03).toFixed(2), defaultValue: `Pay $${(balance.balanceDue * 1.03).toFixed(2)}` })}
             fallbackCtaLabel={t("payBalance.payCtaFallback", { defaultValue: "Confirm Payment" })}
           />

@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import { receiptCustomer, surchargeLine, humanizeSlug, formatSession, billingZipFrom } from "../payment-receipt";
 import { storage } from "../storage";
 import { z } from "zod";
 import { brand } from "@shared/config/brand";
@@ -268,7 +269,21 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         refundPolicyAccepted: true,
       });
 
-      const result = await createTransactionFromNonce(paymentNonce, chargeAmount, order.id, order.orderNumber, true);
+      const productLabel = (productSlugs.length ? productSlugs : [productSlug]).map(humanizeSlug).join(" + ");
+      const result = await createTransactionFromNonce(paymentNonce, chargeAmount, order.id, order.orderNumber, true, billingZipFrom(req.body) ? { zip: billingZipFrom(req.body) } : undefined, {
+        customer: await receiptCustomer(user.id, { contact: { name: contactName, email: contactEmail, phone: contactPhone } }),
+        description: [
+          productLabel,
+          (area as any)?.name,
+          formatSession(sessionDate, startTime),
+          `${participantCount} trainee${Number(participantCount) === 1 ? "" : "s"}`,
+          appliedDiscount ? `discount -$${appliedDiscount.amount.toFixed(2)}` : "",
+        ].filter(Boolean).join(", "),
+        lineItems: [
+          { itemId: String(productSlugs[0] || productSlug || "training"), name: productLabel, description: `${productLabel}, ${formatSession(sessionDate, startTime)}`, quantity: Number(participantCount), unitPrice: Number((pricing.deposit / Number(participantCount)).toFixed(2)) },
+          ...surchargeLine(depositSurcharge),
+        ],
+      });
       if (!result.success) {
         return res.status(400).json({ error: result.errorMessage || "Payment was declined" });
       }
@@ -856,7 +871,12 @@ app.post("/api/bookings/:id/pay-balance", requireAuth, async (req: Request, res:
     const chargeAmount = Number((fin.balanceDue + surcharge).toFixed(2));
 
     const order = await storage.getOrder(fin.booking.orderId);
-    const result = await createTransactionFromNonce(paymentNonce, chargeAmount, fin.booking.orderId, order?.orderNumber || `BAL-${fin.booking.bookingNumber}`, true);
+    const b: any = fin.booking;
+    const result = await createTransactionFromNonce(paymentNonce, chargeAmount, fin.booking.orderId, order?.orderNumber || `BAL-${fin.booking.bookingNumber}`, true, billingZipFrom(req.body) ? { zip: billingZipFrom(req.body) } : undefined, {
+      customer: await receiptCustomer(b.userId, { companyId: (order as any)?.companyId, contact: { name: b.contactName, email: b.contactEmail, phone: b.contactPhone } }),
+      description: [`Balance for ${b.bookingNumber}`, humanizeSlug(b.productSlug), formatSession(b.sessionDate, b.startTime), `${b.participantCount} trainee${b.participantCount === 1 ? "" : "s"}`].filter(Boolean).join(", "),
+      lineItems: [{ itemId: "balance", name: "Training balance", description: `Balance for ${b.bookingNumber}`, quantity: 1, unitPrice: fin.balanceDue }, ...surchargeLine(surcharge)],
+    });
     if (!result.success) {
       return res.status(400).json({ error: result.errorMessage || "Payment was declined" });
     }

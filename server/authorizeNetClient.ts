@@ -66,13 +66,141 @@ export interface BillingAddress {
   country?: string;
 }
 
+// ─── Receipt details (Alberto 2026-10-30) ─────────────────────────────
+// The merchant receipt Simon gets from Authorize.net only shows what we send
+// with the charge. Without these fields it showed an approved amount and
+// nothing else (no name, phone, course, date). Everything here is optional
+// and descriptive; none of it changes what is charged.
+
+export interface ReceiptLineItem {
+  itemId: string;
+  name: string;
+  description?: string;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface ReceiptDetails {
+  customer?: { name?: string | null; email?: string | null; phone?: string | null; company?: string | null };
+  /** One line: what was bought, where, when, how many. */
+  description?: string;
+  lineItems?: ReceiptLineItem[];
+}
+
+/** Authorize.net rejects some markup characters and enforces field lengths. */
+function clean(v: unknown, max: number): string {
+  return String(v ?? "").replace(/[<>&"]/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+function splitName(name: string): { firstName: string; lastName: string } {
+  const parts = clean(name, 101).split(" ").filter(Boolean);
+  if (parts.length === 0) return { firstName: "", lastName: "" };
+  if (parts.length === 1) return { firstName: parts[0], lastName: "" };
+  return { firstName: parts.slice(0, -1).join(" "), lastName: parts[parts.length - 1] };
+}
+
+/**
+ * Build the createTransactionRequest.transactionRequest body. Pure, so the
+ * field order and contents can be unit tested. Authorize.net's JSON API is
+ * schema-ordered: order, lineItems, customer, billTo, userFields must appear
+ * in that sequence.
+ *
+ * Billing-zip safety: the card's zip travels inside the Accept.js nonce, and
+ * ANY billTo replaces it. So billTo is only sent when it carries the zip (the
+ * card form passes the typed zip as billingZip) or a street address.
+ *
+ * The customer's email goes in a merchant-defined field, NOT customer.email,
+ * so Authorize.net never starts emailing its own receipts to customers.
+ */
+export function buildTransactionRequest(
+  paymentNonce: string,
+  amount: number,
+  orderId: number,
+  orderNumber: string,
+  billTo?: BillingAddress,
+  details?: ReceiptDetails
+): Record<string, unknown> {
+  const tx: Record<string, unknown> = {
+    transactionType: "authCaptureTransaction",
+    amount: amount.toFixed(2),
+    payment: {
+      opaqueData: {
+        // Accept.js dispatchData nonces always carry this descriptor.
+        dataDescriptor: "COMMON.ACCEPT.INAPP.PAYMENT",
+        dataValue: paymentNonce,
+      },
+    },
+  };
+
+  const order: Record<string, string> = { invoiceNumber: orderNumber.slice(0, 20) };
+  const description = clean(details?.description, 255);
+  if (description) order.description = description;
+  tx.order = order;
+
+  const items = (details?.lineItems || []).filter((li) => li.quantity > 0 && li.unitPrice >= 0).slice(0, 30);
+  if (items.length) {
+    tx.lineItems = {
+      lineItem: items.map((li) => {
+        const out: Record<string, string> = {
+          itemId: clean(li.itemId, 31) || "item",
+          name: clean(li.name, 31) || "Item",
+        };
+        const d = clean(li.description ?? li.name, 255);
+        if (d) out.description = d;
+        out.quantity = String(Number(li.quantity.toFixed(4)));
+        out.unitPrice = li.unitPrice.toFixed(2);
+        return out;
+      }),
+    };
+  }
+
+  tx.customer = { type: "individual", id: String(orderId) };
+
+  // billTo: explicit address (card orders) wins; otherwise the buyer's name,
+  // company and phone. Empty values are omitted (see zip note above).
+  const c = details?.customer;
+  const fromName = billTo?.firstName || billTo?.lastName
+    ? { firstName: billTo?.firstName || "", lastName: billTo?.lastName || "" }
+    : splitName(c?.name || "");
+  const bill: Array<[string, string]> = [
+    ["firstName", clean(fromName.firstName, 50)],
+    ["lastName", clean(fromName.lastName, 50)],
+    ["company", clean(c?.company, 50)],
+    ["address", clean(billTo?.address, 60)],
+    ["city", clean(billTo?.city, 40)],
+    ["state", clean(billTo?.state, 40)],
+    ["zip", clean(billTo?.zip, 20)],
+    ["country", billTo?.address || billTo?.zip ? clean(billTo?.country || "US", 60) : ""],
+    ["phoneNumber", clean(c?.phone, 25)],
+  ];
+  const billObj = Object.fromEntries(bill.filter(([, v]) => v));
+  // Sending billTo replaces the zip carried in the Accept.js nonce (verified
+  // in sandbox 2026-11-02). Only send it when it carries a zip or street
+  // address; otherwise the name/company ride in merchant-defined fields.
+  const billHasAvs = !!(billObj.zip || billObj.address);
+  if (billHasAvs) tx.billTo = billObj;
+
+  const fields: Array<{ name: string; value: string }> = [];
+  if (!billHasAvs) {
+    const fullName = clean(`${fromName.firstName} ${fromName.lastName}`, 255);
+    if (fullName) fields.push({ name: "customer_name", value: fullName });
+    if (c?.company) fields.push({ name: "customer_company", value: clean(c.company, 255) });
+  }
+  if (c?.email) fields.push({ name: "customer_email", value: clean(c.email, 255) });
+  if (c?.phone) fields.push({ name: "customer_phone", value: clean(c.phone, 255) });
+  if (fields.length) tx.userFields = { userField: fields };
+
+  return tx;
+}
+
 export async function createTransactionFromNonce(
   paymentNonce: string,
   amount: number,
   orderId: number,
   orderNumber: string,
   isCardPayment: boolean = true,
-  billTo?: BillingAddress
+  billTo?: BillingAddress,
+  details?: ReceiptDetails
 ): Promise<TransactionResult> {
   if (!isAuthorizeNetConfigured()) {
     return {
@@ -86,41 +214,7 @@ export async function createTransactionFromNonce(
     transactionKey: TRANSACTION_KEY,
   };
 
-  // transactionType: authCapture charges immediately
-  const transactionRequest: Record<string, unknown> = {
-    transactionType: "authCaptureTransaction",
-    amount: amount.toFixed(2),
-    payment: {
-      opaqueData: {
-        // Accept.js dispatchData nonces always carry this descriptor.
-        dataDescriptor: "COMMON.ACCEPT.INAPP.PAYMENT",
-        dataValue: paymentNonce,
-      },
-    },
-    order: {
-      // Authorize.net's order element accepts invoiceNumber (max 20 chars), not orderId.
-      invoiceNumber: orderNumber.slice(0, 20),
-    },
-    customer: {
-      type: "individual",
-      id: String(orderId),
-    },
-  };
-
-  // Billing address enables AVS (Address Verification Service) checks on the
-  // charge. Only included when the caller supplies one - the course checkout
-  // flow does not collect billing addresses yet, card orders do.
-  if (billTo && (billTo.address || billTo.zip)) {
-    transactionRequest.billTo = {
-      firstName: (billTo.firstName || "").slice(0, 50),
-      lastName: (billTo.lastName || "").slice(0, 50),
-      address: (billTo.address || "").slice(0, 60),
-      city: (billTo.city || "").slice(0, 40),
-      state: (billTo.state || "").slice(0, 40),
-      zip: (billTo.zip || "").slice(0, 20),
-      country: (billTo.country || "US").slice(0, 60),
-    };
-  }
+  const transactionRequest = buildTransactionRequest(paymentNonce, amount, orderId, orderNumber, billTo, details);
 
   const requestBody = {
     createTransactionRequest: {

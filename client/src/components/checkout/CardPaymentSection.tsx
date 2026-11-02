@@ -38,7 +38,7 @@ interface CardPaymentSectionProps {
   pending: boolean;
   /** Called with the payment nonce once tokenization succeeds, or null when
    * payments are not configured (demo/staging fallback). */
-  onPay: (nonce: string | null) => void;
+  onPay: (nonce: string | null, meta?: { billingZip?: string }) => void;
   ctaLabel: string;
   fallbackCtaLabel: string;
 }
@@ -133,7 +133,9 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
         window.Accept!.dispatchData(secureData, (response: AcceptDispatchResponse) => {
           if (response.messages.resultCode === "Ok") {
             setTokenizing(false);
-            onPay(response.opaqueData.dataValue);
+            // The typed zip goes along so the Authorize.net receipt can show
+            // billing details without dropping the zip from the address check.
+            onPay(response.opaqueData.dataValue, { billingZip: cardForm.zip || undefined });
             return;
           }
           const msg = response.messages.message?.[0]?.text || "";

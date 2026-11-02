@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import { receiptCustomer, surchargeLine } from "../payment-receipt";
 import { storage } from "../storage";
 import { z } from "zod";
 import { SHIPPING_RATES } from "../constants";
@@ -302,6 +303,15 @@ app.post("/api/cert-cards", requireAuth, payLimiter, async (req: Request, res: R
           state: billingAddress.state,
           zip: billingAddress.zip,
           country: billingAddress.country || "US",
+        },
+        {
+          customer: await receiptCustomer(req.session.userId, { contact: { name: billingAddress.name } }),
+          description: `Wallet card for certificate ${cert.certificateNumber}, ${shippingMethod} shipping`,
+          lineItems: [
+            { itemId: "wallet-card", name: "Wallet certification card", quantity: 1, unitPrice: cardPrice },
+            ...(shippingCost > 0 ? [{ itemId: "shipping", name: `Shipping (${shippingMethod})`, quantity: 1, unitPrice: shippingCost }] : []),
+            ...surchargeLine(surcharge),
+          ],
         }
       );
       if (!charge.success) {

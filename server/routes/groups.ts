@@ -1,4 +1,5 @@
 import type { Express, Request, Response } from "express";
+import { receiptCustomer, surchargeLine } from "../payment-receipt";
 import { and, eq, ne, isNull } from "drizzle-orm";
 import { db } from "../db";
 import { enrollments as enrollmentsTable, photoIdEntitlements, platformSettings, groupMembers } from "@shared/schema";
@@ -752,6 +753,15 @@ app.post("/api/groups/:id/photo-id-orders", requireAuth, payLimiter, async (req:
           state: ship.state,
           zip: ship.zip,
           country: ship.country || "US",
+        },
+        {
+          customer: await receiptCustomer(req.session.userId, { contact: { name: buyer?.name || ship.name } }),
+          description: `Photo ID card for certificate ${cert.certificateNumber}, ${shippingMethod} shipping`,
+          lineItems: [
+            { itemId: "photo-id", name: "Photo ID card", quantity: 1, unitPrice: PHOTO_ID_PRICE },
+            ...(shipCost > 0 ? [{ itemId: "shipping", name: `Shipping (${shippingMethod})`, quantity: 1, unitPrice: shipCost }] : []),
+            ...surchargeLine(surcharge),
+          ],
         }
       );
       if (!charge.success) {
