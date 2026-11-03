@@ -1094,6 +1094,9 @@ export async function sendNewOrderAdminAlert(params: {
   orderNumber: string;
   customerName: string;
   customerEmail: string;
+  customerPhone?: string | null;
+  /** 2026-11-03: billing address from the card form. */
+  billingAddress?: string | null;
   items: { title: string; quantity: number; unitPrice: number }[];
   total: number;
 }) {
@@ -1116,6 +1119,8 @@ export async function sendNewOrderAdminAlert(params: {
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Order Number</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.orderNumber}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.customerName} (<a href="mailto:${params.customerEmail}" style="color: ${theme.email.linkColor};">${params.customerEmail}</a>)</td></tr>
+          ${params.customerPhone ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Phone</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.customerPhone}</td></tr>` : ""}
+          ${params.billingAddress ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Billing Address</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.billingAddress}</td></tr>` : ""}
         </table>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <thead><tr style="background: #f7f7f7;"><th style="padding: 8px; text-align: left;">Item</th><th style="padding: 8px; text-align: center;">Qty</th><th style="padding: 8px; text-align: right;">Price</th></tr></thead>
@@ -1148,6 +1153,8 @@ export async function sendBookingAdminNotificationToAll(params: {
   actorUserId?: number;
   /** 2026-09-07 (Alberto): total charged, so admin can triage by revenue. */
   amountPaid?: number;
+  /** 2026-11-03: billing address from the card form. */
+  billingAddress?: string | null;
 }) {
   const recipients = await getAdminEmails("booking_new");
   const baseUrl = getSiteUrl();
@@ -1179,6 +1186,7 @@ export async function sendBookingAdminNotificationToAll(params: {
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.sessionDate}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Time</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.startTime} - ${params.endTime}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">${bookingLocation({ address: params.customerAddress, city: params.customerCity, state: params.customerState, zip: params.customerZip }).label}</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${bookingLocation({ address: params.customerAddress, city: params.customerCity, state: params.customerState, zip: params.customerZip }).text}</td></tr>
+          ${params.billingAddress ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Billing Address</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.billingAddress}</td></tr>` : ""}
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Participants</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.participantCount}</td></tr>
           ${amountPaidRow}
           ${specialRequestsRow}

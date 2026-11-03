@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from "express";
-import { receiptCustomer, surchargeLine, trainingLabel, formatSession, billingZipFrom } from "../payment-receipt";
+import { receiptCustomer, surchargeLine, trainingLabel, formatSession, billingFrom, saveBillingAddress } from "../payment-receipt";
+import { normalizeBillingAddress, formatBillingAddress } from "@shared/billing-address";
 import { storage } from "../storage";
 import { z } from "zod";
 import { brand } from "@shared/config/brand";
@@ -270,7 +271,7 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
       });
 
       const productLabel = trainingLabel((productSlugs.length ? productSlugs : [productSlug]).join(", "));
-      const result = await createTransactionFromNonce(paymentNonce, chargeAmount, order.id, order.orderNumber, true, billingZipFrom(req.body) ? { zip: billingZipFrom(req.body) } : undefined, {
+      const result = await createTransactionFromNonce(paymentNonce, chargeAmount, order.id, order.orderNumber, true, billingFrom(req.body), {
         customer: await receiptCustomer(user.id, { contact: { name: contactName, email: contactEmail, phone: contactPhone } }),
         description: [
           productLabel,
@@ -288,6 +289,7 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
       if (!result.success) {
         return res.status(400).json({ error: result.errorMessage || "Payment was declined" });
       }
+      await saveBillingAddress(user.id, req.body);
 
       const { payments: paymentsTable, platformSettings } = await import("@shared/schema");
       // Earnings split (70/30 default, profit_split convention) — mirrors the
@@ -408,6 +410,7 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
         customerZip,
         participantCount,
         specialRequests: specialRequests || null,
+        billingAddress: formatBillingAddress(normalizeBillingAddress(req.body?.billingAddress) || normalizeBillingAddress((user as any).savedBillingAddress)),
         actorUserId: user.id,
         // 2026-09-07 (Alberto): show the actual charged amount so Alberto can
         // triage booking emails by revenue.
@@ -873,7 +876,7 @@ app.post("/api/bookings/:id/pay-balance", requireAuth, async (req: Request, res:
 
     const order = await storage.getOrder(fin.booking.orderId);
     const b: any = fin.booking;
-    const result = await createTransactionFromNonce(paymentNonce, chargeAmount, fin.booking.orderId, order?.orderNumber || `BAL-${fin.booking.bookingNumber}`, true, billingZipFrom(req.body) ? { zip: billingZipFrom(req.body) } : undefined, {
+    const result = await createTransactionFromNonce(paymentNonce, chargeAmount, fin.booking.orderId, order?.orderNumber || `BAL-${fin.booking.bookingNumber}`, true, billingFrom(req.body), {
       customer: await receiptCustomer(b.userId, { companyId: (order as any)?.companyId, contact: { name: b.contactName, email: b.contactEmail, phone: b.contactPhone } }),
       description: [`Balance for ${b.bookingNumber}`, trainingLabel(b.productSlug), formatSession(b.sessionDate, b.startTime), `${b.participantCount} trainee${b.participantCount === 1 ? "" : "s"}`].filter(Boolean).join(", "),
       lineItems: [{ itemId: "balance", name: "Training balance", description: `Balance for ${b.bookingNumber}`, quantity: 1, unitPrice: fin.balanceDue }, ...surchargeLine(surcharge)],
@@ -881,6 +884,7 @@ app.post("/api/bookings/:id/pay-balance", requireAuth, async (req: Request, res:
     if (!result.success) {
       return res.status(400).json({ error: result.errorMessage || "Payment was declined" });
     }
+    await saveBillingAddress(b.userId, req.body);
 
     const { payments: paymentsTable } = await import("@shared/schema");
     await db.insert(paymentsTable).values({

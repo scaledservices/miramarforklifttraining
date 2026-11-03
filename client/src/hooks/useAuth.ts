@@ -9,6 +9,7 @@ export interface AuthUser {
   email: string;
   name: string;
   phone: string | null;
+  savedBillingAddress?: { address: string; city: string; state: string; zip: string } | null;
   role: UserRole;
   authProvider: string | null;
   createdAt: string;

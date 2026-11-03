@@ -1136,7 +1136,12 @@
     "shipping": {
       "whyTitle": "¿A dónde enviamos la tarjeta?",
       "whyNote": "Pedimos esto ahora para que Alberto pueda enviar su tarjeta impresa apenas este lista."
-    }
+    },
+    "billingAddress": "Dirección de facturación",
+    "billingStreet": "Dirección",
+    "billingCity": "Ciudad",
+    "billingState": "Estado",
+    "invalidBilling": "Ingrese su dirección de facturación (calle, ciudad, estado y código postal)."
   },
   "checkoutAuth": {
     "title": "Cuenta Requerida",

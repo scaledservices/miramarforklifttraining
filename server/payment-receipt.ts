@@ -5,7 +5,11 @@
  * flow already has. Purely descriptive: never changes the amount charged.
  */
 import { storage } from "./storage";
-import type { ReceiptDetails, ReceiptLineItem } from "./authorizeNetClient";
+import type { ReceiptDetails, ReceiptLineItem, BillingAddress } from "./authorizeNetClient";
+import { db } from "./db";
+import { users } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import { normalizeBillingAddress, formatBillingAddress } from "@shared/billing-address";
 
 export { humanizeSlug, trainingLabel } from "@shared/booking-labels";
 
@@ -48,6 +52,31 @@ export async function receiptCustomer(
     phone: opts.contact?.phone || user?.phone || null,
     company,
   };
+}
+
+/**
+ * Billing address from the card form (2026-11-03: collected on every order).
+ * Full address when valid; otherwise just the typed zip; otherwise undefined
+ * (billTo is then omitted so the zip inside the Accept.js nonce still drives
+ * AVS). Name comes from the receipt customer.
+ */
+export function billingFrom(body: any): BillingAddress | undefined {
+  const full = normalizeBillingAddress(body?.billingAddress);
+  if (full) return { address: full.address, city: full.city, state: full.state, zip: full.zip, country: "US" };
+  const zip = billingZipFrom(body);
+  return zip ? { zip } : undefined;
+}
+
+/** Remember the billing address on the account (prefills the next order; shown to the office). */
+export async function saveBillingAddress(userId: number | null | undefined, body: any): Promise<string> {
+  const full = normalizeBillingAddress(body?.billingAddress);
+  if (!full || !userId) return "";
+  try {
+    await db.update(users).set({ savedBillingAddress: full } as any).where(eq(users.id, userId));
+  } catch (e) {
+    console.error("[Billing] could not save billing address (non-fatal):", e);
+  }
+  return formatBillingAddress(full);
 }
 
 /** The zip the customer typed into the card form (non-sensitive), if valid. */

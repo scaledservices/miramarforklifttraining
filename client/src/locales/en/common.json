@@ -1136,7 +1136,12 @@
     "shipping": {
       "whyTitle": "Where should we mail the wallet card?",
       "whyNote": "We collect this now so Alberto can mail your printed card as soon as it is ready."
-    }
+    },
+    "billingAddress": "Billing address",
+    "billingStreet": "Street address",
+    "billingCity": "City",
+    "billingState": "State",
+    "invalidBilling": "Please enter your billing address (street, city, state and ZIP)."
   },
   "checkoutAuth": {
     "title": "Account Required",

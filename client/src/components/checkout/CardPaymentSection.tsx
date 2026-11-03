@@ -9,6 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "wouter";
 import { Loader2, Lock, CreditCard } from "lucide-react";
 import { formatCardNumber, digitsOnly } from "@/lib/inputFormat";
+import BillingAddressFields from "@/components/checkout/BillingAddressFields";
+import { useAuth } from "@/hooks/useAuth";
+import { billingAddressProblems, EMPTY_BILLING, type BillingAddressInput } from "@shared/billing-address";
 
 // Same Accept.js (v1) integration as Checkout.tsx — card data goes directly to
 // Authorize.net via Accept.dispatchData; only the opaque nonce reaches our server.
@@ -38,7 +41,7 @@ interface CardPaymentSectionProps {
   pending: boolean;
   /** Called with the payment nonce once tokenization succeeds, or null when
    * payments are not configured (demo/staging fallback). */
-  onPay: (nonce: string | null, meta?: { billingZip?: string }) => void;
+  onPay: (nonce: string | null, meta?: { billingZip?: string; billingAddress?: BillingAddressInput }) => void;
   ctaLabel: string;
   fallbackCtaLabel: string;
 }
@@ -49,6 +52,14 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
   const [policyAccepted, setPolicyAccepted] = useState(false);
   const [tokenizing, setTokenizing] = useState(false);
   const [cardForm, setCardForm] = useState({ cardNumber: "", month: "", year: "", cardCode: "", zip: "" });
+  // Billing address on every order (2026-11-03); prefilled from the last one.
+  const { user } = useAuth();
+  const [billing, setBilling] = useState<BillingAddressInput>(EMPTY_BILLING);
+  const [billingMissing, setBillingMissing] = useState<Array<keyof BillingAddressInput>>([]);
+  useEffect(() => {
+    const saved = (user as any)?.savedBillingAddress;
+    if (saved && typeof saved === "object") setBilling((b) => (b.address ? b : { ...EMPTY_BILLING, ...saved }));
+  }, [user]);
 
   const { data: paymentConfig } = useQuery<PaymentConfig>({
     queryKey: ["/api/payment/config"],
@@ -105,6 +116,12 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
       setError(t("checkout.invalidCvv", { defaultValue: "Please enter the card CVV code." }));
       return;
     }
+    const problems = billingAddressProblems(billing);
+    setBillingMissing(problems);
+    if (problems.length) {
+      setError(t("checkout.invalidBilling", { defaultValue: "Please enter your billing address (street, city, state and ZIP)." }));
+      return;
+    }
 
     setTokenizing(true);
 
@@ -119,7 +136,7 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
     };
 
     const secureData = {
-      cardData: acceptCardData(cardForm),
+      cardData: acceptCardData({ ...cardForm, zip: billing.zip }),
       authData: {
         apiLoginID: paymentConfig.apiLoginID,
         clientKey: paymentConfig.clientKey,
@@ -135,7 +152,7 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
             setTokenizing(false);
             // The typed zip goes along so the Authorize.net receipt can show
             // billing details without dropping the zip from the address check.
-            onPay(response.opaqueData.dataValue, { billingZip: cardForm.zip || undefined });
+            onPay(response.opaqueData.dataValue, { billingZip: billing.zip || undefined, billingAddress: billing });
             return;
           }
           const msg = response.messages.message?.[0]?.text || "";
@@ -184,7 +201,7 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
               data-testid="input-booking-card-number"
             />
           </div>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <div>
               <Label htmlFor="bk-cardMonth">{t("checkout.cardMonth", { defaultValue: "MM" })}</Label>
               <Input id="bk-cardMonth" inputMode="numeric" autoComplete="cc-exp-month" placeholder="MM" maxLength={2}
@@ -200,12 +217,8 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
               <Input id="bk-cardCode" inputMode="numeric" autoComplete="cc-csc" placeholder="123" maxLength={4}
                 value={cardForm.cardCode} onChange={(e) => setCardForm((f) => ({ ...f, cardCode: digitsOnly(e.target.value).slice(0, 4) }))} data-testid="input-booking-card-cvv" />
             </div>
-            <div>
-              <Label htmlFor="bk-cardZip">{t("checkout.cardZip", { defaultValue: "ZIP" })}</Label>
-              <Input id="bk-cardZip" inputMode="numeric" autoComplete="postal-code" placeholder="92121" maxLength={5}
-                value={cardForm.zip} onChange={(e) => setCardForm((f) => ({ ...f, zip: digitsOnly(e.target.value).slice(0, 5) }))} data-testid="input-booking-card-zip" />
-            </div>
           </div>
+          <BillingAddressFields value={billing} onChange={(b) => { setBilling(b); setBillingMissing([]); }} disabled={tokenizing || pending} missing={billingMissing} idPrefix="bk-bill" />
         </div>
       )}
 

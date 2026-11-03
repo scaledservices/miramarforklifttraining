@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from "express";
-import { receiptCustomer, surchargeLine, billingZipFrom } from "../payment-receipt";
+import { receiptCustomer, surchargeLine, billingFrom, saveBillingAddress } from "../payment-receipt";
+import { normalizeBillingAddress, formatBillingAddress } from "@shared/billing-address";
 import { storage } from "../storage";
 import { db } from "../db";
 import { eq } from "drizzle-orm";
@@ -252,7 +253,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
         order.id,
         order.orderNumber,
         isCardPayment !== false,
-        billingZipFrom(req.body) ? { zip: billingZipFrom(req.body) } : undefined,
+        billingFrom(req.body),
         {
           customer: await receiptCustomer(req.session.userId, { companyId: (order as any).companyId }),
           description: `${isTeamPurchase ? "Online training (team seats)" : "Online training"}: ${[
@@ -303,6 +304,7 @@ export function registerAuthorizeNetRoutes(app: Express) {
       }
 
       // Post-payment processing (earnings split, emails, audit log)
+      await saveBillingAddress(req.session.userId, req.body);
       await postPaymentProcessing(order.id, req.session.userId!, result.transactionId!, total, isTeamPurchase,
         addOn ? { count: addOn.count, total: addOnTotal } : undefined,
         surcharge > 0 ? surcharge : undefined);
@@ -656,10 +658,13 @@ async function postPaymentProcessing(
     });
 
     try {
+      const freshUser: any = await storage.getUser(userId);
       await sendNewOrderAdminAlert({
         orderNumber: (await storage.getOrder(orderId))?.orderNumber || "",
         customerName: user.name,
         customerEmail: user.email,
+        customerPhone: freshUser?.phone || null,
+        billingAddress: formatBillingAddress(normalizeBillingAddress(freshUser?.savedBillingAddress)),
         items: courseLookup,
         total,
       });

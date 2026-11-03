@@ -59,13 +59,14 @@ export default function OrderPhotoIdDialog({
   const chargeAmount = Number(((PHOTO_ID_PRICE + SHIPPING_RATES[shippingMethod]) * (1 + CARD_SURCHARGE_RATE)).toFixed(2));
 
   const orderMutation = useMutation({
-    mutationFn: async (paymentNonce: string | null) => {
+    mutationFn: async ({ paymentNonce, billingAddress }: { paymentNonce: string | null; billingAddress?: unknown }) => {
       const res = await apiRequest("POST", `/api/groups/${groupId}/photo-id-orders`, {
         memberId,
         certificationId,
         shippingMethod,
         shippingAddress: address,
         paymentNonce: paymentNonce || undefined,
+        billingAddress,
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || t("teamPhotoId.orderFailed", "Could not place the photo ID order."));
@@ -144,7 +145,7 @@ export default function OrderPhotoIdDialog({
             <CardPaymentSection
               chargeAmount={chargeAmount}
               pending={orderMutation.isPending}
-              onPay={(nonce) => orderMutation.mutate(nonce)}
+              onPay={(nonce, meta) => orderMutation.mutate({ paymentNonce: nonce, billingAddress: meta?.billingAddress })}
               ctaLabel={t("teamPhotoId.payAndOrder", "Pay {{amount}} & Order", { amount: `$${chargeAmount.toFixed(2)}` })}
               fallbackCtaLabel={t("teamPhotoId.placeOrder", "Place Order")}
             />

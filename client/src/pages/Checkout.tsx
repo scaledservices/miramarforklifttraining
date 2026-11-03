@@ -1,3 +1,5 @@
+import BillingAddressFields from "@/components/checkout/BillingAddressFields";
+import { billingAddressProblems, EMPTY_BILLING, type BillingAddressInput } from "@shared/billing-address";
 import { acceptCardData } from "@shared/accept-card-data";
 import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
@@ -97,6 +99,14 @@ export default function Checkout() {
     cardCode: "",
     zip: "",
   });
+  // Billing address on every order (2026-11-03); prefilled from the last one.
+  const [billing, setBilling] = useState<BillingAddressInput>(EMPTY_BILLING);
+  const [billingMissing, setBillingMissing] = useState<Array<keyof BillingAddressInput>>([]);
+  const { user: billingUser } = useAuth();
+  useEffect(() => {
+    const saved = (billingUser as any)?.savedBillingAddress;
+    if (saved && typeof saved === "object") setBilling((b) => (b.address ? b : { ...EMPTY_BILLING, ...saved }));
+  }, [billingUser]);
   const [discountInput, setDiscountInput] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
   const [discountError, setDiscountError] = useState<string | null>(null);
@@ -260,7 +270,7 @@ export default function Checkout() {
   }, [items.length]);
 
   const chargeMutation = useMutation({
-    mutationFn: async (data: { paymentNonce?: string; isCardPayment: boolean; billingZip?: string }) => {
+    mutationFn: async (data: { paymentNonce?: string; isCardPayment: boolean; billingZip?: string; billingAddress?: BillingAddressInput }) => {
       const payload: Record<string, unknown> = {
         items: items.map((i) => ({ courseSlug: i.courseSlug, quantity: i.quantity })),
         refundPolicyAccepted: refundAccepted,
@@ -281,6 +291,7 @@ export default function Checkout() {
       if (data.paymentNonce) {
         payload.paymentNonce = data.paymentNonce;
         if (data.billingZip) payload.billingZip = data.billingZip;
+        if (data.billingAddress) payload.billingAddress = data.billingAddress;
       }
       const res = await apiRequest("POST", "/api/authorize-net/charge", payload);
       return res.json();
@@ -337,12 +348,18 @@ export default function Checkout() {
       setPaymentError(t("checkout.invalidCvv", { defaultValue: "Please enter the card CVV code." }));
       return;
     }
+    const billingProblems = billingAddressProblems(billing);
+    setBillingMissing(billingProblems);
+    if (billingProblems.length) {
+      setPaymentError(t("checkout.invalidBilling", { defaultValue: "Please enter your billing address (street, city, state and ZIP)." }));
+      return;
+    }
 
     setIsProcessing(true);
     setPaymentError(null);
 
     const secureData: AcceptSecureData = {
-      cardData: acceptCardData(cardForm),
+      cardData: acceptCardData({ ...cardForm, zip: billing.zip }),
       authData: {
         apiLoginID: paymentConfig.apiLoginID,
         clientKey: paymentConfig.clientKey,
@@ -356,7 +373,8 @@ export default function Checkout() {
           chargeMutation.mutate({
             paymentNonce: nonce,
             isCardPayment: true,
-            billingZip: cardForm.zip || undefined,
+            billingZip: billing.zip || undefined,
+            billingAddress: billing,
           });
         } else {
           const errMsg = response.messages.message?.[0]?.text || t("checkout.paymentFailed");
@@ -553,21 +571,7 @@ export default function Checkout() {
                           />
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="cardZip">{t("checkout.cardZip", { defaultValue: "Billing ZIP" })}</Label>
-                        <Input
-                          id="cardZip"
-                          type="text"
-                          inputMode="numeric"
-                          autoComplete="postal-code"
-                          placeholder="12345"
-                          maxLength={5}
-                          value={cardForm.zip}
-                          onChange={(e) => setCardForm({ ...cardForm, zip: digitsOnly(e.target.value).slice(0, 5) })}
-                          disabled={isProcessing}
-                          data-testid="input-card-zip"
-                        />
-                      </div>
+                      <BillingAddressFields value={billing} onChange={(nb) => { setBilling(nb); setBillingMissing([]); }} disabled={isProcessing} missing={billingMissing} idPrefix="co-bill" />
                     </div>
                     <div className="flex items-start gap-3 rounded-lg border p-3 bg-muted/30">
                       <Checkbox

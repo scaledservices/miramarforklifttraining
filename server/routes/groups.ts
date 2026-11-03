@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from "express";
-import { receiptCustomer, surchargeLine } from "../payment-receipt";
+import { receiptCustomer, surchargeLine, billingFrom, saveBillingAddress } from "../payment-receipt";
 import { and, eq, ne, isNull } from "drizzle-orm";
 import { db } from "../db";
 import { enrollments as enrollmentsTable, photoIdEntitlements, platformSettings, groupMembers } from "@shared/schema";
@@ -745,7 +745,9 @@ app.post("/api/groups/:id/photo-id-orders", requireAuth, payLimiter, async (req:
         certificationId,
         `CARD-${cert.certificateNumber}`,
         true,
-        {
+        // The card's billing address when given (2026-11-03), else the
+        // shipping address (old behaviour).
+        billingFrom(req.body)?.address ? { ...billingFrom(req.body), firstName: (buyer?.name || ship.name || "").trim().split(/\s+/).slice(0, -1).join(" ") || (buyer?.name || ship.name), lastName: (buyer?.name || ship.name || "").trim().split(/\s+/).length > 1 ? (buyer?.name || ship.name || "").trim().split(/\s+/).pop() : "-" } : {
           firstName: nameParts.slice(0, -1).join(" ") || nameParts[0],
           lastName: nameParts.length > 1 ? nameParts[nameParts.length - 1] : "-",
           address: ship.address,
@@ -768,6 +770,7 @@ app.post("/api/groups/:id/photo-id-orders", requireAuth, payLimiter, async (req:
         logger.warn("[Groups] Photo ID charge declined", { source: "payment", metadata: { groupId: group.id, memberId, certificationId, amount: totalAmount, declineReason: charge.errorMessage } });
         return res.status(400).json({ error: charge.errorMessage || "Payment was declined" });
       }
+      await saveBillingAddress(req.session.userId, req.body);
       transactionId = charge.transactionId!;
     }
 
