@@ -42,11 +42,13 @@ interface CardPaymentSectionProps {
   /** Called with the payment nonce once tokenization succeeds, or null when
    * payments are not configured (demo/staging fallback). */
   onPay: (nonce: string | null, meta?: { billingZip?: string; billingAddress?: BillingAddressInput }) => void;
+  /** Photo ID mailing address, if this order ships a card: offers "same as mailing". */
+  mailingAddress?: { address: string; city: string; state: string; zip: string } | null;
   ctaLabel: string;
   fallbackCtaLabel: string;
 }
 
-export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLabel, fallbackCtaLabel }: CardPaymentSectionProps) {
+export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLabel, fallbackCtaLabel, mailingAddress }: CardPaymentSectionProps) {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [policyAccepted, setPolicyAccepted] = useState(false);
@@ -218,7 +220,7 @@ export default function CardPaymentSection({ chargeAmount, pending, onPay, ctaLa
                 value={cardForm.cardCode} onChange={(e) => setCardForm((f) => ({ ...f, cardCode: digitsOnly(e.target.value).slice(0, 4) }))} data-testid="input-booking-card-cvv" />
             </div>
           </div>
-          <BillingAddressFields value={billing} onChange={(b) => { setBilling(b); setBillingMissing([]); }} disabled={tokenizing || pending} missing={billingMissing} idPrefix="bk-bill" />
+          <BillingAddressFields value={billing} onChange={(b) => { setBilling(b); setBillingMissing([]); }} disabled={tokenizing || pending} missing={billingMissing} idPrefix="bk-bill" mailingAddress={mailingAddress} />
         </div>
       )}
 

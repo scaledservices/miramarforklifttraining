@@ -143,6 +143,7 @@ export default function OrderPhotoIdDialog({
 
           {addressValid && (
             <CardPaymentSection
+              mailingAddress={address}
               chargeAmount={chargeAmount}
               pending={orderMutation.isPending}
               onPay={(nonce, meta) => orderMutation.mutate({ paymentNonce: nonce, billingAddress: meta?.billingAddress })}

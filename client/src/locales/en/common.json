@@ -1141,7 +1141,10 @@
     "billingStreet": "Street address",
     "billingCity": "City",
     "billingState": "State",
-    "invalidBilling": "Please enter your billing address (street, city, state and ZIP)."
+    "invalidBilling": "Please enter your billing address (street, city, state and ZIP).",
+    "billingSameAsMailing": "Billing address same as mailing address",
+    "billingFromMailingEmpty": "Uses the mailing address above.",
+    "billingFromMailingInvalid": "Please check the mailing address above (2-letter state like CA, 5-digit ZIP), or uncheck this box and enter a billing address."
   },
   "checkoutAuth": {
     "title": "Account Required",

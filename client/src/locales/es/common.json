@@ -1141,7 +1141,10 @@
     "billingStreet": "Dirección",
     "billingCity": "Ciudad",
     "billingState": "Estado",
-    "invalidBilling": "Ingrese su dirección de facturación (calle, ciudad, estado y código postal)."
+    "invalidBilling": "Ingrese su dirección de facturación (calle, ciudad, estado y código postal).",
+    "billingSameAsMailing": "Dirección de facturación igual a la dirección de envío",
+    "billingFromMailingEmpty": "Se usa la dirección de envío de arriba.",
+    "billingFromMailingInvalid": "Revise la dirección de envío de arriba (estado de 2 letras como CA, código postal de 5 dígitos), o desmarque esta casilla e ingrese una dirección de facturación."
   },
   "checkoutAuth": {
     "title": "Cuenta Requerida",

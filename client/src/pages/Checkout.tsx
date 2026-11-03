@@ -571,7 +571,7 @@ export default function Checkout() {
                           />
                         </div>
                       </div>
-                      <BillingAddressFields value={billing} onChange={(nb) => { setBilling(nb); setBillingMissing([]); }} disabled={isProcessing} missing={billingMissing} idPrefix="co-bill" />
+                      <BillingAddressFields value={billing} onChange={(nb) => { setBilling(nb); setBillingMissing([]); }} disabled={isProcessing} missing={billingMissing} idPrefix="co-bill" mailingAddress={photoIdAddOnTotal > 0 ? photoIdShipping : null} />
                     </div>
                     <div className="flex items-start gap-3 rounded-lg border p-3 bg-muted/30">
                       <Checkbox
