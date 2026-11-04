@@ -43,7 +43,7 @@ export const brand = {
   },
 
   og: {
-    defaultImage: "/images/hero-forklift.jpg",
+    defaultImage: "/og-miramar.jpg",
   },
 
   social: {
