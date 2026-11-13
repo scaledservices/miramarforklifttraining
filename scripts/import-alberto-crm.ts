@@ -821,6 +821,37 @@ async function main() {
     );
   }
 
+  // ---- Guard: customers the SITE brought in stay new customers ----
+  // A later export of Alberto's old system can include people who first bought
+  // on the new site. Importing them would flip them to "existing" and stop the
+  // new-customer split. Drop any email that already has a paid order on the
+  // site and was not on a previous import of this list.
+  {
+    const siteBuyers = await pool.query(
+      `select distinct lower(u.email) email from orders o join users u on u.id = o.user_id
+        where o.status = 'paid' and u.email is not null`
+    ).catch(() => ({ rows: [] as { email: string }[] }));
+    const prior = await pool.query(
+      `select distinct lower(email) email from contacts where import_batch_id is not null and email is not null`
+    ).catch(() => ({ rows: [] as { email: string }[] }));
+    const priorSet = new Set(prior.rows.map((r: { email: string }) => r.email));
+    const protectedEmails = new Set(
+      siteBuyers.rows.map((r: { email: string }) => r.email).filter((e: string) => !priorSet.has(e))
+    );
+    const dropped: string[] = [];
+    for (const res of [ds1Result, ds2Result, ds3Result]) {
+      if (!res) continue;
+      res.contacts = res.contacts.filter((c) => {
+        if (c.email && protectedEmails.has(c.email)) { dropped.push(c.email); return false; }
+        return true;
+      });
+      for (const comp of res.companies.values()) {
+        if (comp.email && protectedEmails.has(comp.email)) { dropped.push(comp.email); comp.email = null; }
+      }
+    }
+    console.log(`\n  Site-customer guard: ${protectedEmails.size} site buyers checked, ${new Set(dropped).size} kept OFF the legacy list${dropped.length ? ": " + [...new Set(dropped)].join(", ") : ""}`);
+  }
+
   // ---- Cross-dataset summary ----
   console.log("\n" + "=".repeat(70));
   console.log("CROSS-DATASET SUMMARY");
