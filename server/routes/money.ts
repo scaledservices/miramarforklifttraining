@@ -10,6 +10,7 @@ import {
   platformSettings,
 } from "@shared/schema";
 import { requireRole } from "./middleware";
+import { loadLegacyIndex, loadOrderOverrides, classifyOrder, setOrderOverride } from "../customerClassification";
 
 // ---------------------------------------------------------------------------
 // Revenue split configuration
@@ -29,11 +30,10 @@ import { requireRole } from "./middleware";
 //   i.e. 25% / 25% of the revenue); Scaled Services gets the remainder of
 //   the pool. Miramar keeps everything outside the pool.
 //
-// New-customer rule: a payment counts as new-customer revenue when it belongs
-// to the customer's FIRST order that ever received an approved payment
-// (earliest approved payment across all time, per user). All payments on that
-// first order (deposit + balance) are new-customer; payments on any later
-// order are returning-customer.
+// New-customer rule (2026-10-26): classified per customer against the
+// imported legacy customer list (exact email, or non-generic company domain).
+// Not on the list = new customer, for all of their orders. Admins can
+// override a single order. See server/customerClassification.ts.
 // ---------------------------------------------------------------------------
 
 export interface RevenueSplitConfig {
@@ -304,6 +304,32 @@ export function registerMoneyRoutes(app: Express) {
   });
 
   // -------------------------------------------------------------------------
+  // PUT /api/admin/money/orders/:orderId/classification
+  // Body: { classification: "new" | "existing" | null }  (null clears)
+  // Per-order override of the new/existing customer classification.
+  // -------------------------------------------------------------------------
+  app.put("/api/admin/money/orders/:orderId/classification", requireRole("admin", "super_admin"), async (req: Request, res: Response) => {
+    try {
+      const orderId = Number(req.params.orderId);
+      if (!Number.isInteger(orderId) || orderId <= 0) {
+        return res.status(400).json({ error: "Invalid order id" });
+      }
+      const value = req.body?.classification;
+      if (!(value === "new" || value === "existing" || value === null)) {
+        return res.status(400).json({ error: "classification must be \"new\", \"existing\" or null" });
+      }
+      const [order] = await db.select({ id: ordersTable.id }).from(ordersTable).where(eq(ordersTable.id, orderId));
+      if (!order) return res.status(404).json({ error: "Order not found" });
+      const userId = req.session.userId ?? null;
+      const overrides = await setOrderOverride(orderId, value, userId);
+      return res.json({ orderId, classification: overrides[String(orderId)] ?? null });
+    } catch (error) {
+      console.error("[Money] Classification override error:", error);
+      return res.status(500).json({ error: "Failed to save classification" });
+    }
+  });
+
+  // -------------------------------------------------------------------------
   // GET /api/admin/money/statement?month=YYYY-MM
   // Monthly statement: every approved/refunded payment in the month with its
   // three-party split, plus totals per party. Returns all three parties.
@@ -351,39 +377,18 @@ export function registerMoneyRoutes(app: Express) {
         ))
         .orderBy(paymentsTable.createdAt);
 
-      // New-customer detection: find each relevant user's first order that
-      // ever received an approved payment. Payments on that order count as
-      // new-customer revenue.
-      const userIds = Array.from(new Set(monthPayments.map(p => p.userId)));
-      const firstPaidOrderByUser = new Map<number, number>();
-      if (userIds.length > 0) {
-        const history = await db
-          .select({
-            orderId: paymentsTable.orderId,
-            createdAt: paymentsTable.createdAt,
-            paymentId: paymentsTable.id,
-            userId: ordersTable.userId,
-          })
-          .from(paymentsTable)
-          .innerJoin(ordersTable, eq(paymentsTable.orderId, ordersTable.id))
-          .where(and(
-            eq(paymentsTable.status, "approved"),
-            inArray(ordersTable.userId, userIds),
-          ))
-          .orderBy(paymentsTable.createdAt, paymentsTable.id);
-        for (const h of history) {
-          if (!firstPaidOrderByUser.has(h.userId)) {
-            firstPaidOrderByUser.set(h.userId, h.orderId);
-          }
-        }
-      }
+      // New vs existing customer: per customer, by matching the buyer's email
+      // against the imported legacy customer list, with per-order overrides.
+      // See server/customerClassification.ts for the rule.
+      const [legacyIndex, overrides] = await Promise.all([loadLegacyIndex(), loadOrderOverrides()]);
 
       const totals = { revenue: 0, alberto: 0, scaled: 0, miramar: 0, newCustomerRevenue: 0, returningRevenue: 0 };
       const lineItems = monthPayments.map(p => {
         const isRefund = p.status === "refunded";
         // Refunds appear as negative line items so they claw back commissions.
         const principal = isRefund ? -Number(p.amount) : roundCents(principalOf(p));
-        const isNewCustomer = firstPaidOrderByUser.get(p.userId) === p.orderId;
+        const cls = classifyOrder(p.orderId, p.customerEmail, legacyIndex, overrides);
+        const isNewCustomer = cls.classification === "new";
         const split = computeSplit(principal, isNewCustomer, config);
 
         totals.revenue = roundCents(totals.revenue + principal);
@@ -404,6 +409,7 @@ export function registerMoneyRoutes(app: Express) {
           amount: principal,
           isRefund,
           isNewCustomer,
+          classificationSource: cls.source,
           split,
         };
       });
@@ -411,7 +417,7 @@ export function registerMoneyRoutes(app: Express) {
       return res.json({
         month,
         config,
-        newCustomerRule: "A payment is new-customer revenue when it belongs to the customer's first order that ever received an approved payment.",
+        newCustomerRule: "A customer is existing when their email, or their company email domain, is on the imported customer list (Gmail, Yahoo and similar addresses need an exact email match). Everyone else is a new customer, for all of their orders. Any order can be overridden.",
         lineItems,
         totals,
         parties: {

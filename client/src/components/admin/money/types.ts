@@ -40,6 +40,7 @@ export interface StatementLineItem {
   amount: number;
   isRefund: boolean;
   isNewCustomer: boolean;
+  classificationSource?: "legacy_email" | "legacy_domain" | "not_on_legacy_list" | "no_email" | "override";
   split: PartySplit;
 }
 

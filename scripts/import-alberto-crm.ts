@@ -1,47 +1,59 @@
 /**
- * Alberto CRM Import — 3 datasets (Clients + FLA Onsite + MFT Onsite)
+ * Legacy customer list import (Alberto's customer lists).
  *
- * Reads Alberto's 3 xlsx files from LOCAL DISK ONLY and maps them onto the
- * existing companies + contacts + trainingEvents schema.
+ * Loads Miramar's existing customers into companies + contacts + trainingEvents
+ * so the site can tell NEW customers from EXISTING ones (see
+ * server/customerClassification.ts). Imported rows are reference data only,
+ * never the system of record. Labels are neutral ("legacy-customer"): nothing
+ * here may describe any commission arrangement.
  *
- * DATASETS:
- *   1. Clients_19092024_0810 v3.xlsx         — 1,376 contact-centric rows
- *   2. MFT - ONSITE LIST - FLA.xlsx           — 246 training-event rows (FLA era 2019-2024)
- *   3. MFT - ONSITE LIST - 2024-25-26.xlsx    — 116 training-event rows (MFT era 2024-2025)
+ * DATASETS (local files only):
+ *   1. Clients exports (contact-centric). Several files are merged by email,
+ *      first file wins, so pass the newest first. Columns are mapped by header.
+ *   2. MFT - ONSITE LIST - FLA.xlsx       (onsite training rows, FLA era)
+ *   3. MFT - ONSITE LIST - 2024-25-26.xlsx (onsite training rows, MFT era)
  *
  * SAFETY:
- *   - Default mode is DRY-RUN: reads all files, computes the full mapping,
- *     prints counts + samples, and writes NOTHING to the database.
- *   - Live writes require the explicit `--commit` flag (not implemented yet).
+ *   - Default is DRY-RUN: reads, maps and reports, writes nothing.
+ *   - --commit writes inside ONE transaction: it first removes rows from this
+ *     script's own import batches (and nothing else), then inserts. Any error
+ *     rolls everything back.
  *
  * Usage:
- *   npx tsx scripts/import-alberto-crm.ts             # dry-run all 3 datasets
- *   npx tsx scripts/import-alberto-crm.ts --dataset 1  # dry-run DS1 only
- *   npx tsx scripts/import-alberto-crm.ts --dataset 2  # dry-run DS2 only
- *   npx tsx scripts/import-alberto-crm.ts --dataset 3  # dry-run DS3 only
- *   npx tsx scripts/import-alberto-crm.ts --file "/path/to.xlsx"  # custom DS1 file
- *
- * See CRM_DATA_ANALYSIS.md for full analysis, schema recommendations, and import strategy.
+ *   npx tsx scripts/import-alberto-crm.ts \
+ *     --clients "~/Downloads/Clients_29102026_0829.xlsx,~/Downloads/Clients_19092024_0810 v3.xlsx" \
+ *     --fla "~/Downloads/MFT - ONSITE LIST - FLA (2).xlsx" \
+ *     --mft "~/Downloads/MFT - ONSITE LIST - 2024-25-26.xlsx" [--commit]
+ *   --dataset 1|2|3 limits the run to one dataset.
  */
 
 import XLSX from "xlsx";
 import * as fs from "fs";
 import { db, pool } from "../server/db";
 import { companies, contacts, trainingEvents } from "../shared/schema";
-import { eq } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 
 // ---- Config -----------------------------------------------------------------
 
 const HOME = process.env.HOME || "";
-const DS1_FILE = HOME + "/Downloads/Clients_19092024_0810 v3.xlsx";
-const DS2_FILE = HOME + "/Downloads/MFT - ONSITE LIST - FLA.xlsx";
-const DS3_FILE = HOME + "/Downloads/MFT - ONSITE LIST - 2024-25-26.xlsx";
+const expandHome = (f: string) => f.trim().replace(/^~(?=\/)/, HOME);
+const argVal = (name: string): string | null => {
+  const i = process.argv.indexOf(name);
+  return i >= 0 ? process.argv[i + 1] ?? null : null;
+};
 
-const IMPORT_BATCH_ID = "alberto_crm_2026-07-12";
-const LEAD_SOURCE_DS1 = "alberto_pre_partnership";
-const LEAD_SOURCE_DS2 = "alberto_fla_era";
-const LEAD_SOURCE_DS3 = "alberto_mft_era";
-const PRE_PARTNERSHIP_TAG = "pre-partnership";
+const DS1_FILES = (argVal("--clients") ?? argVal("--file") ?? HOME + "/Downloads/Clients_19092024_0810 v3.xlsx")
+  .split(",").map(expandHome).filter(Boolean);
+const DS2_FILE = expandHome(argVal("--fla") ?? HOME + "/Downloads/MFT - ONSITE LIST - FLA.xlsx");
+const DS3_FILE = expandHome(argVal("--mft") ?? HOME + "/Downloads/MFT - ONSITE LIST - 2024-25-26.xlsx");
+
+const IMPORT_BATCH_ID = "legacy_customers_2026-11";
+// Earlier batch ids written by this script; --commit replaces them too.
+const PRIOR_BATCH_IDS = ["alberto_crm_2026-07-12"];
+const LEAD_SOURCE_DS1 = "legacy_customer_list";
+const LEAD_SOURCE_DS2 = "legacy_onsite_fla";
+const LEAD_SOURCE_DS3 = "legacy_onsite_mft";
+const PRE_PARTNERSHIP_TAG = "legacy-customer";
 
 // ---- CLI args ---------------------------------------------------------------
 
@@ -49,8 +61,6 @@ const args = process.argv.slice(2);
 const COMMIT = args.includes("--commit");
 const datasetArgIdx = args.indexOf("--dataset");
 const DATASET_FILTER = datasetArgIdx >= 0 ? args[datasetArgIdx + 1] : null;
-const fileArgIdx = args.indexOf("--file");
-const CUSTOM_DS1_FILE = fileArgIdx >= 0 ? args[fileArgIdx + 1] : null;
 
 // ---- Helpers ----------------------------------------------------------------
 
@@ -205,13 +215,10 @@ function readDataset1(filePath: string): {
   const aoa = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, defval: null });
 
   let headerIdx = -1;
-  let colBase = -1;
   for (let i = 0; i < aoa.length; i++) {
     const row = aoa[i] || [];
-    const fnCol = row.findIndex((c) => c && String(c).trim() === "First Name");
-    if (fnCol >= 0) {
+    if (row.some((c) => c && String(c).trim() === "First Name")) {
       headerIdx = i;
-      colBase = fnCol;
       break;
     }
   }
@@ -230,17 +237,34 @@ function readDataset1(filePath: string): {
   let missingEmail = 0;
   let missingCompany = 0;
 
-  for (const r of rows) {
-    const firstName = normText(r[colBase]);
-    const lastName = normText(r[colBase + 1]);
-    const email = normEmail(r[colBase + 2]);
-    const companyName = normText(r[colBase + 3]);
-    const type = normText(r[colBase + 4]);
-    const phone = normPhone(r[colBase + 5]);
-    const cell = normPhone(r[colBase + 6]);
-    const custom = normText(r[colBase + 7]);
+  // Columns are located by header text: Alberto's exports have moved columns
+  // between versions (Nov 2026 added Referred By / Store Credit / Client due).
+  const header = (aoa[headerIdx] as unknown[]).map((c) => (c === null || c === undefined ? "" : String(c).trim()));
+  const col = (name: string) => header.indexOf(name);
+  const C = {
+    first: col("First Name"), last: col("Last Name"), email: col("Email"), company: col("Client Company"),
+    type: col("Type"), phone: col("Phone"), cell: col("Cell Phone"), custom: col("Custom Field"),
+  };
+  for (const [k, v] of Object.entries(C)) {
+    if (v < 0 && k !== "custom") {
+      console.error(`\n[ERROR] DS1 column not found: ${k} in ${filePath}\n`);
+      process.exit(1);
+    }
+  }
+  const cell = (r: unknown[], i: number) => (i >= 0 ? r[i] : null);
 
-    if (!firstName && !lastName) {
+  for (const r of rows) {
+    const firstName = normText(cell(r, C.first));
+    const lastName = normText(cell(r, C.last));
+    const email = normEmail(cell(r, C.email));
+    const companyName = normText(cell(r, C.company));
+    const type = normText(cell(r, C.type));
+    const phone = normPhone(cell(r, C.phone));
+    const cellPhone = normPhone(cell(r, C.cell));
+    const custom = normText(cell(r, C.custom));
+
+    // Keep email-only rows: the email is what new/existing matching needs.
+    if (!firstName && !lastName && !email) {
       skippedNoName++;
       continue;
     }
@@ -265,8 +289,8 @@ function readDataset1(filePath: string): {
           billingZip: null,
           leadSource: LEAD_SOURCE_DS1,
           importBatchId: IMPORT_BATCH_ID,
-          sourceEra: "pre_partnership",
-          notes: "[Imported from Alberto CRM - Clients dataset]",
+          sourceEra: "legacy_clients",
+          notes: "[Imported from the customer list]",
           contactCount: 1,
         });
       }
@@ -279,7 +303,7 @@ function readDataset1(filePath: string): {
       firstName: firstName ?? "",
       lastName: lastName ?? "",
       email,
-      phone: cell ?? phone,
+      phone: cellPhone ?? phone,
       tags,
       notes: custom,
       isPrimary: true,
@@ -397,7 +421,7 @@ function readOnsiteDataset(
           leadSource,
           importBatchId: IMPORT_BATCH_ID,
           sourceEra,
-          notes: `[Imported from Alberto CRM - ${sourceEra}]`,
+          notes: `[Imported from the onsite training list - ${sourceEra}]`,
           contactCount: 0,
         });
       } else {
@@ -455,7 +479,7 @@ function readOnsiteDataset(
       sourceEra,
       sourceDataset,
       comments,
-      adminNotes: `[Imported from Alberto DS${sourceDataset} | ERA: ${sourceEra} | EMP CODE: ${rawCode ?? "N/A"}]`,
+      adminNotes: `[Imported onsite training history | ${sourceEra} | EMP CODE: ${rawCode ?? "N/A"}]`,
     });
   }
 
@@ -521,25 +545,55 @@ interface CommitResult {
   eventsInserted: number;
 }
 
-async function wipeBatch(): Promise<void> {
-  await db.delete(trainingEvents).where(eq(trainingEvents.importBatchId, IMPORT_BATCH_ID));
-  await db.delete(contacts).where(eq(contacts.importBatchId, IMPORT_BATCH_ID));
-  await db.delete(companies).where(eq(companies.importBatchId, IMPORT_BATCH_ID));
+type Tx = any; // drizzle transaction handle (same API as db)
+
+async function wipeBatch(tx: Tx): Promise<void> {
+  const ids = [IMPORT_BATCH_ID, ...PRIOR_BATCH_IDS];
+  await tx.delete(trainingEvents).where(inArray(trainingEvents.importBatchId, ids));
+  await tx.delete(contacts).where(inArray(contacts.importBatchId, ids));
+  await tx.delete(companies).where(inArray(companies.importBatchId, ids));
+}
+
+/** Merge several Clients exports: first file wins per email; email-less rows dedupe by company+name. */
+function mergeDataset1(results: ReturnType<typeof readDataset1>[]): ReturnType<typeof readDataset1> {
+  const companiesMerged = mergeCompanies(...results.map((r) => r.companies));
+  const seen = new Set<string>();
+  const merged: MappedContact[] = [];
+  let dupes = 0;
+  for (const r of results) {
+    for (const c of r.contacts) {
+      const key = c.email ?? `${c.companyKey}|${c.firstName}|${c.lastName}`.toLowerCase();
+      if (seen.has(key)) { dupes++; continue; }
+      seen.add(key);
+      merged.push(c);
+    }
+  }
+  const stats: Record<string, number> = {
+    filesMerged: results.length,
+    totalRows: results.reduce((n, r) => n + (r.stats.totalRows ?? 0), 0),
+    duplicateContactsAcrossFiles: dupes,
+    contactsCreated: merged.length,
+    companiesCreated: companiesMerged.size,
+    missingEmail: merged.filter((c) => !c.email).length,
+  };
+  return { companies: companiesMerged, contacts: merged, stats };
 }
 
 async function writeDataset(
+  tx: Tx,
   companiesMap: Map<string, MappedCompany>,
   contactsList: MappedContact[],
   eventsList: MappedTrainingEvent[],
   companyIdByKey: Map<string, number>,
-  contactIdByEmail: Map<string, number>
+  contactIdByEmail: Map<string, number>,
+  contactSeen: Set<string>
 ): Promise<CommitResult> {
   const result: CommitResult = { companiesInserted: 0, contactsInserted: 0, eventsInserted: 0 };
 
   // Companies: insert only keys not already created by an earlier dataset.
   for (const [key, comp] of companiesMap) {
     if (companyIdByKey.has(key)) continue;
-    const [row] = await db.insert(companies).values({
+    const [row] = await tx.insert(companies).values({
       name: comp.name,
       phone: comp.phone,
       email: comp.email,
@@ -558,8 +612,14 @@ async function writeDataset(
 
   // Contacts: link to their company; track email -> id for event linkage.
   for (const c of contactsList) {
+    // One contact per person across datasets: the onsite lists repeat the
+    // same contact on every training row.
+    const dedupeKey = c.email ?? `${c.companyKey}|${c.firstName}|${c.lastName}`.toLowerCase();
+    if (contactSeen.has(dedupeKey)) continue;
+    contactSeen.add(dedupeKey);
+    if (!c.email && !c.firstName && !c.lastName) continue;
     const companyId = companyIdByKey.get(c.companyKey) ?? null;
-    const [row] = await db.insert(contacts).values({
+    const [row] = await tx.insert(contacts).values({
       companyId,
       firstName: c.firstName,
       lastName: c.lastName,
@@ -578,7 +638,7 @@ async function writeDataset(
   for (const e of eventsList) {
     const companyId = companyIdByKey.get(e.companyKey) ?? null;
     const primaryContactId = e.contactEmail ? (contactIdByEmail.get(e.contactEmail) ?? null) : null;
-    await db.insert(trainingEvents).values({
+    await tx.insert(trainingEvents).values({
       companyId,
       primaryContactId,
       title: e.title,
@@ -613,7 +673,7 @@ function printDataset1Stats(
   console.log("\n" + "-".repeat(70));
   console.log("DATASET 1: Clients (Contact-Centric)");
   console.log("-".repeat(70));
-  console.log(`  Source file:         ${CUSTOM_DS1_FILE ?? DS1_FILE}`);
+  console.log(`  Source files:        ${DS1_FILES.join(" + ")}`);
   console.log(`  Total source rows:   ${stats.totalRows}`);
   console.log(`  Contacts mapped:     ${stats.contactsCreated}`);
   console.log(`  Companies (deduped): ${stats.companiesCreated}`);
@@ -712,13 +772,18 @@ async function main() {
 
   // ---- DS1 ----
   if (runDS1) {
-    const ds1File = CUSTOM_DS1_FILE ?? DS1_FILE;
-    if (!fs.existsSync(ds1File)) {
-      console.error(`\n[ERROR] DS1 file not found: ${ds1File}\n`);
-      process.exit(1);
+    const parts: ReturnType<typeof readDataset1>[] = [];
+    for (const f of DS1_FILES) {
+      if (!fs.existsSync(f)) {
+        console.error(`\n[ERROR] DS1 file not found: ${f}\n`);
+        process.exit(1);
+      }
+      console.log(`\nReading DS1: ${f}`);
+      const r = readDataset1(f);
+      console.log(`  rows ${r.stats.totalRows}, contacts ${r.contacts.length}, companies ${r.companies.size}`);
+      parts.push(r);
     }
-    console.log(`\nReading DS1: ${ds1File}`);
-    ds1Result = readDataset1(ds1File);
+    ds1Result = parts.length === 1 ? parts[0] : mergeDataset1(parts);
     printDataset1Stats(ds1Result.companies, ds1Result.contacts, ds1Result.stats);
   }
 
@@ -818,35 +883,37 @@ async function main() {
     return;
   }
 
-  // ---- COMMIT: wipe this batch and write DS1 -> DS2 -> DS3 ----
-  console.log("COMMIT MODE — writing to the database...");
+  // ---- COMMIT: one transaction: wipe this script's batches, write DS1 -> DS2 -> DS3 ----
+  console.log("COMMIT MODE — writing to the database in one transaction...");
   console.log("=".repeat(70));
-  await wipeBatch();
-  const companyIdByKey = new Map<string, number>();
-  const contactIdByEmail = new Map<string, number>();
   const totals: CommitResult = { companiesInserted: 0, contactsInserted: 0, eventsInserted: 0 };
-
   const accumulate = (r: CommitResult) => {
     totals.companiesInserted += r.companiesInserted;
     totals.contactsInserted += r.contactsInserted;
     totals.eventsInserted += r.eventsInserted;
   };
 
-  if (ds1Result) {
-    const r = await writeDataset(ds1Result.companies, ds1Result.contacts, [], companyIdByKey, contactIdByEmail);
-    accumulate(r);
-    console.log(`  DS1 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts`);
-  }
-  if (ds2Result) {
-    const r = await writeDataset(ds2Result.companies, ds2Result.contacts, ds2Result.events, companyIdByKey, contactIdByEmail);
-    accumulate(r);
-    console.log(`  DS2 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts, ${r.eventsInserted} events`);
-  }
-  if (ds3Result) {
-    const r = await writeDataset(ds3Result.companies, ds3Result.contacts, ds3Result.events, companyIdByKey, contactIdByEmail);
-    accumulate(r);
-    console.log(`  DS3 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts, ${r.eventsInserted} events`);
-  }
+  await db.transaction(async (tx: Tx) => {
+    await wipeBatch(tx);
+    const companyIdByKey = new Map<string, number>();
+    const contactIdByEmail = new Map<string, number>();
+    const contactSeen = new Set<string>();
+    if (ds1Result) {
+      const r = await writeDataset(tx, ds1Result.companies, ds1Result.contacts, [], companyIdByKey, contactIdByEmail, contactSeen);
+      accumulate(r);
+      console.log(`  DS1 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts`);
+    }
+    if (ds2Result) {
+      const r = await writeDataset(tx, ds2Result.companies, ds2Result.contacts, ds2Result.events, companyIdByKey, contactIdByEmail, contactSeen);
+      accumulate(r);
+      console.log(`  DS2 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts, ${r.eventsInserted} events`);
+    }
+    if (ds3Result) {
+      const r = await writeDataset(tx, ds3Result.companies, ds3Result.contacts, ds3Result.events, companyIdByKey, contactIdByEmail, contactSeen);
+      accumulate(r);
+      console.log(`  DS3 written: ${r.companiesInserted} companies, ${r.contactsInserted} contacts, ${r.eventsInserted} events`);
+    }
+  });
 
   console.log("\n  TOTAL inserted:");
   console.log(`    companies:       ${totals.companiesInserted}`);

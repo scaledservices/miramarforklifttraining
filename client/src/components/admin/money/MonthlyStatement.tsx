@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +10,47 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FileText, ChevronDown, ChevronUp, UserPlus } from "lucide-react";
-import { formatMoney, type MonthlyStatementData } from "./types";
+import { formatMoney, type MonthlyStatementData, type StatementLineItem } from "./types";
+
+const SOURCE_HINT: Record<string, string> = {
+  legacy_email: "Email is on the customer list",
+  legacy_domain: "Company email domain is on the customer list",
+  not_on_legacy_list: "Not on the customer list",
+  no_email: "No email on file",
+  override: "Set by hand",
+};
+
+function CustomerTypeBadge({ item, month }: { item: StatementLineItem; month: string }) {
+  const mutation = useMutation({
+    mutationFn: (classification: "new" | "existing" | null) =>
+      apiRequest("PUT", `/api/admin/money/orders/${item.orderId}/classification`, { classification }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [`/api/admin/money/statement?month=${month}`] }),
+  });
+  const isOverride = item.classificationSource === "override";
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button type="button" className="inline-flex" disabled={mutation.isPending} data-testid={`button-customer-type-${item.paymentId}`}
+          title={SOURCE_HINT[item.classificationSource ?? ""] ?? ""}>
+          <Badge variant={item.isNewCustomer ? "secondary" : "outline"} className="text-xs whitespace-nowrap cursor-pointer">
+            {item.isNewCustomer && <UserPlus className="h-3 w-3 mr-1" />}
+            {item.isNewCustomer ? "New" : "Existing"}
+            {isOverride && " *"}
+          </Badge>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+          {SOURCE_HINT[item.classificationSource ?? ""] ?? "Customer type"}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => mutation.mutate("new")}>Mark as new customer</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => mutation.mutate("existing")}>Mark as existing customer</DropdownMenuItem>
+        {isOverride && <DropdownMenuItem onClick={() => mutation.mutate(null)}>Use the customer list again</DropdownMenuItem>}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 function currentMonth(): string {
   const now = new Date();
@@ -125,12 +167,7 @@ export default function MonthlyStatement() {
                           <TableCell>
                             <div className="flex items-center gap-1.5">
                               <span className="whitespace-nowrap">{item.customerName}</span>
-                              {item.isNewCustomer && (
-                                <Badge variant="secondary" className="text-xs whitespace-nowrap">
-                                  <UserPlus className="h-3 w-3 mr-1" />
-                                  New
-                                </Badge>
-                              )}
+                              {!item.isRefund && <CustomerTypeBadge item={item} month={month} />}
                               {item.isRefund && (
                                 <Badge variant="destructive" className="text-xs">Refund</Badge>
                               )}

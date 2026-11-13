@@ -42,16 +42,16 @@ interface Company {
 }
 
 type SortKey = "revenue" | "name" | "lastEvent" | "created";
-type EraFilter = "all" | "pre_partnership" | "fla_era" | "mft_era";
+type EraFilter = "all" | "legacy_clients" | "fla_era" | "mft_era";
 
 const ERA_LABELS: Record<Exclude<EraFilter, "all">, string> = {
-  pre_partnership: "Pre-Partnership",
+  legacy_clients: "Customer List",
   fla_era: "FLA Era",
   mft_era: "MFT Era",
 };
 
 const ERA_BADGE: Record<string, string> = {
-  pre_partnership: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  legacy_clients: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
   fla_era: "bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300",
   mft_era: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
 };
@@ -311,7 +311,7 @@ export default function AdminCompanies() {
             >
               Has email
             </button>
-            {(["pre_partnership", "fla_era", "mft_era"] as const).map((era) => (
+            {(["legacy_clients", "fla_era", "mft_era"] as const).map((era) => (
               <button
                 key={era}
                 onClick={() => setEraFilter(eraFilter === era ? "all" : era)}

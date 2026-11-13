@@ -90,7 +90,18 @@ app.post("/api/onsite-requests", onsiteRequestLimiter, async (req: Request, res:
       }
     }
 
-    const request = await storage.createOnsiteTrainingRequest(result.data);
+    // New vs existing customer, from the imported customer list. Never blocks
+    // the request: if the lookup fails the lead stays "unverified".
+    let customerClassification: "new" | "existing" | "unverified" = "unverified";
+    try {
+      const { loadLegacyIndex, classifyEmail } = await import("../customerClassification");
+      const index = await loadLegacyIndex();
+      if (index.emails.size > 0) customerClassification = classifyEmail(result.data.email, index).classification;
+    } catch (e) {
+      console.error("[Onsite] Customer classification failed:", e);
+    }
+
+    const request = await storage.createOnsiteTrainingRequest({ ...result.data, customerClassification });
 
     const onsiteLocale = await resolveLocale({ routeLocale: (req.body.locale as string) || undefined });
     sendOnsiteRequestCustomerConfirmation({
