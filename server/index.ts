@@ -4,6 +4,7 @@ import compression from "compression";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { registerSsrMiddleware } from "./seo-ssr";
+import { canonicalHostMiddleware } from "./canonical-host";
 import { createServer as createHttpsServer } from "https";
 import { createServer as createHttpServer } from "http";
 import { readFileSync } from "fs";
@@ -85,6 +86,10 @@ if (isDev && process.env.DEV_SSL !== "false") {
   }
 }
 const httpServer = sslOptions ? createHttpsServer(sslOptions, app) : createHttpServer(app);
+
+// Old Railway prod host -> canonical domain (301). Must run before routes,
+// SSR and static so Google re-indexes onto training.miramarforklift.com.
+app.use(canonicalHostMiddleware);
 
 app.use(helmet({
   contentSecurityPolicy: {
