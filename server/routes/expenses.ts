@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { timingSafeEqual } from "crypto";
 import { z } from "zod";
-import { and, desc, eq, gte, inArray, isNull, lt, lte, notInArray, or } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, lt, lte, or } from "drizzle-orm";
 import { db } from "../db";
 import {
   trainingExpenses,
@@ -33,7 +33,8 @@ import { requireRole } from "./middleware";
 // ---------------------------------------------------------------------------
 
 const PAYABLE_BOOKING_STATUSES = ["confirmed", "completed"] as const;
-const CLOSED_EVENT_STATUSES = ["canceled", "cancelled"];
+// Only trainings that were actually on the calendar (not drafts or canceled).
+const HELD_EVENT_STATUSES = ["scheduled", "awaiting_confirmation", "completed"] as const;
 
 function localDate(d: Date): string {
   const y = d.getFullYear();
@@ -152,7 +153,7 @@ export async function listRecentTrainings(days: number, onlyPending: boolean) {
       isNull(trainingEventsTable.importBatchId),
       gte(trainingEventsTable.scheduledStart, from),
       lt(trainingEventsTable.scheduledStart, new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)),
-      notInArray(trainingEventsTable.status, CLOSED_EVENT_STATUSES as any),
+      inArray(trainingEventsTable.status, [...HELD_EVENT_STATUSES]),
     ))
     .orderBy(desc(trainingEventsTable.scheduledStart));
 
