@@ -107,7 +107,7 @@ async function testStaticPage(path: string, label: string, expectCourse: boolean
 
   if (expectCourse) {
     assert(`${label} has Course JSON-LD`, html.includes('"@type":"Course"'), "Missing Course schema");
-    assert(`${label} Course has price`, html.includes('"price":59.99'), "Missing price in Course schema");
+    assert(`${label} Course has price`, html.includes('"price":45'), "Missing price in Course schema");
   }
 }
 

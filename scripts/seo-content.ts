@@ -135,7 +135,7 @@ export function generatePriorityPages(): InsertSeoPage[] {
       slug: "forklift-certification-online",
       templateKey: "TEMPLATE_COURSE",
       published: true,
-      title: "Online Forklift Certification — OSHA-Compliant Training | $59.99",
+      title: "Online Forklift Certification — OSHA-Compliant Training | $45",
       metaDescription: "Get your forklift certification online in as little as one day. Our OSHA-compliant training covers all required topics per 29 CFR 1910.178. Certificate with QR verification included.",
       heroH1: "Online Forklift Certification",
       heroSubtitle: "Complete your OSHA-compliant forklift operator training online. Study at your own pace, earn your certificate the same day.",
@@ -145,7 +145,7 @@ export function generatePriorityPages(): InsertSeoPage[] {
       canonicalSlug: "forklift-certification-online",
       bodySections: [
         { type: "step_list", heading: "How It Works", steps: [
-          { title: "Create Your Account", description: "Sign up and purchase the certification course for a one-time fee of $59.99." },
+          { title: "Create Your Account", description: "Sign up and purchase the certification course for a one-time fee of $45." },
           { title: "Complete Online Training", description: "Work through 8 modules covering all OSHA-required topics at your own pace." },
           { title: "Pass the Final Exam", description: "Score 80% or higher on the certification exam. Three attempts included." },
           { title: "Get Certified", description: "Download your certificate immediately. QR-verified and employer-ready." },
@@ -165,7 +165,7 @@ export function generatePriorityPages(): InsertSeoPage[] {
           { label: "Employer documentation kit", ours: "✓", others: "✗" },
           { label: "Same-day certification", ours: "✓", others: "3-5 days" },
           { label: "Course access duration", ours: "Lifetime", others: "30-90 days" },
-          { label: "Price", ours: "$59.99", others: "$80-$150" },
+          { label: "Price", ours: "$45", others: "$80-$150" },
         ]},
         { type: "callout", variant: "info", heading: "Important: Employer Evaluation Required", content: "OSHA requires three components for operator certification: formal instruction (our online course), practical training, and evaluation. The employer must complete the hands-on evaluation at your worksite. We provide all the documentation tools your employer needs." },
       ],
@@ -182,22 +182,22 @@ export function generatePriorityPages(): InsertSeoPage[] {
       slug: "forklift-certification-cost",
       templateKey: "TEMPLATE_PRICING",
       published: true,
-      title: "Forklift Certification Cost — $59.99 Complete Program | ForkliftCertified",
-      metaDescription: "How much does forklift certification cost? Our complete OSHA-compliant online certification is $59.99 with no hidden fees. Includes certificate, employer docs, and lifetime access.",
+      title: "Forklift Certification Cost — $45 Complete Program | ForkliftCertified",
+      metaDescription: "How much does forklift certification cost? Our complete OSHA-compliant online certification is $45 with no hidden fees. Includes certificate, employer docs, and lifetime access.",
       heroH1: "How Much Does Forklift Certification Cost?",
-      heroSubtitle: "Transparent pricing with no hidden fees. Everything you need for $59.99.",
-      introParagraph: "Forklift certification costs vary widely depending on the provider, format, and location. In-person classes typically range from $150-$300, while online programs range from $40-$150. At ForkliftCertified, our complete online certification program costs $59.99 — a one-time payment that includes the full course, certification exam, digital certificate, and employer documentation kit.",
+      heroSubtitle: "Transparent pricing with no hidden fees. Everything you need for $45.",
+      introParagraph: "Forklift certification costs vary widely depending on the provider, format, and location. In-person classes typically range from $150-$300, while online programs range from $40-$150. At ForkliftCertified, our complete online certification program costs $45 — a one-time payment that includes the full course, certification exam, digital certificate, and employer documentation kit.",
       primaryKeyword: "forklift certification cost",
       secondaryKeywords: ["how much is forklift certification", "forklift training cost", "forklift license cost"],
       bodySections: [
         { type: "comparison_table", heading: "Cost Comparison", columns: [
-          { label: "Complete online certification", ours: "$59.99", others: "$80-$150" },
+          { label: "Complete online certification", ours: "$45", others: "$80-$150" },
           { label: "In-person classroom training", ours: "N/A", others: "$150-$300" },
           { label: "On-site group training", ours: "Volume discounts", others: "$200-$500/person" },
           { label: "Hidden renewal fees", ours: "None", others: "Common" },
           { label: "Certificate included", ours: "✓ Included", others: "Often extra" },
         ]},
-        { type: "icon_list", heading: "What Your $59.99 Includes", items: [
+        { type: "icon_list", heading: "What Your $45 Includes", items: [
           "Complete 8-module OSHA-compliant training course",
           "Final certification exam (up to 3 attempts)",
           "Digital certificate with QR verification",
@@ -209,7 +209,7 @@ export function generatePriorityPages(): InsertSeoPage[] {
       ],
       faqJson: [
         { q: "Why does forklift certification cost vary so much?", a: "Costs vary based on training format (online vs. in-person), provider reputation, included materials, and location. Online programs are typically less expensive because they don't require physical facilities or instructors." },
-        { q: "Are there any hidden fees?", a: "No. Our $59.99 price includes everything: the full training course, certification exam, digital certificate, and employer documentation kit. There are no renewal fees or surprise charges." },
+        { q: "Are there any hidden fees?", a: "No. Our $45 price includes everything: the full training course, certification exam, digital certificate, and employer documentation kit. There are no renewal fees or surprise charges." },
         { q: "Is cheaper certification less legitimate?", a: "Not necessarily. What matters is that the training covers all OSHA-required topics. Our program is designed to meet all requirements of 29 CFR 1910.178 at a fraction of the cost of in-person training." },
         { q: "Does my employer pay for forklift certification?", a: "Many employers cover the cost of forklift certification as a business expense. OSHA requires employers to provide training at no cost to employees. Check with your employer — they may reimburse you or purchase training directly." },
       ],
@@ -432,7 +432,7 @@ export function generateStatePages(): InsertSeoPage[] {
       templateKey: "TEMPLATE_LOCATION_STATE",
       published: true,
       title: `Forklift Certification in ${s.name} — OSHA-Compliant Training`,
-      metaDescription: `Get your forklift certification in ${s.name}. OSHA-compliant online training available statewide. Same-day certification for $59.99.`,
+      metaDescription: `Get your forklift certification in ${s.name}. OSHA-compliant online training available statewide. Same-day certification for $45.`,
       heroH1: `Forklift Certification in ${s.name}`,
       heroSubtitle: `OSHA-compliant forklift operator training available throughout ${s.name}. Online certification with same-day results.`,
       introParagraph: `Whether you're in ${stateCities.length > 0 ? stateCities.slice(0, 3).map(c => c.city).join(", ") + ", or anywhere else in" : ""} ${s.name}, our online forklift certification program is available to you. OSHA Standard 29 CFR 1910.178 is a federal regulation that applies in all 50 states, meaning your certification is recognized by employers throughout ${s.name} and nationwide.`,
@@ -452,7 +452,7 @@ export function generateStatePages(): InsertSeoPage[] {
       ],
       faqJson: [
         { q: `Is forklift certification required in ${s.name}?`, a: `Yes. Federal OSHA Standard 29 CFR 1910.178 requires forklift operator training nationwide, including ${s.name}. Employers must ensure all operators are properly trained and certified.` },
-        { q: `How much does forklift certification cost in ${s.name}?`, a: `Our online certification is $59.99 — available to all ${s.name} residents. This is typically less expensive than in-person training programs which range from $150-$300.` },
+        { q: `How much does forklift certification cost in ${s.name}?`, a: `Our online certification is $45 — available to all ${s.name} residents. This is typically less expensive than in-person training programs which range from $150-$300.` },
         { q: `Can I use an online forklift certification in ${s.name}?`, a: `Yes. OSHA does not mandate a specific format for the formal instruction component. Online training is accepted throughout ${s.name} as long as it covers all required topics, which our program does.` },
       ],
       internalLinks: cityLinks.length > 0 ? cityLinks : null,
@@ -543,8 +543,8 @@ export function generateCityPages(): InsertSeoPage[] {
         ? `You can complete your forklift certification online from anywhere in ${c.city}, or book hands-on onsite training where our certified trainers come to your facility. Both options provide same-day OSHA-compliant certification.`
         : `You can complete your forklift certification online from anywhere in ${c.city}. Our program is available 24/7, so you can train at your convenience.` },
       { q: `How much does forklift certification cost in ${c.city}?`, a: isOnsiteArea
-        ? `Our online certification is $59.99 per person. Hands-on onsite training starts at $200 per person depending on the equipment type and number of participants. Volume discounts are available for groups.`
-        : `Our online certification is $59.99 — the same price regardless of your location. In-person training centers in ${c.city} typically charge $150-$300.` },
+        ? `Our online certification is $45 per person. Hands-on onsite training starts at $200 per person depending on the equipment type and number of participants. Volume discounts are available for groups.`
+        : `Our online certification is $45 — the same price regardless of your location. In-person training centers in ${c.city} typically charge $150-$300.` },
       { q: `Is online forklift certification valid for ${c.city} employers?`, a: `Yes. OSHA certification requirements are federal and apply uniformly. ${c.city} employers accept online formal instruction as part of the three-component certification process.` },
     ];
 
@@ -568,8 +568,8 @@ export function generateCityPages(): InsertSeoPage[] {
         ? `Forklift Certification in ${c.city}, ${stateObj?.abbr || c.state} — Online & Onsite Training`
         : `Forklift Certification in ${c.city}, ${stateObj?.abbr || c.state} — OSHA Training`,
       metaDescription: isOnsiteArea
-        ? `Get forklift certified in ${c.city}, ${c.state}. Online training ($59.99) and hands-on onsite certification available. Same-day OSHA-compliant certification.`
-        : `Get forklift certified in ${c.city}, ${c.state}. OSHA-compliant online training with same-day certification. $59.99 one-time fee.`,
+        ? `Get forklift certified in ${c.city}, ${c.state}. Online training ($45) and hands-on onsite certification available. Same-day OSHA-compliant certification.`
+        : `Get forklift certified in ${c.city}, ${c.state}. OSHA-compliant online training with same-day certification. $45 one-time fee.`,
       heroH1: `Forklift Certification in ${c.city}, ${stateObj?.abbr || c.state}`,
       heroSubtitle: isOnsiteArea
         ? `Online and hands-on onsite forklift training for ${c.city} area workers. Get certified today.`
@@ -659,7 +659,7 @@ export function generateIndustryPages(): InsertSeoPage[] {
       templateKey: "TEMPLATE_INDUSTRY",
       published: true,
       title: `Forklift Certification for ${ind.label} — OSHA Training`,
-      metaDescription: `OSHA-compliant forklift certification for ${ind.label.toLowerCase()} workers. Online training covering industry-specific topics. $59.99 with same-day certification.`,
+      metaDescription: `OSHA-compliant forklift certification for ${ind.label.toLowerCase()} workers. Online training covering industry-specific topics. $45 with same-day certification.`,
       heroH1: `Forklift Certification for ${ind.label}`,
       heroSubtitle: `Specialized OSHA-compliant training for forklift operators in ${ind.label.toLowerCase()} environments.`,
       introParagraph: content.intro,
@@ -746,7 +746,7 @@ export function generateEquipmentPages(): InsertSeoPage[] {
       templateKey: "TEMPLATE_EQUIPMENT",
       published: true,
       title: `${eq.label} Training — OSHA Certification | ForkliftCertified`,
-      metaDescription: `Get certified to operate a ${eq.label.toLowerCase()}. OSHA-compliant online training covering ${eq.label.toLowerCase()}-specific topics. $59.99 with same-day certification.`,
+      metaDescription: `Get certified to operate a ${eq.label.toLowerCase()}. OSHA-compliant online training covering ${eq.label.toLowerCase()}-specific topics. $45 with same-day certification.`,
       heroH1: `${eq.label} Training & Certification`,
       heroSubtitle: `OSHA-compliant training covering ${eq.label.toLowerCase()} operation, safety, and best practices.`,
       introParagraph: content.intro,

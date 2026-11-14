@@ -18,6 +18,8 @@ export interface TrainingLocation {
   supportsOnsite: boolean;
   equipmentTypes: string[];
   heroImage: string;
+  /** "About our training center" paragraph shown on the location page. */
+  about: string;
   seo: {
     title: string;
     description: string;
@@ -26,6 +28,7 @@ export interface TrainingLocation {
   es?: {
     hours: string;
     equipmentTypes: string[];
+    about: string;
     seo: {
       title: string;
       description: string;
@@ -67,6 +70,8 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
       "Aerial/Boom Lift",
     ],
     heroImage: "/images/san-diego.jpg",
+    about:
+      "Our San Diego training center at 8760 Miramar Place offers hands-on forklift classes with a same-day certificate and wallet card. Most employers choose onsite training: our trainer comes to your warehouse or job site anywhere in the San Diego area and certifies your crew on the equipment they use every day. Equipment covered here includes sit-down counterbalance forklifts, reach trucks, order pickers, electric pallet jacks, scissor lifts and aerial/boom lifts.",
     seo: {
       title: "Forklift Training in San Diego",
       description: "OSHA-aligned forklift certification in San Diego. In-person at our Miramar facility or on-site at your location.",
@@ -81,6 +86,8 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
         "Elevador de Tijera",
         "Elevador Aéreo/de Pluma",
       ],
+      about:
+        "Nuestro centro de capacitación en San Diego, en 8760 Miramar Place, ofrece clases prácticas de montacargas con certificado y tarjeta de billetera el mismo día. La mayoría de los empleadores eligen la capacitación en sitio: nuestro instructor va a su almacén o lugar de trabajo en cualquier parte del área de San Diego y certifica a su equipo en el equipo que usan todos los días. El equipo que cubrimos aquí incluye montacargas de contrapeso de asiento, reach trucks, order pickers, transpaletas eléctricas, elevadores de tijera y elevadores aéreos/de pluma.",
       seo: {
         title: "Capacitación de Montacargas en San Diego",
         description: "Certificación de montacargas alineada con OSHA en San Diego. Presencial en nuestra instalación de Miramar o en el sitio de su empresa.",
@@ -112,6 +119,8 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
       "Electric Pallet Jack (EPJ)",
     ],
     heroImage: "/images/las-vegas.jpg",
+    about:
+      "Our Las Vegas training center at 3301 W Martin Ave Ste A offers hands-on forklift classes with a same-day certificate and wallet card. Most employers choose onsite training: our trainer comes to your warehouse or job site anywhere in the Las Vegas area and certifies your crew on the equipment they use every day. Equipment covered here includes sit-down counterbalance forklifts, reach trucks, order pickers and electric pallet jacks.",
     seo: {
       title: "Forklift Training in Las Vegas",
       description: "OSHA-aligned forklift certification in Las Vegas. In-person at our facility or on-site at your location.",
@@ -124,6 +133,8 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
         "Order Picker",
         "Transpaleta Eléctrica (EPJ)",
       ],
+      about:
+        "Nuestro centro de capacitación en Las Vegas, en 3301 W Martin Ave Ste A, ofrece clases prácticas de montacargas con certificado y tarjeta de billetera el mismo día. La mayoría de los empleadores eligen la capacitación en sitio: nuestro instructor va a su almacén o lugar de trabajo en cualquier parte del área de Las Vegas y certifica a su equipo en el equipo que usan todos los días. El equipo que cubrimos aquí incluye montacargas de contrapeso de asiento, reach trucks, order pickers y transpaletas eléctricas.",
       seo: {
         title: "Capacitación de Montacargas en Las Vegas",
         description: "Certificación de montacargas alineada con OSHA en Las Vegas. Presencial en nuestra instalación o en el sitio de su empresa.",
@@ -157,6 +168,8 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
       "Aerial/Boom Lift",
     ],
     heroImage: "/images/fresno-city.jpg",
+    about:
+      "Our Fresno training location at 3515 N. Sabre Drive offers hands-on forklift classes by appointment, with a same-day certificate and wallet card. Most employers choose onsite training: our trainer comes to your warehouse or job site anywhere in the Fresno area and certifies your crew on the equipment they use every day. Call us to schedule a class or request a quote for onsite training.",
     seo: {
       title: "Forklift Training in Fresno",
       description: "OSHA-aligned forklift certification in Fresno. In-person at our facility or on-site at your location.",
@@ -171,6 +184,8 @@ export const locations: Record<LocationSlug, TrainingLocation> = {
         "Elevador de Tijera",
         "Elevador Aéreo/de Pluma",
       ],
+      about:
+        "Nuestra ubicación de capacitación en Fresno, en 3515 N. Sabre Drive, ofrece clases prácticas de montacargas con cita previa, con certificado y tarjeta de billetera el mismo día. La mayoría de los empleadores eligen la capacitación en sitio: nuestro instructor va a su almacén o lugar de trabajo en cualquier parte del área de Fresno y certifica a su equipo en el equipo que usan todos los días. Llámenos para programar una clase o solicite una cotización para capacitación en sitio.",
       seo: {
         title: "Capacitación de Montacargas en Fresno",
         description: "Certificación de montacargas alineada con OSHA en Fresno. Presencial en nuestra instalación o en el sitio de su empresa.",

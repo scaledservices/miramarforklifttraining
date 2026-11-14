@@ -1,5 +1,6 @@
 import { getActiveLocations } from "./locations";
 import { BOOKING_PRODUCT_PRICES } from "./bookingPricing";
+import { socialLinks } from "./social";
 
 export const brand = {
   name: "Miramar Forklift Training",
@@ -46,13 +47,8 @@ export const brand = {
     defaultImage: "/og-miramar.jpg",
   },
 
-  social: {
-    facebook: "",
-    instagram: "",
-    linkedin: "",
-    twitter: "",
-    youtube: "",
-  },
+  // Real URLs live in ./social.ts (footer + JSON-LD sameAs read from there).
+  social: socialLinks,
 
   locations: getActiveLocations().map(l => ({ name: l.displayName, slug: l.slug })),
 
@@ -64,14 +60,17 @@ export const brand = {
   // Display pricing derives from the authoritative charge table in
   // bookingPricing.ts — never hardcode numbers here. LocationPage renders
   // this grid, so it must match what the booking wizard actually charges.
+  // `requires` lists the equipment a package needs; LocationPage hides any
+  // package whose equipment the location does not have (see
+  // shared/config/locationPricing.ts).
   pricing: {
     inPerson: {
-      standard: { name: "Standard Forklift", price: BOOKING_PRODUCT_PRICES["standard-forklift-certification-san-diego"] },
-      scissorAerial: { name: "Scissor Lift + Aerial", price: BOOKING_PRODUCT_PRICES["scissor-aerial-boom-lift-certification-san-diego"] },
-      reachForklift: { name: "Reach Truck + Forklift", price: BOOKING_PRODUCT_PRICES["reach-forklift-training-san-diego"] },
-      orderPickerForklift: { name: "Order Picker + Forklift", price: BOOKING_PRODUCT_PRICES["order-picker-forklift-training-san-diego"] },
-      forkliftScissorEpj: { name: "Forklift + Scissor Lift + EPJ", price: BOOKING_PRODUCT_PRICES["forklift-scissor-lift-epj-certification-san-diego"] },
-      fullMultiEquipment: { name: "Full Multi-Equipment", price: BOOKING_PRODUCT_PRICES["complete-equipment-certification-san-diego"] },
+      standard: { name: "Standard Forklift", price: BOOKING_PRODUCT_PRICES["standard-forklift-certification-san-diego"], requires: ["counterbalance"] },
+      scissorAerial: { name: "Scissor Lift + Aerial", price: BOOKING_PRODUCT_PRICES["scissor-aerial-boom-lift-certification-san-diego"], requires: ["scissor", "aerial"] },
+      reachForklift: { name: "Reach Truck + Forklift", price: BOOKING_PRODUCT_PRICES["reach-forklift-training-san-diego"], requires: ["reach", "counterbalance"] },
+      orderPickerForklift: { name: "Order Picker + Forklift", price: BOOKING_PRODUCT_PRICES["order-picker-forklift-training-san-diego"], requires: ["orderPicker", "counterbalance"] },
+      forkliftScissorEpj: { name: "Forklift + Scissor Lift + EPJ", price: BOOKING_PRODUCT_PRICES["forklift-scissor-lift-epj-certification-san-diego"], requires: ["counterbalance", "scissor", "epj"] },
+      fullMultiEquipment: { name: "Full Multi-Equipment", price: BOOKING_PRODUCT_PRICES["complete-equipment-certification-san-diego"], requires: ["counterbalance", "scissor", "orderPicker", "reach", "epj"] },
     },
   },
 

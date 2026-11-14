@@ -1,11 +1,12 @@
 import { brand } from "@shared/config/brand";
 import { getAllLocations } from "@shared/config/locations";
+import { getSameAs } from "@shared/config/social";
 import { SITE_URL } from "./siteUrl";
 
 const BASE_URL = SITE_URL;
 
 export function organizationSchema(locale = "en"): Record<string, unknown> {
-  const sameAs = Object.values(brand.social).filter(Boolean);
+  const sameAs = getSameAs();
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -213,6 +214,7 @@ export function localBusinessSchema(location: {
       name: brand.name,
       url: BASE_URL,
     },
+    ...(getSameAs().length > 0 && { sameAs: getSameAs() }),
     priceRange: "$$",
     inLanguage: location.locale || "en",
   };

@@ -5,10 +5,22 @@ import { storage } from "./storage";
 import type { SeoPage } from "@shared/schema";
 import { brand } from "@shared/config/brand";
 import { industry } from "@shared/config/industry";
+import { getLocation } from "@shared/config/locations";
+import { getSameAs } from "@shared/config/social";
+import { ONLINE_FORKLIFT_COURSE_PRICE, ONLINE_FORKLIFT_COURSE_PRICE_DISPLAY } from "@shared/config/onlinePricing";
 
 const SITE_URL = process.env.SITE_URL || `https://${brand.domain}`;
 const SITE_NAME = brand.name;
 const DEFAULT_OG_IMAGE = brand.og.defaultImage;
+const SAME_AS = getSameAs();
+// Online course display price; the charged price is courses.price (DB).
+const ONLINE_PRICE = ONLINE_FORKLIFT_COURSE_PRICE_DISPLAY;
+
+function locationAbout(slug: string, locale: "en" | "es"): string {
+  const loc = getLocation(slug);
+  if (!loc) return "";
+  return escapeHtml(locale === "es" && loc.es ? loc.es.about : loc.about);
+}
 
 const EN_TO_ES_STATIC_SLUGS: Record<string, string> = {
   "/": "/",
@@ -350,6 +362,7 @@ function buildJsonLd(page: SeoPage, locale: string): Record<string, unknown>[] {
       availableLanguage: ["English", "Spanish"],
     },
     description: brand.description,
+    ...(SAME_AS.length > 0 && { sameAs: SAME_AS }),
     inLanguage: locale,
   });
 
@@ -398,7 +411,7 @@ function buildJsonLd(page: SeoPage, locale: string): Record<string, unknown>[] {
       },
       offers: {
         "@type": "Offer",
-        price: 59.99,
+        price: ONLINE_FORKLIFT_COURSE_PRICE,
         priceCurrency: "USD",
         availability: "https://schema.org/InStock",
       },
@@ -505,9 +518,9 @@ function buildSeoPageBodyHtml(page: SeoPage): string {
     <header>
       <h1>${escapeHtml(page.heroH1)}</h1>
       ${page.heroSubtitle ? `<p>${escapeHtml(page.heroSubtitle)}</p>` : ""}
-      <a href="/online-forklift-certification">Start Certification — $59.99</a>
+      <a href="/online-forklift-certification">Start Certification — ${ONLINE_PRICE}</a>
     </header>
-    ${!isKnowledge ? `<section><div><span>${industry.regulatory.body}-Compliant</span> · <span>${industry.regulatory.standard}</span> · <span>Certificate Included</span> · <span>Same-Day Certification</span> · <span>$59.99</span></div></section>` : ""}
+    ${!isKnowledge ? `<section><div><span>${industry.regulatory.body}-Compliant</span> · <span>${industry.regulatory.standard}</span> · <span>Certificate Included</span> · <span>Same-Day Certification</span> · <span>${ONLINE_PRICE}</span></div></section>` : ""}
     ${page.introParagraph ? `<p>${escapeHtml(page.introParagraph)}</p>` : ""}
     ${isKnowledge ? buildTableOfContents(bodySections, faqs) : ""}
     ${renderBodySectionsHtml(bodySections)}
@@ -516,7 +529,7 @@ function buildSeoPageBodyHtml(page: SeoPage): string {
     <section>
       <h2>${isKnowledge ? "Ready to Get Certified?" : "Get Certified Today"}</h2>
       <p>Complete your ${industry.regulatory.body}-compliant forklift certification online. Same-day certification available.</p>
-      <a href="/online-forklift-certification">Start Certification — $59.99</a>
+      <a href="/online-forklift-certification">Start Certification — ${ONLINE_PRICE}</a>
       ${isKnowledge ? `<a href="/forklift-certification-cost">Learn About Pricing</a>` : ""}
     </section>`;
 }
@@ -524,29 +537,29 @@ function buildSeoPageBodyHtml(page: SeoPage): string {
 const STATIC_PAGE_META: Record<string, { title: string; description: string; h1: string; bodyHtml: string; jsonLd?: Record<string, unknown>[]; noindex?: boolean }> = {
   "/": {
     title: `${brand.name} | ${industry.regulatory.body}-Aligned Forklift Training & Certification`,
-    description: `Get your forklift certification online or at our training facilities. ${industry.regulatory.body}-aligned programs with same-day certification available. Starting at $59.99.`,
+    description: `Get your forklift certification online or at our training facilities. ${industry.regulatory.body}-aligned programs with same-day certification available. Starting at ${ONLINE_PRICE}.`,
     h1: `${industry.regulatory.body}-Aligned Forklift Training & Certification`,
-    bodyHtml: `<p>Get your forklift certification online or at our training facilities. ${industry.regulatory.body}-aligned programs with same-day certification available. Starting at $59.99.</p>
+    bodyHtml: `<p>Get your forklift certification online or at our training facilities. ${industry.regulatory.body}-aligned programs with same-day certification available. Starting at ${ONLINE_PRICE}.</p>
       <ul><li>Online certification — complete at your own pace</li><li>Same-day certification upon passing</li><li>${industry.regulatory.body}-compliant training (${industry.regulatory.standard})</li><li>Digital certificate with QR verification</li></ul>
-      <p><a href="/online-forklift-certification">Start Certification — $59.99</a></p>`,
+      <p><a href="/online-forklift-certification">Start Certification — ${ONLINE_PRICE}</a></p>`,
   },
   "/online-forklift-certification": {
-    title: `Online Forklift Certification — ${industry.regulatory.body}-Compliant Training | $59.99`,
+    title: `Online Forklift Certification — ${industry.regulatory.body}-Compliant Training | ${ONLINE_PRICE}`,
     description: `Complete your forklift operator certification online. ${industry.regulatory.body}-compliant training with same-day certification. Includes digital certificate with QR verification.`,
     h1: "Online Forklift Certification",
     bodyHtml: `<p>Complete your forklift operator certification online with our ${industry.regulatory.body}-compliant training program. Our comprehensive 8-module course covers all topics required by ${industry.regulatory.standard}, including pre-operation inspections, load handling, stability, pedestrian safety, and workplace hazards.</p>
       <h2>What's Included</h2>
       <ul><li>8-module ${industry.regulatory.body}-compliant training course</li><li>Final certification exam (up to 3 attempts)</li><li>Digital certificate with QR verification code</li><li>Employer documentation packet</li><li>Lifetime access to course materials</li></ul>
       <h2>How It Works</h2>
-      <ol><li>Sign up and purchase the course for $59.99</li><li>Complete 8 training modules at your own pace</li><li>Pass the final exam with 80% or higher</li><li>Download your certificate immediately</li><li>Your employer completes the hands-on evaluation</li></ol>
-      <p><a href="/online-forklift-certification">Start Certification — $59.99</a></p>`,
+      <ol><li>Sign up and purchase the course for ${ONLINE_PRICE}</li><li>Complete 8 training modules at your own pace</li><li>Pass the final exam with 80% or higher</li><li>Download your certificate immediately</li><li>Your employer completes the hands-on evaluation</li></ol>
+      <p><a href="/online-forklift-certification">Start Certification — ${ONLINE_PRICE}</a></p>`,
     jsonLd: [{
       "@context": "https://schema.org",
       "@type": "Course",
       name: "Online Forklift Operator Certification",
       description: `${industry.regulatory.body}-compliant online forklift operator certification training. Complete at your own pace with same-day certification.`,
       provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-      offers: { "@type": "Offer", price: 59.99, priceCurrency: "USD", availability: "https://schema.org/InStock" },
+      offers: { "@type": "Offer", price: ONLINE_FORKLIFT_COURSE_PRICE, priceCurrency: "USD", availability: "https://schema.org/InStock" },
     }],
   },
   "/training-programs": {
@@ -554,7 +567,7 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; h1:
     description: `Explore our forklift training programs: online certification, in-person training, and train-the-trainer programs. ${industry.regulatory.body}-compliant with flexible scheduling.`,
     h1: "Forklift Training Programs",
     bodyHtml: `<p>Explore our forklift training programs designed to meet ${industry.regulatory.body} requirements. Whether you prefer online learning or hands-on instruction, we have a program for you.</p>
-      <ul><li>Online Certification — Self-paced, $59.99</li><li>In-Person Training — Hands-on instruction at our facilities</li><li>Train-the-Trainer — Become a certified forklift instructor</li><li>Group Training — Volume pricing for businesses</li></ul>`,
+      <ul><li>Online Certification — Self-paced, ${ONLINE_PRICE}</li><li>In-Person Training — Hands-on instruction at our facilities</li><li>Train-the-Trainer — Become a certified forklift instructor</li><li>Group Training — Volume pricing for businesses</li></ul>`,
   },
   "/online-training": {
     title: `Online Forklift Training — Self-Paced Certification | ${brand.name}`,
@@ -679,32 +692,32 @@ const STATIC_PAGE_META: Record<string, { title: string; description: string; h1:
     title: `Forklift Training in San Diego | ${brand.name}`,
     description: `Get certified at our San Diego training facility. Hands-on ${industry.regulatory.body}-aligned forklift certification with same-day results available.`,
     h1: "Forklift Training in San Diego",
-    bodyHtml: `<p>Our San Diego training facility offers comprehensive hands-on forklift certification programs. Training available in English and Spanish.</p>`,
+    bodyHtml: `<p>${locationAbout("san-diego", "en")}</p><p>Training available in English and Spanish.</p>`,
   },
   "/locations/las-vegas": {
     title: `Forklift Training in Las Vegas | ${brand.name}`,
-    description: `Get certified at our Las Vegas training facility. Full range of ${industry.regulatory.body}-aligned operator certifications and Train the Trainer programs.`,
+    description: `Onsite forklift training anywhere in the Las Vegas area, plus hands-on classes at our Las Vegas training center. ${industry.regulatory.body}-aligned, with a same-day certificate and wallet card.`,
     h1: "Forklift Training in Las Vegas",
-    bodyHtml: `<p>Our Las Vegas training facility offers a full range of forklift certification programs including operator certifications and Train the Trainer courses.</p>`,
+    bodyHtml: `<p>${locationAbout("las-vegas", "en")}</p>`,
   },
   "/locations/fresno": {
     title: `Forklift Training in Fresno | ${brand.name}`,
     description: `Get certified at our Fresno, CA training location. ${industry.regulatory.body}-aligned hands-on forklift operator certification with same-day results.`,
     h1: "Forklift Training in Fresno",
-    bodyHtml: `<p>Our Fresno training location brings professional forklift certification to Central California. Training available in English and Spanish.</p>`,
+    bodyHtml: `<p>${locationAbout("fresno", "en")}</p><p>Training available in English and Spanish.</p>`,
   },
 };
 
 const STATIC_PAGE_META_ES: Record<string, { title: string; description: string; h1: string; bodyHtml: string; jsonLd?: Record<string, unknown>[]; noindex?: boolean }> = {
   "/": {
     title: `${brand.name} | Capacitación y Certificación de Montacargas Alineada con ${industry.regulatory.body}`,
-    description: `Obtén tu certificación de montacargas en línea o en nuestras instalaciones. Programas alineados con ${industry.regulatory.body} con certificación el mismo día. Desde $59.99.`,
+    description: `Obtén tu certificación de montacargas en línea o en nuestras instalaciones. Programas alineados con ${industry.regulatory.body} con certificación el mismo día. Desde ${ONLINE_PRICE}.`,
     h1: `Capacitación y Certificación de Montacargas Alineada con ${industry.regulatory.body}`,
-    bodyHtml: `<p>Obtén tu certificación de montacargas en línea o en nuestras instalaciones. Programas alineados con ${industry.regulatory.body} con certificación el mismo día. Desde $59.99.</p>
+    bodyHtml: `<p>Obtén tu certificación de montacargas en línea o en nuestras instalaciones. Programas alineados con ${industry.regulatory.body} con certificación el mismo día. Desde ${ONLINE_PRICE}.</p>
       <ul><li>Certificación en línea — completa a tu propio ritmo</li><li>Certificación el mismo día al aprobar</li><li>Capacitación conforme a ${industry.regulatory.body} (${industry.regulatory.standard})</li><li>Certificado digital con verificación QR</li></ul>`,
   },
   "/online-forklift-certification": {
-    title: `Certificación de Montacargas en Línea — Capacitación Conforme a ${industry.regulatory.body} | $59.99`,
+    title: `Certificación de Montacargas en Línea — Capacitación Conforme a ${industry.regulatory.body} | ${ONLINE_PRICE}`,
     description: `Completa tu certificación de operador de montacargas en línea. Capacitación conforme a ${industry.regulatory.body} con certificación el mismo día. Incluye certificado digital con verificación QR.`,
     h1: "Certificación de Montacargas en Línea",
     bodyHtml: `<p>Completa tu certificación de operador de montacargas en línea con nuestro programa de capacitación conforme a ${industry.regulatory.body}.</p>`,
@@ -715,7 +728,7 @@ const STATIC_PAGE_META_ES: Record<string, { title: string; description: string; 
       description: `Capacitación de certificación de operador de montacargas en línea conforme a ${industry.regulatory.body}. Completa a tu ritmo con certificación el mismo día.`,
       inLanguage: "es",
       provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-      offers: { "@type": "Offer", price: 59.99, priceCurrency: "USD", availability: "https://schema.org/InStock" },
+      offers: { "@type": "Offer", price: ONLINE_FORKLIFT_COURSE_PRICE, priceCurrency: "USD", availability: "https://schema.org/InStock" },
     }],
   },
   "/training-programs": {
@@ -845,19 +858,19 @@ const STATIC_PAGE_META_ES: Record<string, { title: string; description: string; 
     title: `Capacitación de Montacargas en San Diego | ${brand.name}`,
     description: `Certifícate en nuestras instalaciones de capacitación en San Diego. Certificación práctica de montacargas alineada con ${industry.regulatory.body} con resultados el mismo día.`,
     h1: "Capacitación de Montacargas en San Diego",
-    bodyHtml: `<p>Nuestras instalaciones de capacitación en San Diego ofrecen programas completos de certificación práctica de montacargas. Capacitación disponible en inglés y español.</p>`,
+    bodyHtml: `<p>${locationAbout("san-diego", "es")}</p><p>Capacitación disponible en inglés y español.</p>`,
   },
   "/locations/las-vegas": {
     title: `Capacitación de Montacargas en Las Vegas | ${brand.name}`,
-    description: `Certifícate en nuestras instalaciones de capacitación en Las Vegas. Certificaciones de operador alineadas con ${industry.regulatory.body} y programas de capacitar al capacitador.`,
+    description: `Capacitación de montacargas en sitio en cualquier parte del área de Las Vegas, además de clases prácticas en nuestro centro de capacitación en Las Vegas. Alineada con ${industry.regulatory.body}, con certificado y tarjeta de billetera el mismo día.`,
     h1: "Capacitación de Montacargas en Las Vegas",
-    bodyHtml: `<p>Nuestras instalaciones en Las Vegas ofrecen una gama completa de programas de certificación de montacargas incluyendo certificaciones de operador y cursos de capacitar al capacitador.</p>`,
+    bodyHtml: `<p>${locationAbout("las-vegas", "es")}</p>`,
   },
   "/locations/fresno": {
     title: `Capacitación de Montacargas en Fresno | ${brand.name}`,
     description: `Certifícate en nuestra ubicación de capacitación en Fresno, CA. Certificación práctica de operador de montacargas alineada con ${industry.regulatory.body} con resultados el mismo día.`,
     h1: "Capacitación de Montacargas en Fresno",
-    bodyHtml: `<p>Nuestra ubicación de capacitación en Fresno lleva certificación profesional de montacargas al centro de California. Capacitación disponible en inglés y español.</p>`,
+    bodyHtml: `<p>${locationAbout("fresno", "es")}</p><p>Capacitación disponible en inglés y español.</p>`,
   },
 };
 
@@ -901,6 +914,7 @@ export function registerSsrMiddleware(app: Express) {
               availableLanguage: ["English", "Spanish"],
             },
             description: brand.description,
+            ...(SAME_AS.length > 0 && { sameAs: SAME_AS }),
             inLanguage: locale,
           };
 

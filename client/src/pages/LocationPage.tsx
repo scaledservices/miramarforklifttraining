@@ -5,6 +5,7 @@ import SEOHead from "@/components/seo/SEOHead";
 import { brand } from "@shared/config/brand";
 import { industry } from "@shared/config/industry";
 import { getLocation } from "@shared/config/locations";
+import { getLocationPricingPackages } from "@shared/config/locationPricing";
 import { localBusinessSchema } from "@/components/seo/StructuredData";
 import { MapPin, Phone, Clock, Globe, CheckCircle, Award, Users, Shield, Construction } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -64,6 +65,10 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
   const seo = isEs && loc.es ? loc.es.seo : loc.seo;
   const equipmentTypes = isEs && loc.es ? loc.es.equipmentTypes : loc.equipmentTypes;
   const hours = isEs && loc.es ? loc.es.hours : loc.hours;
+  const aboutText = isEs && loc.es ? loc.es.about : loc.about;
+  // Only packages whose equipment this location actually has (LV has no
+  // scissor/aerial, so those bundles are hidden there).
+  const pricingPackages = getLocationPricingPackages(loc);
   const pricingNameEs: Record<string, string> = {
     standard: "Montacargas Estándar",
     scissorAerial: "Elevador de Tijera + Aéreo",
@@ -107,7 +112,7 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                   {t(`${i18nPrefix}.aboutTitle`, { defaultValue: t("location.aboutTitleGeneric", { city: loc.city, defaultValue: L(`About Our ${loc.city} Training Center`, `Acerca de Nuestro Centro de Capacitación en ${loc.city}`) }) })}
                 </h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  {t(`${i18nPrefix}.aboutDesc`, { brand: brand.name, body: industry.regulatory.body, address: loc.address.full, defaultValue: t("location.aboutDescGeneric", { brand: brand.name, city: loc.city, defaultValue: L(`${brand.name} offers forklift training in ${loc.city}.`, `${brand.name} ofrece capacitación de montacargas en ${loc.city}.`) }) })}
+                  {t(`${i18nPrefix}.aboutDesc`, { brand: brand.name, body: industry.regulatory.body, address: loc.address.full, defaultValue: aboutText })}
                 </p>
               </div>
 
@@ -125,14 +130,14 @@ export default function LocationPage({ location: slug }: LocationPageProps) {
                 </div>
               </div>
 
-              {loc.supportsInPerson && (
+              {loc.supportsInPerson && pricingPackages.length > 0 && (
                 <div>
                   <h2 className="text-2xl font-bold tracking-tight mb-4" data-testid="text-pricing-title">
                     {t(`${i18nPrefix}.pricingTitle`, { defaultValue: t("location.pricingTitleDefault", { defaultValue: "Pricing" }) })}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {Object.entries(brand.pricing.inPerson).map(([courseKey, course]) => (
-                      <div key={course.name} className="flex items-center justify-between bg-card border rounded-lg px-4 py-3">
+                    {pricingPackages.map(({ key: courseKey, ...course }) => (
+                      <div key={course.name} data-testid={`pricing-package-${courseKey}`} className="flex items-center justify-between bg-card border rounded-lg px-4 py-3">
                         <span className="text-sm font-medium">{t(`location.pricingNames.${courseKey}`, { defaultValue: L(course.name, pricingNameEs[courseKey] ?? course.name) })}</span>
                         <span className="text-sm font-bold text-brand-orange">${course.price}</span>
                       </div>

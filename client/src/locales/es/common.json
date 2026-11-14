@@ -220,7 +220,8 @@
     "requestQuote": "Solicitar una Cotización",
     "referralProgram": "Programa de Referidos",
     "serviceAreas": "Áreas de Servicio",
-    "onsiteCity": "Capacitación en Sitio {{city}}"
+    "onsiteCity": "Capacitación en Sitio {{city}}",
+    "socialLink": "{{brand}} en {{network}}"
   },
   "badges": {
     "oshaAligned": "Alineado con OSHA",

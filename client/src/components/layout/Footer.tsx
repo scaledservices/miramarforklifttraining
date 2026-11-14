@@ -1,11 +1,19 @@
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin, Instagram, Linkedin, Facebook, type LucideIcon } from "lucide-react";
 import Logo from "@/components/ui/Logo";
 import { brand } from "@shared/config/brand";
+import { getSocialProfiles, type SocialNetwork } from "@shared/config/social";
+
+const SOCIAL_META: Record<SocialNetwork, { icon: LucideIcon; label: string }> = {
+  instagram: { icon: Instagram, label: "Instagram" },
+  linkedin: { icon: Linkedin, label: "LinkedIn" },
+  facebook: { icon: Facebook, label: "Facebook" },
+};
 
 export default function Footer() {
   const { t } = useTranslation();
+  const socialProfiles = getSocialProfiles();
 
   return (
     <footer className="bg-brand-dark text-white" data-testid="footer">
@@ -18,6 +26,28 @@ export default function Footer() {
             <p className="text-sm opacity-80 leading-relaxed">
               {t("footer.description")}
             </p>
+            {socialProfiles.length > 0 && (
+              <ul className="flex items-center gap-3 mt-5" data-testid="footer-social">
+                {socialProfiles.map(({ network, url }) => {
+                  const { icon: Icon, label } = SOCIAL_META[network];
+                  return (
+                    <li key={network}>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={t("footer.socialLink", { network: label, brand: brand.name, defaultValue: "{{brand}} on {{network}}" })}
+                        title={label}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 opacity-80 transition hover:opacity-100 hover:bg-white/20"
+                        data-testid={`footer-social-${network}`}
+                      >
+                        <Icon className="h-4 w-4" aria-hidden="true" />
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
           <div>

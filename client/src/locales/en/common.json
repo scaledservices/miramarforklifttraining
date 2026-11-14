@@ -220,7 +220,8 @@
     "requestQuote": "Request a Quote",
     "referralProgram": "Referral Program",
     "serviceAreas": "Service Areas",
-    "onsiteCity": "Onsite Training {{city}}"
+    "onsiteCity": "Onsite Training {{city}}",
+    "socialLink": "{{brand}} on {{network}}"
   },
   "badges": {
     "oshaAligned": "OSHA-Aligned",

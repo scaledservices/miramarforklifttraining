@@ -2,6 +2,7 @@ import { Express, Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { isAdminRole } from "@shared/roles";
 import { brand } from "@shared/config/brand";
+import { ONLINE_FORKLIFT_COURSE_PRICE_DISPLAY } from "@shared/config/onlinePricing";
 import { GENERATED_CITY_SLUGS } from "../client/src/data/serviceAreaCityFacts";
 import { legacyRedirectMiddleware } from "./legacy-redirects";
 
@@ -514,7 +515,7 @@ async function buildRelatedLinks(page: any, locale: string) {
 
   hubLinks.push({
     slug: "online-forklift-certification",
-    label: locale === "es" ? "Certifícate en Línea — $59.99" : "Get Certified Online — $59.99",
+    label: locale === "es" ? `Certifícate en Línea — ${ONLINE_FORKLIFT_COURSE_PRICE_DISPLAY}` : `Get Certified Online — ${ONLINE_FORKLIFT_COURSE_PRICE_DISPLAY}`,
     type: "cta",
     isExternal: false,
   });

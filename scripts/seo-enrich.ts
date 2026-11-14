@@ -91,7 +91,7 @@ async function enrichPages() {
         type: "step_list",
         heading: "How to Get Certified Online",
         steps: [
-          { title: "Sign Up & Purchase", description: `Create your account and enroll in the certification course for $59.99. Available to all ${page.state} residents.` },
+          { title: "Sign Up & Purchase", description: `Create your account and enroll in the certification course for $45. Available to all ${page.state} residents.` },
           { title: "Complete 8 Training Modules", description: "Work through lessons covering pre-operation inspections, load handling, stability, pedestrian safety, parking procedures, and OSHA regulations." },
           { title: "Pass the Final Exam", description: "Score 80% or higher on the certification exam. You get up to 3 attempts and can review materials between tries." },
           { title: "Download Your Certificate", description: "Get your digital certificate immediately. It includes a QR code that employers can scan to verify your certification." },
@@ -113,7 +113,7 @@ async function enrichPages() {
 
     const newFaqs = [
       { q: `Is forklift certification required in ${page.state}?`, a: `Yes. Federal OSHA Standard 29 CFR 1910.178 requires forklift operator training nationwide, including ${page.state}. Employers must ensure all operators are properly trained and certified before authorizing them to operate powered industrial trucks. ${ctx.facts}.` },
-      { q: `How much does forklift certification cost in ${page.state}?`, a: `Our online certification is $59.99 — available to all ${page.state} residents. This is typically less expensive than in-person training programs in ${page.state} which range from $150-$300. The fee includes the full course, certification exam, digital certificate, and employer documentation kit.` },
+      { q: `How much does forklift certification cost in ${page.state}?`, a: `Our online certification is $45 — available to all ${page.state} residents. This is typically less expensive than in-person training programs in ${page.state} which range from $150-$300. The fee includes the full course, certification exam, digital certificate, and employer documentation kit.` },
       { q: `Can I use an online forklift certification in ${page.state}?`, a: `Yes. OSHA does not mandate a specific format for the formal instruction component. Online training is accepted throughout ${page.state} as long as it covers all required topics, which our program does. Your employer must still conduct the hands-on practical evaluation at your worksite.` },
       { q: `What industries hire forklift operators in ${page.state}?`, a: `${page.state} has strong demand for certified forklift operators in ${ctx.industries}. Having your certification ready makes you more competitive in the ${page.state} job market.` },
       { q: `How long is forklift certification valid in ${page.state}?`, a: `OSHA requires re-evaluation of forklift operators at least every three years. This applies in ${page.state} and all other states. Additionally, refresher training is needed after accidents, observed unsafe behavior, or changes in workplace conditions.` },
@@ -149,7 +149,7 @@ async function enrichPages() {
         items: [
           `No need to travel to a training center in ${page.city} — complete your certification from home or office`,
           "Available 24/7 — study at your own pace with no scheduling conflicts",
-          "Same OSHA-compliant content as in-person courses at a fraction of the cost ($59.99 vs. $150-$300)",
+          "Same OSHA-compliant content as in-person courses at a fraction of the cost ($45 vs. $150-$300)",
           `Certificate recognized by all ${page.city} area employers under federal OSHA standards`,
           "Employer documentation kit included for the hands-on evaluation your employer must complete",
           `Lifetime access to course materials for refresher training as required by your ${page.city} employer`,
@@ -159,7 +159,7 @@ async function enrichPages() {
         type: "step_list",
         heading: `How to Get Forklift Certified in ${page.city}`,
         steps: [
-          { title: "Enroll Online", description: `Sign up from anywhere in ${page.city} and purchase the certification course for $59.99. No travel required.` },
+          { title: "Enroll Online", description: `Sign up from anywhere in ${page.city} and purchase the certification course for $45. No travel required.` },
           { title: "Complete 8 Modules", description: "Work through comprehensive lessons covering vehicle inspections, load handling, stability principles, pedestrian safety, and OSHA regulations." },
           { title: "Pass the Exam", description: "Score 80% or higher on the final certification exam. Three attempts included with full course review between tries." },
           { title: "Get Your Certificate", description: "Download your digital certificate with QR verification code immediately upon passing. Employers can verify it instantly." },
@@ -182,7 +182,7 @@ async function enrichPages() {
 
     const newFaqs = [
       { q: `Where can I get forklift certified in ${page.city}?`, a: `You can complete your forklift certification online from anywhere in ${page.city}. Our OSHA-compliant program is available 24/7, so you can train at your convenience without traveling to a physical training center.` },
-      { q: `How much does forklift certification cost in ${page.city}?`, a: `Our online certification is $59.99 — the same affordable price regardless of your location. In-person training centers in ${page.city} typically charge $150-$300 for comparable OSHA-compliant training.` },
+      { q: `How much does forklift certification cost in ${page.city}?`, a: `Our online certification is $45 — the same affordable price regardless of your location. In-person training centers in ${page.city} typically charge $150-$300 for comparable OSHA-compliant training.` },
       { q: `Is online forklift certification valid for ${page.city} employers?`, a: `Yes. OSHA certification requirements are federal and apply uniformly. ${page.city} employers accept online formal instruction as part of the three-component certification process required by 29 CFR 1910.178.` },
       { q: `What industries in ${page.city} hire forklift operators?`, a: `${page.city} has demand for certified operators in ${ctx.industries}. ${ctx.employers}.` },
       { q: `How quickly can I get certified in ${page.city}?`, a: `Most students complete our online course in 4-6 hours and receive their certificate the same day. You can start training immediately from your location in ${page.city} — no scheduling or waiting required.` },
