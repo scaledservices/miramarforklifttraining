@@ -940,6 +940,37 @@ export const trainingEvents = pgTable("training_events", {
   index("training_events_import_batch_id_idx").on(table.importBatchId),
 ]);
 
+// Training expenses (2026-11-14, Peter). Costs Alberto incurs to deliver a
+// training (travel, lodging, meals, rentals...). Netted out of new-customer
+// revenue before the commission pool is split, then reimbursed to Alberto.
+// category "none" with amount 0 = "confirmed no expenses" for that training,
+// so the assistant stops asking. orderId is resolved on insert when known.
+export const TRAINING_EXPENSE_CATEGORIES = ["travel", "lodging", "meals", "equipment_rental", "materials", "parking_tolls", "other", "none"] as const;
+
+export const trainingExpenses = pgTable("training_expenses", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").references(() => orders.id),
+  bookingId: integer("booking_id").references(() => bookings.id),
+  trainingEventId: integer("training_event_id").references(() => trainingEvents.id),
+  category: text("category", { enum: [...TRAINING_EXPENSE_CATEGORIES] }).notNull(),
+  description: text("description"),
+  amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
+  incurredOn: date("incurred_on").notNull(),
+  source: text("source", { enum: ["admin", "assistant"] }).notNull().default("admin"),
+  createdByUserId: integer("created_by_user_id").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("training_expenses_order_idx").on(table.orderId),
+  index("training_expenses_booking_idx").on(table.bookingId),
+  index("training_expenses_event_idx").on(table.trainingEventId),
+  index("training_expenses_incurred_idx").on(table.incurredOn),
+  check("training_expenses_amount_check", sql`${table.amount} >= 0`),
+  check("training_expenses_link_check", sql`${table.orderId} is not null or ${table.bookingId} is not null or ${table.trainingEventId} is not null`),
+]);
+
+export type TrainingExpense = typeof trainingExpenses.$inferSelect;
+
 export const insertTrainingEventSchema = createInsertSchema(trainingEvents).omit({ id: true, status: true, createdAt: true, updatedAt: true });
 export type InsertTrainingEvent = z.infer<typeof insertTrainingEventSchema>;
 export type TrainingEvent = typeof trainingEvents.$inferSelect;

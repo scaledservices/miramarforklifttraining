@@ -11,6 +11,7 @@ import {
 } from "@shared/schema";
 import { requireRole } from "./middleware";
 import { loadLegacyIndex, loadOrderOverrides, classifyOrder, setOrderOverride } from "../customerClassification";
+import { loadExpensesForRange } from "./expenses";
 
 // ---------------------------------------------------------------------------
 // Revenue split configuration
@@ -96,6 +97,31 @@ export function computeSplit(principal: number, isNewCustomer: boolean, config: 
   }
   const miramar = roundCents(principal - alberto - scaled);
   return { alberto, scaled, miramar };
+}
+
+/**
+ * Effect of one training expense on the three parties (2026-11-14, Peter).
+ * New-customer order: the expense comes off the top before the commission
+ * pool is split (pool shrinks by amount x pool%), and Alberto is reimbursed
+ * the full amount. Returning-customer order (or no linked order): Alberto is
+ * simply reimbursed out of Miramar's share; his regular commission is
+ * unchanged. Either way the effects sum to 0: expenses move money between
+ * parties, they do not change the revenue collected.
+ */
+export function computeExpenseEffect(amount: number, isNewCustomer: boolean, config: RevenueSplitConfig): PartySplit & { reimbursement: number } {
+  const reimbursement = roundCents(amount);
+  if (isNewCustomer) {
+    const pool = computeSplit(-amount, true, config); // negative shares
+    // The amount taken off the top IS the reimbursement, so Miramar is not
+    // charged again: net effect sums to 0 (a shift, not new cash).
+    return {
+      alberto: roundCents(pool.alberto + reimbursement),
+      scaled: pool.scaled,
+      miramar: pool.miramar,
+      reimbursement,
+    };
+  }
+  return { alberto: reimbursement, scaled: 0, miramar: roundCents(-reimbursement), reimbursement };
 }
 
 // Card surcharges are processing fees, not training revenue. Payments store
@@ -414,9 +440,48 @@ export function registerMoneyRoutes(app: Express) {
         };
       });
 
+      // Training expenses incurred this month (travel, lodging...). See
+      // computeExpenseEffect for how they move each party's total.
+      const expenseRows = await loadExpensesForRange(from, to);
+      let expenseTotal = 0;
+      let reimbursementTotal = 0;
+      const expenseItems = expenseRows
+        .filter((e) => e.category !== "none" && Number(e.amount) > 0)
+        .map((e) => {
+          const amount = roundCents(Number(e.amount));
+          const cls = e.orderId ? classifyOrder(e.orderId, e.customerEmail, legacyIndex, overrides) : null;
+          const isNewCustomer = cls?.classification === "new";
+          const effect = computeExpenseEffect(amount, isNewCustomer, config);
+          totals.alberto = roundCents(totals.alberto + effect.alberto);
+          totals.scaled = roundCents(totals.scaled + effect.scaled);
+          totals.miramar = roundCents(totals.miramar + effect.miramar);
+          expenseTotal = roundCents(expenseTotal + amount);
+          reimbursementTotal = roundCents(reimbursementTotal + effect.reimbursement);
+          return {
+            expenseId: e.id,
+            date: e.incurredOn,
+            orderId: e.orderId,
+            orderNumber: e.orderNumber,
+            bookingId: e.bookingId,
+            trainingEventId: e.trainingEventId,
+            customerName: e.customerName,
+            category: e.category,
+            description: e.description,
+            source: e.source,
+            amount,
+            isNewCustomer,
+            linkedToOrder: !!e.orderId,
+            split: { alberto: effect.alberto, scaled: effect.scaled, miramar: effect.miramar },
+            reimbursement: effect.reimbursement,
+          };
+        });
+
       return res.json({
         month,
         config,
+        expenseItems,
+        expenseTotals: { expenses: expenseTotal, reimbursedToAlberto: reimbursementTotal },
+        expenseRule: "Expenses on new-customer orders come off the top before the commission pool is split. Alberto is reimbursed every expense.",
         newCustomerRule: "A customer is existing when their email, or their company email domain, is on the imported customer list (Gmail, Yahoo and similar addresses need an exact email match). Everyone else is a new customer, for all of their orders. Any order can be overridden.",
         lineItems,
         totals,

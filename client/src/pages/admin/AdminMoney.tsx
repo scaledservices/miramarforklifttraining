@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { DollarSign, AlertTriangle, CalendarDays, CalendarRange, Wallet, Sun } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import MonthlyStatement from "@/components/admin/money/MonthlyStatement";
+import TrainingExpenses from "@/components/admin/money/TrainingExpenses";
 import SplitConfigEditor from "@/components/admin/money/SplitConfigEditor";
 import { formatMoney, type MoneySummary, type SplitConfigResponse } from "@/components/admin/money/types";
 import { useMoneyInsights } from "@/components/admin/money/useMoneyInsights";
@@ -417,6 +418,8 @@ export default function AdminMoney() {
             </Card>
           </>
         )}
+
+        <TrainingExpenses />
 
         <MonthlyStatement />
 

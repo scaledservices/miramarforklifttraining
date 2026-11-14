@@ -57,6 +57,17 @@ function currentMonth(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 }
 
+export const EXPENSE_LABELS: Record<string, string> = {
+  travel: "Travel / mileage",
+  lodging: "Lodging",
+  meals: "Meals",
+  equipment_rental: "Equipment rental",
+  materials: "Materials",
+  parking_tolls: "Parking / tolls",
+  other: "Other",
+  none: "No expenses",
+};
+
 const PARTY_COLORS: Record<string, string> = {
   alberto: "text-amber-600",
   scaled: "text-blue-600",
@@ -126,6 +137,12 @@ export default function MonthlyStatement() {
               <span>
                 Returning: <span className="font-medium text-foreground">{formatMoney(data.totals.returningRevenue)}</span>
               </span>
+              {(data.expenseTotals?.expenses ?? 0) > 0 && (
+                <span>
+                  Training expenses: <span className="font-medium text-foreground">{formatMoney(data.expenseTotals!.expenses)}</span>
+                  <span className="text-xs"> (reimbursed to Alberto)</span>
+                </span>
+              )}
             </div>
 
             <div>
@@ -181,13 +198,32 @@ export default function MonthlyStatement() {
                           <TableCell className="text-right whitespace-nowrap">{formatMoney(item.split.miramar)}</TableCell>
                         </TableRow>
                       ))}
+                      {(data.expenseItems ?? []).map((e) => (
+                        <TableRow key={`exp-${e.expenseId}`} className="bg-muted/30" data-testid={`row-expense-${e.expenseId}`}>
+                          <TableCell className="whitespace-nowrap">
+                            {new Date(`${e.date}T12:00:00`).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </TableCell>
+                          <TableCell className="whitespace-nowrap">{e.orderNumber ?? "-"}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1.5">
+                              <Badge variant="outline" className="text-xs whitespace-nowrap">Expense</Badge>
+                              <span className="whitespace-nowrap">{EXPENSE_LABELS[e.category] ?? e.category}</span>
+                              {e.description && <span className="text-xs text-muted-foreground truncate max-w-[14rem]">{e.description}</span>}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right whitespace-nowrap font-medium">-{formatMoney(e.amount)}</TableCell>
+                          <TableCell className="text-right whitespace-nowrap">{formatMoney(e.split.alberto)}</TableCell>
+                          <TableCell className="text-right whitespace-nowrap">{formatMoney(e.split.scaled)}</TableCell>
+                          <TableCell className="text-right whitespace-nowrap">{formatMoney(e.split.miramar)}</TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
               )
             )}
 
-            <p className="text-xs text-muted-foreground">{data.newCustomerRule} Card surcharges are excluded.</p>
+            <p className="text-xs text-muted-foreground">{data.newCustomerRule} {data.expenseRule ?? ""} Card surcharges are excluded.</p>
           </>
         )}
       </CardContent>

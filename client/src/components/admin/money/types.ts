@@ -53,7 +53,28 @@ export interface StatementTotals {
   returningRevenue: number;
 }
 
+export interface StatementExpenseItem {
+  expenseId: number;
+  date: string;
+  orderId: number | null;
+  orderNumber: string | null;
+  bookingId: number | null;
+  trainingEventId: number | null;
+  customerName: string | null;
+  category: string;
+  description: string | null;
+  source: "admin" | "assistant";
+  amount: number;
+  isNewCustomer: boolean;
+  linkedToOrder: boolean;
+  split: PartySplit;
+  reimbursement: number;
+}
+
 export interface MonthlyStatementData {
+  expenseItems?: StatementExpenseItem[];
+  expenseTotals?: { expenses: number; reimbursedToAlberto: number };
+  expenseRule?: string;
   month: string;
   config: RevenueSplitConfig;
   newCustomerRule: string;

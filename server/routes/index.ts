@@ -20,6 +20,7 @@ import { registerQuoteRoutes } from "./quotes";
 import { registerAuthorizeNetRoutes } from "./authorizeNet";
 import { registerTodayRoutes } from "./today";
 import { registerMoneyRoutes } from "./money";
+import { registerExpenseRoutes } from "./expenses";
 import { registerDiscountRoutes } from "./discounts";
 import { registerReferralRoutes } from "./referrals";
 import { registerGeoRoutes } from "./geo";
@@ -86,6 +87,7 @@ export async function registerRoutes(
   registerAuthorizeNetRoutes(app);
   registerTodayRoutes(app);
   registerMoneyRoutes(app);
+  registerExpenseRoutes(app);
   registerDiscountRoutes(app);
   registerReferralRoutes(app);
   registerGeoRoutes(app);
