@@ -114,7 +114,7 @@ const strings: Record<string, EmailStrings> = {
     bookingConfirmation: {
       subject: "Booking Confirmed - {{bookingNumber}}",
       heading: "Booking Confirmed!",
-      body: "Your on-site training session has been booked. Here are your details:",
+      body: "Your hands-on training class has been booked. Here are your details:",
       bookingNumber: "Booking Number",
       trainingType: "Training Type",
       date: "Date",
@@ -135,7 +135,7 @@ const strings: Record<string, EmailStrings> = {
     bookingCancellation: {
       subject: "Booking Cancelled - {{bookingNumber}}",
       heading: "Booking Cancelled",
-      body: "Your on-site training booking has been cancelled. Here are the details of the cancelled session:",
+      body: "Your hands-on training booking has been cancelled. Here are the details of the cancelled class:",
       refundNote: "If you were charged, a refund will be processed according to our cancellation policy. Please allow 5-10 business days for the refund to appear on your statement.",
       cta: "Book Another Session",
       footer: "If you have any questions about this cancellation, please contact our team.",
@@ -143,7 +143,7 @@ const strings: Record<string, EmailStrings> = {
     bookingConfirmed: {
       subject: "Training Confirmed - {{bookingNumber}}",
       heading: "Your Training is Confirmed!",
-      body: "Great news — your on-site training session has been confirmed by our team. Here are the details:",
+      body: "Great news: your hands-on training class has been confirmed by our team. Here are the details:",
       whatToPrepare: "What to Prepare",
       prepareArea: "Ensure the training area is clear and accessible for {{participantCount}} participant(s)",
       prepareParticipants: "Have all participants available at the scheduled time",
@@ -154,7 +154,7 @@ const strings: Record<string, EmailStrings> = {
       subject: "Training Complete - {{bookingNumber}}",
       heading: "Training Complete!",
       greeting: "Hi {{contactName}},",
-      body: "Thank you for choosing {{brandName}} for your on-site training. Your session on <strong>{{sessionDate}}</strong> ({{trainingType}}) for {{participantCount}} participant(s) has been marked as complete.",
+      body: "Thank you for choosing {{brandName}} for your hands-on training. Your session on <strong>{{sessionDate}}</strong> ({{trainingType}}) for {{participantCount}} participant(s) has been marked as complete.",
       nextSteps: "Next Steps",
       certsDashboard: "Certificates will be available in each participant's dashboard",
       walletCards: "Physical wallet cards can be ordered from the certificate page",
@@ -397,7 +397,7 @@ const strings: Record<string, EmailStrings> = {
     bookingConfirmation: {
       subject: "Reserva Confirmada - {{bookingNumber}}",
       heading: "¡Reserva Confirmada!",
-      body: "Tu sesión de capacitación en sitio ha sido reservada. Aquí están tus detalles:",
+      body: "Su clase de capacitación práctica ha sido reservada. Aquí están sus detalles:",
       bookingNumber: "Número de Reserva",
       trainingType: "Tipo de Capacitación",
       date: "Fecha",
@@ -418,7 +418,7 @@ const strings: Record<string, EmailStrings> = {
     bookingCancellation: {
       subject: "Reserva Cancelada - {{bookingNumber}}",
       heading: "Reserva Cancelada",
-      body: "Tu reserva de capacitación en sitio ha sido cancelada. Aquí están los detalles de la sesión cancelada:",
+      body: "Su reserva de capacitación práctica ha sido cancelada. Aquí están los detalles de la clase cancelada:",
       refundNote: "Si se te cobró, un reembolso será procesado de acuerdo con nuestra política de cancelación. Por favor permite 5-10 días hábiles para que el reembolso aparezca en tu estado de cuenta.",
       cta: "Reservar Otra Sesión",
       footer: "Si tienes alguna pregunta sobre esta cancelación, por favor contacta a nuestro equipo.",
@@ -426,7 +426,7 @@ const strings: Record<string, EmailStrings> = {
     bookingConfirmed: {
       subject: "Capacitación Confirmada - {{bookingNumber}}",
       heading: "¡Tu Capacitación Está Confirmada!",
-      body: "Excelentes noticias — tu sesión de capacitación en sitio ha sido confirmada por nuestro equipo. Aquí están los detalles:",
+      body: "Excelentes noticias: su clase de capacitación práctica ha sido confirmada por nuestro equipo. Aquí están los detalles:",
       whatToPrepare: "Qué Preparar",
       prepareArea: "Asegúrese de que el área de capacitación esté despejada y accesible para {{participantCount}} participante(s)",
       prepareParticipants: "Tenga a todos los participantes disponibles a la hora programada",
@@ -437,7 +437,7 @@ const strings: Record<string, EmailStrings> = {
       subject: "Capacitación Completada - {{bookingNumber}}",
       heading: "¡Capacitación Completada!",
       greeting: "Hola {{contactName}},",
-      body: "Gracias por elegir {{brandName}} para tu capacitación en sitio. Tu sesión del <strong>{{sessionDate}}</strong> ({{trainingType}}) para {{participantCount}} participante(s) ha sido marcada como completada.",
+      body: "Gracias por elegir {{brandName}} para su capacitación práctica. Su clase del <strong>{{sessionDate}}</strong> ({{trainingType}}) para {{participantCount}} participante(s) ha sido marcada como completada.",
       nextSteps: "Próximos Pasos",
       certsDashboard: "Los certificados estarán disponibles en el panel de cada participante",
       walletCards: "Las tarjetas físicas de billetera pueden ordenarse desde la página del certificado",
