@@ -721,7 +721,7 @@ export async function sendBookingAdminNotification(params: {
     },
     html: wrap(loc, `
       <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New Training Booking</h2>
-      <p>A new on-site training session has been booked. Review the details below:</p>
+      <p>A new hands-on training class has been booked. Review the details below:</p>
       <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Booking Number</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
         <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer Name</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactName}</td></tr>
@@ -1176,7 +1176,7 @@ export async function sendBookingAdminNotificationToAll(params: {
       payload: params,
       html: wrap(loc, `
         <h2 style="color: ${theme.email.headingColor}; font-family: ${theme.email.headingFont}; margin-top: 0;">New Training Booking</h2>
-        <p>A new on-site training session has been booked. Review the details below:</p>
+        <p>A new hands-on training class has been booked. Review the details below:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Booking Number</td><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">${params.bookingNumber}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: ${theme.colors.text.muted};">Customer Name</td><td style="padding: 8px; border-bottom: 1px solid #eee;">${params.contactName}</td></tr>
