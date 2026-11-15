@@ -10,7 +10,8 @@ import { generateCertificatePdf } from "../certificate-pdf";
 import { resolveLocale } from "../locale-resolver";
 import { requireAuth, requireRole } from "./middleware";
 import { db } from "../db";
-import { computeBookingPrice, BOOKING_DEPOSIT_RATE } from "@shared/config/bookingPricing";
+import { computeBookingPrice, BOOKING_DEPOSIT_RATE, BOOKING_PRODUCT_PRICES } from "@shared/config/bookingPricing";
+import { slugsNotInArea, slugsInDisplayString } from "@shared/booking-city";
 import { validateDiscountCode, computeDiscountAmount, recordDiscountRedemption } from "./discounts";
 import { createTransactionFromNonce, isAuthorizeNetConfigured, calculateCardSurcharge } from "../authorizeNetClient";
 import { isAdminRole } from "@shared/roles";
@@ -147,6 +148,20 @@ app.post("/api/bookings", requireAuth, async (req: Request, res: Response) => {
 
     const area = await storage.getServiceAreaById(serviceAreaId);
     if (!area) return res.status(404).json({ error: "Service area not found" });
+
+    // City guard (LV-1116-02): every product must be the selected city's
+    // version. Checks the priced productSlugs array and any catalog slugs in
+    // the joined display string persisted as bookings.productSlug.
+    {
+      const requested = [
+        ...(Array.isArray(req.body.productSlugs) ? req.body.productSlugs.filter((s: unknown) => typeof s === "string") : []),
+        ...(typeof productSlug === "string" ? slugsInDisplayString(productSlug, BOOKING_PRODUCT_PRICES) : []),
+      ];
+      const wrongCity = slugsNotInArea(requested, area.slug);
+      if (wrongCity.length > 0) {
+        return res.status(400).json({ error: `The selected training (${wrongCity.join(", ")}) is not offered in ${area.name}. Please choose a program for this city.` });
+      }
+    }
 
     const rules = area.availabilityRules as any;
     if (!rules || !rules.daysOfWeek || !rules.timeSlots) {
