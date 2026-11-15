@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { useTranslation } from "react-i18next";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useQueries, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +17,11 @@ import AttendeeNamesForm from "@/components/booking/AttendeeNamesForm";
 import CardPaymentSection from "@/components/checkout/CardPaymentSection";
 import { computeBookingPrice, BOOKING_DEPOSIT_RATE, CARD_SURCHARGE_RATE } from "@shared/config/bookingPricing";
 import { trackEvent } from "@/lib/analytics";
+import {
+  summarizeClassDays, formatClassDays, formatClassDate, localIsoDate, addDaysIso,
+  validateNoDateLead, buildNoDateLeadPayload,
+} from "@shared/booking-availability";
+import { remapProductsToFacility, slugsNotInArea } from "@shared/booking-city";
 import {
   formatUsPhone,
   isValidUsPhone,
@@ -34,7 +39,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   MapPin, Calendar, Clock, Users, ChevronRight, ChevronLeft,
   CheckCircle, Loader2, AlertCircle, Phone, Mail, Building2,
-  ClipboardList, Shield, Minus, Plus,
+  ClipboardList, Shield, Minus, Plus, Award, CalendarX,
 } from "lucide-react";
 
 type Step = 1 | 2 | 3 | 4;
@@ -159,6 +164,8 @@ export default function BookTraining() {
   const [authFallbackMode, setAuthFallbackMode] = useState<"login" | "register">("login");
 
   const [serviceArea, setServiceArea] = useState<ServiceArea | null>(null);
+  // Programs removed on a city change because the new city doesn't offer them.
+  const [droppedProducts, setDroppedProducts] = useState<Product[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>(() => {
     if (productSlug) {
@@ -227,6 +234,18 @@ export default function BookTraining() {
   const [companyName, setCompanyName] = useState("");
   const [participantCount, setParticipantCount] = useState(1);
   const [specialRequests, setSpecialRequests] = useState("");
+
+  // "None of these dates work" request (2026-11-14): never dead-end a
+  // customer on the calendar. Submits to the existing quote endpoint as a
+  // hands-on class date request at the selected city, so the operator sees it.
+  const [noDateOpen, setNoDateOpen] = useState(false);
+  const [noDateName, setNoDateName] = useState("");
+  const [noDateEmail, setNoDateEmail] = useState("");
+  const [noDatePhone, setNoDatePhone] = useState("");
+  const [noDatePreferred, setNoDatePreferred] = useState("");
+  const [noDatePeople, setNoDatePeople] = useState("1");
+  const [noDateErrors, setNoDateErrors] = useState<string[]>([]);
+  const [noDateSent, setNoDateSent] = useState(false);
 
   const [submitted, setSubmitted] = useState(false);
   const [bookingNumber, setBookingNumber] = useState("");
@@ -346,18 +365,51 @@ export default function BookTraining() {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Availability up front (2026-11-14): each city card shows its class days
+  // and next class, from the same /api/available-slots data the calendar
+  // uses, over the next 8 weeks. Shows nothing while loading or on error.
+  const bookableAreas = useMemo(
+    () => (serviceAreas ?? []).filter((area) => SERVICE_AREA_FACILITY[area.slug] !== undefined),
+    [serviceAreas]
+  );
+  const summaryFrom = useMemo(() => localIsoDate(new Date()), []);
+  const summaryTo = useMemo(() => addDaysIso(summaryFrom, 56), [summaryFrom]);
+  const areaSlotQueries = useQueries({
+    queries: bookableAreas.map((area) => ({
+      queryKey: ["/api/available-slots", area.id, summaryFrom, summaryTo],
+      queryFn: async (): Promise<RawSlot[]> => {
+        const res = await fetch(`/api/available-slots?serviceAreaId=${area.id}&from=${summaryFrom}&to=${summaryTo}`);
+        if (!res.ok) throw new Error("Failed to fetch slots");
+        return res.json();
+      },
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    })),
+  });
+  const areaSummaries = new Map(
+    bookableAreas.map((area, i) => [area.slug, areaSlotQueries[i]?.data ? summarizeClassDays(areaSlotQueries[i].data, summaryFrom) : null])
+  );
+
   // Shared: after a service area is chosen (by city), pre-select the area's
   // most popular course so the visitor never starts from an empty selection.
+  // City change (prod bug LV-1116-02): products preselected from a
+  // city-specific URL or an earlier city pick are remapped to the same
+  // program at the new city; programs the city doesn't offer are dropped
+  // and named in an inline note, so a booking never carries another city's product.
   function applyServiceArea(area: ServiceArea) {
     setServiceArea(area);
-    setSelectedProducts((prev) => {
-      if (prev.length > 0) return prev;
-      const areaFacility = SERVICE_AREA_FACILITY[area.slug];
-      const defaultProduct = catalog.find(
-        (p) => p.slug === `standard-forklift-certification-${areaFacility}` && p.category === "hands-on"
-      );
-      return defaultProduct ? [defaultProduct] : prev;
-    });
+    const areaFacility = SERVICE_AREA_FACILITY[area.slug];
+    if (!areaFacility) return;
+    const { products, dropped } = remapProductsToFacility(selectedProducts, areaFacility, catalog);
+    setDroppedProducts(dropped);
+    if (products.length > 0) {
+      setSelectedProducts(products);
+      return;
+    }
+    const defaultProduct = catalog.find(
+      (p) => p.slug === `standard-forklift-certification-${areaFacility}` && p.category === "hands-on"
+    );
+    setSelectedProducts(defaultProduct ? [defaultProduct] : []);
   }
 
   // City selection replaces the old ZIP-code gate: the customer picks one of
@@ -458,6 +510,44 @@ export default function BookTraining() {
     discountCode?: string;
   }
 
+  const noDateMutation = useMutation({
+    mutationFn: (payload: ReturnType<typeof buildNoDateLeadPayload>) => apiRequest("POST", "/api/onsite-requests", payload),
+    onSuccess: () => {
+      setNoDateSent(true);
+      trackEvent("lead_submit", { source: "booking_no_date", service_area: serviceArea?.slug });
+    },
+  });
+
+  function submitNoDateRequest() {
+    if (!serviceArea || !facility || !facilitySlug) return;
+    const people = Number(noDatePeople);
+    const errors = validateNoDateLead(
+      { name: noDateName, email: noDateEmail, phone: noDatePhone, people },
+      isValidEmail,
+      isValidUsPhone,
+    );
+    setNoDateErrors(errors);
+    if (errors.length > 0) return;
+    noDateMutation.mutate(buildNoDateLeadPayload({
+      name: capitalizeWords(noDateName),
+      email: normalizeEmail(noDateEmail),
+      phone: noDatePhone,
+      preferredDates: noDatePreferred,
+      people,
+      city: facility.city,
+      facility: {
+        slug: facilitySlug,
+        street: facility.address.street,
+        city: facility.address.city,
+        state: facility.address.state,
+        zip: facility.address.zip,
+      },
+      programs: selectedProducts.map((pr) => pr.title),
+      leadSource: new URLSearchParams(window.location.search).get("ref"),
+      locale: i18n.language?.startsWith("es") ? "es" : "en",
+    }));
+  }
+
   const bookingMutation = useMutation({
     mutationFn: (payload: BookingPayload) => apiRequest("POST", "/api/bookings", payload),
     onSuccess: async (res) => {
@@ -500,6 +590,16 @@ export default function BookTraining() {
 
   function handleSubmit(paymentNonce?: string | null, billingZip?: string, billingAddress?: unknown) {
     if (!isAuthenticated || !serviceArea || !selectedDate || !selectedSlot) return;
+    // Guard (LV-1116-02): never submit a product from a different city than
+    // the selected service area. The server rejects this too.
+    if (slugsNotInArea(selectedProducts.map((p) => p.slug), serviceArea.slug).length > 0) {
+      toast({
+        title: t("bookTraining.bookingFailed"),
+        description: t("bookTraining.cityMismatch", { city: facility?.city ?? serviceArea.name }),
+        variant: "destructive",
+      });
+      return;
+    }
     const productPrice = productsSubtotal;
     bookingMutation.mutate({
       paymentNonce: paymentNonce || undefined,
@@ -696,12 +796,10 @@ export default function BookTraining() {
                     </div>
                   ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" data-testid="city-options">
-                    {(serviceAreas ?? [])
-                      // Only the three real facilities with a known mapping. This
-                      // drops QA/staging-only rows (e.g. "San Diego (Staging
-                      // Test)") that share the table but are not bookable cities.
-                      .filter((area) => SERVICE_AREA_FACILITY[area.slug] !== undefined)
-                      .map((area) => {
+                    {/* Only the three real facilities with a known mapping. This
+                        drops QA/staging-only rows (e.g. "San Diego (Staging
+                        Test)") that share the table but are not bookable cities. */}
+                    {bookableAreas.map((area) => {
                       const areaFacility = getLocation(SERVICE_AREA_FACILITY[area.slug]);
                       const isSelected = serviceArea?.slug === area.slug;
                       return (
@@ -726,6 +824,24 @@ export default function BookTraining() {
                           {areaFacility && (
                             <p className="text-xs text-muted-foreground">{areaFacility.address.full}</p>
                           )}
+                          {(() => {
+                            const summary = areaSummaries.get(area.slug);
+                            if (!summary || !summary.nextDate) return null;
+                            const lang = i18n.language || "en";
+                            return (
+                              <div className="mt-2 space-y-0.5 text-xs" data-testid={`city-availability-${area.slug}`}>
+                                <p className="font-medium text-green-700 dark:text-green-400 flex items-center gap-1">
+                                  <Calendar className="w-3.5 h-3.5" />
+                                  {t("bookTraining.nextClass", { date: formatClassDate(summary.nextDate, lang) })}
+                                </p>
+                                {summary.weekdays.length > 0 && (
+                                  <p className="text-muted-foreground">
+                                    {t("bookTraining.classDays", { days: formatClassDays(summary.weekdays, lang) })}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </button>
                       );
                     })}
@@ -746,6 +862,19 @@ export default function BookTraining() {
                           {facility.displayName}, {facility.address.full}
                         </span>
                       </div>
+                    </div>
+                  )}
+                  {serviceArea && facility && droppedProducts.length > 0 && (
+                    <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-sm text-amber-800 dark:text-amber-200 space-y-1" data-testid="text-program-dropped">
+                      {droppedProducts.map((p) => (
+                        <p key={p.id} className="flex items-start gap-2">
+                          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                          <span>{t("bookTraining.programDropped", { program: trTitle(p), city: facility.city })}</span>
+                        </p>
+                      ))}
+                      <Link href="/request-quote?location=onsite" className="ml-6 underline font-medium" data-testid="link-dropped-onsite">
+                        {t("bookTraining.requestOnsiteLink")}
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -961,6 +1090,77 @@ export default function BookTraining() {
                     <p>{t("bookTraining.noSlotsForDate")}</p>
                   </div>
                 )}
+
+                <div className="bg-card border rounded-xl p-6" data-testid="no-date-box">
+                  {noDateSent ? (
+                    <p className="flex items-start gap-2 text-green-700 dark:text-green-400 font-medium" data-testid="text-no-date-success">
+                      <CheckCircle className="w-5 h-5 shrink-0" />
+                      {t("bookTraining.noDate.success")}
+                    </p>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setNoDateOpen((o) => !o)}
+                        aria-expanded={noDateOpen}
+                        className="w-full flex items-center gap-2 text-left font-semibold text-foreground hover:text-brand-dark"
+                        data-testid="button-no-date-toggle"
+                      >
+                        <CalendarX className="w-5 h-5 text-brand-dark shrink-0" />
+                        <span className="flex-1">{t("bookTraining.noDate.toggle")}</span>
+                        <ChevronRight className={`w-4 h-4 transition-transform ${noDateOpen ? "rotate-90" : ""}`} />
+                      </button>
+                      {noDateOpen && (
+                        <div className="mt-4 space-y-4">
+                          <p className="text-sm text-muted-foreground">{t("bookTraining.noDate.intro")}</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <Label htmlFor="nodate-name">{t("bookTraining.noDate.name")} *</Label>
+                              <Input id="nodate-name" autoComplete="name" value={noDateName} onChange={(e) => setNoDateName(e.target.value)} data-testid="input-no-date-name" />
+                              {noDateErrors.includes("name") && <p className="text-xs text-destructive">{t("bookTraining.noDate.errName")}</p>}
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor="nodate-email">{t("bookTraining.noDate.email")} *</Label>
+                              <Input id="nodate-email" type="email" autoComplete="email" value={noDateEmail} onChange={(e) => setNoDateEmail(e.target.value)} data-testid="input-no-date-email" />
+                              {noDateErrors.includes("email") && <p className="text-xs text-destructive">{t("bookTraining.noDate.errEmail")}</p>}
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor="nodate-phone">{t("bookTraining.noDate.phone")}</Label>
+                              <Input id="nodate-phone" type="tel" autoComplete="tel" value={noDatePhone} onChange={(e) => setNoDatePhone(formatUsPhone(e.target.value))} data-testid="input-no-date-phone" />
+                              {noDateErrors.includes("phone") && <p className="text-xs text-destructive">{t("bookTraining.noDate.errPhone")}</p>}
+                            </div>
+                            <div className="space-y-1">
+                              <Label htmlFor="nodate-people">{t("bookTraining.noDate.people")} *</Label>
+                              <Input id="nodate-people" type="number" min={1} max={1000} inputMode="numeric" value={noDatePeople} onChange={(e) => setNoDatePeople(e.target.value)} data-testid="input-no-date-people" />
+                              {noDateErrors.includes("people") && <p className="text-xs text-destructive">{t("bookTraining.noDate.errPeople")}</p>}
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <Label htmlFor="nodate-dates">{t("bookTraining.noDate.preferredDates")}</Label>
+                            <Input id="nodate-dates" value={noDatePreferred} onChange={(e) => setNoDatePreferred(e.target.value)} placeholder={t("bookTraining.noDate.preferredDatesPlaceholder")} data-testid="input-no-date-dates" />
+                          </div>
+                          {noDateMutation.isError && (
+                            <p className="text-sm text-destructive" data-testid="text-no-date-error">{t("bookTraining.noDate.error")}</p>
+                          )}
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                            <Button type="button" onClick={submitNoDateRequest} disabled={noDateMutation.isPending} data-testid="button-no-date-submit">
+                              {noDateMutation.isPending ? (
+                                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{t("bookTraining.noDate.submitting")}</>
+                              ) : t("bookTraining.noDate.submit")}
+                            </Button>
+                            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                              <Phone className="w-4 h-4 text-brand-dark" />
+                              {t("bookTraining.noDate.callUs")}{" "}
+                              <a href={`tel:${brand.support.phoneTel}`} className="font-medium text-brand-dark hover:underline" data-testid="link-no-date-phone">
+                                {brand.support.phone}
+                              </a>
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             )}
 
@@ -1460,7 +1660,7 @@ export default function BookTraining() {
                   <span>{t("bookTraining.benefit1")}</span>
                 </li>
                 <li className="flex gap-2">
-                  <Users className="h-5 w-5 shrink-0 text-accent" />
+                  <Award className="h-5 w-5 shrink-0 text-accent" />
                   <span>{t("bookTraining.benefit2")}</span>
                 </li>
                 <li className="flex gap-2">
@@ -1468,10 +1668,26 @@ export default function BookTraining() {
                   <span>{t("bookTraining.benefit3", { body: industry.regulatory.body })}</span>
                 </li>
                 <li className="flex gap-2">
-                  <Calendar className="h-5 w-5 shrink-0 text-accent" />
+                  <Users className="h-5 w-5 shrink-0 text-accent" />
                   <span>{t("bookTraining.benefit4")}</span>
                 </li>
               </ul>
+            </div>
+
+            <div className="bg-card border-2 border-accent/40 rounded-xl p-6 space-y-2" data-testid="card-onsite-quote">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-brand-dark" />
+                {t("bookTraining.onsiteCardTitle")}
+              </h3>
+              <p className="text-sm text-muted-foreground">{t("bookTraining.onsiteCardBody")}</p>
+              <Link
+                href="/request-quote?location=onsite"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-brand-dark hover:underline"
+                data-testid="link-onsite-quote"
+              >
+                {t("bookTraining.onsiteCardCta")}
+                <ChevronRight className="h-4 w-4" />
+              </Link>
             </div>
 
             <div className="bg-card border rounded-xl p-6 space-y-3">

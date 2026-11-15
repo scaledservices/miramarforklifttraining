@@ -802,8 +802,8 @@
       "description": "Request on-site forklift certification training at your facility. We come to you — {{body}}-aligned programs for groups of any size. Get a quote today."
     },
     "bookTraining": {
-      "title": "Book On-Site Forklift Training | {{brand}}",
-      "description": "Book on-site forklift certification training with real-time availability. Choose your date, time, and training type. {{body}}-aligned programs."
+      "title": "Book Hands-On Forklift Training | {{brand}}",
+      "description": "Book a hands-on forklift certification class at our training center with real-time availability. Choose your date, time, and program. {{body}}-aligned programs."
     },
     "locationSouthernCalifornia": {
       "title": "On-Site Forklift Training in Southern California | {{brand}}",
@@ -1870,10 +1870,10 @@
     "traineePlaceholder": "e.g. 10"
   },
   "bookTraining": {
-    "seoTitle": "Book On-Site Forklift Training | {{brand}}",
-    "seoDescription": "Book on-site forklift certification training. Choose your date, time, and training type. {{body}}-aligned programs with real-time availability.",
-    "pageTitle": "Book On-Site Training",
-    "pageSubtitle": "Pick your date, pay securely online, and your training is booked. Same-day certification included.",
+    "seoTitle": "Book Hands-On Forklift Training | {{brand}}",
+    "seoDescription": "Book a hands-on forklift certification class at our San Diego, Las Vegas, or Fresno training center. See class dates up front, pay securely online, and get your certificate the same day. {{body}}-aligned programs.",
+    "pageTitle": "Book Hands-On Training",
+    "pageSubtitle": "Pick a class date at our training center, pay securely online, and get your certificate the same day.",
     "step1Label": "Your Location",
     "step2Label": "Select Your Date",
     "step3Label": "Your Details",
@@ -1932,10 +1932,10 @@
     "equipmentPricingNote": "Equipment pricing will be confirmed by our team after submission.",
     "subjectToConfirmation": "Selected dates and times are subject to trainer availability confirmation. Our team will reach out to finalize.",
     "whyBookWithUs": "Why Book With Us",
-    "benefit1": "Certified instructor comes to your facility",
-    "benefit2": "Groups of any size — individuals to full teams",
-    "benefit3": "{{body}}-aligned curriculum with same-day certification",
-    "benefit4": "Flexible scheduling including weekends",
+    "benefit1": "Train hands-on on real equipment at our training center",
+    "benefit2": "Same-day certificate and wallet card",
+    "benefit3": "{{body}}-aligned curriculum",
+    "benefit4": "Individuals and small groups welcome",
     "needHelp": "Need Help?",
     "preferSimpleRequest": "Prefer a simple request form instead?",
     "successTitle": "Payment Received — You're Booked!",
@@ -1968,7 +1968,34 @@
     "onsiteSessionBase": "On-site training session",
     "travelFee": "Travel fee (~{{miles}} mi)",
     "travelWaived": "Travel fee waived (3+ participants)",
-    "participantCountHint": "Tap + or -, or type a number and tab away."
+    "participantCountHint": "Tap + or -, or type a number and tab away.",
+    "onsiteCardTitle": "Need training at your facility?",
+    "onsiteCardBody": "Our trainer comes to you.",
+    "onsiteCardCta": "Get a free onsite quote",
+    "nextClass": "Next class: {{date}}",
+    "classDays": "Classes: {{days}}",
+    "programDropped": "{{program}} isn't offered in {{city}}. Choose another program or request onsite training.",
+    "requestOnsiteLink": "Request onsite training",
+    "cityMismatch": "Your selected training doesn't match the {{city}} training center. Please go back and choose a program for this city.",
+    "noDate": {
+      "toggle": "None of these dates work for you?",
+      "intro": "Tell us when you can train. Alberto will contact you to find a class date that works.",
+      "name": "Your name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "preferredDates": "Preferred date(s)",
+      "preferredDatesPlaceholder": "e.g. any Thursday in December",
+      "people": "Number of people",
+      "submit": "Send request",
+      "submitting": "Sending...",
+      "callUs": "Prefer to talk? Call",
+      "success": "Thanks, Alberto will contact you to find a date that works.",
+      "error": "We couldn't send your request. Please try again or call us.",
+      "errName": "Please enter your name.",
+      "errEmail": "Please enter a valid email so we can reach you.",
+      "errPhone": "Please enter a valid 10-digit phone number or leave it blank.",
+      "errPeople": "Please enter how many people need training."
+    }
   },
   "businessPage": {
     "heroTitle": "Forklift Training for Your Business",
@@ -2003,7 +2030,7 @@
     "trustScalable": "Scalable",
     "trustScalableDesc": "Solutions that grow with your workforce needs",
     "onsiteLabel": "Hands-On Training",
-    "onsiteTrackTitle": "On-Site Training at Our Facilities",
+    "onsiteTrackTitle": "Hands-On Training at Our Facilities",
     "onsiteTrackSubtitle": "Need hands-on certification with real equipment? Book instructor-led training at one of our locations.",
     "callForPrice": "Call for pricing",
     "morePrograms": "more programs",

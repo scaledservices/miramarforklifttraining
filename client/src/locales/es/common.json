@@ -802,8 +802,8 @@
       "description": "Solicita capacitación presencial de certificación de montacargas en tu instalación. Vamos a ti — programas alineados con {{body}} para grupos de cualquier tamaño."
     },
     "bookTraining": {
-      "title": "Reservar Capacitación Presencial de Montacargas | {{brand}}",
-      "description": "Reserve capacitación presencial de certificación de montacargas con disponibilidad en tiempo real. Elija su fecha, hora y tipo de capacitación. Programas alineados con {{body}}."
+      "title": "Reservar Capacitación Práctica de Montacargas | {{brand}}",
+      "description": "Reserve una clase práctica de certificación de montacargas en nuestro centro de capacitación con disponibilidad en tiempo real. Elija su fecha, hora y programa. Programas alineados con {{body}}."
     },
     "locationSouthernCalifornia": {
       "title": "Capacitación Presencial de Montacargas en el Sur de California | {{brand}}",
@@ -1867,10 +1867,10 @@
     "traineePlaceholder": "ej. 10"
   },
   "bookTraining": {
-    "seoTitle": "Reservar Capacitación en Su Instalación | {{brand}}",
-    "seoDescription": "Reserve capacitación de certificación de montacargas en su instalación. Elija su fecha, hora y tipo de capacitación. Programas alineados con {{body}} con disponibilidad en tiempo real.",
-    "pageTitle": "Reservar Capacitación en Su Instalación",
-    "pageSubtitle": "Elija su fecha, pague de forma segura en línea y su capacitación queda reservada. Certificación el mismo día incluida.",
+    "seoTitle": "Reservar Capacitación Práctica de Montacargas | {{brand}}",
+    "seoDescription": "Reserve una clase práctica de certificación de montacargas en nuestro centro de capacitación de San Diego, Las Vegas o Fresno. Vea las fechas de clase desde el inicio, pague de forma segura en línea y obtenga su certificado el mismo día. Programas alineados con {{body}}.",
+    "pageTitle": "Reservar Capacitación Práctica",
+    "pageSubtitle": "Elija una fecha de clase en nuestro centro de capacitación, pague de forma segura en línea y obtenga su certificado el mismo día.",
     "step1Label": "Su Ubicación",
     "step2Label": "Elija Su Fecha",
     "step3Label": "Sus Datos",
@@ -1929,10 +1929,10 @@
     "equipmentPricingNote": "El precio del equipo será confirmado por nuestro equipo después del envío.",
     "subjectToConfirmation": "Las fechas y horarios seleccionados están sujetos a confirmación de disponibilidad del instructor. Nuestro equipo se comunicará para finalizar.",
     "whyBookWithUs": "¿Por Qué Reservar Con Nosotros?",
-    "benefit1": "Instructor certificado va a su instalación",
-    "benefit2": "Grupos de cualquier tamaño — individuales a equipos completos",
-    "benefit3": "Currículo alineado con {{body}} con certificación el mismo día",
-    "benefit4": "Horarios flexibles incluyendo fines de semana",
+    "benefit1": "Capacitación práctica con equipo real en nuestro centro de capacitación",
+    "benefit2": "Certificado y tarjeta de billetera el mismo día",
+    "benefit3": "Currículo alineado con {{body}}",
+    "benefit4": "Personas individuales y grupos pequeños son bienvenidos",
     "needHelp": "¿Necesita Ayuda?",
     "preferSimpleRequest": "¿Prefiere un formulario de solicitud simple?",
     "successTitle": "Pago Recibido — ¡Reserva Realizada!",
@@ -1965,7 +1965,34 @@
     "onsiteSessionBase": "Sesión de capacitación en su sitio",
     "travelFee": "Cargo por desplazamiento (~{{miles}} mi)",
     "travelWaived": "Cargo por desplazamiento exento (3+ participantes)",
-    "participantCountHint": "Toca + o -, o escribe un número y sal del campo."
+    "participantCountHint": "Toca + o -, o escribe un número y sal del campo.",
+    "onsiteCardTitle": "¿Necesita capacitación en sus instalaciones?",
+    "onsiteCardBody": "Nuestro instructor va a usted.",
+    "onsiteCardCta": "Obtenga una cotización gratuita en sitio",
+    "nextClass": "Próxima clase: {{date}}",
+    "classDays": "Clases: {{days}}",
+    "programDropped": "{{program}} no se ofrece en {{city}}. Elija otro programa o solicite capacitación en sus instalaciones.",
+    "requestOnsiteLink": "Solicitar capacitación en sus instalaciones",
+    "cityMismatch": "La capacitación seleccionada no corresponde al centro de capacitación de {{city}}. Regrese y elija un programa para esta ciudad.",
+    "noDate": {
+      "toggle": "¿Ninguna de estas fechas le funciona?",
+      "intro": "Díganos cuándo puede capacitarse. Alberto se comunicará con usted para encontrar una fecha de clase que le funcione.",
+      "name": "Su nombre",
+      "email": "Correo electrónico",
+      "phone": "Teléfono (opcional)",
+      "preferredDates": "Fecha(s) preferida(s)",
+      "preferredDatesPlaceholder": "ej. cualquier jueves de diciembre",
+      "people": "Número de personas",
+      "submit": "Enviar solicitud",
+      "submitting": "Enviando...",
+      "callUs": "¿Prefiere hablar? Llame al",
+      "success": "Gracias, Alberto se comunicará con usted para encontrar una fecha que le funcione.",
+      "error": "No pudimos enviar su solicitud. Intente de nuevo o llámenos.",
+      "errName": "Ingrese su nombre.",
+      "errEmail": "Ingrese un correo electrónico válido para poder comunicarnos con usted.",
+      "errPhone": "Ingrese un teléfono válido de 10 dígitos o déjelo en blanco.",
+      "errPeople": "Indique cuántas personas necesitan capacitación."
+    }
   },
   "businessPage": {
     "heroTitle": "Capacitación de Montacargas para Tu Empresa",
@@ -2000,7 +2027,7 @@
     "trustScalable": "Escalable",
     "trustScalableDesc": "Soluciones que crecen con las necesidades de tu fuerza laboral",
     "onsiteLabel": "Capacitación Práctica",
-    "onsiteTrackTitle": "Capacitación Presencial en Nuestras Instalaciones",
+    "onsiteTrackTitle": "Capacitación Práctica en Nuestras Instalaciones",
     "onsiteTrackSubtitle": "¿Necesitas certificación práctica con equipo real? Reserva capacitación dirigida por instructor en una de nuestras ubicaciones.",
     "callForPrice": "Llame para precios",
     "morePrograms": "programas más",
