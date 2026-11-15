@@ -10,7 +10,7 @@ export interface SocialLinks {
 export const socialLinks: SocialLinks = {
   instagram: "https://www.instagram.com/miramarforklifttraining",
   linkedin: "https://www.linkedin.com/company/miramar-forklift-training",
-  facebook: null, // URL not confirmed yet
+  facebook: "https://www.facebook.com/1425690627295010",
 };
 
 export type SocialNetwork = keyof SocialLinks;

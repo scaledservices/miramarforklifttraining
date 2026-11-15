@@ -73,12 +73,13 @@ test('no stale $59.99 online price in server SSR / SEO sources or locales', () =
 });
 
 // ── 4. Social links ──────────────────────────────────────────────────
-test('social config: instagram + linkedin set, facebook unset and skipped', () => {
-  assert.equal(socialLinks.facebook, null);
-  assert.deepEqual(getSocialProfiles().map((p) => p.network), ['instagram', 'linkedin']);
+test('social config: instagram, linkedin and facebook set, in order', () => {
+  assert.equal(socialLinks.facebook, 'https://www.facebook.com/1425690627295010');
+  assert.deepEqual(getSocialProfiles().map((p) => p.network), ['instagram', 'linkedin', 'facebook']);
   assert.deepEqual(getSameAs(), [
     'https://www.instagram.com/miramarforklifttraining',
     'https://www.linkedin.com/company/miramar-forklift-training',
+    'https://www.facebook.com/1425690627295010',
   ]);
   assert.deepEqual(
     getSocialProfiles({ instagram: null, linkedin: '', facebook: 'https://facebook.com/x' }).map((p) => p.network),
